@@ -1,9 +1,9 @@
 # Ktlint Gradle
 
-Provides a convinient wrapper plugin over the [ktlint](https://github.com/shyiko/ktlint) project.
+Provides a convenient wrapper plugin over the [ktlint](https://github.com/shyiko/ktlint) project.
 
 This plugin can be applied to any project but only activates if that project has the kotlin plugin applied.
-The assumption being that you wouldn't want to lint code you weren't compiling.
+The assumption being that you would not want to lint code you weren't compiling.
 
 ## Warning
 
