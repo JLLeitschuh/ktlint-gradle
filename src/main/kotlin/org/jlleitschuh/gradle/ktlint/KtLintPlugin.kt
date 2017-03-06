@@ -43,7 +43,7 @@ open class KtLintPlugin : Plugin<Project> {
                         args(sourcePaths)
                     }
 
-                    target.task<JavaExec>("ktlint${it.name.capitalize()}") {
+                    target.task<JavaExec>("ktlint${it.name.capitalize()}Format") {
                         group = formattingGroup
                         description = "Runs a check against all .kt files to ensure that they are formatted according to ktlint."
                         main = "com.github.shyiko.ktlint.Main"
