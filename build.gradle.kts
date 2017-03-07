@@ -22,7 +22,7 @@ apply {
     plugin("com.gradle.plugin-publish")
 }
 group = "org.jlleitschuh.gradle"
-version = "1.0.0"
+version = "1.0.1"
 
 val kotlin_version: String by extra
 
