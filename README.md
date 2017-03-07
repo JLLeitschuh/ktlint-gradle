@@ -40,6 +40,19 @@ plugins {
 }
 ```
 
+## Configuration
+The following configuration block is optional.
+
+If you don't configure this the defaults defined in the [KtlintExtension](src/main/kotlin/org/jlleitschuh/gradle/ktlint/KtlintExtention.kt) object will be used.
+The version of Ktlint used by default may change between patch versions of this plugin. If you don't want to inherit these changes then make sure you lock your version here.
+```groovy
+ktlint {
+    version = ""
+    debug = true
+    verbose = true
+}
+```
+
 ## Tasks Added
 
 This plugin adds two tasks to every source set: `ktlint[source set name]` and `ktlint[source set name]Format`.

@@ -16,11 +16,11 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 /**
  * Task that provides a wrapper over the `ktlint` project.
  */
-open class KtLintPlugin : Plugin<Project> {
+open class KtlintPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         val formattingGroup = "formatting"
 
-        val extention = target.extensions.create("ktlint", KtLintExtention::class.java)
+        val extention = target.extensions.create("ktlint", KtlintExtension::class.java)
 
         // Only apply this plugin to projects that have the kotlin plugin applied.
         target.pluginManager.withPlugin("kotlin") {

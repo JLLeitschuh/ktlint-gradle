@@ -1,9 +1,9 @@
 package org.jlleitschuh.gradle.ktlint;
 
 /**
- * Extension class for configuring the [KtLintPlugin].
+ * Extension class for configuring the [KtlintPlugin].
  */
-open class KtLintExtention {
+open class KtlintExtension {
     /**
      * The version of ktlint to use.
      */
