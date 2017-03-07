@@ -16,22 +16,27 @@ is released with a stable version of kotlin.
 
 ## How to use
 
-**TOOD**
-
-Currently this plugin only supports publishing to your local M2 repository. I plan to publish this soon.
-
-
-Gradle script kotlin usage example:
-```kotlin
+Build script snippet for use in all Gradle versions:
+```groovy
 buildscript {
-    repositories {
-        // TODO: Publish to a public maven repo
-        mavenLocal()
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
     }
+  }
+  dependencies {
+    classpath "gradle.plugin.org.jlleitschuh.gradle:ktlint-gradle:1.0-SNAPSHOT"
+  }
 }
 
-apply {
-    plugin("org.jlleitschuh.gradle.ktlint")
+apply plugin: "org.jlleitschuh.gradle.ktlint"
+
+```
+
+Build script snippet for new, incubating, plugin mechanism introduced in Gradle 2.1:
+```groovy
+plugins {
+  id "org.jlleitschuh.gradle.ktlint" version "1.0-SNAPSHOT"
 }
 ```
 
@@ -51,3 +56,7 @@ Similarly, a `ktlintFormat` task has been added that formats all of the source s
 ### Future Development
 
 Add support for linting `*.kts` for gradle script kotlin builds.
+
+## Links
+
+[Ktlint Gradle Plugin on the Gradle Plugin Registry](https://plugins.gradle.org/plugin/org.jlleitschuh.gradle.ktlint)
