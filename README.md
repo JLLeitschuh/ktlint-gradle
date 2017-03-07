@@ -1,5 +1,7 @@
 # Ktlint Gradle
 
+[![Join the chat at https://gitter.im/ktlint-gradle/Lobby](https://badges.gitter.im/ktlint-gradle/Lobby.svg)](https://gitter.im/ktlint-gradle/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Provides a convenient wrapper plugin over the [ktlint](https://github.com/shyiko/ktlint) project.
 
 This plugin can be applied to any project but only activates if that project has the kotlin plugin applied.
