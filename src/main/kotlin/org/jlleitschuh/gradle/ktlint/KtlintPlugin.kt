@@ -22,6 +22,15 @@ open class KtlintPlugin : Plugin<Project> {
 
         val extention = target.extensions.create("ktlint", KtlintExtension::class.java)
 
+        val ktlintTask = target.task("ktlint") {
+            group = formattingGroup
+            description = "Runs ktlint on all kotlin sources in this project."
+        }
+        val ktlintFormatTask = target.task("ktlintFormat") {
+            group = formattingGroup
+            description = "Runs the ktlint formatter on all kotlin sources in this project."
+        }
+
         // Only apply this plugin to projects that have the kotlin plugin applied.
         target.pluginManager.withPlugin("kotlin") {
             val ktLintConfig = target.configurations.maybeCreate("ktlint")
@@ -30,9 +39,6 @@ open class KtlintPlugin : Plugin<Project> {
                 add(ktLintConfig.name,
                     create(group = "com.github.shyiko", name = "ktlint", version = extention.version))
             }
-
-            val ktlintTask = target.task("ktlint")
-            val ktlintFormatTask = target.task("ktlintFormat")
             target.afterEvaluate {
                 val sourceSets = target.the<JavaPluginConvention>().sourceSets
                 sourceSets.forEach {
