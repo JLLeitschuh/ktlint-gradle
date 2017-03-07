@@ -43,7 +43,7 @@ plugins {
 ## Configuration
 The following configuration block is optional.
 
-If you don't configure this the defaults defined in the [KtlintExtension](src/main/kotlin/org/jlleitschuh/gradle/ktlint/KtlintExtention.kt) object will be used.
+If you don't configure this the defaults defined in the [KtlintExtension](src/main/kotlin/org/jlleitschuh/gradle/ktlint/KtlintExtension.kt) object will be used.
 The version of Ktlint used by default may change between patch versions of this plugin. If you don't want to inherit these changes then make sure you lock your version here.
 ```groovy
 ktlint {
