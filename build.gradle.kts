@@ -3,7 +3,7 @@ import org.gradle.api.publish.maven.MavenPublication
 
 buildscript {
     var kotlin_version: String by extra
-    kotlin_version = "1.1.0-rc-91"
+    kotlin_version = "1.1.1"
 
     repositories {
         maven { setUrl("http://dl.bintray.com/kotlin/kotlin-eap-1.1") }
@@ -35,7 +35,6 @@ dependencies {
     compile(gradleApi())
     compile(gradleScriptKotlinApi())
     compile(kotlinModule("gradle-plugin"))
-    compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version")
 }
 
 configure<PublishingExtension> {
