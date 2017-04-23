@@ -1,40 +1,23 @@
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 
-buildscript {
-    var kotlin_version: String by extra
-    kotlin_version = "1.1.1"
-
-    repositories {
-        maven { setUrl("http://dl.bintray.com/kotlin/kotlin-eap-1.1") }
-        maven { setUrl("https://plugins.gradle.org/m2/") }
-        mavenCentral()
-    }
-    dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
-        classpath("com.gradle.publish:plugin-publish-plugin:0.9.7")
-    }
+plugins {
+    id("org.jetbrains.kotlin.jvm").version("1.1.1")
+    id("com.gradle.plugin-publish").version("0.9.7")
+    id("maven-publish")
 }
 
-apply {
-    plugin("kotlin")
-    plugin("maven-publish")
-    plugin("com.gradle.plugin-publish")
-}
 group = "org.jlleitschuh.gradle"
 version = "1.0.2"
 
-val kotlin_version: String by extra
-
 repositories {
-    maven { setUrl("http://dl.bintray.com/kotlin/kotlin-eap-1.1") }
     mavenCentral()
 }
 
 dependencies {
-    compile(gradleApi())
-    compile(gradleScriptKotlinApi())
-    compile(kotlinModule("gradle-plugin"))
+    compileOnly(gradleApi())
+    compileOnly(gradleScriptKotlinApi())
+    compileOnly(kotlinModule("gradle-plugin"))
 }
 
 configure<PublishingExtension> {
