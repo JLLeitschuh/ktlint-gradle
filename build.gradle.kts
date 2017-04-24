@@ -1,9 +1,10 @@
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.api.tasks.wrapper.Wrapper
 
 plugins {
-    id("org.jetbrains.kotlin.jvm").version("1.1.1")
-    id("com.gradle.plugin-publish").version("0.9.7")
+    id("org.jetbrains.kotlin.jvm") version "1.1.1"
+    id("com.gradle.plugin-publish") version "0.9.7"
     id("maven-publish")
 }
 
@@ -40,6 +41,10 @@ pluginBundle {
             displayName = "Ktlint Gradle Plugin"
         }
     }
+}
+
+task<Wrapper>("wrapper") {
+    gradleVersion = "3.5"
 }
 
 /**
