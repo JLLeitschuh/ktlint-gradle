@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "org.jlleitschuh.gradle"
-version = "1.0.2"
+version = "1.0.3-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -18,7 +18,7 @@ repositories {
 dependencies {
     compileOnly(gradleApi())
     compileOnly(gradleScriptKotlinApi())
-    compileOnly(kotlinModule("gradle-plugin"))
+    compileOnly(kotlinModule("gradle-plugin", "1.1.1"))
 }
 
 configure<PublishingExtension> {
