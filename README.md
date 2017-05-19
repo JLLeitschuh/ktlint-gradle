@@ -10,8 +10,12 @@ The assumption being that you would not want to lint code you weren't compiling.
 
 ## Warning
 
-This uses/publishes with a beta version of gradle. I plan to fix this as soon as the newest version of gradle script kotlin
-is released with a stable version of kotlin.
+This plugin was written using the new API available for gradle script kotlin builds.
+This API is available in new versions of gradle.
+
+This plugin has only been tested with gradle `3.5` and should work with versions `3.5+`.
+
+If you find this plugin works with older versions feel free to update this readme to reflect this.
 
 
 ## How to use
