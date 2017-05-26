@@ -20,9 +20,9 @@ open class KtlintPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         val formattingGroup = "formatting"
 
-        val extention = target.extensions.create("ktlint", KtlintExtension::class.java)
+        val extension = target.extensions.create("ktlint", KtlintExtension::class.java)
 
-        val ktlintTask = target.task("ktlint") {
+        val ktlintTask = target.task("ktlintCheck") {
             group = formattingGroup
             description = "Runs ktlint on all kotlin sources in this project."
         }
@@ -37,7 +37,7 @@ open class KtlintPlugin : Plugin<Project> {
 
             target.dependencies {
                 add(ktLintConfig.name,
-                    create(group = "com.github.shyiko", name = "ktlint", version = extention.version))
+                    create(group = "com.github.shyiko", name = "ktlint", version = extension.version))
             }
             target.afterEvaluate {
                 val sourceSets = target.the<JavaPluginConvention>().sourceSets
@@ -49,10 +49,10 @@ open class KtlintPlugin : Plugin<Project> {
                     val runArgs = kotlinSourceSet.sourceDirectories.files.map { "${it.path}/**/*.kt" }.toMutableList()
 
                     // Add the args to enable verbose and debug mode.
-                    if (extention.verbose) runArgs.add("--verbose")
-                    if (extention.debug) runArgs.add("--debug")
+                    if (extension.verbose) runArgs.add("--verbose")
+                    if (extension.debug) runArgs.add("--debug")
 
-                    val ktlintSourceSetTask = target.task<JavaExec>("ktlint${it.name.capitalize()}") {
+                    val ktlintSourceSetTask = target.task<JavaExec>("ktlint${it.name.capitalize()}Check") {
                         group = formattingGroup
                         description = "Runs a check against all .kt files to ensure that they are formatted according to ktlint."
                         main = "com.github.shyiko.ktlint.Main"
