@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "org.jlleitschuh.gradle"
-version = "2.0.0"
+version = "2.0.1-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -17,8 +17,12 @@ repositories {
 
 dependencies {
     compileOnly(gradleApi())
-    compileOnly(gradleScriptKotlinApi())
     compileOnly(kotlinModule("gradle-plugin", "1.1.1"))
+    /*
+     * Do not depend upon the gradle script kotlin plugin API. IE: gradleScriptKotlinApi()
+     * It's currently in flux and has binary breaking changes in gradle 4.0
+     * https://github.com/JLLeitschuh/ktlint-gradle/issues/9
+     */
 }
 
 configure<PublishingExtension> {
