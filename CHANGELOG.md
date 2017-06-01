@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
-## [Unreleased]
+## [2.0.1] - 2017-06-1
 ### Changed
  - Remove dependency on Gradle Script Kotlin plugin API. (#9)
  - Compatibility with Gradle v4.0. (#9)
