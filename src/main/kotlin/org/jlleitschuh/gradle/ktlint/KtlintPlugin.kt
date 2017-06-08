@@ -17,11 +17,12 @@ import kotlin.reflect.KClass
 open class KtlintPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         val formattingGroup = "formatting"
+        val verificationGroup = "Verification"
 
         val extension = target.extensions.create("ktlint", KtlintExtension::class.java)
 
         val ktlintTask = target.task("ktlintCheck").apply {
-            group = formattingGroup
+            group = verificationGroup
             description = "Runs ktlint on all kotlin sources in this project."
         }
         val ktlintFormatTask = target.task("ktlintFormat").apply {
@@ -49,7 +50,7 @@ open class KtlintPlugin : Plugin<Project> {
                     if (extension.debug) runArgs.add("--debug")
 
                     val ktlintSourceSetTask = target.taskHelper<JavaExec>("ktlint${it.name.capitalize()}Check") {
-                        group = formattingGroup
+                        group = verificationGroup
                         description = "Runs a check against all .kt files to ensure that they are formatted according to ktlint."
                         main = "com.github.shyiko.ktlint.Main"
                         classpath = ktLintConfig
