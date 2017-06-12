@@ -30,6 +30,12 @@ open class KtlintPlugin : Plugin<Project> {
 
         addKtLintTasksToKotlinPlugin(target, extension)
         addKtLintTasksToAndroidKotlinPlugin(target, extension)
+
+        // Checking subprojects as well
+        target.subprojects {
+            addKtLintTasksToKotlinPlugin(it, extension)
+            addKtLintTasksToAndroidKotlinPlugin(it, extension)
+        }
     }
 
     private fun addKtLintTasksToKotlinPlugin(target: Project,
@@ -47,10 +53,10 @@ open class KtlintPlugin : Plugin<Project> {
                     addAdditionalRunArgs(extension, runArgs)
 
                     val checkTask = createCheckTask(target, it.name, ktLintConfig, kotlinSourceSet, runArgs)
-                    getOrCreateParentKtlintCheckTask(target).dependsOn(checkTask)
+                    addKtlintCheckTaskToProjectMetaCheckTask(target, checkTask)
 
                     val ktlintSourceSetFormatTask = createFormatTask(target, it.name, ktLintConfig, kotlinSourceSet, runArgs)
-                    getOrCreateParentKtlintFormatTask(target).dependsOn(ktlintSourceSetFormatTask)
+                    addKtlintFormatTaskToProjectMetaFormatTask(target, ktlintSourceSetFormatTask)
                 }
             }
         }
@@ -68,10 +74,10 @@ open class KtlintPlugin : Plugin<Project> {
                     addAdditionalRunArgs(extension, runArgs)
 
                     val checkTask = createCheckTask(target, it.name, ktLintConfig, kotlinSourceDir, runArgs)
-                    getOrCreateParentKtlintCheckTask(target).dependsOn(checkTask)
+                    addKtlintCheckTaskToProjectMetaCheckTask(target, checkTask)
 
                     val ktlintSourceSetFormatTask = createFormatTask(target, it.name, ktLintConfig, kotlinSourceDir, runArgs)
-                    getOrCreateParentKtlintFormatTask(target).dependsOn(ktlintSourceSetFormatTask)
+                    addKtlintFormatTaskToProjectMetaFormatTask(target, ktlintSourceSetFormatTask)
                 }
             }
         }
@@ -89,17 +95,19 @@ open class KtlintPlugin : Plugin<Project> {
         if (extension.debug) runArgs.add("--debug")
     }
 
-    private fun getOrCreateParentKtlintCheckTask(target: Project) = target.tasks.findByName(CHECK_PARENT_TASK_NAME) ?:
-            target.task(CHECK_PARENT_TASK_NAME).apply {
-                group = VERIFICATION_GROUP
-                description = "Runs ktlint on all kotlin sources in this project."
-            }
+    private fun addKtlintCheckTaskToProjectMetaCheckTask(target: Project, checkTask: Task) {
+        target.getMetaKtlintCheckTask().dependsOn(checkTask)
+        if (target.rootProject != target) {
+            target.rootProject.getMetaKtlintCheckTask().dependsOn(checkTask)
+        }
+    }
 
-    private fun getOrCreateParentKtlintFormatTask(target: Project) = target.tasks.findByName(FORMAT_PARENT_TASK_NAME) ?:
-            target.task(FORMAT_PARENT_TASK_NAME).apply {
-                group = FORMATTING_GROUP
-                description = "Runs the ktlint formatter on all kotlin sources in this project."
-            }
+    private fun addKtlintFormatTaskToProjectMetaFormatTask(target: Project, formatTask: Task) {
+        target.getMetaKtlintFormatTask().dependsOn(formatTask)
+        if (target.rootProject != target) {
+            target.rootProject.getMetaKtlintFormatTask().dependsOn(formatTask)
+        }
+    }
 
     private fun createFormatTask(target: Project,
                                  sourceSetName: String,
@@ -135,9 +143,20 @@ open class KtlintPlugin : Plugin<Project> {
         }
     }
 
+    private fun Project.getMetaKtlintCheckTask(): Task = this.tasks.findByName(CHECK_PARENT_TASK_NAME) ?:
+            this.task(CHECK_PARENT_TASK_NAME).apply {
+                group = VERIFICATION_GROUP
+                description = "Runs ktlint on all kotlin sources in this project."
+            }
+
+    private fun Project.getMetaKtlintFormatTask(): Task = this.tasks.findByName(FORMAT_PARENT_TASK_NAME) ?:
+            this.task(FORMAT_PARENT_TASK_NAME).apply {
+                group = FORMATTING_GROUP
+                description = "Runs the ktlint formatter on all kotlin sources in this project."
+            }
+
     /*
      * Helper functions used until Gradle Script Kotlin solidifies it's plugin API.
-     *
      */
 
     private inline fun <reified T : Any> Project.theHelper() =
