@@ -61,8 +61,10 @@ ktlint {
 
 This plugin adds two tasks to every source set: `ktlint[source set name]Check` and `ktlint[source set name]Format`.
 Additionally, a simple `ktlintCheck` task has also been added that checks all of the source sets for that project.
-Similarly, a `ktlintFormat` task has been added that formats all of the source sets. Also same meta tasks are added
-to the root project for convenience - they will call related tasks in subprojects. 
+Similarly, a `ktlintFormat` task has been added that formats all of the source sets.
+
+If project has subprojects - plugin also adds two meta tasks `ktlintCheck` and `ktlintFormat` to the root project that 
+triggers related tasks in subprojects.
 
 
 ## Developers
