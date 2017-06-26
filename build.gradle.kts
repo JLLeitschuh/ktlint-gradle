@@ -18,7 +18,7 @@ repositories {
 dependencies {
     compileOnly(gradleApi())
     compileOnly(kotlinModule("gradle-plugin", "1.1.1"))
-    compileOnly("com.android.tools.build:gradle:2.3.2")
+    compileOnly("com.android.tools.build:gradle:2.3.3")
     /*
      * Do not depend upon the gradle script kotlin plugin API. IE: gradleScriptKotlinApi()
      * It's currently in flux and has binary breaking changes in gradle 4.0
