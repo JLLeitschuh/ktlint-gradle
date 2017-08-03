@@ -41,9 +41,9 @@ open class KtlintPlugin : Plugin<Project> {
     private fun addKtLintTasksToKotlinPlugin(target: Project,
                                              extension: KtlintExtension) {
         target.pluginManager.withPlugin("kotlin") {
-            val ktLintConfig = createConfiguration(target, extension)
-
             target.afterEvaluate {
+                val ktLintConfig = createConfiguration(target, extension)
+                
                 target.theHelper<JavaPluginConvention>().sourceSets.forEach {
                     val kotlinSourceSet: SourceDirectorySet = (it as HasConvention)
                             .convention
@@ -65,9 +65,9 @@ open class KtlintPlugin : Plugin<Project> {
     private fun addKtLintTasksToAndroidKotlinPlugin(target: Project,
                                                     extension: KtlintExtension) {
         target.pluginManager.withPlugin("kotlin-android") {
-            val ktLintConfig = createConfiguration(target, extension)
-
             target.afterEvaluate {
+                val ktLintConfig = createConfiguration(target, extension)
+                
                 target.extensions.findByType(BaseExtension::class.java).sourceSets.forEach {
                     val kotlinSourceDir = it.java.sourceFiles
                     val runArgs = it.java.srcDirs.map { "${it.path}/**/*.kt" }.toMutableSet()
