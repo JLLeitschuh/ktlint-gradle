@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Unreleased
 ### Changed
  - Update default ktlint version to 0.8.1
+ - Fix extension version has no effect on used ktlint version
 
 ## [2.1.0] - 2017-07-5
 ### Added
