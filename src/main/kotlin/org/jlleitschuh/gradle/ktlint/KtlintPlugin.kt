@@ -54,6 +54,7 @@ open class KtlintPlugin : Plugin<Project> {
 
                     val checkTask = createCheckTask(target, it.name, ktLintConfig, kotlinSourceSet, runArgs)
                     addKtlintCheckTaskToProjectMetaCheckTask(target, checkTask)
+                    setCheckTaskDependsOnKtlintCheckTask(target, checkTask)
 
                     val ktlintSourceSetFormatTask = createFormatTask(target, it.name, ktLintConfig, kotlinSourceSet, runArgs)
                     addKtlintFormatTaskToProjectMetaFormatTask(target, ktlintSourceSetFormatTask)
@@ -75,6 +76,7 @@ open class KtlintPlugin : Plugin<Project> {
 
                     val checkTask = createCheckTask(target, it.name, ktLintConfig, kotlinSourceDir, runArgs)
                     addKtlintCheckTaskToProjectMetaCheckTask(target, checkTask)
+                    setCheckTaskDependsOnKtlintCheckTask(target, checkTask)
 
                     val ktlintSourceSetFormatTask = createFormatTask(target, it.name, ktLintConfig, kotlinSourceDir, runArgs)
                     addKtlintFormatTaskToProjectMetaFormatTask(target, ktlintSourceSetFormatTask)
@@ -154,6 +156,10 @@ open class KtlintPlugin : Plugin<Project> {
                 group = FORMATTING_GROUP
                 description = "Runs the ktlint formatter on all kotlin sources in this project."
             }
+
+    private fun setCheckTaskDependsOnKtlintCheckTask(project: Project, ktlintCheck: Task) {
+        project.tasks.findByName("check")?.dependsOn(ktlintCheck)
+    }
 
     /*
      * Helper functions used until Gradle Script Kotlin solidifies it's plugin API.

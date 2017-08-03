@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Unreleased
 ### Changed
  - Update default ktlint version to 0.8.1
+ - Add check task also depends on ktlintCheck task
 
 ## [2.1.0] - 2017-07-5
 ### Added
