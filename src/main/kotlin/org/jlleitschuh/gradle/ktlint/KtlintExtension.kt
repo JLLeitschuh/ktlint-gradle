@@ -1,4 +1,4 @@
-package org.jlleitschuh.gradle.ktlint;
+package org.jlleitschuh.gradle.ktlint
 
 /**
  * Extension class for configuring the [KtlintPlugin].
@@ -16,4 +16,14 @@ open class KtlintExtension {
      * Enable debug mode.
      */
     var debug = false
+
+    /**
+     * Report output format.
+     *
+     * Possible values are: plain, checkstyle, json.
+     * By default is plain.
+     *
+     * Available since ktlint version 0.9.0.
+     */
+    var reporter = "plain"
 }

@@ -12,6 +12,7 @@ import org.gradle.api.plugins.Convention
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.JavaExec
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
+import java.io.File
 import kotlin.reflect.KClass
 
 const val VERIFICATION_GROUP = "Verification"
@@ -52,7 +53,8 @@ open class KtlintPlugin : Plugin<Project> {
                     val runArgs = kotlinSourceSet.sourceDirectories.files.map { "${it.path}/**/*.kt" }.toMutableSet()
                     addAdditionalRunArgs(extension, runArgs)
 
-                    val checkTask = createCheckTask(target, it.name, ktLintConfig, kotlinSourceSet, runArgs)
+                    val outputDir = createCheckTaskOutputDir(target, extension)
+                    val checkTask = createCheckTask(target, it.name, ktLintConfig, kotlinSourceSet, outputDir, runArgs)
                     addKtlintCheckTaskToProjectMetaCheckTask(target, checkTask)
                     setCheckTaskDependsOnKtlintCheckTask(target, checkTask)
 
@@ -74,7 +76,8 @@ open class KtlintPlugin : Plugin<Project> {
                     val runArgs = it.java.srcDirs.map { "${it.path}/**/*.kt" }.toMutableSet()
                     addAdditionalRunArgs(extension, runArgs)
 
-                    val checkTask = createCheckTask(target, it.name, ktLintConfig, kotlinSourceDir, runArgs)
+                    val outputDir = createCheckTaskOutputDir(target, extension)
+                    val checkTask = createCheckTask(target, it.name, ktLintConfig, kotlinSourceDir, outputDir, runArgs)
                     addKtlintCheckTaskToProjectMetaCheckTask(target, checkTask)
                     setCheckTaskDependsOnKtlintCheckTask(target, checkTask)
 
@@ -95,7 +98,38 @@ open class KtlintPlugin : Plugin<Project> {
         // Add the args to enable verbose and debug mode.
         if (extension.verbose) runArgs.add("--verbose")
         if (extension.debug) runArgs.add("--debug")
+        addReporter(extension, runArgs)
     }
+
+    private fun addReporter(extension: KtlintExtension, runArgs: MutableSet<String>) {
+        if (isReportAvailable(extension.version)) {
+            runArgs.add("--reporter=${extension.reporter}")
+        }
+    }
+
+    private fun isReportAvailable(version: String): Boolean {
+        val versionsNumbers = version.split('.')
+        if (versionsNumbers[0].toInt() >= 1) {
+            return true
+        } else if (versionsNumbers[1].toInt() >= 9) {
+            return true
+        }
+
+        return false
+    }
+
+    private fun createCheckTaskOutputDir(target: Project, extension: KtlintExtension): File {
+        val reportsDir = File(target.buildDir, "reports/ktlint")
+        reportsDir.mkdirs()
+        return File(reportsDir, "ktlint.${getReportFileExtension(extension)}")
+    }
+
+    private fun getReportFileExtension(extension: KtlintExtension): String =
+            when(extension.reporter) {
+                "checkstyle" -> "xml"
+                "json" -> "json"
+                else -> "txt"
+            }
 
     private fun addKtlintCheckTaskToProjectMetaCheckTask(target: Project, checkTask: Task) {
         target.getMetaKtlintCheckTask().dependsOn(checkTask)
@@ -134,6 +168,7 @@ open class KtlintPlugin : Plugin<Project> {
                                 sourceSetName: String,
                                 ktLintConfig: Configuration,
                                 kotlinSourceSet: FileCollection,
+                                outputFile: File,
                                 runArgs: MutableSet<String>): Task {
         return target.taskHelper<JavaExec>("ktlint${sourceSetName.capitalize()}Check") {
             group = VERIFICATION_GROUP
@@ -141,6 +176,7 @@ open class KtlintPlugin : Plugin<Project> {
             main = "com.github.shyiko.ktlint.Main"
             classpath = ktLintConfig
             inputs.dir(kotlinSourceSet)
+            standardOutput = outputFile.outputStream()
             args(runArgs)
         }
     }

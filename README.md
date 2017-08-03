@@ -54,6 +54,7 @@ ktlint {
     version = ""
     debug = true
     verbose = true
+    reporter = "checkstyle"
 }
 ```
 
