@@ -20,10 +20,19 @@ open class KtlintExtension {
     /**
      * Report output format.
      *
-     * Possible values are: plain, checkstyle, json.
-     * By default is plain.
+     * Available values: plain, plain_group_by_file, checkstyle, json.
      *
-     * Available since ktlint version 0.9.0.
+     * Default is plain.
      */
-    var reporter = "plain"
+    var reporter: ReporterType  = ReporterType.PLAIN
+
+    /**
+     * Supported reporter types.
+     */
+    enum class ReporterType(val reporterName: String, val availableSinceVersion: String, val fileExtension: String) {
+        PLAIN("plain", "0.9.0", "txt"),
+        PLAIN_GROUP_BY_FILE("plain?group_by_file", "0.9.0", "txt"),
+        CHECKSTYLE("checkstyle", "0.9.0", "xml"),
+        JSON("json", "0.9.0", "json");
+    }
 }

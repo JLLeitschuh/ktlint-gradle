@@ -102,34 +102,24 @@ open class KtlintPlugin : Plugin<Project> {
     }
 
     private fun addReporter(extension: KtlintExtension, runArgs: MutableSet<String>) {
-        if (isReportAvailable(extension.version)) {
-            runArgs.add("--reporter=${extension.reporter}")
+        if (isReportAvailable(extension.version, extension.reporter.availableSinceVersion)) {
+            runArgs.add("--reporter=${extension.reporter.reporterName}")
         }
     }
 
-    private fun isReportAvailable(version: String): Boolean {
+    private fun isReportAvailable(version: String, availableSinceVersion: String): Boolean {
         val versionsNumbers = version.split('.')
-        if (versionsNumbers[0].toInt() >= 1) {
-            return true
-        } else if (versionsNumbers[1].toInt() >= 9) {
-            return true
-        }
-
-        return false
+        val reporterVersionNumbers = availableSinceVersion.split('.')
+        return versionsNumbers[0] >= reporterVersionNumbers[0] &&
+                versionsNumbers[1] >= reporterVersionNumbers[1] &&
+                versionsNumbers[2] >= reporterVersionNumbers[2]
     }
 
     private fun createCheckTaskOutputDir(target: Project, extension: KtlintExtension): File {
         val reportsDir = File(target.buildDir, "reports/ktlint")
         reportsDir.mkdirs()
-        return File(reportsDir, "ktlint.${getReportFileExtension(extension)}")
+        return File(reportsDir, "ktlint.${extension.reporter.fileExtension}")
     }
-
-    private fun getReportFileExtension(extension: KtlintExtension): String =
-            when(extension.reporter) {
-                "checkstyle" -> "xml"
-                "json" -> "json"
-                else -> "txt"
-            }
 
     private fun addKtlintCheckTaskToProjectMetaCheckTask(target: Project, checkTask: Task) {
         target.getMetaKtlintCheckTask().dependsOn(checkTask)
