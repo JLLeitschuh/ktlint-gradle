@@ -12,7 +12,6 @@ import org.gradle.api.plugins.Convention
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.JavaExec
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
-import java.io.File
 import kotlin.reflect.KClass
 
 const val VERIFICATION_GROUP = "Verification"
@@ -53,8 +52,7 @@ open class KtlintPlugin : Plugin<Project> {
                     val runArgs = kotlinSourceSet.sourceDirectories.files.map { "${it.path}/**/*.kt" }.toMutableSet()
                     addAdditionalRunArgs(extension, runArgs)
 
-                    val outputDir = createCheckTaskOutputDir(target, extension)
-                    val checkTask = createCheckTask(target, it.name, ktLintConfig, kotlinSourceSet, outputDir, runArgs)
+                    val checkTask = createCheckTask(target, extension, it.name, ktLintConfig, kotlinSourceSet, runArgs)
                     addKtlintCheckTaskToProjectMetaCheckTask(target, checkTask)
                     setCheckTaskDependsOnKtlintCheckTask(target, checkTask)
 
@@ -76,8 +74,7 @@ open class KtlintPlugin : Plugin<Project> {
                     val runArgs = it.java.srcDirs.map { "${it.path}/**/*.kt" }.toMutableSet()
                     addAdditionalRunArgs(extension, runArgs)
 
-                    val outputDir = createCheckTaskOutputDir(target, extension)
-                    val checkTask = createCheckTask(target, it.name, ktLintConfig, kotlinSourceDir, outputDir, runArgs)
+                    val checkTask = createCheckTask(target, extension, it.name, ktLintConfig, kotlinSourceDir, runArgs)
                     addKtlintCheckTaskToProjectMetaCheckTask(target, checkTask)
                     setCheckTaskDependsOnKtlintCheckTask(target, checkTask)
 
@@ -98,27 +95,6 @@ open class KtlintPlugin : Plugin<Project> {
         // Add the args to enable verbose and debug mode.
         if (extension.verbose) runArgs.add("--verbose")
         if (extension.debug) runArgs.add("--debug")
-        addReporter(extension, runArgs)
-    }
-
-    private fun addReporter(extension: KtlintExtension, runArgs: MutableSet<String>) {
-        if (isReportAvailable(extension.version, extension.reporter.availableSinceVersion)) {
-            runArgs.add("--reporter=${extension.reporter.reporterName}")
-        }
-    }
-
-    private fun isReportAvailable(version: String, availableSinceVersion: String): Boolean {
-        val versionsNumbers = version.split('.')
-        val reporterVersionNumbers = availableSinceVersion.split('.')
-        return versionsNumbers[0] >= reporterVersionNumbers[0] &&
-                versionsNumbers[1] >= reporterVersionNumbers[1] &&
-                versionsNumbers[2] >= reporterVersionNumbers[2]
-    }
-
-    private fun createCheckTaskOutputDir(target: Project, extension: KtlintExtension): File {
-        val reportsDir = File(target.buildDir, "reports/ktlint")
-        reportsDir.mkdirs()
-        return File(reportsDir, "ktlint.${extension.reporter.fileExtension}")
     }
 
     private fun addKtlintCheckTaskToProjectMetaCheckTask(target: Project, checkTask: Task) {
@@ -155,10 +131,10 @@ open class KtlintPlugin : Plugin<Project> {
     }
 
     private fun createCheckTask(target: Project,
+                                extension: KtlintExtension,
                                 sourceSetName: String,
                                 ktLintConfig: Configuration,
                                 kotlinSourceSet: FileCollection,
-                                outputFile: File,
                                 runArgs: MutableSet<String>): Task {
         return target.taskHelper<JavaExec>("ktlint${sourceSetName.capitalize()}Check") {
             group = VERIFICATION_GROUP
@@ -166,9 +142,8 @@ open class KtlintPlugin : Plugin<Project> {
             main = "com.github.shyiko.ktlint.Main"
             classpath = ktLintConfig
             inputs.dir(kotlinSourceSet)
-            standardOutput = outputFile.outputStream()
             args(runArgs)
-        }
+        }.apply { this.applyReporter(target, extension) }
     }
 
     private fun Project.getMetaKtlintCheckTask(): Task = this.tasks.findByName(CHECK_PARENT_TASK_NAME) ?:

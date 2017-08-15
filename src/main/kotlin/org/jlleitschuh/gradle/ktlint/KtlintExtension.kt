@@ -24,15 +24,5 @@ open class KtlintExtension {
      *
      * Default is plain.
      */
-    var reporter: ReporterType  = ReporterType.PLAIN
-
-    /**
-     * Supported reporter types.
-     */
-    enum class ReporterType(val reporterName: String, val availableSinceVersion: String, val fileExtension: String) {
-        PLAIN("plain", "0.9.0", "txt"),
-        PLAIN_GROUP_BY_FILE("plain?group_by_file", "0.9.0", "txt"),
-        CHECKSTYLE("checkstyle", "0.9.0", "xml"),
-        JSON("json", "0.9.0", "json");
-    }
+    var reporter: ReporterType = ReporterType.PLAIN
 }
