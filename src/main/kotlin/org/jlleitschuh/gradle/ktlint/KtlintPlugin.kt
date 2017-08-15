@@ -52,7 +52,7 @@ open class KtlintPlugin : Plugin<Project> {
                     val runArgs = kotlinSourceSet.sourceDirectories.files.map { "${it.path}/**/*.kt" }.toMutableSet()
                     addAdditionalRunArgs(extension, runArgs)
 
-                    val checkTask = createCheckTask(target, it.name, ktLintConfig, kotlinSourceSet, runArgs)
+                    val checkTask = createCheckTask(target, extension, it.name, ktLintConfig, kotlinSourceSet, runArgs)
                     addKtlintCheckTaskToProjectMetaCheckTask(target, checkTask)
                     setCheckTaskDependsOnKtlintCheckTask(target, checkTask)
 
@@ -74,7 +74,7 @@ open class KtlintPlugin : Plugin<Project> {
                     val runArgs = it.java.srcDirs.map { "${it.path}/**/*.kt" }.toMutableSet()
                     addAdditionalRunArgs(extension, runArgs)
 
-                    val checkTask = createCheckTask(target, it.name, ktLintConfig, kotlinSourceDir, runArgs)
+                    val checkTask = createCheckTask(target, extension, it.name, ktLintConfig, kotlinSourceDir, runArgs)
                     addKtlintCheckTaskToProjectMetaCheckTask(target, checkTask)
                     setCheckTaskDependsOnKtlintCheckTask(target, checkTask)
 
@@ -131,6 +131,7 @@ open class KtlintPlugin : Plugin<Project> {
     }
 
     private fun createCheckTask(target: Project,
+                                extension: KtlintExtension,
                                 sourceSetName: String,
                                 ktLintConfig: Configuration,
                                 kotlinSourceSet: FileCollection,
@@ -142,7 +143,7 @@ open class KtlintPlugin : Plugin<Project> {
             classpath = ktLintConfig
             inputs.dir(kotlinSourceSet)
             args(runArgs)
-        }
+        }.apply { this.applyReporter(target, extension) }
     }
 
     private fun Project.getMetaKtlintCheckTask(): Task = this.tasks.findByName(CHECK_PARENT_TASK_NAME) ?:
