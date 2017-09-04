@@ -144,7 +144,7 @@ open class KtlintPlugin : Plugin<Project> {
             args(runArgs)
         }.apply {
             this.isIgnoreExitValue = extension.ignoreFailures
-            this.applyReporter(target, extension)
+            this.applyReporter(target, extension, sourceSetName)
         }
     }
 
