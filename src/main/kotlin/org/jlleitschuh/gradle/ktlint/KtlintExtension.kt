@@ -18,6 +18,14 @@ open class KtlintExtension {
     var debug = false
 
     /**
+     * Whether or not to allow the build to continue if there are warnings;
+     * defaults to {@code false}, as for any other static code analysis tool.
+     * <p>
+     * Example: {@code ignoreFailures = true}
+     */
+    var ignoreFailures = false
+
+    /**
      * Report output format.
      *
      * Available values: plain, plain_group_by_file, checkstyle, json.

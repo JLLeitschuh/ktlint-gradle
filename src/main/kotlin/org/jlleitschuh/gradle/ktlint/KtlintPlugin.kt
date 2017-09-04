@@ -143,7 +143,10 @@ open class KtlintPlugin : Plugin<Project> {
             classpath = ktLintConfig
             inputs.dir(kotlinSourceSet)
             args(runArgs)
-        }.apply { this.applyReporter(target, extension) }
+        }.apply {
+            this.isIgnoreExitValue = extension.ignoreFailures
+            this.applyReporter(target, extension)
+        }
     }
 
     private fun Project.getMetaKtlintCheckTask(): Task = this.tasks.findByName(CHECK_PARENT_TASK_NAME) ?:
