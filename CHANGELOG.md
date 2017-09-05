@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.2.0] - 2017-09-05
+### Added
+ - Add configuration parameter `ignoreFailures` with default value to false
+### Changed
+ - Update default ktlint version to 0.9.2 
+
 ## [2.1.1] - 2017-08-15
 ### Changed
  - Update default ktlint version to 0.8.1

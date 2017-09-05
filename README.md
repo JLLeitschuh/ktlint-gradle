@@ -55,6 +55,7 @@ ktlint {
     debug = true
     verbose = true
     reporter = "checkstyle"
+    ignoreFailures = true
 }
 ```
 
