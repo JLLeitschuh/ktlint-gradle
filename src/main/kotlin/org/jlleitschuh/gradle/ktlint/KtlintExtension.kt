@@ -21,7 +21,7 @@ open class KtlintExtension {
      * Whether or not to allow the build to continue if there are warnings;
      * defaults to {@code false}, as for any other static code analysis tool.
      * <p>
-     * Example: {@code ignoreFailures = true}
+     * Example: `ignoreFailures = true`
      */
     var ignoreFailures = false
 
