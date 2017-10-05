@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [2.2.0] - 2017-09-05
+## [2.2.0] - 2017-10-05
 ### Added
  - Add configuration parameter `ignoreFailures` with default value to false
 ### Changed
