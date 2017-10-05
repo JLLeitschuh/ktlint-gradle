@@ -22,8 +22,10 @@ enum class ReporterType(val reporterName: String, val availableSinceVersion: Str
  */
 fun JavaExec.applyReporter(target: Project, extension: KtlintExtension) {
     if (isReportAvailable(extension.version, extension.reporter.availableSinceVersion)) {
+        val reportOutput = createReportOutputDir(target, extension).outputStream()
         this.args("--reporter=${extension.reporter.reporterName}")
-        this.standardOutput = createReportOutputDir(target, extension).outputStream()
+        this.standardOutput = reportOutput
+        doLast { reportOutput.close() }
     } else {
         target.logger.info("Reporter is not available in this ktlint version")
     }
