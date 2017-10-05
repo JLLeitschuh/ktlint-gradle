@@ -69,7 +69,7 @@ open class KtlintPlugin : Plugin<Project> {
             target.afterEvaluate {
                 val ktLintConfig = createConfiguration(target, extension)
                 
-                target.extensions.findByType(BaseExtension::class.java).sourceSets.forEach {
+                target.extensions.findByType(BaseExtension::class.java)?.sourceSets?.forEach {
                     val kotlinSourceDir = it.java.sourceFiles
                     val runArgs = it.java.srcDirs.map { "${it.path}/**/*.kt" }.toMutableSet()
                     addAdditionalRunArgs(extension, runArgs)

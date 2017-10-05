@@ -3,7 +3,7 @@ import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.wrapper.Wrapper
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.1.1"
+    kotlin("jvm")
     id("com.gradle.plugin-publish") version "0.9.7"
     id("maven-publish")
 }
@@ -17,7 +17,7 @@ repositories {
 
 dependencies {
     compileOnly(gradleApi())
-    compileOnly(kotlinModule("gradle-plugin", "1.1.1"))
+    compileOnly(kotlin("gradle-plugin", "1.1.1"))
     compileOnly("com.android.tools.build:gradle:2.3.3")
     /*
      * Do not depend upon the gradle script kotlin plugin API. IE: gradleScriptKotlinApi()
@@ -49,11 +49,5 @@ pluginBundle {
 }
 
 task<Wrapper>("wrapper") {
-    gradleVersion = "3.5"
+    gradleVersion = "4.2"
 }
-
-/**
- * Retrieves or configures the [pluginBundle][com.gradle.publish.PluginBundleExtension] project extension.
- */
-fun Project.pluginBundle(configure: com.gradle.publish.PluginBundleExtension.() -> Unit = {}) =
-    extensions.getByName<com.gradle.publish.PluginBundleExtension>("pluginBundle").apply { configure() }
