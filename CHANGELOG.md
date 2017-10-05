@@ -9,7 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
  - Add configuration parameter `ignoreFailures` with default value to false
 ### Changed
- - Update default ktlint version to 0.9.2 
+ - Update default ktlint version to 0.9.2
+### Fixed
+ - Fixed report output is not closed after task run is finished (#25)
 
 ## [2.1.1] - 2017-08-15
 ### Changed
