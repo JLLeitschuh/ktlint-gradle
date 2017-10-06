@@ -6,6 +6,7 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.JavaExec
 import org.gradle.util.GFileUtils
 import java.io.File
+import java.io.FileOutputStream
 
 /**
  * Supported reporter types.
@@ -22,10 +23,14 @@ enum class ReporterType(val reporterName: String, val availableSinceVersion: Str
  */
 fun JavaExec.applyReporter(target: Project, extension: KtlintExtension) {
     if (isReportAvailable(extension.version, extension.reporter.availableSinceVersion)) {
-        val reportOutput = createReportOutputDir(target, extension).outputStream()
-        this.args("--reporter=${extension.reporter.reporterName}")
-        this.standardOutput = reportOutput
-        doLast { reportOutput.close() }
+        var reportOutput: FileOutputStream? = null
+        doFirst {
+            reportOutput = createReportOutputDir(target, extension).outputStream().also {
+                this.args("--reporter=${extension.reporter.reporterName}")
+                this.standardOutput = it
+            }
+        }
+        doLast { reportOutput?.close() }
     } else {
         target.logger.info("Reporter is not available in this ktlint version")
     }
