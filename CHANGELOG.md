@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
-(Nothing yet)
+- Fixed report output is always opened since task is created
 
 ## [2.2.0] - 2017-10-05
 ### Added
