@@ -37,8 +37,8 @@ fun JavaExec.applyReporter(target: Project, extension: KtlintExtension) {
 }
 
 private fun isReportAvailable(version: String, availableSinceVersion: String): Boolean {
-    val versionsNumbers = version.split('.')
-    val reporterVersionNumbers = availableSinceVersion.split('.')
+    val versionsNumbers = version.split('.').map { it.toInt() }
+    val reporterVersionNumbers = availableSinceVersion.split('.').map { it.toInt() }
     return versionsNumbers[0] >= reporterVersionNumbers[0] &&
             versionsNumbers[1] >= reporterVersionNumbers[1] &&
             versionsNumbers[2] >= reporterVersionNumbers[2]
