@@ -6,6 +6,7 @@ plugins {
     kotlin("jvm")
     id("com.gradle.plugin-publish") version "0.9.7"
     id("maven-publish")
+    id("org.jlleitschuh.gradle.ktlint") version "2.2.1"
 }
 
 group = "org.jlleitschuh.gradle"
