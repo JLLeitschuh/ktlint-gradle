@@ -1,6 +1,6 @@
 package org.jlleitschuh.gradle.ktlint
 
-import com.android.build.gradle.BaseExtension
+import com.android.build.gradle.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -11,6 +11,7 @@ import org.gradle.api.internal.HasConvention
 import org.gradle.api.plugins.Convention
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.JavaExec
+import org.gradle.api.tasks.StopExecutionException
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import kotlin.reflect.KClass
 
@@ -63,27 +64,37 @@ open class KtlintPlugin : Plugin<Project> {
         }
     }
 
-    private fun addKtLintTasksToAndroidKotlinPlugin(target: Project,
-                                                    extension: KtlintExtension) {
+    private fun addKtLintTasksToAndroidKotlinPlugin(target: Project, extension: KtlintExtension) {
         target.pluginManager.withPlugin("kotlin-android") {
             target.afterEvaluate {
                 val ktLintConfig = createConfiguration(target, extension)
-                
-                target.extensions.findByType(BaseExtension::class.java)?.sourceSets?.forEach {
-                    val kotlinSourceDir = it.java.sourceFiles
-                    val runArgs = it.java.srcDirs.map { "${it.path}/**/*.kt" }.toMutableSet()
+
+                val variantManager = when {
+                    target.plugins.hasPlugin(AppPlugin::class.java) -> target.plugins.findPlugin(AppPlugin::class.java)?.variantManager
+                    target.plugins.hasPlugin(LibraryPlugin::class.java) -> target.plugins.findPlugin(LibraryPlugin::class.java)?.variantManager
+                    target.plugins.hasPlugin(InstantAppPlugin::class.java) -> target.plugins.findPlugin(LibraryPlugin::class.java)?.variantManager
+                    target.plugins.hasPlugin(InstantAppPlugin::class.java) -> target.plugins.findPlugin(LibraryPlugin::class.java)?.variantManager
+                    target.plugins.hasPlugin(FeaturePlugin::class.java) -> target.plugins.findPlugin(LibraryPlugin::class.java)?.variantManager
+                    target.plugins.hasPlugin(TestPlugin::class.java) -> target.plugins.findPlugin(LibraryPlugin::class.java)?.variantManager
+                    else -> throw StopExecutionException("Must be applied with 'android' or 'android-library' plugin.")
+                }
+
+                variantManager?.variantScopes?.forEach {
+                    val kotlinSourceDir = target.files(it.variantData.javaSources)
+                    val runArgs = it.variantData.javaSources.map { "${it.dir.path}/**/*.kt" }.toMutableSet()
                     addAdditionalRunArgs(extension, runArgs)
 
-                    val checkTask = createCheckTask(target, extension, it.name, ktLintConfig, kotlinSourceDir, runArgs)
+                    val checkTask = createCheckTask(target, extension, it.fullVariantName, ktLintConfig, kotlinSourceDir, runArgs)
                     addKtlintCheckTaskToProjectMetaCheckTask(target, checkTask)
                     setCheckTaskDependsOnKtlintCheckTask(target, checkTask)
 
-                    val ktlintSourceSetFormatTask = createFormatTask(target, it.name, ktLintConfig, kotlinSourceDir, runArgs)
+                    val ktlintSourceSetFormatTask = createFormatTask(target, it.fullVariantName, ktLintConfig, kotlinSourceDir, runArgs)
                     addKtlintFormatTaskToProjectMetaFormatTask(target, ktlintSourceSetFormatTask)
                 }
             }
         }
     }
+
 
     private fun createConfiguration(target: Project, extension: KtlintExtension) =
             target.configurations.maybeCreate("ktlint").apply {
