@@ -19,7 +19,6 @@ const val FORMATTING_GROUP = "Formatting"
 const val CHECK_PARENT_TASK_NAME = "ktlintCheck"
 const val FORMAT_PARENT_TASK_NAME = "ktlintFormat"
 
-
 /**
  * Task that provides a wrapper over the `ktlint` project.
  */
@@ -43,7 +42,7 @@ open class KtlintPlugin : Plugin<Project> {
         target.pluginManager.withPlugin("kotlin") {
             target.afterEvaluate {
                 val ktLintConfig = createConfiguration(target, extension)
-                
+
                 target.theHelper<JavaPluginConvention>().sourceSets.forEach {
                     val kotlinSourceSet: SourceDirectorySet = (it as HasConvention)
                             .convention
@@ -68,7 +67,7 @@ open class KtlintPlugin : Plugin<Project> {
         target.pluginManager.withPlugin("kotlin-android") {
             target.afterEvaluate {
                 val ktLintConfig = createConfiguration(target, extension)
-                
+
                 target.extensions.findByType(BaseExtension::class.java)?.sourceSets?.forEach {
                     val kotlinSourceDir = it.java.sourceFiles
                     val runArgs = it.java.srcDirs.map { "${it.path}/**/*.kt" }.toMutableSet()
@@ -174,7 +173,6 @@ open class KtlintPlugin : Plugin<Project> {
 
     private fun <T : Any> Project.theHelper(extensionType: KClass<T>) =
         convention.findPlugin(extensionType.java) ?: convention.getByType(extensionType.java)!!
-
 
     private inline fun <reified T : Task> Project.taskHelper(name: String, noinline configuration: T.() -> Unit): T {
         return this.tasks.create(name, T::class.java, configuration)!!
