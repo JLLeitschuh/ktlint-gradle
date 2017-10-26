@@ -72,10 +72,9 @@ open class KtlintPlugin : Plugin<Project> {
                 val variantManager = when {
                     target.plugins.hasPlugin(AppPlugin::class.java) -> target.plugins.findPlugin(AppPlugin::class.java)?.variantManager
                     target.plugins.hasPlugin(LibraryPlugin::class.java) -> target.plugins.findPlugin(LibraryPlugin::class.java)?.variantManager
-                    target.plugins.hasPlugin(InstantAppPlugin::class.java) -> target.plugins.findPlugin(LibraryPlugin::class.java)?.variantManager
-                    target.plugins.hasPlugin(InstantAppPlugin::class.java) -> target.plugins.findPlugin(LibraryPlugin::class.java)?.variantManager
-                    target.plugins.hasPlugin(FeaturePlugin::class.java) -> target.plugins.findPlugin(LibraryPlugin::class.java)?.variantManager
-                    target.plugins.hasPlugin(TestPlugin::class.java) -> target.plugins.findPlugin(LibraryPlugin::class.java)?.variantManager
+                    target.plugins.hasPlugin(InstantAppPlugin::class.java) -> target.plugins.findPlugin(InstantAppPlugin::class.java)?.variantManager
+                    target.plugins.hasPlugin(FeaturePlugin::class.java) -> target.plugins.findPlugin(FeaturePlugin::class.java)?.variantManager
+                    target.plugins.hasPlugin(TestPlugin::class.java) -> target.plugins.findPlugin(TestPlugin::class.java)?.variantManager
                     else -> throw StopExecutionException("Must be applied with 'android' or 'android-library' plugin.")
                 }
 

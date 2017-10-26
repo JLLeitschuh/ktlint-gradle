@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [unreleased]
 ### Fixed
 - Fixed plugin doesn't apply custom reporter for ktlint versions >0.10.x (#28)
-
+- Bumped android tools versions to 3.0 and now support multidimension projects >0.10.x (#29)
 ## [2.2.1] - 2017-10-06
 ### Fixed
 - Fixed report output is always opened since task is created
