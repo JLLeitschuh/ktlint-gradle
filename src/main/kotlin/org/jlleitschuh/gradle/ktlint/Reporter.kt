@@ -21,11 +21,11 @@ enum class ReporterType(val reporterName: String, val availableSinceVersion: Str
 /**
  * Apply reporter to the task.
  */
-fun JavaExec.applyReporter(target: Project, extension: KtlintExtension) {
+fun JavaExec.applyReporter(target: Project, extension: KtlintExtension, sourceSetName: String) {
     if (isReportAvailable(extension.version, extension.reporter.availableSinceVersion)) {
         var reportOutput: FileOutputStream? = null
         doFirst {
-            reportOutput = createReportOutputDir(target, extension).outputStream().also {
+            reportOutput = createReportOutputDir(target, extension, sourceSetName).outputStream().also {
                 this.args("--reporter=${extension.reporter.reporterName}")
                 this.standardOutput = it
             }
@@ -44,8 +44,8 @@ private fun isReportAvailable(version: String, availableSinceVersion: String): B
             versionsNumbers[2] >= reporterVersionNumbers[2]
 }
 
-private fun createReportOutputDir(target: Project, extension: KtlintExtension): File {
+private fun createReportOutputDir(target: Project, extension: KtlintExtension, sourceSetName: String): File {
     val reportsDir = File(target.buildDir, "reports/ktlint")
     GFileUtils.mkdirs(reportsDir)
-    return File(reportsDir, "ktlint.${extension.reporter.fileExtension}")
+    return File(reportsDir, "ktlint-$sourceSetName.${extension.reporter.fileExtension}")
 }

@@ -6,12 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
+### Changed
+ - Define a different output file for each sourceSet
 ### Fixed
-- Fixed plugin doesn't apply custom reporter for ktlint versions >0.10.x (#28)
+ - Fixed plugin doesn't apply custom reporter for ktlint versions >0.10.x (#28)
 
 ## [2.2.1] - 2017-10-06
 ### Fixed
-- Fixed report output is always opened since task is created
+ - Fixed report output is always opened since task is created
 
 ## [2.2.0] - 2017-10-05
 ### Added
