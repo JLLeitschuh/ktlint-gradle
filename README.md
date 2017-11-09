@@ -47,7 +47,7 @@ plugins {
 ## Configuration
 The following configuration block is optional.
 
-If you don't configure this the defaults defined in the [KtlintExtension](src/main/kotlin/org/jlleitschuh/gradle/ktlint/KtlintExtension.kt) object will be used.
+If you don't configure this the defaults defined in the [KtlintExtension](plugin/src/main/kotlin/org/jlleitschuh/gradle/ktlint/KtlintExtension.kt) object will be used.
 The version of Ktlint used by default may change between patch versions of this plugin. If you don't want to inherit these changes then make sure you lock your version here.
 ```groovy
 ktlint {
@@ -65,11 +65,15 @@ This plugin adds two tasks to every source set: `ktlint[source set name]Check` a
 Additionally, a simple `ktlintCheck` task has also been added that checks all of the source sets for that project.
 Similarly, a `ktlintFormat` task has been added that formats all of the source sets.
 
-If project has subprojects - plugin also adds two meta tasks `ktlintCheck` and `ktlintFormat` to the root project that 
+If project has subprojects - plugin also adds two meta tasks `ktlintCheck` and `ktlintFormat` to the root project that
 triggers related tasks in subprojects.
 
 
 ## Developers
+
+### IDE Support
+
+Import the [samples/settings.gradle](samples/settings.gradle) file into your IDE.
 
 #### Building
 
