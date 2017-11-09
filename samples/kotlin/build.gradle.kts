@@ -1,9 +1,9 @@
 plugins {
-    kotlin("jvm") version "1.1.51"
     application
 }
 
 apply {
+    plugins.apply("org.jlleitschuh.gradle.ktlint")
     plugin("kotlin")
 }
 
