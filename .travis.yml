@@ -1,8 +1,9 @@
 language: java
 
 script:
-  - ./gradlew build --no-daemon
-  - ./gradlew ktlintCheck --no-daemon
+  - ./plugin/gradlew -p ./plugin build --no-daemon
+  - ./plugin/gradlew -p ./plugin ktlintCheck --no-daemon
+  - ./samples/gradlew -p ./samples :kotlin:ktlintCheck --no-daemon
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
