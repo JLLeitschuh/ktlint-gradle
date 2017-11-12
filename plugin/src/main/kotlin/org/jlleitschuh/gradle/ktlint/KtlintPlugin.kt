@@ -94,6 +94,7 @@ open class KtlintPlugin : Plugin<Project> {
         // Add the args to enable verbose and debug mode.
         if (extension.verbose) runArgs.add("--verbose")
         if (extension.debug) runArgs.add("--debug")
+        if (extension.android) runArgs.add("--android")
     }
 
     private fun addKtlintCheckTaskToProjectMetaCheckTask(target: Project, checkTask: Task) {

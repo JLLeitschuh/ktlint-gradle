@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
+### Added
+ - Add configuration parameter `android` with default value to false
 ### Changed
  - Define a different output file for each sourceSet
 ### Fixed
