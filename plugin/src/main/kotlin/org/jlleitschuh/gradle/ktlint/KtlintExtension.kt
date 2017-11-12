@@ -16,7 +16,10 @@ open class KtlintExtension {
      * Enable debug mode.
      */
     var debug = false
-
+    /**
+     * Enable android mode.
+     */
+    var android = false
     /**
      * Whether or not to allow the build to continue if there are warnings;
      * defaults to {@code false}, as for any other static code analysis tool.

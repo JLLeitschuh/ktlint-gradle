@@ -54,6 +54,7 @@ ktlint {
     version = ""
     debug = true
     verbose = true
+    android = false
     reporter = "checkstyle"
     ignoreFailures = true
 }
