@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Add configuration parameter `android` with default value to false
 ### Changed
  - Define a different output file for each sourceSet
+ - Output to console
 ### Fixed
  - Fixed plugin doesn't apply custom reporter for ktlint versions >0.10.x (#28)
 
