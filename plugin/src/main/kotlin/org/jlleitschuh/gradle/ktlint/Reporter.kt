@@ -8,6 +8,7 @@ import org.gradle.util.GFileUtils
 import java.io.File
 import java.io.FileOutputStream
 import net.swiftzer.semver.SemVer
+import java.io.OutputStream
 
 /**
  * Supported reporter types.
@@ -28,7 +29,12 @@ fun JavaExec.applyReporter(target: Project, extension: KtlintExtension, sourceSe
         doFirst {
             reportOutput = createReportOutputDir(target, extension, sourceSetName).outputStream().also {
                 this.args("--reporter=${extension.reporter.reporterName}")
-                this.standardOutput = it
+                this.standardOutput = object : OutputStream() {
+                    override fun write(b: Int) {
+                        it.write(b)
+                        System.out.write(b)
+                    }
+                }
             }
         }
         doLast { reportOutput?.close() }
