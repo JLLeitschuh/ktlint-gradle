@@ -16,10 +16,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [2.3.0] - 2017-11-13
 ### Added
- - Add configuration parameter `android` with default value to false
+ - Add configuration parameter `android` with default value to false (#39)
 ### Changed
  - Define a different output file for each sourceSet
- - Output to console
+ - Output to console (#38)
+ - Support multiple reporters for ktlint >0.10.x (#38)
 ### Fixed
  - Fixed plugin doesn't apply custom reporter for ktlint versions >0.10.x (#28)
 

@@ -1,5 +1,7 @@
 package org.jlleitschuh.gradle.ktlint
 
+import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+
 /**
  * Extension class for configuring the [KtlintPlugin].
  */
@@ -21,6 +23,10 @@ open class KtlintExtension {
      */
     var android = false
     /**
+     * Enable console output mode.
+     */
+    var outputToConsole = true
+    /**
      * Whether or not to allow the build to continue if there are warnings;
      * defaults to {@code false}, as for any other static code analysis tool.
      * <p>
@@ -29,11 +35,11 @@ open class KtlintExtension {
     var ignoreFailures = false
 
     /**
-     * Report output format.
+     * Report output formats.
      *
      * Available values: plain, plain_group_by_file, checkstyle, json.
      *
-     * Default is plain.
+     * Default is empty.
      */
-    var reporter: ReporterType = ReporterType.PLAIN
+    var reporters: List<ReporterType> = mutableListOf()
 }

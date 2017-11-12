@@ -19,16 +19,19 @@ import org.gradle.api.tasks.StopExecutionException
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import kotlin.reflect.KClass
 import net.swiftzer.semver.SemVer
-
-const val VERIFICATION_GROUP = "Verification"
-const val FORMATTING_GROUP = "Formatting"
-const val CHECK_PARENT_TASK_NAME = "ktlintCheck"
-const val FORMAT_PARENT_TASK_NAME = "ktlintFormat"
+import org.jlleitschuh.gradle.ktlint.reporter.applyReporters
 
 /**
  * Task that provides a wrapper over the `ktlint` project.
  */
 open class KtlintPlugin : Plugin<Project> {
+
+    companion object {
+        const val VERIFICATION_GROUP = "Verification"
+        const val FORMATTING_GROUP = "Formatting"
+        const val CHECK_PARENT_TASK_NAME = "ktlintCheck"
+        const val FORMAT_PARENT_TASK_NAME = "ktlintFormat"
+    }
 
     override fun apply(target: Project) {
         val extension = target.extensions.create("ktlint", KtlintExtension::class.java)
@@ -43,8 +46,7 @@ open class KtlintPlugin : Plugin<Project> {
         }
     }
 
-    private fun addKtLintTasksToKotlinPlugin(target: Project,
-                                             extension: KtlintExtension) {
+    private fun addKtLintTasksToKotlinPlugin(target: Project, extension: KtlintExtension) {
         target.pluginManager.withPlugin("kotlin") {
             target.afterEvaluate {
                 val ktLintConfig = createConfiguration(target, extension)
@@ -105,7 +107,6 @@ open class KtlintPlugin : Plugin<Project> {
             }
 
     private fun addAdditionalRunArgs(extension: KtlintExtension, runArgs: MutableSet<String>) {
-        // Add the args to enable verbose and debug mode.
         if (extension.verbose) runArgs.add("--verbose")
         if (extension.debug) runArgs.add("--debug")
         if (extension.android && SemVer.parse(extension.version).compareTo(SemVer(0, 12, 0)) >= 0) {
@@ -161,7 +162,7 @@ open class KtlintPlugin : Plugin<Project> {
             args(runArgs)
         }.apply {
             this.isIgnoreExitValue = extension.ignoreFailures
-            this.applyReporter(target, extension, sourceSetName)
+            this.applyReporters(target, extension, sourceSetName)
         }
     }
 
