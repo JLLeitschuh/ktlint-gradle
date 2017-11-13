@@ -55,5 +55,5 @@ internal fun JavaExec.applyReporters(target: Project, extension: KtlintExtension
 private fun createReportOutputFile(target: Project, fileExtension: String, sourceSetName: String): File {
     val reportsDir = File(target.buildDir, "reports/ktlint")
     GFileUtils.mkdirs(reportsDir)
-    return File(reportsDir, "ktlint-$sourceSetName.${fileExtension}")
+    return File(reportsDir, "ktlint-$sourceSetName.$fileExtension")
 }
