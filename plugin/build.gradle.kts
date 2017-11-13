@@ -18,7 +18,7 @@ repositories {
 
 dependencies {
     compileOnly(gradleApi())
-    compileOnly(kotlin("gradle-plugin", "1.1.1"))
+    compileOnly(kotlin("gradle-plugin", "1.1.60"))
     compileOnly("com.android.tools.build:gradle:2.3.3")
     compile("net.swiftzer.semver:semver:1.0.0")
 
