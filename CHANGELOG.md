@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
  - Define a different output file for each sourceSet
 ### Fixed
-- Fixed plugin doesn't apply custom reporter for ktlint versions >0.10.x (#28)
+ - Fixed plugin doesn't apply custom reporter for ktlint versions >0.10.x (#28)
 
 ## [2.2.1] - 2017-10-06
 ### Fixed

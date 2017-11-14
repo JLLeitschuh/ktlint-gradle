@@ -98,7 +98,6 @@ open class KtlintPlugin : Plugin<Project> {
         }
     }
 
-
     private fun createConfiguration(target: Project, extension: KtlintExtension) =
             target.configurations.maybeCreate("ktlint").apply {
                 target.dependencies.add(this.name,
