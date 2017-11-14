@@ -21,17 +21,15 @@ import kotlin.reflect.KClass
 import net.swiftzer.semver.SemVer
 import org.jlleitschuh.gradle.ktlint.reporter.applyReporters
 
+const val VERIFICATION_GROUP = "Verification"
+const val FORMATTING_GROUP = "Formatting"
+const val CHECK_PARENT_TASK_NAME = "ktlintCheck"
+const val FORMAT_PARENT_TASK_NAME = "ktlintFormat"
+
 /**
  * Task that provides a wrapper over the `ktlint` project.
  */
 open class KtlintPlugin : Plugin<Project> {
-
-    companion object {
-        const val VERIFICATION_GROUP = "Verification"
-        const val FORMATTING_GROUP = "Formatting"
-        const val CHECK_PARENT_TASK_NAME = "ktlintCheck"
-        const val FORMAT_PARENT_TASK_NAME = "ktlintFormat"
-    }
 
     override fun apply(target: Project) {
         val extension = target.extensions.create("ktlint", KtlintExtension::class.java)
