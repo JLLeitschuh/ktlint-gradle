@@ -1,6 +1,10 @@
 package org.jlleitschuh.gradle.ktlint
 
-import com.android.build.gradle.*
+import com.android.build.gradle.AppPlugin
+import com.android.build.gradle.FeaturePlugin
+import com.android.build.gradle.InstantAppPlugin
+import com.android.build.gradle.LibraryPlugin
+import com.android.build.gradle.TestPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
