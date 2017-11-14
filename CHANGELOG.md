@@ -5,13 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [unreleased]
+## [Unreleased]
+### Added
+ - ?
+## Changed
+ - Update kotlin to 1.1.60 version
+ - Bumped android tools versions to 3.0 and now support multidimension projects >0.10.x (#29)
+### Fixed
+ - ?
+
+## [2.3.0] - 2017-11-13
+### Added
+ - Add configuration parameter `android` with default value to false
+### Changed
+ - Define a different output file for each sourceSet
 ### Fixed
 - Fixed plugin doesn't apply custom reporter for ktlint versions >0.10.x (#28)
-- Bumped android tools versions to 3.0 and now support multidimension projects >0.10.x (#29)
+
 ## [2.2.1] - 2017-10-06
 ### Fixed
-- Fixed report output is always opened since task is created
+ - Fixed report output is always opened since task is created
 
 ## [2.2.0] - 2017-10-05
 ### Added

@@ -14,12 +14,12 @@ import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.StopExecutionException
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import kotlin.reflect.KClass
+import net.swiftzer.semver.SemVer
 
 const val VERIFICATION_GROUP = "Verification"
 const val FORMATTING_GROUP = "Formatting"
 const val CHECK_PARENT_TASK_NAME = "ktlintCheck"
 const val FORMAT_PARENT_TASK_NAME = "ktlintFormat"
-
 
 /**
  * Task that provides a wrapper over the `ktlint` project.
@@ -44,7 +44,7 @@ open class KtlintPlugin : Plugin<Project> {
         target.pluginManager.withPlugin("kotlin") {
             target.afterEvaluate {
                 val ktLintConfig = createConfiguration(target, extension)
-                
+
                 target.theHelper<JavaPluginConvention>().sourceSets.forEach {
                     val kotlinSourceSet: SourceDirectorySet = (it as HasConvention)
                             .convention
@@ -105,6 +105,9 @@ open class KtlintPlugin : Plugin<Project> {
         // Add the args to enable verbose and debug mode.
         if (extension.verbose) runArgs.add("--verbose")
         if (extension.debug) runArgs.add("--debug")
+        if (extension.android && SemVer.parse(extension.version).compareTo(SemVer(0, 12, 0)) >= 0) {
+            runArgs.add("--android")
+        }
     }
 
     private fun addKtlintCheckTaskToProjectMetaCheckTask(target: Project, checkTask: Task) {
@@ -155,7 +158,7 @@ open class KtlintPlugin : Plugin<Project> {
             args(runArgs)
         }.apply {
             this.isIgnoreExitValue = extension.ignoreFailures
-            this.applyReporter(target, extension)
+            this.applyReporter(target, extension, sourceSetName)
         }
     }
 
@@ -184,7 +187,6 @@ open class KtlintPlugin : Plugin<Project> {
 
     private fun <T : Any> Project.theHelper(extensionType: KClass<T>) =
         convention.findPlugin(extensionType.java) ?: convention.getByType(extensionType.java)!!
-
 
     private inline fun <reified T : Task> Project.taskHelper(name: String, noinline configuration: T.() -> Unit): T {
         return this.tasks.create(name, T::class.java, configuration)!!

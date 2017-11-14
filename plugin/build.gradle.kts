@@ -6,10 +6,11 @@ plugins {
     kotlin("jvm")
     id("com.gradle.plugin-publish") version "0.9.7"
     id("maven-publish")
+    id("org.jlleitschuh.gradle.ktlint") version "2.2.1"
 }
 
 group = "org.jlleitschuh.gradle"
-version = "2.2.2-SNAPSHOT"
+version = "2.3.1-SNAPSHOT"
 
 repositories {
     jcenter()
@@ -18,8 +19,10 @@ repositories {
 
 dependencies {
     compileOnly(gradleApi())
-    compileOnly(kotlin("gradle-plugin", "1.1.1"))
+    compileOnly(kotlin("gradle-plugin", "1.1.60"))
     compileOnly("com.android.tools.build:gradle:3.0.0")
+    compile("net.swiftzer.semver:semver:1.0.0")
+
     /*
      * Do not depend upon the gradle script kotlin plugin API. IE: gradleScriptKotlinApi()
      * It's currently in flux and has binary breaking changes in gradle 4.0
