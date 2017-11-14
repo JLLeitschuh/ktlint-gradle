@@ -107,7 +107,8 @@ open class KtlintPlugin : Plugin<Project> {
     private fun addAdditionalRunArgs(extension: KtlintExtension, runArgs: MutableSet<String>) {
         if (extension.verbose) runArgs.add("--verbose")
         if (extension.debug) runArgs.add("--debug")
-        if (extension.android && SemVer.parse(extension.version).compareTo(SemVer(0, 12, 0)) >= 0) {
+        if (extension.android && SemVer.parse(extension.version) >= SemVer(0, 12, 0)) {
+            // Android option is available from ktlint 0.12.0
             runArgs.add("--android")
         }
     }

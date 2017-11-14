@@ -15,7 +15,8 @@ import java.io.OutputStream
  * Apply reporter to the task.
  */
 internal fun JavaExec.applyReporters(target: Project, extension: KtlintExtension, sourceSetName: String) {
-    if (SemVer.parse(extension.version).compareTo(SemVer(0, 10, 0)) >= 0) {
+    if (SemVer.parse(extension.version) >= SemVer(0, 10, 0)) {
+        // Multiple reporters are available from ktlint 0.10.0
         extension.reporters.forEach { reporter ->
             doFirst {
                 val reportOutputFile = createReportOutputFile(target, reporter.fileExtension, sourceSetName)
@@ -27,7 +28,7 @@ internal fun JavaExec.applyReporters(target: Project, extension: KtlintExtension
         }
     } else {
         extension.reporters.firstOrNull()?.let { reporter ->
-            if (SemVer.parse(extension.version).compareTo(reporter.availableSinceVersion) >= 0) {
+            if (SemVer.parse(extension.version) >= reporter.availableSinceVersion) {
                 var reportOutput: FileOutputStream? = null
                 doFirst {
                     reportOutput = createReportOutputFile(target, reporter.fileExtension, sourceSetName).outputStream().also {
