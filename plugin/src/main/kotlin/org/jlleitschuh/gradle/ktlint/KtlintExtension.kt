@@ -41,5 +41,5 @@ open class KtlintExtension {
      *
      * Default is empty.
      */
-    var reporters: List<ReporterType> = mutableListOf()
+    var reporters: Set<ReporterType> = setOf(ReporterType.PLAIN)
 }
