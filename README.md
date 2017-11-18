@@ -34,13 +34,19 @@ buildscript {
 }
 
 apply plugin: "org.jlleitschuh.gradle.ktlint"
-
 ```
 
 Build script snippet for new, incubating, plugin mechanism introduced in Gradle 2.1:
 ```groovy
 plugins {
   id "org.jlleitschuh.gradle.ktlint" version "2.3.0"
+}
+```
+
+Optionally apply plugin to all project modules:
+```groovy
+subprojects {
+    apply plugin: "org.jlleitschuh.gradle.ktlint" // Version should be inherited from parent
 }
 ```
 
