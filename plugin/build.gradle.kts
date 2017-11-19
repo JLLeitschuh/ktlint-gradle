@@ -14,12 +14,13 @@ version = "2.3.1-SNAPSHOT"
 
 repositories {
     jcenter()
+    google()
 }
 
 dependencies {
     compileOnly(gradleApi())
     compileOnly(kotlin("gradle-plugin", "1.1.60"))
-    compileOnly("com.android.tools.build:gradle:2.3.3")
+    compileOnly("com.android.tools.build:gradle:3.0.0")
     compile("net.swiftzer.semver:semver:1.0.0")
 
     /*
