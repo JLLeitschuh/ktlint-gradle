@@ -7,9 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
- - ?
+ - Output to console (#38)
+ - Support multiple reporters for ktlint >0.10.x (#38)
 ## Changed
  - Update kotlin to 1.2.0 version
+ - Set default ktltint version to `0.13.0`
  - Bumped android tools versions to 3.0 and now support multidimension projects >0.10.x (#29)
 ### Fixed
  - ?
@@ -19,8 +21,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Add configuration parameter `android` with default value to false (#39)
 ### Changed
  - Define a different output file for each sourceSet
- - Output to console (#38)
- - Support multiple reporters for ktlint >0.10.x (#38)
 ### Fixed
  - Fixed plugin doesn't apply custom reporter for ktlint versions >0.10.x (#28)
 

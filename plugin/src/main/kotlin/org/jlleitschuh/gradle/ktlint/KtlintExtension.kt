@@ -9,7 +9,7 @@ open class KtlintExtension {
     /**
      * The version of ktlint to use.
      */
-    var version = "0.9.2"
+    var version = "0.13.0"
     /**
      * Enable verbose mode.
      */
@@ -41,5 +41,8 @@ open class KtlintExtension {
      *
      * Default is empty.
      */
-    var reporters: Set<ReporterType> = setOf(ReporterType.PLAIN)
+    var reporters: Array<ReporterType> = arrayOf(ReporterType.plain)
+
+    @Deprecated(message = "Ktlint introduced multi output support since 0.11.1 version", replaceWith = ReplaceWith("reporters = arrayOf()"), "reporter"))
+    var reporter: ReporterType = ReporterType.plain
 }
