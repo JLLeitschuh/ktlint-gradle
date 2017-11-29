@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
  - ?
 ## Changed
- - Update kotlin to 1.1.60 version
+ - Update kotlin to 1.2.0 version
  - Bumped android tools versions to 3.0 and now support multidimension projects >0.10.x (#29)
 ### Fixed
  - ?
