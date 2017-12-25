@@ -5,14 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
-### Added
- - ?
+## [3.0.0] - 2017-12-25
 ## Changed
- - Update kotlin to 1.2.0 version
+ - Update Kotlin to 1.2.0 version
  - Bumped android tools versions to 3.0 and now support multidimension projects >0.10.x (#29)
-### Fixed
- - ?
 
 ## [2.3.0] - 2017-11-13
 ### Added
