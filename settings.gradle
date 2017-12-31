@@ -1,6 +1,9 @@
 rootProject.name = "ktlint-gradle-samples"
 
-include(':kotlin')
-project(':kotlin').projectDir = new File('./samples/kotlin')
+include(':kotlin-ks')
+project(':kotlin-ks').projectDir = new File('./samples/kotlin-ks')
+
+include(':kotlin-gradle')
+project(':kotlin-gradle').projectDir = new File('./samples/kotlin-gradle')
 
 includeBuild('./plugin')
