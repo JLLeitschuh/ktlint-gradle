@@ -1,10 +1,12 @@
 buildscript {
     repositories {
         jcenter()
+        google()
     }
 
     dependencies {
         classpath("org.jlleitschuh.gradle:ktlint-gradle:+")
+        classpath("com.android.tools.build:gradle:3.0.1")
     }
 }
 plugins {
@@ -14,6 +16,7 @@ plugins {
 allprojects {
     repositories {
         jcenter()
+        google()
     }
 }
 

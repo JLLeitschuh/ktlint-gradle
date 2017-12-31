@@ -6,4 +6,7 @@ project(':kotlin-ks').projectDir = new File('./samples/kotlin-ks')
 include(':kotlin-gradle')
 project(':kotlin-gradle').projectDir = new File('./samples/kotlin-gradle')
 
+include(':android-app')
+project(':android-app').projectDir = new File('./samples/android-app')
+
 includeBuild('./plugin')
