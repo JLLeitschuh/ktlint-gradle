@@ -1,3 +1,6 @@
+import org.jlleitschuh.gradle.ktlint.KtlintExtension
+import org.jlleitschuh.gradle.ktlint.ReporterType
+
 plugins {
     application
 }
@@ -13,4 +16,9 @@ application {
 
 dependencies {
     compile(kotlin("stdlib"))
+}
+
+configure<KtlintExtension> {
+    verbose = true
+    reporter = ReporterType.JSON
 }

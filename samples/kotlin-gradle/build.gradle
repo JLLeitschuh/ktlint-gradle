@@ -7,3 +7,8 @@ mainClassName = "org.jlleitschuh.gradle.ktlint.sample.gradle.MainKt"
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib"
 }
+
+ktlint {
+    verbose = true
+    reporter = "checkstyle"
+}
