@@ -1,4 +1,7 @@
-language: java
+language: android
+android:
+  components:
+    - andoroid-26
 
 script:
   - ./plugin/gradlew -p ./plugin build --no-daemon
