@@ -6,11 +6,11 @@ buildscript {
 
     dependencies {
         classpath("org.jlleitschuh.gradle:ktlint-gradle:+")
-        classpath("com.android.tools.build:gradle:3.0.1")
     }
 }
 plugins {
-    kotlin(module = "jvm", version = "1.2.0") apply false
+    kotlin("jvm") version "1.2.0" apply false
+    id("com.android.application") version "3.0.1" apply false
 }
 
 allprojects {
