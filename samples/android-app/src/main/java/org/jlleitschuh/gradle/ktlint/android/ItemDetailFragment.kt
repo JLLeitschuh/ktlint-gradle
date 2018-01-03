@@ -1,13 +1,13 @@
-package by.egorr.myapplication
+package org.jlleitschuh.gradle.ktlint.android
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import by.egorr.myapplication.dummy.DummyContent
-import kotlinx.android.synthetic.main.activity_item_detail.*
-import kotlinx.android.synthetic.main.item_detail.view.*
+import kotlinx.android.synthetic.main.activity_item_detail.toolbar_layout
+import kotlinx.android.synthetic.main.item_detail.view.item_detail
+import org.jlleitschuh.gradle.ktlint.android.dummy.DummyContent
 
 /**
  * A fragment representing a single Item detail screen.
@@ -25,13 +25,13 @@ class ItemDetailFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (arguments.containsKey(ARG_ITEM_ID)) {
+        if (arguments?.containsKey(ARG_ITEM_ID) == true) {
             // Load the dummy content specified by the fragment
             // arguments. In a real-world scenario, use a Loader
             // to load content from a content provider.
-            mItem = DummyContent.ITEM_MAP[arguments.getString(ARG_ITEM_ID)]
+            mItem = DummyContent.ITEM_MAP[arguments!!.getString(ARG_ITEM_ID)]
             mItem?.let {
-                activity.toolbar_layout?.title = it.content
+                activity?.toolbar_layout?.title = it.content
             }
         }
     }

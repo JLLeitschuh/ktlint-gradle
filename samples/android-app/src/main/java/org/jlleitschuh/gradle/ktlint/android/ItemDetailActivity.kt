@@ -1,11 +1,12 @@
-package by.egorr.myapplication
+package org.jlleitschuh.gradle.ktlint.android
 
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
-import kotlinx.android.synthetic.main.activity_item_detail.*
+import kotlinx.android.synthetic.main.activity_item_detail.detail_toolbar
+import kotlinx.android.synthetic.main.activity_item_detail.fab
 
 /**
  * An activity representing a single Item detail screen. This

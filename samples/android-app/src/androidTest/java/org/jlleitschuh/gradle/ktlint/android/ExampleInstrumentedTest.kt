@@ -1,4 +1,4 @@
-package by.egorr.myapplication
+package org.jlleitschuh.gradle.ktlint.android
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
@@ -18,6 +18,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getTargetContext()
-        assertEquals("by.egorr.myapplication", appContext.packageName)
+        assertEquals("org.jlleitschuh.gradle.ktlint.android", appContext.packageName)
     }
 }

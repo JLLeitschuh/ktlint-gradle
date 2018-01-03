@@ -1,4 +1,4 @@
-package by.egorr.myapplication.dummy
+package org.jlleitschuh.gradle.ktlint.android.dummy
 
 import java.util.ArrayList
 import java.util.HashMap

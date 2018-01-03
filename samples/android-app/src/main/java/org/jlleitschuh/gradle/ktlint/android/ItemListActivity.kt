@@ -1,20 +1,22 @@
-package by.egorr.myapplication
+package org.jlleitschuh.gradle.ktlint.android
 
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
-import android.support.design.widget.Snackbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-
-import by.egorr.myapplication.dummy.DummyContent
-import kotlinx.android.synthetic.main.activity_item_list.*
-import kotlinx.android.synthetic.main.item_list_content.view.*
-
-import kotlinx.android.synthetic.main.item_list.*
+import kotlinx.android.synthetic.main.activity_item_list.fab
+import kotlinx.android.synthetic.main.activity_item_list.toolbar
+import kotlinx.android.synthetic.main.item_list.item_detail_container
+import kotlinx.android.synthetic.main.item_list.item_list
+import kotlinx.android.synthetic.main.item_list_content.view.content
+import kotlinx.android.synthetic.main.item_list_content.view.id_text
+import org.jlleitschuh.gradle.ktlint.android.ItemListActivity.SimpleItemRecyclerViewAdapter.ViewHolder
+import org.jlleitschuh.gradle.ktlint.android.dummy.DummyContent
 
 /**
  * An activity representing a list of Pings. This activity
@@ -62,7 +64,7 @@ class ItemListActivity : AppCompatActivity() {
     class SimpleItemRecyclerViewAdapter(private val mParentActivity: ItemListActivity,
                                         private val mValues: List<DummyContent.DummyItem>,
                                         private val mTwoPane: Boolean) :
-            RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder>() {
+            RecyclerView.Adapter<ViewHolder>() {
 
         private val mOnClickListener: View.OnClickListener
 
@@ -72,7 +74,7 @@ class ItemListActivity : AppCompatActivity() {
                 if (mTwoPane) {
                     val fragment = ItemDetailFragment().apply {
                         arguments = Bundle()
-                        arguments.putString(ItemDetailFragment.ARG_ITEM_ID, item.id)
+                        arguments?.putString(ItemDetailFragment.ARG_ITEM_ID, item.id)
                     }
                     mParentActivity.supportFragmentManager
                             .beginTransaction()

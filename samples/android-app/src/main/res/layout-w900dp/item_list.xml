@@ -9,7 +9,7 @@
               android:divider="?android:attr/dividerHorizontal"
               android:orientation="horizontal"
               android:showDividers="middle"
-              tools:context="by.egorr.myapplication.ItemListActivity">
+              tools:context="org.jlleitschuh.gradle.ktlint.android.ItemListActivity">
 
     <!--
     This layout is a two-pane layout for the Items
@@ -20,13 +20,13 @@
     <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
                                             xmlns:tools="http://schemas.android.com/tools"
                                             android:id="@+id/item_list"
-                                            android:name="by.egorr.myapplication.ItemListFragment"
+                                            android:name="org.jlleitschuh.gradle.ktlint.android.ItemListFragment"
                                             android:layout_width="@dimen/item_width"
                                             android:layout_height="match_parent"
                                             android:layout_marginLeft="16dp"
                                             android:layout_marginRight="16dp"
                                             app:layoutManager="LinearLayoutManager"
-                                            tools:context="by.egorr.myapplication.ItemListActivity"
+                                            tools:context="org.jlleitschuh.gradle.ktlint.android.ItemListActivity"
                                             tools:listitem="@layout/item_list_content"/>
 
     <FrameLayout

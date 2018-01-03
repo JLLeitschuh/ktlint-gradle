@@ -1,4 +1,4 @@
-package by.egorr.myapplication
+package org.jlleitschuh.gradle.ktlint.android
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
