@@ -189,10 +189,10 @@ open class KtlintPlugin : Plugin<Project> {
         theHelper(T::class)
 
     private fun <T : Any> Project.theHelper(extensionType: KClass<T>) =
-        convention.findPlugin(extensionType.java) ?: convention.getByType(extensionType.java)!!
+        convention.findPlugin(extensionType.java) ?: convention.getByType(extensionType.java)
 
     private inline fun <reified T : Task> Project.taskHelper(name: String, noinline configuration: T.() -> Unit): T {
-        return this.tasks.create(name, T::class.java, configuration)!!
+        return this.tasks.create(name, T::class.java, configuration)
     }
 
     private inline fun <reified T> Convention.getPluginHelper() = getPlugin(T::class.java)
