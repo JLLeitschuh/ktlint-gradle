@@ -1,9 +1,17 @@
-language: java
+language: android
+jdk:
+  - oraclejdk8
+install:
+  - yes | sdkmanager --verbose "build-tools;26.0.2"
+  - yes | sdkmanager --verbose "platform-tools"
+  - yes | sdkmanager --verbose "tools"
+  - yes | sdkmanager --verbose "platforms;android-27"
+  - yes | sdkmanager --verbose "extras;android;m2repository"
 
 script:
   - ./plugin/gradlew -p ./plugin build --no-daemon
   - ./plugin/gradlew -p ./plugin ktlintCheck --no-daemon
-  - ./samples/gradlew -p ./samples :kotlin:ktlintCheck --no-daemon
+  - ./gradlew ktlintCheck --no-daemon
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock

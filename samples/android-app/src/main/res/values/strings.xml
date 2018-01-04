@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">My Application</string>
+    <string name="title_item_detail">Item Detail</string>
+</resources>
