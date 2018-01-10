@@ -3,14 +3,14 @@ import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.wrapper.Wrapper
 
 plugins {
-    kotlin("jvm")
+    kotlin("jvm") version "1.2.0"
     id("com.gradle.plugin-publish") version "0.9.7"
     id("maven-publish")
     id("org.jlleitschuh.gradle.ktlint") version "2.2.1"
 }
 
 group = "org.jlleitschuh.gradle"
-version = "2.3.1-SNAPSHOT"
+version = "3.0.0"
 
 repositories {
     jcenter()

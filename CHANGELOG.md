@@ -9,12 +9,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
  - Output to console (#38)
  - Support multiple reporters for ktlint >0.10.x (#38)
+### Changed
+ - Set default ktltint version to `0.13.0`
+
+## [3.0.0] - 2017-12-25
 ## Changed
  - Update kotlin to 1.2.0 version
- - Set default ktltint version to `0.13.0`
  - Bumped android tools versions to 3.0 and now support multidimension projects >0.10.x (#29)
-### Fixed
- - ?
 
 ## [2.3.0] - 2017-11-13
 ### Added
