@@ -1,5 +1,6 @@
 package org.jlleitschuh.gradle.ktlint
 
+import org.jlleitschuh.gradle.ktlint.ReporterType as DeprecatedReporterType
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 /**
@@ -39,11 +40,20 @@ open class KtlintExtension {
      *
      * Available values: plain, plain_group_by_file, checkstyle, json.
      *
+     * **Note** for Gradle scripts: for now all values should be uppercase due to bug in Gradle.
+     *
      * Default is empty.
      */
-    var reporters: Array<ReporterType> = arrayOf(ReporterType.PLAIN)
+    var reporters: Array<ReporterType> = emptyArray()
 
+    /**
+     * Report output format.
+     *
+     * Available values: plain, plain_group_by_file, checkstyle, json.
+     *
+     * Default is none.
+     */
     @Deprecated(message = "Ktlint introduced multi output support since 0.11.1 version",
             replaceWith = ReplaceWith("reporters = arrayOf()", "reporter"))
-    var reporter: ReporterType = ReporterType.PLAIN
+    var reporter: DeprecatedReporterType? = null
 }
