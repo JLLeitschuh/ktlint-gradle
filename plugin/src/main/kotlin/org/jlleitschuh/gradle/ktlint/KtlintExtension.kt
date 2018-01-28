@@ -41,8 +41,9 @@ open class KtlintExtension {
      *
      * Default is empty.
      */
-    var reporters: Array<ReporterType> = arrayOf(ReporterType.plain)
+    var reporters: Array<ReporterType> = arrayOf(ReporterType.PLAIN)
 
-    @Deprecated(message = "Ktlint introduced multi output support since 0.11.1 version", replaceWith = ReplaceWith("reporters = arrayOf()"), "reporter"))
-    var reporter: ReporterType = ReporterType.plain
+    @Deprecated(message = "Ktlint introduced multi output support since 0.11.1 version",
+            replaceWith = ReplaceWith("reporters = arrayOf()", "reporter"))
+    var reporter: ReporterType = ReporterType.PLAIN
 }
