@@ -2,13 +2,12 @@
 
 package org.jlleitschuh.gradle.ktlint.reporter
 
+import net.swiftzer.semver.SemVer
 import org.gradle.api.Project
 import org.gradle.api.tasks.JavaExec
 import org.gradle.util.GFileUtils
-import java.io.File
-import net.swiftzer.semver.SemVer
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
-import org.jlleitschuh.gradle.ktlint.ReporterType as DeprecatedReporterType
+import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
 
@@ -37,8 +36,8 @@ private fun JavaExec.setMultipleReporters(
 
     val oldReporter = extension.reporter
     if (oldReporter != null) {
-        checkReporterAvailable(oldReporter.toNewReporter(), extension, target) {
-            applyOutputReporter(oldReporter.toNewReporter(), target, sourceSetName)
+        checkReporterAvailable(oldReporter, extension, target) {
+            applyOutputReporter(oldReporter, target, sourceSetName)
         }
     }
 
@@ -54,8 +53,8 @@ private fun JavaExec.setOneReporter(
 ) {
     val oldReporter = extension.reporter
     if (oldReporter != null) {
-        checkReporterAvailable(oldReporter.toNewReporter(), extension, target) {
-            applyOnlyOneOutputReporter(target, oldReporter.toNewReporter(), sourceSetName, extension)
+        checkReporterAvailable(oldReporter, extension, target) {
+            applyOnlyOneOutputReporter(target, oldReporter, sourceSetName, extension)
         }
     } else {
         extension.reporters.firstOrNull()?.let { reporter ->
@@ -116,11 +115,3 @@ private fun createReportOutputFile(target: Project, fileExtension: String, sourc
     GFileUtils.mkdirs(reportsDir)
     return File(reportsDir, "ktlint-$sourceSetName.$fileExtension")
 }
-
-private fun DeprecatedReporterType.toNewReporter() =
-        when (this) {
-            DeprecatedReporterType.PLAIN -> ReporterType.PLAIN
-            DeprecatedReporterType.PLAIN_GROUP_BY_FILE -> ReporterType.PLAIN_GROUP_BY_FILE
-            DeprecatedReporterType.CHECKSTYLE -> ReporterType.CHECKSTYLE
-            DeprecatedReporterType.JSON -> ReporterType.JSON
-        }
