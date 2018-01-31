@@ -53,5 +53,5 @@ pluginBundle {
 }
 
 task<Wrapper>("wrapper") {
-    gradleVersion = "4.2"
+    gradleVersion = "4.5"
 }
