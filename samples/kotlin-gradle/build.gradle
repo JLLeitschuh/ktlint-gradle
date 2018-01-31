@@ -11,5 +11,5 @@ dependencies {
 ktlint {
     verbose = true
     // For now have to be uppercase, see https://github.com/gradle/gradle/issues/4030
-    reporters = ["CHECKSTYLE"]
+    reporters = ["CHECKSTYLE", "PLAIN"]
 }

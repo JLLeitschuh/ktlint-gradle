@@ -1,5 +1,5 @@
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
-import org.jlleitschuh.gradle.ktlint.ReporterType
+import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
     application
