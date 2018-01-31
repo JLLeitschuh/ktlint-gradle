@@ -1,5 +1,6 @@
 package org.jlleitschuh.gradle.ktlint
 
+@Deprecated("Moved to org.jlleitschuh.gradle.ktlint.reporter package")
 typealias ReporterType = org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 /**
