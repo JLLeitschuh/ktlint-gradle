@@ -5,14 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+### Added
+ - Output to console (#38)
+ - Support multiple reporters for ktlint >0.10.x (#38)
+### Changed
+ - Set default ktltint version to `0.15.0`
+
 ## [3.0.0] - 2017-12-25
 ## Changed
- - Update Kotlin to 1.2.0 version
+ - Update kotlin to 1.2.0 version
  - Bumped android tools versions to 3.0 and now support multidimension projects >0.10.x (#29)
 
 ## [2.3.0] - 2017-11-13
 ### Added
- - Add configuration parameter `android` with default value to false
+ - Add configuration parameter `android` with default value to false (#39)
 ### Changed
  - Define a different output file for each sourceSet
 ### Fixed

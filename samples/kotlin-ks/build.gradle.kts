@@ -20,5 +20,6 @@ dependencies {
 
 configure<KtlintExtension> {
     verbose = true
-    reporter = ReporterType.JSON
+    outputToConsole = true
+    reporters = arrayOf(ReporterType.CHECKSTYLE, ReporterType.JSON)
 }

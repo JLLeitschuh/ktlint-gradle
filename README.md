@@ -61,7 +61,8 @@ ktlint {
     debug = true
     verbose = true
     android = false
-    reporter = "checkstyle"
+    outputToConsole = true
+    reporters = ["PLAIN", "CHECKSTYLE"]
     ignoreFailures = true
 }
 ```
