@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Support multiple reporters for ktlint >0.10.x (#38)
 ### Changed
  - Set default ktltint version to `0.15.0`
+ - Update Kotlin to `1.2.21` version
 
 ## [3.0.0] - 2017-12-25
 ## Changed
