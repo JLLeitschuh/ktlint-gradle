@@ -3,7 +3,7 @@ import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.wrapper.Wrapper
 
 plugins {
-    kotlin("jvm") version "1.2.20"
+    kotlin("jvm") version "1.2.21"
     id("com.gradle.plugin-publish") version "0.9.7"
     id("maven-publish")
     id("org.jlleitschuh.gradle.ktlint") version "2.2.1"
@@ -19,7 +19,7 @@ repositories {
 
 dependencies {
     compileOnly(gradleApi())
-    compileOnly(kotlin("gradle-plugin", "1.2.20"))
+    compileOnly(kotlin("gradle-plugin", "1.2.21"))
     compileOnly("com.android.tools.build:gradle:3.0.0")
     compile("net.swiftzer.semver:semver:1.0.0")
 

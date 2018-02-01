@@ -9,7 +9,7 @@ buildscript {
     }
 }
 plugins {
-    kotlin("jvm") version "1.2.20" apply false
+    kotlin("jvm") version "1.2.21" apply false
     id("com.android.application") version "3.0.1" apply false
 }
 
