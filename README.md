@@ -81,7 +81,7 @@ triggers related tasks in subprojects.
 
 ### IDE Support
 
-Import the [samples/settings.gradle](samples/settings.gradle) file into your IDE.
+Import the [settings.gradle.kts](settings.gradle.kts) file into your IDE.
 
 #### Building
 
