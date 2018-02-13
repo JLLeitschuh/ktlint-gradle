@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "org.jlleitschuh.gradle"
-version = "3.0.1"
+version = "3.0.2-SNAPSHOT"
 
 repositories {
     jcenter()
