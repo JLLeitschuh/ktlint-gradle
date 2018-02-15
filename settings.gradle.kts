@@ -1,3 +1,5 @@
+import java.util.Properties
+
 pluginManagement {
     repositories {
         gradlePluginPortal()
@@ -14,8 +16,20 @@ pluginManagement {
 
 rootProject.name = "ktlint-gradle-samples"
 
+fun isAndroidSdkAvailable(): Boolean {
+    val propertiesFile = file("local.properties")
+    if (propertiesFile.exists()) {
+        val properties = Properties()
+        properties.load(propertiesFile.inputStream())
+        return properties.containsKey("sdk.dir")
+    }
+
+    return false
+}
+
 include("samples:kotlin-ks")
 include("samples:kotlin-gradle")
-include("samples:android-app")
-
+if (isAndroidSdkAvailable()) {
+    include("samples:android-app")
+}
 includeBuild("./plugin")

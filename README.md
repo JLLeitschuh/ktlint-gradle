@@ -83,6 +83,11 @@ triggers related tasks in subprojects.
 
 Import the [settings.gradle.kts](settings.gradle.kts) file into your IDE.
 
+To enable Android sample add `local.properties` file to project root folder with following content:
+```properties
+sdk.dir=<android-sdk-location>
+```
+
 #### Building
 
 `./gradlew build`
