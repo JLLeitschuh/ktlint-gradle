@@ -16,7 +16,7 @@ pluginManagement {
 
 rootProject.name = "ktlint-gradle-samples"
 
-fun isAndroidSdkAvailable(): Boolean {
+fun isAndroidSdkInLocalPropertiesSet(): Boolean {
     val propertiesFile = file("local.properties")
     if (propertiesFile.exists()) {
         val properties = Properties()
@@ -26,6 +26,9 @@ fun isAndroidSdkAvailable(): Boolean {
 
     return false
 }
+
+fun isAndroidSdkVariableSet(): Boolean = System.getenv().containsKey("ANDROID_HOME")
+fun isAndroidSdkAvailable(): Boolean = isAndroidSdkVariableSet() || isAndroidSdkInLocalPropertiesSet()
 
 include("samples:kotlin-ks")
 include("samples:kotlin-gradle")
