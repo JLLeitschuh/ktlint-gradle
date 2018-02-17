@@ -1,0 +1,23 @@
+buildscript {
+    ext.kotlin_version = '1.2.21'
+
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+
+apply plugin: 'kotlin-platform-common'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlin_version"
+    testCompile "org.jetbrains.kotlin:kotlin-test-annotations-common:$kotlin_version"
+    testCompile "org.jetbrains.kotlin:kotlin-test-common:$kotlin_version"
+}
