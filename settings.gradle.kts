@@ -35,4 +35,6 @@ include("samples:kotlin-gradle")
 if (isAndroidSdkAvailable()) {
     include("samples:android-app")
 }
+include("samples:kotlin-js")
+
 includeBuild("./plugin")
