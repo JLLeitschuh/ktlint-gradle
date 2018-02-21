@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ## Added
- - ?
+ - Support for Kotlin javascript (kotlin2js)
 ## Changed
  - ?
 ## Fixed
