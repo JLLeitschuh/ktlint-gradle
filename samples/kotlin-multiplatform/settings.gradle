@@ -1,3 +1,0 @@
-rootProject.name = 'kotlin-multiplatform'
-
-include 'kotlin-multiplatform-jvm', 'kotlin-multiplatform-js'
