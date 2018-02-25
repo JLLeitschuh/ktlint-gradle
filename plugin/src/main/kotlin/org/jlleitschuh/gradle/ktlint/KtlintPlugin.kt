@@ -19,6 +19,7 @@ import org.gradle.api.tasks.StopExecutionException
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import kotlin.reflect.KClass
 import net.swiftzer.semver.SemVer
+import org.gradle.api.plugins.AppliedPlugin
 import org.jlleitschuh.gradle.ktlint.reporter.applyReporters
 
 const val VERIFICATION_GROUP = "Verification"
@@ -35,17 +36,24 @@ open class KtlintPlugin : Plugin<Project> {
         val extension = target.extensions.create("ktlint", KtlintExtension::class.java)
 
         addKtLintTasksToKotlinPlugin(target, extension)
-        addKtLintTasksToAndroidKotlinPlugin(target, extension)
 
         // Checking subprojects as well
         target.subprojects {
             addKtLintTasksToKotlinPlugin(it, extension)
-            addKtLintTasksToAndroidKotlinPlugin(it, extension)
         }
     }
 
     private fun addKtLintTasksToKotlinPlugin(target: Project, extension: KtlintExtension) {
-        target.pluginManager.withPlugin("kotlin") {
+        target.pluginManager.withPlugin("kotlin", applyKtLint(target, extension))
+        target.pluginManager.withPlugin("kotlin2js", applyKtLint(target, extension))
+        target.pluginManager.withPlugin("kotlin-android", applyKtLintToAndroid(target, extension))
+    }
+
+    private fun applyKtLint(
+            target: Project,
+            extension: KtlintExtension
+    ): (AppliedPlugin) -> Unit {
+        return {
             target.afterEvaluate {
                 val ktLintConfig = createConfiguration(target, extension)
 
@@ -68,8 +76,11 @@ open class KtlintPlugin : Plugin<Project> {
         }
     }
 
-    private fun addKtLintTasksToAndroidKotlinPlugin(target: Project, extension: KtlintExtension) {
-        target.pluginManager.withPlugin("kotlin-android") {
+    private fun applyKtLintToAndroid(
+            target: Project,
+            extension: KtlintExtension
+    ): (AppliedPlugin) -> Unit {
+        return {
             target.afterEvaluate {
                 val ktLintConfig = createConfiguration(target, extension)
 
@@ -131,7 +142,7 @@ open class KtlintPlugin : Plugin<Project> {
                                  sourceSetName: String,
                                  ktLintConfig: Configuration,
                                  kotlinSourceSet: FileCollection,
-                                 runArgs: MutableSet<String>): JavaExec {
+                                 runArgs: MutableSet<String>): Task {
         return target.taskHelper<JavaExec>("ktlint${sourceSetName.capitalize()}Format") {
             group = FORMATTING_GROUP
             description = "Runs a check against all .kt files to ensure that they are formatted according to ktlint."
