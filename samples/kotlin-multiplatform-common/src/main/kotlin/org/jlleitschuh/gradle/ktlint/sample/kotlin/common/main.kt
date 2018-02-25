@@ -1,4 +1,4 @@
-package org.jlleitschuh.gradle.ktlint.sample.kotlin
+package org.jlleitschuh.gradle.ktlint.sample.kotlin.common
 
 /**
  * The main function is multi-platform, it depends on platform specific code.

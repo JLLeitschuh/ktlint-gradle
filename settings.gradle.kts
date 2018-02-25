@@ -36,5 +36,6 @@ if (isAndroidSdkAvailable()) {
     include("samples:android-app")
 }
 include("samples:kotlin-js")
+include("samples:kotlin-multiplatform-common")
 
 includeBuild("./plugin")
