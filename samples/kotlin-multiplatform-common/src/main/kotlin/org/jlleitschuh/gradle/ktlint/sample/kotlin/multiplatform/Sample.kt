@@ -1,4 +1,4 @@
-package org.jlleitschuh.gradle.ktlint.sample.kotlin.common
+package org.jlleitschuh.gradle.ktlint.sample.kotlin.multiplatform
 
 /**
  * Each platform must implement a Sample class matching this signature.

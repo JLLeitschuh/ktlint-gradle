@@ -1,4 +1,4 @@
-package org.jlleitschuh.gradle.ktlint.sample.kotlin
+package org.jlleitschuh.gradle.ktlint.sample.kotlin.multiplatform
 
 /**
  * JVM platform implementation of demo class.
