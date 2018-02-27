@@ -1,7 +1,7 @@
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
 
+plugins.apply("org.jlleitschuh.gradle.ktlint")
 apply {
-    plugins.apply("org.jlleitschuh.gradle.ktlint")
     plugin("kotlin-platform-jvm")
 }
 

@@ -1,8 +1,8 @@
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
+plugins.apply("org.jlleitschuh.gradle.ktlint")
 apply {
-    plugins.apply("org.jlleitschuh.gradle.ktlint")
     plugin("kotlin2js")
 }
 
