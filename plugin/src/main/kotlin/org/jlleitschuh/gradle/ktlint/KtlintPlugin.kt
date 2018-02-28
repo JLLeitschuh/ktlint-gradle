@@ -46,6 +46,7 @@ open class KtlintPlugin : Plugin<Project> {
     private fun addKtLintTasksToKotlinPlugin(target: Project, extension: KtlintExtension) {
         target.pluginManager.withPlugin("kotlin", applyKtLint(target, extension))
         target.pluginManager.withPlugin("kotlin2js", applyKtLint(target, extension))
+        target.pluginManager.withPlugin("kotlin-platform-common", applyKtLint(target, extension))
         target.pluginManager.withPlugin("kotlin-android", applyKtLintToAndroid(target, extension))
     }
 

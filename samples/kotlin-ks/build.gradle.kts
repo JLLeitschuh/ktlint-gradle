@@ -5,8 +5,8 @@ plugins {
     application
 }
 
+plugins.apply("org.jlleitschuh.gradle.ktlint")
 apply {
-    plugins.apply("org.jlleitschuh.gradle.ktlint")
     plugin("kotlin")
 }
 
