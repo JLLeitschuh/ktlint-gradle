@@ -15,12 +15,14 @@ version = "3.0.2-SNAPSHOT"
 repositories {
     jcenter()
     google()
+    maven("https://dl.bintray.com/jetbrains/kotlin-native-dependencies")
 }
 
 dependencies {
     compileOnly(gradleApi())
     compileOnly(kotlin("gradle-plugin", "1.2.21"))
     compileOnly("com.android.tools.build:gradle:3.0.0")
+    compileOnly("org.jetbrains.kotlin:kotlin-native-gradle-plugin:0.6")
     compile("net.swiftzer.semver:semver:1.0.0")
 
     /*

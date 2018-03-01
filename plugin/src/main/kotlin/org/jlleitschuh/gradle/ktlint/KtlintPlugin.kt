@@ -5,6 +5,7 @@ import com.android.build.gradle.FeaturePlugin
 import com.android.build.gradle.InstantAppPlugin
 import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.TestPlugin
+import net.swiftzer.semver.SemVer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -12,15 +13,17 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.internal.HasConvention
+import org.gradle.api.plugins.AppliedPlugin
 import org.gradle.api.plugins.Convention
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.StopExecutionException
+import org.jetbrains.kotlin.gradle.plugin.KonanArtifactContainer
+import org.jetbrains.kotlin.gradle.plugin.KonanExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
-import kotlin.reflect.KClass
-import net.swiftzer.semver.SemVer
-import org.gradle.api.plugins.AppliedPlugin
+import org.jetbrains.kotlin.gradle.plugin.tasks.KonanCompileTask
 import org.jlleitschuh.gradle.ktlint.reporter.applyReporters
+import kotlin.reflect.KClass
 
 const val VERIFICATION_GROUP = "Verification"
 const val FORMATTING_GROUP = "Formatting"
@@ -48,6 +51,7 @@ open class KtlintPlugin : Plugin<Project> {
         target.pluginManager.withPlugin("kotlin2js", applyKtLint(target, extension))
         target.pluginManager.withPlugin("kotlin-platform-common", applyKtLint(target, extension))
         target.pluginManager.withPlugin("kotlin-android", applyKtLintToAndroid(target, extension))
+        target.pluginManager.withPlugin("konan", applyKtLintNative(target, extension))
     }
 
     private fun applyKtLint(
@@ -105,6 +109,46 @@ open class KtlintPlugin : Plugin<Project> {
 
                     val ktlintSourceSetFormatTask = createFormatTask(target, it.fullVariantName, ktLintConfig, kotlinSourceDir, runArgs)
                     addKtlintFormatTaskToProjectMetaFormatTask(target, ktlintSourceSetFormatTask)
+                }
+            }
+        }
+    }
+
+    private fun applyKtLintNative(
+            project: Project,
+            extension: KtlintExtension
+    ): (AppliedPlugin) -> Unit {
+        return {
+            project.afterEvaluate {
+                val ktLintConfig = createConfiguration(project, extension)
+
+                val compileTargets = project.theHelper<KonanExtension>().targets
+
+                project.theHelper<KonanArtifactContainer>().forEach { konanBuildingConfig ->
+                    val sourceDirectoriesList = mutableListOf<FileCollection>()
+                    compileTargets.forEach { target ->
+                        val compileTask = konanBuildingConfig.findByTarget(target)
+                        if (compileTask != null) {
+                            val sourceFiles = (compileTask as KonanCompileTask).srcFiles
+                            sourceDirectoriesList.addAll(sourceFiles)
+                        }
+                    }
+                    if (sourceDirectoriesList.isNotEmpty()) {
+                        val kotlinSourceSet = sourceDirectoriesList.reduce { acc, fileCollection ->
+                            acc.add(fileCollection)
+                        }
+                        val runArgs = kotlinSourceSet.files.map { "${it.path}/**/*.kt" }.toMutableSet()
+                        addAdditionalRunArgs(extension, runArgs)
+
+                        val checkTask = createCheckTask(project, extension, it.name, ktLintConfig,
+                                kotlinSourceSet, runArgs)
+                        addKtlintCheckTaskToProjectMetaCheckTask(project, checkTask)
+                        setCheckTaskDependsOnKtlintCheckTask(project, checkTask)
+
+                        val ktlintSourceSetFormatTask = createFormatTask(project, it.name, ktLintConfig,
+                                kotlinSourceSet, runArgs)
+                        addKtlintFormatTaskToProjectMetaFormatTask(project, ktlintSourceSetFormatTask)
+                    }
                 }
             }
         }
