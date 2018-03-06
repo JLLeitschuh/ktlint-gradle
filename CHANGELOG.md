@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Added
  - Support for Kotlin javascript (kotlin2js) (#58)
  - Support for Kotlin multiplatform projects (#58)
+ - Support for Kotlin native (konan) (#58)
 ## Changed
  - ?
 ## Fixed

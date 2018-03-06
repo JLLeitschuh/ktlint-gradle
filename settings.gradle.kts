@@ -4,11 +4,15 @@ pluginManagement {
     repositories {
         gradlePluginPortal()
         google()
+        maven("https://dl.bintray.com/jetbrains/kotlin-native-dependencies")
     }
     resolutionStrategy {
         eachPlugin {
-            if (requested.id.id == "com.android.application") {
-                useModule("com.android.tools.build:gradle:${requested.version}")
+            when (requested.id.id) {
+                "com.android.application" ->
+                    useModule("com.android.tools.build:gradle:${requested.version}")
+                "konan" ->
+                    useModule("org.jetbrains.kotlin:kotlin-native-gradle-plugin:${requested.version}")
             }
         }
     }
@@ -39,5 +43,6 @@ include("samples:kotlin-js")
 include("samples:kotlin-multiplatform-common")
 include("samples:kotlin-multiplatform-jvm")
 include("samples:kotlin-multiplatform-js")
+include("samples:kotlin-native")
 
 includeBuild("./plugin")
