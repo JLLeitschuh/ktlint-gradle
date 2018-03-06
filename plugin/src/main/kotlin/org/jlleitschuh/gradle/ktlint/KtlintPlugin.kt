@@ -221,14 +221,14 @@ open class KtlintPlugin : Plugin<Project> {
         }
     }
 
-    private fun Project.getMetaKtlintCheckTask(): Task = this.tasks.findByName(CHECK_PARENT_TASK_NAME) ?:
-            this.task(CHECK_PARENT_TASK_NAME).apply {
+    private fun Project.getMetaKtlintCheckTask(): Task = this.tasks.findByName(CHECK_PARENT_TASK_NAME)
+            ?: this.task(CHECK_PARENT_TASK_NAME).apply {
                 group = VERIFICATION_GROUP
                 description = "Runs ktlint on all kotlin sources in this project."
             }
 
-    private fun Project.getMetaKtlintFormatTask(): Task = this.tasks.findByName(FORMAT_PARENT_TASK_NAME) ?:
-            this.task(FORMAT_PARENT_TASK_NAME).apply {
+    private fun Project.getMetaKtlintFormatTask(): Task = this.tasks.findByName(FORMAT_PARENT_TASK_NAME)
+            ?: this.task(FORMAT_PARENT_TASK_NAME).apply {
                 group = FORMATTING_GROUP
                 description = "Runs the ktlint formatter on all kotlin sources in this project."
             }
