@@ -5,15 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [3.1.0] - 2018-3-18
 ## Added
  - Support for Kotlin javascript (kotlin2js) (#58)
  - Support for Kotlin multiplatform projects (#58)
  - Support for Kotlin native (konan) (#58)
-## Changed
- - ?
-## Fixed
- - ?
 
 ## [3.0.1] - 2018-2-13
 ### Added
