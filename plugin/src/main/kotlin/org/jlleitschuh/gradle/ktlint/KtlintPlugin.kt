@@ -193,7 +193,7 @@ open class KtlintPlugin : Plugin<Project> {
             description = "Runs a check against all .kt files to ensure that they are formatted according to ktlint."
             main = "com.github.shyiko.ktlint.Main"
             classpath = ktLintConfig
-            inputs.dir(kotlinSourceSet)
+            inputs.files(kotlinSourceSet)
             // This copies the list
             val sourcePathsWithFormatFlag = runArgs.toMutableList()
             // Prepend the format flag to the beginning of the list
@@ -213,7 +213,7 @@ open class KtlintPlugin : Plugin<Project> {
             description = "Runs a check against all .kt files to ensure that they are formatted according to ktlint."
             main = "com.github.shyiko.ktlint.Main"
             classpath = ktLintConfig
-            inputs.dir(kotlinSourceSet)
+            inputs.files(kotlinSourceSet)
             args(runArgs)
         }.apply {
             this.isIgnoreExitValue = extension.ignoreFailures

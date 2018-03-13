@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
  - ?
 ### Changed
- - ?
+ - Remove usage of deprecated Gradle features (#60)
 ### Fixed
  - ?
 
