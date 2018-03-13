@@ -4,7 +4,7 @@ import org.gradle.api.tasks.wrapper.Wrapper
 
 plugins {
     kotlin("jvm") version "1.2.21"
-    id("com.gradle.plugin-publish") version "0.9.7"
+    id("com.gradle.plugin-publish") version "0.9.10"
     id("maven-publish")
     id("org.jlleitschuh.gradle.ktlint") version "3.0.1"
 }
