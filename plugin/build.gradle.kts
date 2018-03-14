@@ -5,6 +5,7 @@ import org.gradle.api.tasks.wrapper.Wrapper
 plugins {
     kotlin("jvm") version "1.2.21"
     id("com.gradle.plugin-publish") version "0.9.10"
+    id("java-gradle-plugin")
     id("maven-publish")
     id("org.jlleitschuh.gradle.ktlint") version "3.0.1"
 }
@@ -20,22 +21,34 @@ repositories {
 
 dependencies {
     compileOnly(gradleApi())
-    compileOnly(kotlin("gradle-plugin", "1.2.21"))
-    compileOnly("com.android.tools.build:gradle:3.0.0")
-    compileOnly("org.jetbrains.kotlin:kotlin-native-gradle-plugin:0.6")
-    compile("net.swiftzer.semver:semver:1.0.0")
+    implementation(kotlin("gradle-plugin", "1.2.21"))
+    implementation("com.android.tools.build:gradle:3.0.0")
+    implementation("org.jetbrains.kotlin:kotlin-native-gradle-plugin:0.6")
+    implementation("net.swiftzer.semver:semver:1.0.0")
 
     /*
      * Do not depend upon the gradle script kotlin plugin API. IE: gradleScriptKotlinApi()
      * It's currently in flux and has binary breaking changes in gradle 4.0
      * https://github.com/JLLeitschuh/ktlint-gradle/issues/9
      */
+
+    testImplementation(gradleTestKit())
+    testImplementation("junit:junit:4.12")
 }
 
 configure<PublishingExtension> {
     publications {
         create<MavenPublication>("mavenJar") {
             from(components.getByName("java"))
+        }
+    }
+}
+
+gradlePlugin {
+    (plugins) {
+        "ktlintPlugin" {
+            id = "org.jlleitschuh.gradle.ktlint"
+            implementationClass = "org.jlleitschuh.gradle.ktlint.KtlintPlugin"
         }
     }
 }
