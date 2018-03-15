@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
  - Remove usage of deprecated Gradle features (#60)
 ### Fixed
- - ?
+ - Fix running check task also runs some android tasks (#63)
 
 ## [3.1.0] - 2018-3-18
 ## Added
