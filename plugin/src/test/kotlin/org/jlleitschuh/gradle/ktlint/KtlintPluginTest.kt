@@ -36,7 +36,7 @@ class KtlintPluginTest {
     }
 
     @Test
-    fun `check tasks`() {
+    fun `should fail check on failing sources`() {
 
         withFailingSources()
 
@@ -44,6 +44,10 @@ class KtlintPluginTest {
             assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.FAILED))
             assertThat(output, containsString("Unnecessary space(s)"))
         }
+    }
+
+    @Test
+    fun `should succeed check on clean sources`() {
 
         withCleanSources()
 
