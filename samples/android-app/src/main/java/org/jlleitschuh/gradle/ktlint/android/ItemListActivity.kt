@@ -61,10 +61,11 @@ class ItemListActivity : AppCompatActivity() {
         recyclerView.adapter = SimpleItemRecyclerViewAdapter(this, DummyContent.ITEMS, mTwoPane)
     }
 
-    class SimpleItemRecyclerViewAdapter(private val mParentActivity: ItemListActivity,
-                                        private val mValues: List<DummyContent.DummyItem>,
-                                        private val mTwoPane: Boolean) :
-            RecyclerView.Adapter<ViewHolder>() {
+    class SimpleItemRecyclerViewAdapter(
+        private val mParentActivity: ItemListActivity,
+        private val mValues: List<DummyContent.DummyItem>,
+        private val mTwoPane: Boolean
+    ) : RecyclerView.Adapter<ViewHolder>() {
 
         private val mOnClickListener: View.OnClickListener
 
