@@ -1,5 +1,5 @@
 object Versions {
-    val kotlin = "1.2.21"
+    val kotlin = "1.2.30"
     val androidPlugin = "3.0.0"
     val kotlinNativePlugin = "0.6"
     val gradleWrapper = "4.5"
