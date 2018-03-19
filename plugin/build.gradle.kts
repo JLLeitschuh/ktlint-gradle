@@ -3,10 +3,10 @@ import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.wrapper.Wrapper
 
 plugins {
-    kotlin("jvm") version Versions.kotlin
-    id("com.gradle.plugin-publish") version Versions.gradlePublishPlugin
+    kotlin("jvm") version PluginVersions.kotlin
+    id("com.gradle.plugin-publish") version PluginVersions.gradlePublishPlugin
     id("maven-publish")
-    id("org.jlleitschuh.gradle.ktlint") version Versions.ktlintPlugin
+    id("org.jlleitschuh.gradle.ktlint") version PluginVersions.ktlintPlugin
 }
 
 group = "org.jlleitschuh.gradle"
@@ -20,10 +20,10 @@ repositories {
 
 dependencies {
     compileOnly(gradleApi())
-    compileOnly(kotlin("gradle-plugin", Versions.kotlin))
-    compileOnly("com.android.tools.build:gradle:${Versions.androidPlugin}")
-    compileOnly("org.jetbrains.kotlin:kotlin-native-gradle-plugin:${Versions.kotlinNativePlugin}")
-    compile("net.swiftzer.semver:semver:${Versions.semver}")
+    compileOnly(kotlin("gradle-plugin", PluginVersions.kotlin))
+    compileOnly("com.android.tools.build:gradle:${PluginVersions.androidPlugin}")
+    compileOnly("org.jetbrains.kotlin:kotlin-native-gradle-plugin:${PluginVersions.kotlinNativePlugin}")
+    compile("net.swiftzer.semver:semver:${PluginVersions.semver}")
 
     /*
      * Do not depend upon the gradle script kotlin plugin API. IE: gradleScriptKotlinApi()
@@ -55,5 +55,5 @@ pluginBundle {
 }
 
 task<Wrapper>("wrapper") {
-    gradleVersion = Versions.gradleWrapper
+    gradleVersion = PluginVersions.gradleWrapper
 }

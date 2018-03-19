@@ -33,14 +33,14 @@ configure<AppExtension> {
 }
 
 dependencies {
-    "implementation"("org.jetbrains.kotlin:kotlin-stdlib-jre7:${Versions.kotlin}")
-    "implementation"("com.android.support:appcompat-v7:${Versions.androidSupport}")
-    "implementation"("com.android.support:support-v4:${Versions.androidSupport}")
-    "implementation"("com.android.support:recyclerview-v7:${Versions.androidSupport}")
-    "implementation"("com.android.support:design:${Versions.androidSupport}")
-    "testImplementation"("junit:junit:${Versions.junit}")
-    "androidTestImplementation"("com.android.support.test:runner:${Versions.espressoRunner}")
-    "androidTestImplementation"("com.android.support.test.espresso:espresso-core:${Versions.espresso}")
+    "implementation"("org.jetbrains.kotlin:kotlin-stdlib-jre7:${SamplesVersions.kotlin}")
+    "implementation"("com.android.support:appcompat-v7:${SamplesVersions.androidSupport}")
+    "implementation"("com.android.support:support-v4:${SamplesVersions.androidSupport}")
+    "implementation"("com.android.support:recyclerview-v7:${SamplesVersions.androidSupport}")
+    "implementation"("com.android.support:design:${SamplesVersions.androidSupport}")
+    "testImplementation"("junit:junit:${SamplesVersions.junit}")
+    "androidTestImplementation"("com.android.support.test:runner:${SamplesVersions.espressoRunner}")
+    "androidTestImplementation"("com.android.support.test.espresso:espresso-core:${SamplesVersions.espresso}")
 }
 
 configure<KtlintExtension> {
