@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.gradle.plugin.KonanExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.tasks.KonanCompileTask
 import org.jlleitschuh.gradle.ktlint.reporter.applyReporters
+import java.io.File
 import kotlin.reflect.KClass
 
 const val VERIFICATION_GROUP = "Verification"
@@ -99,7 +100,13 @@ open class KtlintPlugin : Plugin<Project> {
                 }
 
                 variantManager?.variantScopes?.forEach {
-                    val kotlinSourceDir = target.files(it.variantData.javaSources)
+                    val sourceDirs = it.variantData.javaSources
+                            .fold(mutableListOf<File>()) { acc, configurableFileTree ->
+                                acc.add(configurableFileTree.dir)
+                                acc
+                            }
+                    // Don't use it.variantData.javaSources directly as it will trigger some android tasks execution
+                    val kotlinSourceDir = target.files(*sourceDirs.toTypedArray())
                     val runArgs = it.variantData.javaSources.map { "${it.dir.path}/**/*.kt" }.toMutableSet()
                     addAdditionalRunArgs(extension, runArgs)
 
