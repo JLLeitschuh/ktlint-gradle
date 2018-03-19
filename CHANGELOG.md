@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Remove usage of deprecated Gradle features (#60)
  - Update Kotlin to 1.2.30 version
  - Update Gradle to 4.6 version
+ - Update default Ktlint version to 0.19.0
 ### Fixed
  - Fix running check task also runs some android tasks (#63)
 
