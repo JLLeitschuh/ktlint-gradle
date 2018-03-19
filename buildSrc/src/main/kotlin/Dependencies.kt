@@ -2,7 +2,7 @@ object Versions {
     val kotlin = "1.2.30"
     val androidPlugin = "3.0.0"
     val kotlinNativePlugin = "0.6"
-    val gradleWrapper = "4.5"
+    val gradleWrapper = "4.6"
 
     // Android sample dependencies
     val androidSupport = "27.0.2"
