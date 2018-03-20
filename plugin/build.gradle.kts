@@ -21,9 +21,10 @@ repositories {
 
 dependencies {
     compileOnly(gradleApi())
-    implementation(kotlin("gradle-plugin", "1.2.21"))
-    implementation("com.android.tools.build:gradle:3.0.0")
-    implementation("org.jetbrains.kotlin:kotlin-native-gradle-plugin:0.6")
+    compileOnly(kotlin("gradle-plugin", "1.2.21"))
+    compileOnly("com.android.tools.build:gradle:3.0.0")
+    compileOnly("org.jetbrains.kotlin:kotlin-native-gradle-plugin:0.6")
+
     implementation("net.swiftzer.semver:semver:1.0.0")
 
     /*
@@ -69,4 +70,28 @@ pluginBundle {
 
 task<Wrapper>("wrapper") {
     gradleVersion = "4.5"
+}
+
+// Work around Gradle TestKit limitations in order to allow for compileOnly dependencies
+publishing {
+    repositories {
+        maven {
+            name = "test"
+            url = uri("$buildDir/plugin-test-repository")
+        }
+    }
+}
+tasks {
+    val publishPluginsToTestRepository by creating {
+        dependsOn("publishPluginMavenPublicationToTestRepository")
+    }
+    val processTestResources: ProcessResources by getting
+    val writeTestProperties by creating(WriteProperties::class) {
+        outputFile = processTestResources.destinationDir.resolve("test.properties")
+        property("version", version)
+    }
+    processTestResources.dependsOn(writeTestProperties)
+    "test" {
+        dependsOn(publishPluginsToTestRepository)
+    }
 }

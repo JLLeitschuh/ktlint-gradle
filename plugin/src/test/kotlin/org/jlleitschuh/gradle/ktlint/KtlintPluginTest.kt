@@ -1,6 +1,5 @@
 package org.jlleitschuh.gradle.ktlint
 
-import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 
 import org.hamcrest.CoreMatchers.containsString
@@ -8,24 +7,21 @@ import org.hamcrest.CoreMatchers.equalTo
 
 import org.junit.Assert.assertThat
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.TemporaryFolder
 
-class KtlintPluginTest {
-
-    @get:Rule
-    val temporaryFolder = TemporaryFolder()
+class KtlintPluginTest : AbstractPluginTest() {
 
     @Before
     fun setupBuild() {
-        temporaryFolder.root.apply {
-            resolve("settings.gradle").writeText("")
+        projectRoot.apply {
             resolve("build.gradle").writeText("""
+                ${buildscriptBlockWithUnderTestPlugin()}
+
                 plugins {
                     id("org.jetbrains.kotlin.jvm") version "1.2.21"
-                    id("org.jlleitschuh.gradle.ktlint")
                 }
+
+                apply plugin: "org.jlleitschuh.gradle.ktlint"
 
                 repositories {
                     gradlePluginPortal()
@@ -57,25 +53,10 @@ class KtlintPluginTest {
     }
 
     private
-    fun build(vararg arguments: String) =
-        gradleRunnerFor(*arguments).build()
-
-    private
-    fun buildAndFail(vararg arguments: String) =
-        gradleRunnerFor(*arguments).buildAndFail()
-
-    private
-    fun gradleRunnerFor(vararg arguments: String) =
-        GradleRunner.create()
-            .withProjectDir(temporaryFolder.root)
-            .withPluginClasspath()
-            .withArguments(arguments.toList())
-
-    private
     fun withCleanSources() =
-        temporaryFolder.root.resolve("src/main/kotlin/source.kt").writeText("""val foo = "bar"""")
+        projectRoot.resolve("src/main/kotlin/source.kt").writeText("""val foo = "bar"""")
 
     private
     fun withFailingSources() =
-        temporaryFolder.root.resolve("src/main/kotlin/source.kt").writeText("""val  foo    =     "bar"""")
+        projectRoot.resolve("src/main/kotlin/source.kt").writeText("""val  foo    =     "bar"""")
 }
