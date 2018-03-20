@@ -88,6 +88,7 @@ tasks {
     val writeTestProperties by creating(WriteProperties::class) {
         outputFile = processTestResources.destinationDir.resolve("test.properties")
         property("version", version)
+        property("kotlinVersion", PluginVersions.kotlin)
     }
     processTestResources.dependsOn(writeTestProperties)
     "test" {

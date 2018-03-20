@@ -48,7 +48,7 @@ abstract class AbstractPluginTest {
     val testRepositoryPath
         get() = normaliseFileSeparators(File("build/plugin-test-repository").absolutePath)
 
-    private
+    protected
     val testProperties: Properties by lazy {
         javaClass.getResourceAsStream("/test.properties").use {
             Properties().apply { load(it) }
