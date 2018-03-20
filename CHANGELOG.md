@@ -5,9 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
-### Added
- - ?
+## [3.2.0] - 2018-3-19
 ### Changed
  - Remove usage of deprecated Gradle features (#60)
  - Update Kotlin to 1.2.30 version
