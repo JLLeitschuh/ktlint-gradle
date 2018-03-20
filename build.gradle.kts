@@ -10,9 +10,9 @@ buildscript {
     }
 }
 plugins {
-    kotlin("jvm") version "1.2.21" apply false
-    id("com.android.application") version "3.0.1" apply false
-    id("konan") version "0.6" apply false
+    kotlin("jvm") version SamplesVersions.kotlin apply false
+    id("com.android.application") version SamplesVersions.androidPlugin apply false
+    id("konan") version SamplesVersions.kotlinNativePlugin apply false
 }
 
 allprojects {
@@ -23,6 +23,6 @@ allprojects {
 }
 
 task<Wrapper>("wrapper") {
-    gradleVersion = "4.5"
+    gradleVersion = SamplesVersions.gradleWrapper
     distributionType = Wrapper.DistributionType.ALL
 }

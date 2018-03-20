@@ -33,14 +33,14 @@ configure<AppExtension> {
 }
 
 dependencies {
-    "implementation"("org.jetbrains.kotlin:kotlin-stdlib-jre7:1.2.0")
-    "implementation"("com.android.support:appcompat-v7:27.0.2")
-    "implementation"("com.android.support:support-v4:27.0.2")
-    "implementation"("com.android.support:recyclerview-v7:27.0.2")
-    "implementation"("com.android.support:design:27.0.2")
-    "testImplementation"("junit:junit:4.12")
-    "androidTestImplementation"("com.android.support.test:runner:1.0.1")
-    "androidTestImplementation"("com.android.support.test.espresso:espresso-core:3.0.1")
+    "implementation"("org.jetbrains.kotlin:kotlin-stdlib-jre7:${SamplesVersions.kotlin}")
+    "implementation"("com.android.support:appcompat-v7:${SamplesVersions.androidSupport}")
+    "implementation"("com.android.support:support-v4:${SamplesVersions.androidSupport}")
+    "implementation"("com.android.support:recyclerview-v7:${SamplesVersions.androidSupport}")
+    "implementation"("com.android.support:design:${SamplesVersions.androidSupport}")
+    "testImplementation"("junit:junit:${SamplesVersions.junit}")
+    "androidTestImplementation"("com.android.support.test:runner:${SamplesVersions.espressoRunner}")
+    "androidTestImplementation"("com.android.support.test.espresso:espresso-core:${SamplesVersions.espresso}")
 }
 
 configure<KtlintExtension> {

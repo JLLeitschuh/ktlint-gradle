@@ -3,15 +3,15 @@ import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.wrapper.Wrapper
 
 plugins {
-    kotlin("jvm") version "1.2.21"
-    id("com.gradle.plugin-publish") version "0.9.10"
+    kotlin("jvm") version PluginVersions.kotlin
+    id("com.gradle.plugin-publish") version PluginVersions.gradlePublishPlugin
     id("java-gradle-plugin")
     id("maven-publish")
-    id("org.jlleitschuh.gradle.ktlint") version "3.0.1"
+    id("org.jlleitschuh.gradle.ktlint") version PluginVersions.ktlintPlugin
 }
 
 group = "org.jlleitschuh.gradle"
-version = "3.1.1-SNAPSHOT"
+version = "3.2.0"
 
 repositories {
     jcenter()
@@ -21,11 +21,10 @@ repositories {
 
 dependencies {
     compileOnly(gradleApi())
-    compileOnly(kotlin("gradle-plugin", "1.2.21"))
-    compileOnly("com.android.tools.build:gradle:3.0.0")
-    compileOnly("org.jetbrains.kotlin:kotlin-native-gradle-plugin:0.6")
-
-    implementation("net.swiftzer.semver:semver:1.0.0")
+    compileOnly(kotlin("gradle-plugin", PluginVersions.kotlin))
+    compileOnly("com.android.tools.build:gradle:${PluginVersions.androidPlugin}")
+    compileOnly("org.jetbrains.kotlin:kotlin-native-gradle-plugin:${PluginVersions.kotlinNativePlugin}")
+    implementation("net.swiftzer.semver:semver:${PluginVersions.semver}")
 
     /*
      * Do not depend upon the gradle script kotlin plugin API. IE: gradleScriptKotlinApi()
@@ -69,7 +68,7 @@ pluginBundle {
 }
 
 task<Wrapper>("wrapper") {
-    gradleVersion = "4.5"
+    gradleVersion = PluginVersions.gradleWrapper
 }
 
 // Work around Gradle TestKit limitations in order to allow for compileOnly dependencies
