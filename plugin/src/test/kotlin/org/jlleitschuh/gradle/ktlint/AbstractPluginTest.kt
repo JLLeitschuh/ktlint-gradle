@@ -9,7 +9,7 @@ import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 
 import java.io.File
-import java.util.*
+import java.util.Properties
 
 abstract class AbstractPluginTest {
 
