@@ -106,7 +106,7 @@ private inline fun checkReporterAvailable(
 private fun JavaExec.applyOutputReporter(reporter: ReporterType, target: Project, sourceSetName: String) {
     doFirst {
         val reporterOutput = createReportOutputFile(target, reporter.fileExtension, sourceSetName)
-        this.args("--reporter=${reporter.reporterName},output=${reporterOutput.absolutePath}")
+        this.args("\"--reporter=${reporter.reporterName},output=${reporterOutput.absolutePath}\"")
     }
 }
 

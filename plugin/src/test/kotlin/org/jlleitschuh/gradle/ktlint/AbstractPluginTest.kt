@@ -17,7 +17,7 @@ abstract class AbstractPluginTest {
     val temporaryFolder = TemporaryFolder()
 
     val projectRoot: File
-        get() = temporaryFolder.root.resolve("plugin-test").apply { mkdirs() }
+        get() = temporaryFolder.root.resolve("plugin test").apply { mkdirs() }
 
     protected
     fun buildscriptBlockWithUnderTestPlugin() =
