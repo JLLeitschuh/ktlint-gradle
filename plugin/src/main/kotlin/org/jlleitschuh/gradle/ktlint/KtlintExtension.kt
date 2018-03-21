@@ -10,7 +10,7 @@ open class KtlintExtension {
     /**
      * The version of ktlint to use.
      */
-    var version = "0.19.0"
+    var version = "0.20.0"
     /**
      * Enable verbose mode.
      */
