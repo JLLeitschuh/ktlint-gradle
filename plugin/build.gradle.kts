@@ -5,6 +5,7 @@ import org.gradle.api.tasks.wrapper.Wrapper
 plugins {
     kotlin("jvm") version PluginVersions.kotlin
     id("com.gradle.plugin-publish") version PluginVersions.gradlePublishPlugin
+    id("java-gradle-plugin")
     id("maven-publish")
     id("org.jlleitschuh.gradle.ktlint") version PluginVersions.ktlintPlugin
 }
@@ -23,19 +24,31 @@ dependencies {
     compileOnly(kotlin("gradle-plugin", PluginVersions.kotlin))
     compileOnly("com.android.tools.build:gradle:${PluginVersions.androidPlugin}")
     compileOnly("org.jetbrains.kotlin:kotlin-native-gradle-plugin:${PluginVersions.kotlinNativePlugin}")
-    compile("net.swiftzer.semver:semver:${PluginVersions.semver}")
+    implementation("net.swiftzer.semver:semver:${PluginVersions.semver}")
 
     /*
      * Do not depend upon the gradle script kotlin plugin API. IE: gradleScriptKotlinApi()
      * It's currently in flux and has binary breaking changes in gradle 4.0
      * https://github.com/JLLeitschuh/ktlint-gradle/issues/9
      */
+
+    testImplementation(gradleTestKit())
+    testImplementation("junit:junit:4.12")
 }
 
 configure<PublishingExtension> {
     publications {
         create<MavenPublication>("mavenJar") {
             from(components.getByName("java"))
+        }
+    }
+}
+
+gradlePlugin {
+    (plugins) {
+        "ktlintPlugin" {
+            id = "org.jlleitschuh.gradle.ktlint"
+            implementationClass = "org.jlleitschuh.gradle.ktlint.KtlintPlugin"
         }
     }
 }
@@ -56,4 +69,29 @@ pluginBundle {
 
 task<Wrapper>("wrapper") {
     gradleVersion = PluginVersions.gradleWrapper
+}
+
+// Work around Gradle TestKit limitations in order to allow for compileOnly dependencies
+publishing {
+    repositories {
+        maven {
+            name = "test"
+            url = uri("$buildDir/plugin-test-repository")
+        }
+    }
+}
+tasks {
+    val publishPluginsToTestRepository by creating {
+        dependsOn("publishPluginMavenPublicationToTestRepository")
+    }
+    val processTestResources: ProcessResources by getting
+    val writeTestProperties by creating(WriteProperties::class) {
+        outputFile = processTestResources.destinationDir.resolve("test.properties")
+        property("version", version)
+        property("kotlinVersion", PluginVersions.kotlin)
+    }
+    processTestResources.dependsOn(writeTestProperties)
+    "test" {
+        dependsOn(publishPluginsToTestRepository)
+    }
 }
