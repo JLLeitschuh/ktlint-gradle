@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.2.1]
+### Changed
+ - Update default Ktlint version to 0.20.0
+
 ## [3.2.0] - 2018-3-19
 ### Changed
  - Remove usage of deprecated Gradle features (#60)
