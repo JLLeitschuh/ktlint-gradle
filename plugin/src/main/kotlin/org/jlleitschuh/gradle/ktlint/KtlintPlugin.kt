@@ -17,6 +17,7 @@ import org.gradle.api.plugins.AppliedPlugin
 import org.gradle.api.plugins.Convention
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.JavaExec
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.StopExecutionException
 import org.jetbrains.kotlin.gradle.plugin.KonanArtifactContainer
 import org.jetbrains.kotlin.gradle.plugin.KonanExtension
@@ -221,6 +222,8 @@ open class KtlintPlugin : Plugin<Project> {
             main = "com.github.shyiko.ktlint.Main"
             classpath = ktLintConfig
             inputs.files(kotlinSourceSet)
+                    .withPropertyName("source")
+                    .withPathSensitivity(PathSensitivity.RELATIVE)
             args(runArgs)
         }.apply {
             this.isIgnoreExitValue = extension.ignoreFailures
