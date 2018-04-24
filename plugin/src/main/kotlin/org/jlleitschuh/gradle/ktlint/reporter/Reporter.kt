@@ -3,6 +3,7 @@
 package org.jlleitschuh.gradle.ktlint.reporter
 
 import net.swiftzer.semver.SemVer
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.tasks.JavaExec
 import org.gradle.util.GFileUtils
@@ -28,16 +29,17 @@ private fun JavaExec.setMultipleReporters(
         target: Project,
         sourceSetName: String
 ) {
+    val requestedVersion = SemVer.parse(extension.version)
     extension.reporters.forEach { reporter ->
         checkReporterAvailable(reporter, extension, target) {
-            applyOutputReporter(reporter, target, sourceSetName)
+            applyOutputReporter(reporter, target, sourceSetName, requestedVersion)
         }
     }
 
     val oldReporter = extension.reporter
     if (oldReporter != null) {
         checkReporterAvailable(oldReporter, extension, target) {
-            applyOutputReporter(oldReporter, target, sourceSetName)
+            applyOutputReporter(oldReporter, target, sourceSetName, requestedVersion)
         }
     }
 
@@ -103,10 +105,16 @@ private inline fun checkReporterAvailable(
     }
 }
 
-private fun JavaExec.applyOutputReporter(reporter: ReporterType, target: Project, sourceSetName: String) {
+private fun JavaExec.applyOutputReporter(reporter: ReporterType, target: Project, sourceSetName: String, ktLintVersion: SemVer) {
     doFirst {
         val reporterOutput = createReportOutputFile(target, reporter.fileExtension, sourceSetName)
-        this.args("--reporter=${reporter.reporterName},output=${reporterOutput.absolutePath}")
+        val reportOutputPath = reporterOutput.absolutePath
+        if (reportOutputPath.contains(" ") && ktLintVersion < SemVer(0, 20, 0)) {
+            throw GradleException(
+                "The output path passed `$reportOutputPath` contains spaces. Ktlint versions less than 0.20.0 do not support this.")
+        } else {
+            this.args("--reporter=${reporter.reporterName},output=$reportOutputPath")
+        }
     }
 }
 
