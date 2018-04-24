@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Changed
- - Update default Ktlint version to 0.20.0
+ - Update default Ktlint version to 0.22.0
 
 ## [3.2.0] - 2018-3-19
 ### Changed
