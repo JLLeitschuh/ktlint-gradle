@@ -64,6 +64,10 @@ ktlint {
     outputToConsole = true
     reporters = ["PLAIN", "CHECKSTYLE"]
     ignoreFailures = true
+    ruleSets = [
+        "/path/to/custom/rulseset.jar",
+        "com.github.username:rulseset:master-SNAPSHOT"
+    ]
 }
 ```
 

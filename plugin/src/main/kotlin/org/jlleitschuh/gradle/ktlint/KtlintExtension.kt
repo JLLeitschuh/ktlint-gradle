@@ -34,6 +34,10 @@ open class KtlintExtension {
      * Example: `ignoreFailures = true`
      */
     var ignoreFailures = false
+    /**
+     * The ruleset(s) of ktlint to use.
+     */
+    var ruleSets: Array<String> = arrayOf()
 
     /**
      * Report output formats.
