@@ -12,6 +12,7 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
+import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.TaskAction
 import org.jlleitschuh.gradle.ktlint.reporter.KtlintReport
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
@@ -24,6 +25,7 @@ open class KtlintCheck : DefaultTask() {
     @get:Internal
     val sourceDirectories: ConfigurableFileCollection = project.files()
 
+    @get:SkipWhenEmpty
     @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:InputFiles
     val sources: FileTree = sourceDirectories.asFileTree.matching { it.include("**/*.kt") }
