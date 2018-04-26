@@ -31,4 +31,3 @@ tasks {
         dependsOn(":samples:kotlin-rulesets-creating:build")
     }
 }
-

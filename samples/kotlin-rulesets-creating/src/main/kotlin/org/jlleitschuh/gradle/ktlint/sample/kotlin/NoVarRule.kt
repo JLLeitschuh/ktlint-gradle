@@ -6,7 +6,7 @@ import org.jetbrains.kotlin.com.intellij.psi.impl.source.tree.LeafPsiElement
 import org.jetbrains.kotlin.com.intellij.psi.util.PsiTreeUtil.getNonStrictParentOfType
 import org.jetbrains.kotlin.psi.KtStringTemplateEntry
 
-class NovVarRule : Rule("no-var") {
+class NoVarRule : Rule("no-var") {
     override fun visit(
         node: ASTNode,
         autoCorrect: Boolean,
