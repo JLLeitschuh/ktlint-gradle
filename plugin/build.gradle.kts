@@ -36,6 +36,16 @@ dependencies {
     testImplementation("junit:junit:4.12")
 }
 
+// Work around Gradle TestKit limitations in order to allow for compileOnly dependencies
+publishing {
+    repositories {
+        maven {
+            name = "test"
+            url = uri("$buildDir/plugin-test-repository")
+        }
+    }
+}
+
 configure<PublishingExtension> {
     publications {
         create<MavenPublication>("mavenJar") {
@@ -71,15 +81,6 @@ task<Wrapper>("wrapper") {
     gradleVersion = PluginVersions.gradleWrapper
 }
 
-// Work around Gradle TestKit limitations in order to allow for compileOnly dependencies
-publishing {
-    repositories {
-        maven {
-            name = "test"
-            url = uri("$buildDir/plugin-test-repository")
-        }
-    }
-}
 tasks {
     val publishPluginsToTestRepository by creating {
         dependsOn("publishPluginMavenPublicationToTestRepository")
