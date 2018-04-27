@@ -58,7 +58,7 @@ class KtlintPluginTest : AbstractPluginTest() {
             ktlint.reporters = ["PLAIN_GROUP_BY_FILE", "CHECKSTYLE", "JSON"]
         """.trimIndent())
 
-        buildAndFail("ktlintCheck", "--info").apply {
+        buildAndFail("ktlintCheck").apply {
             assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.FAILED))
             assertThat(output, containsString("Unnecessary space(s)"))
             assertReportCreated(ReporterType.PLAIN_GROUP_BY_FILE)
