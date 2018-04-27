@@ -5,9 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [3.3.0] - 2018-4-24
+### Added
+ - Check for spaces in output path for KtLint versions earlier
+then 0.20.0 (#83)
+ - Use relative for input file path sensivity (#67)
 ### Changed
- - Update default Ktlint version to 0.20.0
+ - Update default Ktlint version to 0.22.0
 
 ## [3.2.0] - 2018-3-19
 ### Changed

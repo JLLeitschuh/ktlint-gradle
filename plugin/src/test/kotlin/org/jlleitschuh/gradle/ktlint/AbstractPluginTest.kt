@@ -31,6 +31,14 @@ abstract class AbstractPluginTest {
         """.trimIndent()
 
     protected
+    fun pluginsBlockWithKotlinJvmPlugin() =
+        """
+            plugins {
+                id("org.jetbrains.kotlin.jvm") version "${testProperties["kotlinVersion"]}"
+            }
+        """.trimIndent()
+
+    protected
     fun build(vararg arguments: String): BuildResult =
         gradleRunnerFor(*arguments).build()
 

@@ -18,9 +18,7 @@ class KtlintPluginTest : AbstractPluginTest() {
             resolve("build.gradle").writeText("""
                 ${buildscriptBlockWithUnderTestPlugin()}
 
-                plugins {
-                    id("org.jetbrains.kotlin.jvm") version "${testProperties["kotlinVersion"]}"
-                }
+                ${pluginsBlockWithKotlinJvmPlugin()}
 
                 apply plugin: "org.jlleitschuh.gradle.ktlint"
 
