@@ -2,12 +2,9 @@ package org.jlleitschuh.gradle.ktlint
 
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
-
 import org.gradle.util.TextUtil.normaliseFileSeparators
-
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
-
 import java.io.File
 import java.util.Properties
 
@@ -40,11 +37,11 @@ abstract class AbstractPluginTest {
 
     protected
     fun build(vararg arguments: String): BuildResult =
-        gradleRunnerFor(*arguments).build()
+        gradleRunnerFor(*arguments).forwardOutput().build()
 
     protected
     fun buildAndFail(vararg arguments: String): BuildResult =
-        gradleRunnerFor(*arguments).buildAndFail()
+        gradleRunnerFor(*arguments).forwardOutput().buildAndFail()
 
     protected
     fun gradleRunnerFor(vararg arguments: String): GradleRunner =
@@ -61,5 +58,18 @@ abstract class AbstractPluginTest {
         javaClass.getResourceAsStream("/test.properties").use {
             Properties().apply { load(it) }
         }
+    }
+
+    protected
+    fun withCleanSources() = createSourceFile("src/main/kotlin/source.kt", """val foo = "bar"""")
+
+    protected
+    fun withFailingSources() = createSourceFile("src/main/kotlin/source.kt", """val  foo    =     "bar"""")
+
+    private
+    fun createSourceFile(sourceFilePath: String, contents: String) {
+        val sourceFile = projectRoot.resolve(sourceFilePath)
+        sourceFile.parentFile.mkdirs()
+        sourceFile.writeText(contents)
     }
 }

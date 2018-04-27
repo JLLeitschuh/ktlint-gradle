@@ -28,7 +28,6 @@ class KtlintPluginTest : AbstractPluginTest() {
 
                 ktlint.reporters = ["PLAIN", "CHECKSTYLE"]
             """.trimIndent())
-            resolve("src/main/kotlin").mkdirs()
         }
     }
 
@@ -87,12 +86,4 @@ class KtlintPluginTest : AbstractPluginTest() {
             assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.SUCCESS))
         }
     }
-
-    private
-    fun withCleanSources() =
-        projectRoot.resolve("src/main/kotlin/source.kt").writeText("""val foo = "bar"""")
-
-    private
-    fun withFailingSources() =
-        projectRoot.resolve("src/main/kotlin/source.kt").writeText("""val  foo    =     "bar"""")
 }
