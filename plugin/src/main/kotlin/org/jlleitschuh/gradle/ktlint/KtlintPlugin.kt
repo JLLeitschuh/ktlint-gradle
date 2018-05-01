@@ -57,8 +57,8 @@ open class KtlintPlugin : Plugin<Project> {
     }
 
     private fun applyKtLint(
-            target: Project,
-            extension: KtlintExtension
+        target: Project,
+        extension: KtlintExtension
     ): (AppliedPlugin) -> Unit {
         return {
             target.afterEvaluate {
@@ -84,8 +84,8 @@ open class KtlintPlugin : Plugin<Project> {
     }
 
     private fun applyKtLintToAndroid(
-            target: Project,
-            extension: KtlintExtension
+        target: Project,
+        extension: KtlintExtension
     ): (AppliedPlugin) -> Unit {
         return {
             target.afterEvaluate {
@@ -123,8 +123,8 @@ open class KtlintPlugin : Plugin<Project> {
     }
 
     private fun applyKtLintNative(
-            project: Project,
-            extension: KtlintExtension
+        project: Project,
+        extension: KtlintExtension
     ): (AppliedPlugin) -> Unit {
         return {
             project.afterEvaluate {
@@ -191,11 +191,13 @@ open class KtlintPlugin : Plugin<Project> {
         }
     }
 
-    private fun createFormatTask(target: Project,
-                                 sourceSetName: String,
-                                 ktLintConfig: Configuration,
-                                 kotlinSourceSet: FileCollection,
-                                 runArgs: MutableSet<String>): Task {
+    private fun createFormatTask(
+        target: Project,
+        sourceSetName: String,
+        ktLintConfig: Configuration,
+        kotlinSourceSet: FileCollection,
+        runArgs: MutableSet<String>
+    ): Task {
         return target.taskHelper<JavaExec>("ktlint${sourceSetName.capitalize()}Format") {
             group = FORMATTING_GROUP
             description = "Runs a check against all .kt files to ensure that they are formatted according to ktlint."
@@ -210,12 +212,14 @@ open class KtlintPlugin : Plugin<Project> {
         }
     }
 
-    private fun createCheckTask(target: Project,
-                                extension: KtlintExtension,
-                                sourceSetName: String,
-                                ktLintConfig: Configuration,
-                                kotlinSourceSet: FileCollection,
-                                runArgs: MutableSet<String>): Task {
+    private fun createCheckTask(
+        target: Project,
+        extension: KtlintExtension,
+        sourceSetName: String,
+        ktLintConfig: Configuration,
+        kotlinSourceSet: FileCollection,
+        runArgs: MutableSet<String>
+    ): Task {
         return target.taskHelper<JavaExec>("ktlint${sourceSetName.capitalize()}Check") {
             group = VERIFICATION_GROUP
             description = "Runs a check against all .kt files to ensure that they are formatted according to ktlint."
