@@ -34,15 +34,15 @@ open class KtlintCheck : DefaultTask() {
     val sources: FileTree = sourceDirectories.asFileTree.matching { it.include("**/*.kt") }
 
     @get:Input
-    val verbose: Property<Boolean> = project.objects.property(Boolean::class.javaObjectType)
+    val verbose: Property<Boolean> = booleanProperty()
     @get:Input
-    val debug: Property<Boolean> = project.objects.property(Boolean::class.javaObjectType)
+    val debug: Property<Boolean> = booleanProperty()
     @get:Input
-    val android: Property<Boolean> = project.objects.property(Boolean::class.javaObjectType)
+    val android: Property<Boolean> = booleanProperty()
     @get:Input
-    val ignoreFailures: Property<Boolean> = project.objects.property(Boolean::class.javaObjectType)
+    val ignoreFailures: Property<Boolean> = booleanProperty()
     @get:Console
-    val outputToConsole: Property<Boolean> = project.objects.property(Boolean::class.javaObjectType)
+    val outputToConsole: Property<Boolean> = booleanProperty()
 
     @get:Internal
     val reports: Map<ReporterType, KtlintReport> = ReporterType.values().map {
@@ -99,4 +99,8 @@ open class KtlintCheck : DefaultTask() {
         }
         return version
     }
+
+    private
+    fun booleanProperty() =
+            project.objects.property(Boolean::class.javaObjectType)
 }
