@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Unreleased [3.4.0-SNAPSHOT]
 ### Added
 ### Changed
+  - Update Kotlin to 1.2.41 version
 ### Fixed
 
 ## [3.3.0] - 2018-4-24
