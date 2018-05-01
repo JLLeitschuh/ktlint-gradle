@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 ### Changed
   - Update Kotlin to 1.2.41 version
+  - Update Gradle wrapper to 4.7 version
 ### Fixed
 
 ## [3.3.0] - 2018-4-24

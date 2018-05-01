@@ -5,5 +5,5 @@ object PluginVersions {
     val androidPlugin = "3.1.1"
     val kotlinNativePlugin = "0.7"
     val semver = "1.0.0"
-    val gradleWrapper = "4.6"
+    val gradleWrapper = "4.7"
 }
