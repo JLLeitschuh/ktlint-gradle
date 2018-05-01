@@ -36,8 +36,6 @@ class KtlintPluginVersionTest : AbstractPluginTest() {
 
     @Test
     fun `with ktlint version equal to 0_20`() {
-        withCleanSources()
-
         projectRoot.buildScriptUsingKtlintVersion("0.20.0")
         build("ktlintCheck").apply {
             assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.SUCCESS))
@@ -46,8 +44,6 @@ class KtlintPluginVersionTest : AbstractPluginTest() {
 
     @Test
     fun `with ktlint version less than 0_20`() {
-        withCleanSources()
-
         projectRoot.buildScriptUsingKtlintVersion("0.19.0")
         buildAndFail("ktlintCheck").apply {
             assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.FAILED))
