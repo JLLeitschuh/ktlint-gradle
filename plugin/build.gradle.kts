@@ -1,4 +1,3 @@
-import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.wrapper.Wrapper
 
@@ -11,7 +10,7 @@ plugins {
 }
 
 group = "org.jlleitschuh.gradle"
-version = "3.3.0"
+version = "3.4.0-SNAPSHOT"
 
 repositories {
     jcenter()
@@ -36,17 +35,15 @@ dependencies {
     testImplementation("junit:junit:4.12")
 }
 
-// Work around Gradle TestKit limitations in order to allow for compileOnly dependencies
 publishing {
     repositories {
+        // Work around Gradle TestKit limitations in order to allow for compileOnly dependencies
         maven {
             name = "test"
             url = uri("$buildDir/plugin-test-repository")
         }
     }
-}
 
-configure<PublishingExtension> {
     publications {
         create<MavenPublication>("mavenJar") {
             from(components.getByName("java"))

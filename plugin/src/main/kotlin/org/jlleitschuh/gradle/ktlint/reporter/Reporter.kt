@@ -25,9 +25,9 @@ internal fun JavaExec.applyReporters(target: Project, extension: KtlintExtension
 }
 
 private fun JavaExec.setMultipleReporters(
-        extension: KtlintExtension,
-        target: Project,
-        sourceSetName: String
+    extension: KtlintExtension,
+    target: Project,
+    sourceSetName: String
 ) {
     val requestedVersion = SemVer.parse(extension.version)
     extension.reporters.forEach { reporter ->
@@ -49,9 +49,9 @@ private fun JavaExec.setMultipleReporters(
 }
 
 private fun JavaExec.setOneReporter(
-        extension: KtlintExtension,
-        target: Project,
-        sourceSetName: String
+    extension: KtlintExtension,
+    target: Project,
+    sourceSetName: String
 ) {
     val oldReporter = extension.reporter
     if (oldReporter != null) {
@@ -68,10 +68,10 @@ private fun JavaExec.setOneReporter(
 }
 
 private fun JavaExec.applyOnlyOneOutputReporter(
-        target: Project,
-        reporter: ReporterType,
-        sourceSetName: String,
-        extension: KtlintExtension
+    target: Project,
+    reporter: ReporterType,
+    sourceSetName: String,
+    extension: KtlintExtension
 ) {
     var reportOutput: FileOutputStream? = null
     doFirst {
@@ -93,10 +93,10 @@ private fun JavaExec.applyOnlyOneOutputReporter(
 }
 
 private inline fun checkReporterAvailable(
-        reporter: ReporterType,
-        extension: KtlintExtension,
-        target: Project,
-        applyReporter: () -> Unit
+    reporter: ReporterType,
+    extension: KtlintExtension,
+    target: Project,
+    applyReporter: () -> Unit
 ) {
     if (SemVer.parse(extension.version) >= reporter.availableSinceVersion) {
         applyReporter()
