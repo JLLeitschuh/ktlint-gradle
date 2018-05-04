@@ -175,7 +175,7 @@ open class KtlintPlugin : Plugin<Project> {
             // Android option is available from ktlint 0.12.0
             runArgs.add("--android")
         }
-        if (extension.ruleSets.size > 0 && SemVer.parse(extension.version) >= SemVer(0, 20, 0)) {
+        if (extension.ruleSets.size > 0) {
             extension.ruleSets.forEach { runArgs.add("--ruleset=$it") }
         }
     }

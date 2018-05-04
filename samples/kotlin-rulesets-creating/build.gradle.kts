@@ -9,6 +9,5 @@ apply {
 
 dependencies {
     compileOnly(kotlin("stdlib"))
-    compileOnly("com.github.shyiko.ktlint:ktlint-core:0.22.0")
-
+    compileOnly("com.github.shyiko.ktlint:ktlint-core:${SamplesVersions.ktlintCore}")
 }
