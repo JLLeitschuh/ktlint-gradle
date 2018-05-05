@@ -64,6 +64,43 @@ class KtlintPluginTest : AbstractPluginTest() {
         }
     }
 
+    @Test
+    fun `is out of date when different report is enabled`() {
+        withCleanSources()
+
+        projectRoot.resolve("build.gradle").appendText("""
+
+            ktlint.reporters = ["PLAIN", property("reportType")]
+        """.trimIndent())
+
+        build("ktlintCheck", "-PreportType=JSON").apply {
+            assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.SUCCESS))
+            assertReportCreated(ReporterType.PLAIN)
+            assertReportCreated(ReporterType.JSON)
+            assertReportNotCreated(ReporterType.CHECKSTYLE)
+        }
+
+        build("ktlintCheck", "-PreportType=JSON").apply {
+            assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.UP_TO_DATE))
+            assertReportCreated(ReporterType.PLAIN)
+            assertReportCreated(ReporterType.JSON)
+            assertReportNotCreated(ReporterType.CHECKSTYLE)
+        }
+
+        build("ktlintCheck", "-PreportType=CHECKSTYLE").apply {
+            assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.SUCCESS))
+            assertReportCreated(ReporterType.PLAIN)
+            // TODO: Stale reports are not cleaned up
+            assertReportCreated(ReporterType.JSON)
+            assertReportCreated(ReporterType.CHECKSTYLE)
+        }
+    }
+
+    @Test
+    fun `check task is relocatable`() {
+        withCleanSources()
+    }
+
     private
     fun assertReportCreated(reportType: ReporterType) {
         assertTrue(reportLocation(reportType).isFile)
