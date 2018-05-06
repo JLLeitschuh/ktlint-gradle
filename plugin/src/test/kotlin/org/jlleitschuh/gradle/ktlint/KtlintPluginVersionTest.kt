@@ -10,7 +10,7 @@ import java.io.File
 class KtlintPluginVersionTest : AbstractPluginTest() {
 
     private fun File.buildScriptUsingKtlintVersion(version: String) {
-        resolve("build.gradle").writeText("""
+        buildFile().writeText("""
                 ${buildscriptBlockWithUnderTestPlugin()}
 
                 ${pluginsBlockWithKotlinJvmPlugin()}
@@ -31,7 +31,7 @@ class KtlintPluginVersionTest : AbstractPluginTest() {
 
     @Before
     fun setup() {
-        withCleanSources()
+        projectRoot.withCleanSources()
     }
 
     @Test

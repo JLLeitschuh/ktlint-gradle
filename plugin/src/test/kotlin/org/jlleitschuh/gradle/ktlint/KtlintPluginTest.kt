@@ -39,7 +39,7 @@ class KtlintPluginTest : AbstractPluginTest() {
             ktlint.version = "0.9.0"
         """.trimIndent())
 
-        withCleanSources()
+        projectRoot.withCleanSources()
 
         buildAndFail("ktlintCheck").apply {
             assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.FAILED))
@@ -49,8 +49,7 @@ class KtlintPluginTest : AbstractPluginTest() {
 
     @Test
     fun `should fail check on failing sources`() {
-
-        withFailingSources()
+        projectRoot.withFailingSources()
 
         buildAndFail("ktlintCheck").apply {
             assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.FAILED))
@@ -63,8 +62,7 @@ class KtlintPluginTest : AbstractPluginTest() {
 
     @Test
     fun `creates multiple reports`() {
-
-        withFailingSources()
+        projectRoot.withFailingSources()
 
         projectRoot.buildFile().appendText("""
 
@@ -82,7 +80,7 @@ class KtlintPluginTest : AbstractPluginTest() {
 
     @Test
     fun `is out of date when different report is enabled`() {
-        withCleanSources()
+        projectRoot.withCleanSources()
 
         projectRoot.buildFile().appendText("""
 
@@ -124,7 +122,7 @@ class KtlintPluginTest : AbstractPluginTest() {
         val localBuildCacheDirectory = temporaryFolder.root.resolve("build-cache")
         listOf(originalLocation, relocatedLocation).forEach {
             it.apply {
-                withCleanSources(it)
+                withCleanSources()
                 buildFile().writeText("""
                     ${buildscriptBlockWithUnderTestPlugin()}
 
@@ -138,7 +136,7 @@ class KtlintPluginTest : AbstractPluginTest() {
 
                     ktlint.reporters = ["PLAIN", "CHECKSTYLE"]
                 """.trimIndent())
-                resolve("settings.gradle").writeText("""
+                settingsFile().writeText("""
                     buildCache {
                         local {
                             directory = '${localBuildCacheDirectory.toURI()}'
@@ -181,7 +179,7 @@ class KtlintPluginTest : AbstractPluginTest() {
     @Test
     fun `should succeed check on clean sources`() {
 
-        withCleanSources()
+        projectRoot.withCleanSources()
 
         build("ktlintCheck").apply {
             assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.SUCCESS))
