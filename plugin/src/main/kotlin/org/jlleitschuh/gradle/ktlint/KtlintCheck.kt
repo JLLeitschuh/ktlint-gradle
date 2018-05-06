@@ -8,6 +8,7 @@ import org.gradle.api.file.FileTree
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Console
 import org.gradle.api.tasks.Input
@@ -23,6 +24,7 @@ import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import java.io.File
 import javax.inject.Inject
 
+@CacheableTask
 open class KtlintCheck @Inject constructor(objectFactory: ObjectFactory): DefaultTask() {
 
     @get:Classpath

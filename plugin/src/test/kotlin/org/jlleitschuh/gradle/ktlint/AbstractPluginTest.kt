@@ -61,13 +61,13 @@ abstract class AbstractPluginTest {
     }
 
     protected
-    fun withCleanSources() = createSourceFile("src/main/kotlin/source.kt", """val foo = "bar"""")
+    fun withCleanSources(projectRoot: File = this.projectRoot) = createSourceFile("src/main/kotlin/source.kt", """val foo = "bar"""", projectRoot)
 
     protected
-    fun withFailingSources() = createSourceFile("src/main/kotlin/source.kt", """val  foo    =     "bar"""")
+    fun withFailingSources(projectRoot: File = this.projectRoot) = createSourceFile("src/main/kotlin/source.kt", """val  foo    =     "bar"""", projectRoot)
 
     private
-    fun createSourceFile(sourceFilePath: String, contents: String) {
+    fun createSourceFile(sourceFilePath: String, contents: String, projectRoot: File = this.projectRoot) {
         val sourceFile = projectRoot.resolve(sourceFilePath)
         sourceFile.parentFile.mkdirs()
         sourceFile.writeText(contents)

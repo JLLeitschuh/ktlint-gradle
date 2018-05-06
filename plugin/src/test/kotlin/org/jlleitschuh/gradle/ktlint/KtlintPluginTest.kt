@@ -1,5 +1,6 @@
 package org.jlleitschuh.gradle.ktlint
 
+import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.equalTo
@@ -70,35 +71,83 @@ class KtlintPluginTest : AbstractPluginTest() {
 
         projectRoot.resolve("build.gradle").appendText("""
 
-            ktlint.reporters = ["PLAIN", property("reportType")]
+            ktlint.reporters = ["JSON", property("reportType")]
         """.trimIndent())
 
-        build("ktlintCheck", "-PreportType=JSON").apply {
+        build("ktlintCheck", "-PreportType=PLAIN").apply {
             assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.SUCCESS))
             assertReportCreated(ReporterType.PLAIN)
             assertReportCreated(ReporterType.JSON)
-            assertReportNotCreated(ReporterType.CHECKSTYLE)
         }
 
-        build("ktlintCheck", "-PreportType=JSON").apply {
+        build("ktlintCheck", "-PreportType=PLAIN").apply {
             assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.UP_TO_DATE))
             assertReportCreated(ReporterType.PLAIN)
             assertReportCreated(ReporterType.JSON)
             assertReportNotCreated(ReporterType.CHECKSTYLE)
         }
 
+        build("ktlintCheck", "-PreportType=PLAIN_GROUP_BY_FILE").apply {
+            assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.SUCCESS))
+            assertReportCreated(ReporterType.PLAIN_GROUP_BY_FILE)
+            assertReportCreated(ReporterType.JSON)
+        }
+
         build("ktlintCheck", "-PreportType=CHECKSTYLE").apply {
             assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.SUCCESS))
-            assertReportCreated(ReporterType.PLAIN)
-            // TODO: Stale reports are not cleaned up
             assertReportCreated(ReporterType.JSON)
             assertReportCreated(ReporterType.CHECKSTYLE)
+            // TODO: Stale reports are not cleaned up
+            assertReportCreated(ReporterType.PLAIN)
         }
     }
 
     @Test
     fun `check task is relocatable`() {
-        withCleanSources()
+        val originalLocation = temporaryFolder.root.resolve("original")
+        val relocatedLocation = temporaryFolder.root.resolve("relocated")
+        val localBuildCacheDirectory = temporaryFolder.root.resolve("build-cache")
+        listOf(originalLocation, relocatedLocation).forEach {
+            it.apply {
+                withCleanSources(it)
+                resolve("build.gradle").writeText("""
+                    ${buildscriptBlockWithUnderTestPlugin()}
+
+                    ${pluginsBlockWithKotlinJvmPlugin()}
+
+                    apply plugin: "org.jlleitschuh.gradle.ktlint"
+
+                    repositories {
+                        gradlePluginPortal()
+                    }
+
+                    ktlint.reporters = ["PLAIN", "CHECKSTYLE"]
+                """.trimIndent())
+                resolve("settings.gradle").writeText("""
+                    buildCache {
+                        local {
+                            directory = '${localBuildCacheDirectory.toURI()}'
+                        }
+                    }
+                """.trimIndent())
+            }
+        }
+
+        GradleRunner.create()
+                .withProjectDir(originalLocation)
+                .withArguments("ktlintCheck", "--build-cache")
+                .forwardOutput()
+                .build().apply {
+                    assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.SUCCESS))
+                }
+        
+        GradleRunner.create()
+                .withProjectDir(relocatedLocation)
+                .withArguments("ktlintCheck", "--build-cache")
+                .forwardOutput()
+                .build().apply {
+                    assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.FROM_CACHE))
+                }
     }
 
     private
