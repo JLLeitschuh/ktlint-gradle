@@ -72,4 +72,7 @@ abstract class AbstractPluginTest {
         sourceFile.parentFile.mkdirs()
         sourceFile.writeText(contents)
     }
+
+    fun File.buildFile() = resolve("build.gradle")
+    fun File.settingsFile() = resolve("settings.gradle")
 }

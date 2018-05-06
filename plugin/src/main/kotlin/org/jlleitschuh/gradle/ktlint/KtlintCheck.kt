@@ -25,7 +25,7 @@ import java.io.File
 import javax.inject.Inject
 
 @CacheableTask
-open class KtlintCheck @Inject constructor(objectFactory: ObjectFactory): DefaultTask() {
+open class KtlintCheck @Inject constructor(objectFactory: ObjectFactory) : DefaultTask() {
 
     @get:Classpath
     val classpath: ConfigurableFileCollection = project.files()
@@ -62,6 +62,11 @@ open class KtlintCheck @Inject constructor(objectFactory: ObjectFactory): Defaul
     fun lint() {
         val reportsToProcess = enabledReports.values
         val ktlintVersion = determineKtlintVersion(classpath)
+        ktlintVersion?.let {
+            if (it < SemVer(0, 10, 0)) {
+                throw GradleException("Ktlint versions less than 0.10.0 are not supported. Detected Ktlint version: $it.")
+            }
+        }
         ktlintVersion?.let { version ->
             if (version < SemVer(0, 20, 0)) {
                 reportsToProcess.forEach {

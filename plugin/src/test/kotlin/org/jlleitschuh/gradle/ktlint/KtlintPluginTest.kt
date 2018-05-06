@@ -16,7 +16,7 @@ class KtlintPluginTest : AbstractPluginTest() {
     @Before
     fun setupBuild() {
         projectRoot.apply {
-            resolve("build.gradle").writeText("""
+            buildFile().writeText("""
                 ${buildscriptBlockWithUnderTestPlugin()}
 
                 ${pluginsBlockWithKotlinJvmPlugin()}
@@ -29,6 +29,21 @@ class KtlintPluginTest : AbstractPluginTest() {
 
                 ktlint.reporters = ["PLAIN", "CHECKSTYLE"]
             """.trimIndent())
+        }
+    }
+
+    @Test
+    fun `fails on versions older than 0_10`() {
+        projectRoot.buildFile().appendText("""
+
+            ktlint.version = "0.9.0"
+        """.trimIndent())
+
+        withCleanSources()
+
+        buildAndFail("ktlintCheck").apply {
+            assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.FAILED))
+            assertThat(output, containsString("Ktlint versions less than 0.10.0 are not supported. Detected Ktlint version: 0.9.0."))
         }
     }
 
@@ -51,7 +66,7 @@ class KtlintPluginTest : AbstractPluginTest() {
 
         withFailingSources()
 
-        projectRoot.resolve("build.gradle").appendText("""
+        projectRoot.buildFile().appendText("""
 
             ktlint.reporters = ["PLAIN_GROUP_BY_FILE", "CHECKSTYLE", "JSON"]
         """.trimIndent())
@@ -69,7 +84,7 @@ class KtlintPluginTest : AbstractPluginTest() {
     fun `is out of date when different report is enabled`() {
         withCleanSources()
 
-        projectRoot.resolve("build.gradle").appendText("""
+        projectRoot.buildFile().appendText("""
 
             ktlint.reporters = ["JSON", property("reportType")]
         """.trimIndent())
@@ -110,7 +125,7 @@ class KtlintPluginTest : AbstractPluginTest() {
         listOf(originalLocation, relocatedLocation).forEach {
             it.apply {
                 withCleanSources(it)
-                resolve("build.gradle").writeText("""
+                buildFile().writeText("""
                     ${buildscriptBlockWithUnderTestPlugin()}
 
                     ${pluginsBlockWithKotlinJvmPlugin()}
@@ -140,7 +155,7 @@ class KtlintPluginTest : AbstractPluginTest() {
                 .build().apply {
                     assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.SUCCESS))
                 }
-        
+
         GradleRunner.create()
                 .withProjectDir(relocatedLocation)
                 .withArguments("ktlintCheck", "--build-cache")
