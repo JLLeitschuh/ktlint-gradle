@@ -26,9 +26,3 @@ task<Wrapper>("wrapper") {
     gradleVersion = SamplesVersions.gradleWrapper
     distributionType = Wrapper.DistributionType.ALL
 }
-
-tasks {
-    "ktlintCheck" {
-        dependsOn(":samples:kotlin-rulesets-creating:build")
-    }
-}
