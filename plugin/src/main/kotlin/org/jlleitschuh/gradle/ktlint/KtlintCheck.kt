@@ -36,7 +36,10 @@ open class KtlintCheck @Inject constructor(objectFactory: ObjectFactory) : Defau
     @get:SkipWhenEmpty
     @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:InputFiles
-    val sources: FileTree = sourceDirectories.asFileTree.matching { it.include("**/*.kt") }
+    val sources: FileTree = sourceDirectories.asFileTree.matching {
+        it.include("**/*.kt")
+        it.include("**/*.kts")
+    }
 
     @get:Input
     val verbose: Property<Boolean> = objectFactory.booleanProperty()
@@ -81,7 +84,7 @@ open class KtlintCheck @Inject constructor(objectFactory: ObjectFactory) : Defau
         project.javaexec {
             it.classpath = classpath
             it.main = "com.github.shyiko.ktlint.Main"
-            it.args(sourceDirectories.map { "${it.path}/**/*.kt" })
+            it.args(sourceDirectories.flatMap { dir -> listOf("kt", "kts").map { extension -> "${dir.path}/**/*.$extension" } })
             if (verbose.get()) {
                 it.args("--verbose")
             }
