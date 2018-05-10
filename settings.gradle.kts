@@ -44,5 +44,7 @@ include("samples:kotlin-multiplatform-common")
 include("samples:kotlin-multiplatform-jvm")
 include("samples:kotlin-multiplatform-js")
 include("samples:kotlin-native")
+include("samples:kotlin-rulesets-creating")
+include("samples:kotlin-rulesets-using")
 
 includeBuild("./plugin")
