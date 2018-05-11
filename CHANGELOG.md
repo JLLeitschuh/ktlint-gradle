@@ -7,16 +7,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased [3.4.0-SNAPSHOT]
 ### Added
+ - Also check `*.kts` files in Kotlin source directories
+ - Use a cacheable task for the KtLint check
 ### Changed
   - Update Kotlin to 1.2.41 version
   - Update Gradle wrapper to 4.7 version
 ### Fixed
+### Removed
+  - KtLint versions prior to 0.10.0 are not supported any more
 
 ## [3.3.0] - 2018-4-24
 ### Added
  - Check for spaces in output path for KtLint versions earlier
 then 0.20.0 (#83)
- - Use relative for input file path sensivity (#67)
+ - Use relative for input file path sensitivity (#67)
 ### Changed
  - Update default Ktlint version to 0.22.0
 
