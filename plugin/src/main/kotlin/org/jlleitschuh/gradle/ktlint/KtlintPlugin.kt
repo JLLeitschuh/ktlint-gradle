@@ -30,6 +30,7 @@ const val VERIFICATION_GROUP = "Verification"
 const val FORMATTING_GROUP = "Formatting"
 const val CHECK_PARENT_TASK_NAME = "ktlintCheck"
 const val FORMAT_PARENT_TASK_NAME = "ktlintFormat"
+val KOTLIN_EXTENSIONS = listOf("kt", "kts")
 
 /**
  * Task that provides a wrapper over the `ktlint` project.
@@ -72,7 +73,9 @@ open class KtlintPlugin : Plugin<Project> {
                     addKtlintCheckTaskToProjectMetaCheckTask(target, checkTask)
                     setCheckTaskDependsOnKtlintCheckTask(target, checkTask)
 
-                    val runArgs = kotlinSourceSet.sourceDirectories.files.map { "${it.path}/**/*.kt" }.toMutableSet()
+                    val runArgs = kotlinSourceSet.sourceDirectories.files.flatMap { baseDir ->
+                        KOTLIN_EXTENSIONS.map { "${baseDir.path}/**/*.$it" }
+                    }.toMutableSet()
                     addAdditionalRunArgs(extension, runArgs)
 
                     val ktlintSourceSetFormatTask = createFormatTask(target, it.name, ktLintConfig, kotlinSourceSet, runArgs)

@@ -36,9 +36,10 @@ open class KtlintCheck @Inject constructor(objectFactory: ObjectFactory) : Defau
     @get:SkipWhenEmpty
     @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:InputFiles
-    val sources: FileTree = sourceDirectories.asFileTree.matching {
-        it.include("**/*.kt")
-        it.include("**/*.kts")
+    val sources: FileTree = sourceDirectories.asFileTree.matching { filterable ->
+        KOTLIN_EXTENSIONS.forEach {
+            filterable.include("**/*.$it")
+        }
     }
 
     @get:Input
@@ -84,7 +85,7 @@ open class KtlintCheck @Inject constructor(objectFactory: ObjectFactory) : Defau
         project.javaexec {
             it.classpath = classpath
             it.main = "com.github.shyiko.ktlint.Main"
-            it.args(sourceDirectories.flatMap { dir -> listOf("kt", "kts").map { extension -> "${dir.path}/**/*.$extension" } })
+            it.args(sourceDirectories.flatMap { dir -> KOTLIN_EXTENSIONS.map { extension -> "${dir.path}/**/*.$extension" } })
             if (verbose.get()) {
                 it.args("--verbose")
             }
