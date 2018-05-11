@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Update Gradle wrapper to 4.7 version
 ### Fixed
 ### Removed
-  - KtLint versions prior to 0.10.0 are not supported any more
+  - KtLint versions prior to 0.10.0 are not supported anymore
 
 ## [3.3.0] - 2018-4-24
 ### Added
