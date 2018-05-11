@@ -7,6 +7,7 @@ import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileTree
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Classpath
@@ -44,6 +45,8 @@ open class KtlintCheck @Inject constructor(objectFactory: ObjectFactory) : Defau
 
     @get:Input
     val verbose: Property<Boolean> = objectFactory.booleanProperty()
+    @get:Input
+    val ruleSets: ListProperty<String> = objectFactory.listProperty(String::class.java)
     @get:Input
     val debug: Property<Boolean> = objectFactory.booleanProperty()
     @get:Input
@@ -98,6 +101,7 @@ open class KtlintCheck @Inject constructor(objectFactory: ObjectFactory) : Defau
             if (outputToConsole.get()) {
                 it.args("--reporter=plain")
             }
+            it.args(ruleSets.get().map { "--ruleset=$it" })
             it.isIgnoreExitValue = ignoreFailures.get()
             it.args(reportsToProcess.map { it.asArgument() })
         }

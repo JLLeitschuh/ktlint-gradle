@@ -234,6 +234,7 @@ open class KtlintPlugin : Plugin<Project> {
             android.set(target.provider { extension.android && SemVer.parse(extension.version) >= SemVer(0, 12, 0) })
             ignoreFailures.set(target.provider { extension.ignoreFailures })
             outputToConsole.set(target.provider { extension.outputToConsole })
+            ruleSets.set(target.provider { extension.ruleSets.toList() })
             reports.forEach { _, report ->
                 report.enabled.set(target.provider {
                     val reporterType = report.reporterType
