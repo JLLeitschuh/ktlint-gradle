@@ -3,13 +3,14 @@ package org.jlleitschuh.gradle.ktlint
 import org.gradle.testkit.runner.TaskOutcome
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Before
 import org.junit.Test
 import java.io.File
 
 class KtlintPluginVersionTest : AbstractPluginTest() {
 
     private fun File.buildScriptUsingKtlintVersion(version: String) {
-        resolve("build.gradle").writeText("""
+        buildFile().writeText("""
                 ${buildscriptBlockWithUnderTestPlugin()}
 
                 ${pluginsBlockWithKotlinJvmPlugin()}
@@ -26,6 +27,11 @@ class KtlintPluginVersionTest : AbstractPluginTest() {
                     version = "$version"
                 }
             """.trimIndent())
+    }
+
+    @Before
+    fun setup() {
+        projectRoot.withCleanSources()
     }
 
     @Test

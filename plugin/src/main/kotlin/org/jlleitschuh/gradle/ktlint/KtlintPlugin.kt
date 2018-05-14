@@ -17,13 +17,12 @@ import org.gradle.api.plugins.AppliedPlugin
 import org.gradle.api.plugins.Convention
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.JavaExec
-import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.StopExecutionException
 import org.jetbrains.kotlin.gradle.plugin.KonanArtifactContainer
 import org.jetbrains.kotlin.gradle.plugin.KonanExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.tasks.KonanCompileTask
-import org.jlleitschuh.gradle.ktlint.reporter.applyReporters
+import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import java.io.File
 import kotlin.reflect.KClass
 
@@ -31,6 +30,7 @@ const val VERIFICATION_GROUP = "Verification"
 const val FORMATTING_GROUP = "Formatting"
 const val CHECK_PARENT_TASK_NAME = "ktlintCheck"
 const val FORMAT_PARENT_TASK_NAME = "ktlintFormat"
+val KOTLIN_EXTENSIONS = listOf("kt", "kts")
 
 /**
  * Task that provides a wrapper over the `ktlint` project.
@@ -69,12 +69,14 @@ open class KtlintPlugin : Plugin<Project> {
                             .convention
                             .getPluginHelper<KotlinSourceSet>()
                             .kotlin
-                    val runArgs = kotlinSourceSet.sourceDirectories.files.map { "${it.path}/**/*.kt" }.toMutableSet()
-                    addAdditionalRunArgs(extension, runArgs)
-
-                    val checkTask = createCheckTask(target, extension, it.name, ktLintConfig, kotlinSourceSet, runArgs)
+                    val checkTask = createCheckTask(target, extension, it.name, ktLintConfig, kotlinSourceSet.sourceDirectories)
                     addKtlintCheckTaskToProjectMetaCheckTask(target, checkTask)
                     setCheckTaskDependsOnKtlintCheckTask(target, checkTask)
+
+                    val runArgs = kotlinSourceSet.sourceDirectories.files.flatMap { baseDir ->
+                        KOTLIN_EXTENSIONS.map { "${baseDir.path}/**/*.$it" }
+                    }.toMutableSet()
+                    addAdditionalRunArgs(extension, runArgs)
 
                     val ktlintSourceSetFormatTask = createFormatTask(target, it.name, ktLintConfig, kotlinSourceSet, runArgs)
                     addKtlintFormatTaskToProjectMetaFormatTask(target, ktlintSourceSetFormatTask)
@@ -111,7 +113,7 @@ open class KtlintPlugin : Plugin<Project> {
                     val runArgs = it.variantData.javaSources.map { "${it.dir.path}/**/*.kt" }.toMutableSet()
                     addAdditionalRunArgs(extension, runArgs)
 
-                    val checkTask = createCheckTask(target, extension, it.fullVariantName, ktLintConfig, kotlinSourceDir, runArgs)
+                    val checkTask = createCheckTask(target, extension, it.fullVariantName, ktLintConfig, sourceDirs)
                     addKtlintCheckTaskToProjectMetaCheckTask(target, checkTask)
                     setCheckTaskDependsOnKtlintCheckTask(target, checkTask)
 
@@ -142,16 +144,16 @@ open class KtlintPlugin : Plugin<Project> {
                         }
                     }
                     if (sourceDirectoriesList.isNotEmpty()) {
+                        val checkTask = createCheckTask(project, extension, it.name, ktLintConfig,
+                                sourceDirectoriesList)
+                        addKtlintCheckTaskToProjectMetaCheckTask(project, checkTask)
+                        setCheckTaskDependsOnKtlintCheckTask(project, checkTask)
+
                         val kotlinSourceSet = sourceDirectoriesList.reduce { acc, fileCollection ->
                             acc.add(fileCollection)
                         }
                         val runArgs = kotlinSourceSet.files.map { "${it.path}/**/*.kt" }.toMutableSet()
                         addAdditionalRunArgs(extension, runArgs)
-
-                        val checkTask = createCheckTask(project, extension, it.name, ktLintConfig,
-                                kotlinSourceSet, runArgs)
-                        addKtlintCheckTaskToProjectMetaCheckTask(project, checkTask)
-                        setCheckTaskDependsOnKtlintCheckTask(project, checkTask)
 
                         val ktlintSourceSetFormatTask = createFormatTask(project, it.name, ktLintConfig,
                                 kotlinSourceSet, runArgs)
@@ -220,23 +222,32 @@ open class KtlintPlugin : Plugin<Project> {
         extension: KtlintExtension,
         sourceSetName: String,
         ktLintConfig: Configuration,
-        kotlinSourceSet: FileCollection,
-        runArgs: MutableSet<String>
+        kotlinSourceDirectories: Iterable<*>
     ): Task {
-        return target.taskHelper<JavaExec>("ktlint${sourceSetName.capitalize()}Check") {
+        return target.taskHelper<KtlintCheck>("ktlint${sourceSetName.capitalize()}Check") {
             group = VERIFICATION_GROUP
             description = "Runs a check against all .kt files to ensure that they are formatted according to ktlint."
-            main = "com.github.shyiko.ktlint.Main"
-            classpath = ktLintConfig
-            inputs.files(kotlinSourceSet)
-                    .withPropertyName("source")
-                    .withPathSensitivity(PathSensitivity.RELATIVE)
-            args(runArgs)
-        }.apply {
-            this.isIgnoreExitValue = extension.ignoreFailures
-            this.applyReporters(target, extension, sourceSetName)
+            classpath.setFrom(ktLintConfig)
+            sourceDirectories.setFrom(kotlinSourceDirectories)
+            verbose.set(target.provider { extension.verbose })
+            debug.set(target.provider { extension.debug })
+            android.set(target.provider { extension.android && SemVer.parse(extension.version) >= SemVer(0, 12, 0) })
+            ignoreFailures.set(target.provider { extension.ignoreFailures })
+            outputToConsole.set(target.provider { extension.outputToConsole })
+            ruleSets.set(target.provider { extension.ruleSets.toList() })
+            reports.forEach { _, report ->
+                report.enabled.set(target.provider {
+                    val reporterType = report.reporterType
+                    reporterAvailable(extension.version, reporterType) && (extension.reporters.contains(reporterType) || extension.reporter == reporterType)
+                })
+                report.outputFile.set(target.layout.buildDirectory.file(target.provider {
+                    "reports/ktlint/ktlint-$sourceSetName.${report.reporterType.fileExtension}"
+                }))
+            }
         }
     }
+
+    private fun reporterAvailable(version: String, reporter: ReporterType) = SemVer.parse(version) >= reporter.availableSinceVersion
 
     private fun Project.getMetaKtlintCheckTask(): Task = this.tasks.findByName(CHECK_PARENT_TASK_NAME)
             ?: this.task(CHECK_PARENT_TASK_NAME).apply {
