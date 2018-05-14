@@ -70,20 +70,8 @@ open class KtlintCheck @Inject constructor(objectFactory: ObjectFactory) : Defau
         val reportsToProcess = enabledReports.values
         val ktlintVersion = determineKtlintVersion(classpath)
         ktlintVersion?.let {
-            if (it < SemVer(0, 10, 0)) {
-                throw GradleException("Ktlint versions less than 0.10.0 are not supported. Detected Ktlint version: $it.")
-            }
-        }
-        ktlintVersion?.let { version ->
-            if (version < SemVer(0, 20, 0)) {
-                reportsToProcess.forEach {
-                    val reportOutputPath = it.outputFile.get().asFile.absolutePath
-                    if (reportOutputPath.contains(" ")) {
-                        throw GradleException(
-                                "The output path passed `$reportOutputPath` contains spaces. Ktlint versions less than 0.20.0 do not support this.")
-                    }
-                }
-            }
+            it.checkMinimalSupportedKtlintVersion()
+            it.checkOutputPathsWithSpacesSupported(reportsToProcess)
         }
         project.javaexec {
             it.classpath = classpath
@@ -108,11 +96,31 @@ open class KtlintCheck @Inject constructor(objectFactory: ObjectFactory) : Defau
     }
 
     private
+    fun SemVer.checkMinimalSupportedKtlintVersion() {
+            if (this < SemVer(0, 10, 0)) {
+                throw GradleException("Ktlint versions less than 0.10.0 are not supported. Detected Ktlint version: $this.")
+            }
+    }
+
+    private
+    fun SemVer.checkOutputPathsWithSpacesSupported(reportsToProcess: Collection<KtlintReport>) {
+        if (this < SemVer(0, 20, 0)) {
+            reportsToProcess.forEach {
+                val reportOutputPath = it.outputFile.get().asFile.absolutePath
+                if (reportOutputPath.contains(" ")) {
+                    throw GradleException(
+                            "The output path passed `$reportOutputPath` contains spaces. Ktlint versions less than 0.20.0 do not support this.")
+                }
+            }
+        }
+    }
+
+    private
     fun determineKtlintVersion(ktlintClasspath: Iterable<File>): SemVer? {
         val ktlintJarRegex = "ktlint-(\\d+.*)\\.jar".toRegex()
         val ktlintJarName = ktlintClasspath.find { ktlintJarRegex.matches(it.name) }?.name
         val version = ktlintJarName?.let {
-            val versionString = ktlintJarRegex.matchEntire(it)!!.groups[1]!!.value
+            val versionString = ktlintJarRegex.matchEntire(it)?.groups?.get(1)?.value ?: return null
             try { SemVer.parse(versionString) } catch (e: IllegalArgumentException) { null }
         }
         return version

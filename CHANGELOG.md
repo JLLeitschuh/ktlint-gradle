@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 ### Removed
   - KtLint versions prior to 0.10.0 are not supported anymore
+  - Gradle versions prior to 4.3 are not supported anymore
 
 ## [3.3.0] - 2018-4-24
 ### Added
