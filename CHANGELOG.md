@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased [3.4.0-SNAPSHOT]
 ### Added
+ - Add support for providing custom rulesets (#71)
  - Also check `*.kts` files in Kotlin source directories
  - Use a cacheable task for the KtLint check
 ### Changed
