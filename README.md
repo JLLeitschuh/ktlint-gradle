@@ -13,10 +13,9 @@ The assumption being that you would not want to lint code you weren't compiling.
 This plugin was written using the new API available for gradle script kotlin builds.
 This API is available in new versions of gradle.
 
-This plugin has only been tested with gradle `3.5` and should work with versions `3.5+`.
+Minimal supported Gradle version: `4.3`
 
-If you find this plugin works with older versions feel free to update this readme to reflect this.
-
+Minimal supported [ktlint](https://github.com/shyiko/ktlint) version: `0.10.0`
 
 ## How to use
 
@@ -29,7 +28,7 @@ buildscript {
     }
   }
   dependencies {
-    classpath "gradle.plugin.org.jlleitschuh.gradle:ktlint-gradle:3.3.0"
+    classpath "gradle.plugin.org.jlleitschuh.gradle:ktlint-gradle:4.0.0"
   }
 }
 
@@ -39,7 +38,7 @@ apply plugin: "org.jlleitschuh.gradle.ktlint"
 Build script snippet for new, incubating, plugin mechanism introduced in Gradle 2.1:
 ```groovy
 plugins {
-  id "org.jlleitschuh.gradle.ktlint" version "3.3.0"
+  id "org.jlleitschuh.gradle.ktlint" version "4.0.0"
 }
 ```
 
@@ -71,6 +70,10 @@ ktlint {
 }
 ```
 
+## Samples
+
+Check [samples](samples/) folder that provides examples how-to apply plugin.
+
 ## Tasks Added
 
 This plugin adds two tasks to every source set: `ktlint[source set name]Check` and `ktlint[source set name]Format`.
@@ -95,11 +98,9 @@ sdk.dir=<android-sdk-location>
 
 #### Building
 
-`./gradlew build`
+Building the plugin: `./plugin/gradlew build`
 
-### Future Development
-
-Add support for linting `*.kts` for gradle script kotlin builds.
+Running current plugin snapshot check on sample projects: `./gradlew ktlintCheck`
 
 ## Links
 
