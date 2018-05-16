@@ -238,7 +238,7 @@ open class KtlintPlugin : Plugin<Project> {
             reports.forEach { _, report ->
                 report.enabled.set(target.provider {
                     val reporterType = report.reporterType
-                    reporterAvailable(extension.version, reporterType) && (extension.reporters.contains(reporterType) || extension.reporter == reporterType)
+                    reporterAvailable(extension.version, reporterType) && extension.reporters.contains(reporterType)
                 })
                 report.outputFile.set(target.layout.buildDirectory.file(target.provider {
                     "reports/ktlint/ktlint-$sourceSetName.${report.reporterType.fileExtension}"

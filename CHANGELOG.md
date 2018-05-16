@@ -5,17 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased [3.4.0-SNAPSHOT]
+## [4.0.0] - 2018-5-15
 ### Added
+ - Add support for providing custom rulesets (#71)
  - Also check `*.kts` files in Kotlin source directories
  - Use a cacheable task for the KtLint check
 ### Changed
   - Update Kotlin to 1.2.41 version
   - Update Gradle wrapper to 4.7 version
-### Fixed
+  - Changed default KtLint version to `0.23.1`
 ### Removed
   - KtLint versions prior to 0.10.0 are not supported anymore
   - Gradle versions prior to 4.3 are not supported anymore
+  - Deprecated ReporterType typealias
+  - Deprecated reporter field from extension
 
 ## [3.3.0] - 2018-4-24
 ### Added
