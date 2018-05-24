@@ -6,4 +6,5 @@ object PluginVersions {
     val kotlinNativePlugin = "0.7"
     val semver = "1.0.0"
     val gradleWrapper = "4.7"
+    val junit = "4.12"
 }

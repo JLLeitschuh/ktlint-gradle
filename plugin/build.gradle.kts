@@ -32,7 +32,7 @@ dependencies {
      */
 
     testImplementation(gradleTestKit())
-    testImplementation("junit:junit:4.12")
+    testImplementation("junit:junit:${PluginVersions.junit}")
 }
 
 publishing {
