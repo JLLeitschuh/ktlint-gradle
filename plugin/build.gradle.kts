@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "org.jlleitschuh.gradle"
-version = "4.0.0"
+version = "4.1.0-SNAPSHOT"
 
 repositories {
     jcenter()
@@ -32,7 +32,7 @@ dependencies {
      */
 
     testImplementation(gradleTestKit())
-    testImplementation("junit:junit:4.12")
+    testImplementation("junit:junit:${PluginVersions.junit}")
 }
 
 publishing {
