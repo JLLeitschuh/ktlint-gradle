@@ -185,4 +185,15 @@ class KtlintPluginTest : AbstractPluginTest() {
             assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.SUCCESS))
         }
     }
+
+    @Test
+    fun `Should generate code style files`() {
+        projectRoot.withCleanSources()
+        val ideaRootDir = projectRoot.resolve(".idea").apply { mkdir() }
+
+        build("ktlintApplyToIDEA").apply {
+            assertThat(task(":ktlintApplyToIdea")!!.outcome, equalTo(TaskOutcome.SUCCESS))
+            assertThat(ideaRootDir.listFiles().isNotEmpty(), equalTo(true))
+        }
+    }
 }

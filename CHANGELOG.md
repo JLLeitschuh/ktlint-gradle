@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased [4.1.0-SNAPSHOT]
 ### Added
-  - ?
+  - apply to IDEA task (#91)
 ### Changed
   - ?
 ### Removed
