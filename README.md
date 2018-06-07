@@ -83,6 +83,10 @@ Similarly, a `ktlintFormat` task has been added that formats all of the source s
 If project has subprojects - plugin also adds two meta tasks `ktlintCheck` and `ktlintFormat` to the root project that
 triggers related tasks in subprojects.
 
+Another task added: `ktlintApplyToIdea`. It is always added only to the
+root project. Task generates IntelliJ IDEA (or Android Studio) Kotlin
+style files in `.idea/` folder. **Note** that this task will overwrite
+the existing style file.
 
 ## Developers
 

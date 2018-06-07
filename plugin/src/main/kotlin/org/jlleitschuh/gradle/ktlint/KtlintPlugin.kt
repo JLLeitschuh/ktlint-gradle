@@ -15,9 +15,11 @@ import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.internal.HasConvention
 import org.gradle.api.plugins.AppliedPlugin
 import org.gradle.api.plugins.Convention
+import org.gradle.api.plugins.HelpTasksPlugin
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.StopExecutionException
+import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jetbrains.kotlin.gradle.plugin.KonanArtifactContainer
 import org.jetbrains.kotlin.gradle.plugin.KonanExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
@@ -26,10 +28,12 @@ import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import java.io.File
 import kotlin.reflect.KClass
 
-const val VERIFICATION_GROUP = "Verification"
+const val VERIFICATION_GROUP = LifecycleBasePlugin.VERIFICATION_GROUP
 const val FORMATTING_GROUP = "Formatting"
+const val HELP_GROUP = HelpTasksPlugin.HELP_GROUP
 const val CHECK_PARENT_TASK_NAME = "ktlintCheck"
 const val FORMAT_PARENT_TASK_NAME = "ktlintFormat"
+const val APPLY_TO_IDEA_TASK_NAME = "ktlintApplyToIdea"
 val KOTLIN_EXTENSIONS = listOf("kt", "kts")
 
 /**
@@ -46,6 +50,8 @@ open class KtlintPlugin : Plugin<Project> {
         target.subprojects {
             addKtLintTasksToKotlinPlugin(it, extension)
         }
+
+        addApplyToIdeaTask(target, extension)
     }
 
     private fun addKtLintTasksToKotlinPlugin(target: Project, extension: KtlintExtension) {
@@ -166,21 +172,28 @@ open class KtlintPlugin : Plugin<Project> {
 
     private fun createConfiguration(target: Project, extension: KtlintExtension) =
             target.configurations.maybeCreate("ktlint").apply {
-                target.dependencies.add(this.name,
-                        mapOf("group" to "com.github.shyiko", "name" to "ktlint", "version" to extension.version))
+                target.dependencies.add(
+                    this.name,
+                    mapOf(
+                        "group" to "com.github.shyiko",
+                        "name" to "ktlint",
+                        "version" to extension.version
+                    )
+                )
             }
 
     private fun addAdditionalRunArgs(extension: KtlintExtension, runArgs: MutableSet<String>) {
         if (extension.verbose) runArgs.add("--verbose")
         if (extension.debug) runArgs.add("--debug")
-        if (extension.android && SemVer.parse(extension.version) >= SemVer(0, 12, 0)) {
-            // Android option is available from ktlint 0.12.0
-            runArgs.add("--android")
-        }
+        if (extension.isAndroidFlagEnabled()) runArgs.add("--android")
         if (extension.ruleSets.size > 0) {
             extension.ruleSets.forEach { runArgs.add("--ruleset=$it") }
         }
     }
+
+    // Android option is available from ktlint 0.12.0
+    private fun KtlintExtension.isAndroidFlagEnabled() =
+        android && SemVer.parse(version) >= SemVer(0, 12, 0)
 
     private fun addKtlintCheckTaskToProjectMetaCheckTask(target: Project, checkTask: Task) {
         target.getMetaKtlintCheckTask().dependsOn(checkTask)
@@ -231,7 +244,7 @@ open class KtlintPlugin : Plugin<Project> {
             sourceDirectories.setFrom(kotlinSourceDirectories)
             verbose.set(target.provider { extension.verbose })
             debug.set(target.provider { extension.debug })
-            android.set(target.provider { extension.android && SemVer.parse(extension.version) >= SemVer(0, 12, 0) })
+            android.set(target.provider { extension.isAndroidFlagEnabled() })
             ignoreFailures.set(target.provider { extension.ignoreFailures })
             outputToConsole.set(target.provider { extension.outputToConsole })
             ruleSets.set(target.provider { extension.ruleSets.toList() })
@@ -263,6 +276,22 @@ open class KtlintPlugin : Plugin<Project> {
 
     private fun setCheckTaskDependsOnKtlintCheckTask(project: Project, ktlintCheck: Task) {
         project.tasks.findByName("check")?.dependsOn(ktlintCheck)
+    }
+
+    private fun addApplyToIdeaTask(target: Project, extension: KtlintExtension) {
+        target.afterEvaluate {
+            val rootProject = target.rootProject
+            if (rootProject.tasks.findByName(APPLY_TO_IDEA_TASK_NAME) == null) {
+                val ktLintConfig = createConfiguration(rootProject, extension)
+
+                target.rootProject.taskHelper<KtlintApplyToIdeaTask>(APPLY_TO_IDEA_TASK_NAME) {
+                    group = HELP_GROUP
+                    description = "Generates IDEA built-in formatter rules. It will overwrite existing ones."
+                    classpath.setFrom(ktLintConfig)
+                    android.set(target.provider { extension.isAndroidFlagEnabled() })
+                }
+            }
+        }
     }
 
     /*
