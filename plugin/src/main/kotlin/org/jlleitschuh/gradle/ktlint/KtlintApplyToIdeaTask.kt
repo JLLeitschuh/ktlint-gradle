@@ -19,13 +19,21 @@ open class KtlintApplyToIdeaTask @Inject constructor(
     @get:Input
     val android: Property<Boolean> = objectFactory.booleanProperty()
 
+    @get:Input
+    val globally: Property<Boolean> = objectFactory.booleanProperty()
+
     @TaskAction
     fun generate() {
         project.javaexec {
             it.classpath = classpath
             it.main = "com.github.shyiko.ktlint.Main"
+            if (globally.get()) {
+                it.args("--apply-to-idea")
+            } else {
+                it.args("--apply-to-idea-project")
+            }
             // -y here to auto-overwrite existing IDEA code style
-            it.args("--apply-to-idea-project", "-y")
+            it.args("-y")
             if (android.get()) {
                 it.args("--android")
             }

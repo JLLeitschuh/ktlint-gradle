@@ -187,12 +187,36 @@ class KtlintPluginTest : AbstractPluginTest() {
     }
 
     @Test
-    fun `Should generate code style files`() {
+    fun `should generate code style files in project`() {
         projectRoot.withCleanSources()
         val ideaRootDir = projectRoot.resolve(".idea").apply { mkdir() }
 
-        build("ktlintApplyToIDEA").apply {
-            assertThat(task(":ktlintApplyToIdea")!!.outcome, equalTo(TaskOutcome.SUCCESS))
+        build("ktlintApplyToIdea").apply {
+            assertThat(task(":ktlintApplyToIdea")?.outcome, equalTo(TaskOutcome.SUCCESS))
+            assertThat(ideaRootDir.listFiles().isNotEmpty(), equalTo(true))
+        }
+    }
+
+    @Test
+    fun `should not add ktlintApplyToIdea if ktlint version less then 0_22_0`() {
+        projectRoot.withCleanSources()
+        projectRoot.buildFile().appendText("""
+
+            ktlint.version = "0.10.0"
+        """.trimIndent())
+
+        build(":tasks").apply {
+            // With space to not interfere with ktlintApplyToIdeaGlobally tasks
+            assertThat(output.contains("ktlintApplyToIdea ", ignoreCase = true), equalTo(false))
+        }
+    }
+
+    @Test
+    fun `should generate code style file globally`() {
+        val ideaRootDir = projectRoot.resolve(".idea").apply { mkdir() }
+
+        build(":ktlintApplyToIdeaGlobally").apply {
+            assertThat(task(":ktlintApplyToIdeaGlobally")?.outcome, equalTo(TaskOutcome.SUCCESS))
             assertThat(ideaRootDir.listFiles().isNotEmpty(), equalTo(true))
         }
     }
