@@ -34,6 +34,7 @@ const val HELP_GROUP = HelpTasksPlugin.HELP_GROUP
 const val CHECK_PARENT_TASK_NAME = "ktlintCheck"
 const val FORMAT_PARENT_TASK_NAME = "ktlintFormat"
 const val APPLY_TO_IDEA_TASK_NAME = "ktlintApplyToIdea"
+const val APPLY_TO_IDEA_GLOBALLY_TASK_NAME = "ktlintApplyToIdeaGlobally"
 val KOTLIN_EXTENSIONS = listOf("kt", "kts")
 
 /**
@@ -284,15 +285,35 @@ open class KtlintPlugin : Plugin<Project> {
             if (rootProject.tasks.findByName(APPLY_TO_IDEA_TASK_NAME) == null) {
                 val ktLintConfig = createConfiguration(rootProject, extension)
 
-                target.rootProject.taskHelper<KtlintApplyToIdeaTask>(APPLY_TO_IDEA_TASK_NAME) {
+                if (extension.isApplyToIdeaPerProjectAvailable()) {
+                    target.rootProject.taskHelper<KtlintApplyToIdeaTask>(APPLY_TO_IDEA_TASK_NAME) {
+                        group = HELP_GROUP
+                        description = "Generates IDEA built-in formatter rules and apply them to the project." +
+                            "It will overwrite existing ones."
+                        classpath.setFrom(ktLintConfig)
+                        android.set(target.provider { extension.isAndroidFlagEnabled() })
+                        globally.set(target.provider { false })
+                    }
+                }
+
+                target.rootProject.taskHelper<KtlintApplyToIdeaTask>(APPLY_TO_IDEA_GLOBALLY_TASK_NAME) {
                     group = HELP_GROUP
-                    description = "Generates IDEA built-in formatter rules. It will overwrite existing ones."
+                    description = "Generates IDEA built-in formatter rules and apply them globally " +
+                        "(in IDEA user settings folder). It will overwrite existing ones."
                     classpath.setFrom(ktLintConfig)
                     android.set(target.provider { extension.isAndroidFlagEnabled() })
+                    globally.set(target.provider { true })
                 }
             }
         }
     }
+
+    /**
+     * Checks if apply code style to IDEA IDE per project is availalbe.
+     *
+     * Available since KtLint version `0.22.0`.
+     */
+    private fun KtlintExtension.isApplyToIdeaPerProjectAvailable() = SemVer.parse(version) >= SemVer(0, 22, 0)
 
     /*
      * Helper functions used until Gradle Script Kotlin solidifies it's plugin API.
