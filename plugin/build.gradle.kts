@@ -51,6 +51,29 @@ publishing {
     }
 }
 
+/**
+ * Configures the publishing environment for publishing with Travis CI.
+ * All you need to do is push a tagged commit to github and Travis CI will automatically publish a
+ * release of the plugin using the current [Project.getVersion].
+ */
+fun setupPublishingEnvironment() {
+    val keyEnvironmentVariable = "GRADLE_PUBLISH_KEY"
+    val secretEnvironmentVariable = "GRADLE_PUBLISH_SECRET"
+
+    val keyProperty = "gradle.publish.key"
+    val secretProperty = "gradle.publish.secret"
+
+    if (System.getProperty(keyProperty) == null || System.getProperty(secretProperty) == null) {
+        logger
+            .info("`$keyProperty` or `$secretProperty` were not set. Attempting to configure from environment variables")
+
+        System.setProperty(keyProperty, System.getProperty(keyEnvironmentVariable))
+        System.setProperty(secretProperty, System.getProperty(secretEnvironmentVariable))
+    }
+}
+
+setupPublishingEnvironment()
+
 gradlePlugin {
     (plugins) {
         "ktlintPlugin" {
