@@ -67,8 +67,14 @@ fun setupPublishingEnvironment() {
         logger
             .info("`$keyProperty` or `$secretProperty` were not set. Attempting to configure from environment variables")
 
-        System.setProperty(keyProperty, System.getProperty(keyEnvironmentVariable))
-        System.setProperty(secretProperty, System.getProperty(secretEnvironmentVariable))
+        val key: String? = System.getProperty(keyEnvironmentVariable)
+        val secret: String? = System.getProperty(secretEnvironmentVariable)
+        if (key != null && secret != null) {
+            System.setProperty(keyProperty, key)
+            System.setProperty(secretProperty, secret)
+        } else {
+            logger.debug("key or secret was null")
+        }
     }
 }
 
