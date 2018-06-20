@@ -38,12 +38,15 @@ const val APPLY_TO_IDEA_GLOBALLY_TASK_NAME = "ktlintApplyToIdeaGlobally"
 val KOTLIN_EXTENSIONS = listOf("kt", "kts")
 
 /**
- * Task that provides a wrapper over the `ktlint` project.
+ * Plugin that provides a wrapper over the `ktlint` project.
  */
 open class KtlintPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
-        val extension = target.extensions.create("ktlint", KtlintExtension::class.java)
+        target.plugins.apply(KtlintHelperPlugin::class.java)
+
+        // The extension has been added by the helper plugin above.
+        val extension = target.extensions.getByName("ktlint") as KtlintExtension
 
         addKtLintTasksToKotlinPlugin(target, extension)
 
@@ -51,8 +54,6 @@ open class KtlintPlugin : Plugin<Project> {
         target.subprojects {
             addKtLintTasksToKotlinPlugin(it, extension)
         }
-
-        addApplyToIdeaTask(target, extension)
     }
 
     private fun addKtLintTasksToKotlinPlugin(target: Project, extension: KtlintExtension) {
@@ -171,30 +172,14 @@ open class KtlintPlugin : Plugin<Project> {
         }
     }
 
-    private fun createConfiguration(target: Project, extension: KtlintExtension) =
-            target.configurations.maybeCreate("ktlint").apply {
-                target.dependencies.add(
-                    this.name,
-                    mapOf(
-                        "group" to "com.github.shyiko",
-                        "name" to "ktlint",
-                        "version" to extension.version
-                    )
-                )
-            }
-
     private fun addAdditionalRunArgs(extension: KtlintExtension, runArgs: MutableSet<String>) {
         if (extension.verbose) runArgs.add("--verbose")
         if (extension.debug) runArgs.add("--debug")
         if (extension.isAndroidFlagEnabled()) runArgs.add("--android")
-        if (extension.ruleSets.size > 0) {
+        if (extension.ruleSets.isNotEmpty()) {
             extension.ruleSets.forEach { runArgs.add("--ruleset=$it") }
         }
     }
-
-    // Android option is available from ktlint 0.12.0
-    private fun KtlintExtension.isAndroidFlagEnabled() =
-        android && SemVer.parse(version) >= SemVer(0, 12, 0)
 
     private fun addKtlintCheckTaskToProjectMetaCheckTask(target: Project, checkTask: Task) {
         target.getMetaKtlintCheckTask().dependsOn(checkTask)
@@ -261,59 +246,24 @@ open class KtlintPlugin : Plugin<Project> {
         }
     }
 
-    private fun reporterAvailable(version: String, reporter: ReporterType) = SemVer.parse(version) >= reporter.availableSinceVersion
+    private fun reporterAvailable(version: String, reporter: ReporterType) =
+        SemVer.parse(version) >= reporter.availableSinceVersion
 
     private fun Project.getMetaKtlintCheckTask(): Task = this.tasks.findByName(CHECK_PARENT_TASK_NAME)
-            ?: this.task(CHECK_PARENT_TASK_NAME).apply {
-                group = VERIFICATION_GROUP
-                description = "Runs ktlint on all kotlin sources in this project."
-            }
+        ?: this.task(CHECK_PARENT_TASK_NAME).apply {
+            group = VERIFICATION_GROUP
+            description = "Runs ktlint on all kotlin sources in this project."
+        }
 
     private fun Project.getMetaKtlintFormatTask(): Task = this.tasks.findByName(FORMAT_PARENT_TASK_NAME)
-            ?: this.task(FORMAT_PARENT_TASK_NAME).apply {
-                group = FORMATTING_GROUP
-                description = "Runs the ktlint formatter on all kotlin sources in this project."
-            }
+        ?: this.task(FORMAT_PARENT_TASK_NAME).apply {
+            group = FORMATTING_GROUP
+            description = "Runs the ktlint formatter on all kotlin sources in this project."
+        }
 
     private fun setCheckTaskDependsOnKtlintCheckTask(project: Project, ktlintCheck: Task) {
         project.tasks.findByName("check")?.dependsOn(ktlintCheck)
     }
-
-    private fun addApplyToIdeaTask(target: Project, extension: KtlintExtension) {
-        target.afterEvaluate {
-            val rootProject = target.rootProject
-            if (rootProject.tasks.findByName(APPLY_TO_IDEA_TASK_NAME) == null) {
-                val ktLintConfig = createConfiguration(rootProject, extension)
-
-                if (extension.isApplyToIdeaPerProjectAvailable()) {
-                    target.rootProject.taskHelper<KtlintApplyToIdeaTask>(APPLY_TO_IDEA_TASK_NAME) {
-                        group = HELP_GROUP
-                        description = "Generates IDEA built-in formatter rules and apply them to the project." +
-                            "It will overwrite existing ones."
-                        classpath.setFrom(ktLintConfig)
-                        android.set(target.provider { extension.isAndroidFlagEnabled() })
-                        globally.set(target.provider { false })
-                    }
-                }
-
-                target.rootProject.taskHelper<KtlintApplyToIdeaTask>(APPLY_TO_IDEA_GLOBALLY_TASK_NAME) {
-                    group = HELP_GROUP
-                    description = "Generates IDEA built-in formatter rules and apply them globally " +
-                        "(in IDEA user settings folder). It will overwrite existing ones."
-                    classpath.setFrom(ktLintConfig)
-                    android.set(target.provider { extension.isAndroidFlagEnabled() })
-                    globally.set(target.provider { true })
-                }
-            }
-        }
-    }
-
-    /**
-     * Checks if apply code style to IDEA IDE per project is availalbe.
-     *
-     * Available since KtLint version `0.22.0`.
-     */
-    private fun KtlintExtension.isApplyToIdeaPerProjectAvailable() = SemVer.parse(version) >= SemVer(0, 22, 0)
 
     /*
      * Helper functions used until Gradle Script Kotlin solidifies it's plugin API.
@@ -325,9 +275,78 @@ open class KtlintPlugin : Plugin<Project> {
     private fun <T : Any> Project.theHelper(extensionType: KClass<T>) =
         convention.findPlugin(extensionType.java) ?: convention.getByType(extensionType.java)
 
-    private inline fun <reified T : Task> Project.taskHelper(name: String, noinline configuration: T.() -> Unit): T {
-        return this.tasks.create(name, T::class.java, configuration)
-    }
-
     private inline fun <reified T> Convention.getPluginHelper() = getPlugin(T::class.java)
 }
+
+/**
+ * Helper plugin that only applies tasks that don't modify the "check" task.
+ */
+open class KtlintHelperPlugin : Plugin<Project> {
+    override fun apply(target: Project) {
+        val extension = target.extensions.create("ktlint", KtlintExtension::class.java)
+
+        if (target == target.rootProject) {
+            /*
+             * Only add these tasks if we are applying to the root project.
+             */
+            addApplyToIdeaTasks(target, extension)
+        }
+    }
+
+    private fun addApplyToIdeaTasks(rootProject: Project, extension: KtlintExtension) {
+        rootProject.afterEvaluate {
+            if (rootProject.tasks.findByName(APPLY_TO_IDEA_TASK_NAME) == null) {
+                val ktLintConfig = createConfiguration(rootProject, extension)
+
+                if (extension.isApplyToIdeaPerProjectAvailable()) {
+                    rootProject.taskHelper<KtlintApplyToIdeaTask>(APPLY_TO_IDEA_TASK_NAME) {
+                        group = HELP_GROUP
+                        description = "Generates IDEA built-in formatter rules and apply them to the project." +
+                            "It will overwrite existing ones."
+                        classpath.setFrom(ktLintConfig)
+                        android.set(rootProject.provider { extension.isAndroidFlagEnabled() })
+                        globally.set(rootProject.provider { false })
+                    }
+                }
+
+                rootProject.taskHelper<KtlintApplyToIdeaTask>(APPLY_TO_IDEA_GLOBALLY_TASK_NAME) {
+                    group = HELP_GROUP
+                    description = "Generates IDEA built-in formatter rules and apply them globally " +
+                        "(in IDEA user settings folder). It will overwrite existing ones."
+                    classpath.setFrom(ktLintConfig)
+                    android.set(rootProject.provider { extension.isAndroidFlagEnabled() })
+                    globally.set(rootProject.provider { true })
+                }
+            }
+        }
+    }
+
+    /**
+     * Checks if apply code style to IDEA IDE per project is availalbe.
+     *
+     * Available since KtLint version `0.22.0`.
+     */
+    private fun KtlintExtension.isApplyToIdeaPerProjectAvailable() = SemVer.parse(version) >= SemVer(0, 22, 0)
+}
+
+private fun createConfiguration(target: Project, extension: KtlintExtension) =
+    target.configurations.maybeCreate("ktlint").apply {
+        target.dependencies.add(
+            this.name,
+            mapOf(
+                "group" to "com.github.shyiko",
+                "name" to "ktlint",
+                "version" to extension.version
+            )
+        )
+    }
+
+private inline fun <reified T : Task> Project.taskHelper(name: String, noinline configuration: T.() -> Unit): T {
+    return this.tasks.create(name, T::class.java, configuration)
+}
+
+/**
+ * Android option is available from ktlint 0.12.0.
+ */
+private fun KtlintExtension.isAndroidFlagEnabled() =
+    android && SemVer.parse(version) >= SemVer(0, 12, 0)

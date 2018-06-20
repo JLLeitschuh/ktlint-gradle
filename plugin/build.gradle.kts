@@ -86,6 +86,11 @@ gradlePlugin {
             id = "org.jlleitschuh.gradle.ktlint"
             implementationClass = "org.jlleitschuh.gradle.ktlint.KtlintPlugin"
         }
+
+        "ktlintHelperPlugin" {
+            id = "org.jlleitschuh.gradle.ktlint-helper"
+            implementationClass = "org.jlleitschuh.gradle.ktlint.KtlintHelperPlugin"
+        }
     }
 }
 
