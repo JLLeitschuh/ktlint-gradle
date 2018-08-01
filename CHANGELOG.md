@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+### Added
+ - Split project into multiple smaller plugins. `ktlint-base`, `ktlint-idea` & `ktlint`
+
+### Removed
+ - Does not automatically apply plugin tasks to all sub-projects (it breaks the Gradle plugin model).
+
 ## [4.1.0] - 2018-6-13
 ### Added
   - apply to IDEA task (in the project) (#91)
