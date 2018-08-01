@@ -5,7 +5,7 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
 import org.junit.Test
 
-class KtlintHelperPluginTest : AbstractPluginTest() {
+class KtlintIdeaPluginTest : AbstractPluginTest() {
     @Before
     fun setupBuild() {
         projectRoot.apply {
@@ -15,7 +15,7 @@ class KtlintHelperPluginTest : AbstractPluginTest() {
 
                 ${pluginsBlockWithKotlinJvmPlugin()}
 
-                apply plugin: "org.jlleitschuh.gradle.ktlint-helper"
+                apply plugin: "org.jlleitschuh.gradle.ktlint-idea"
 
                 repositories {
                     gradlePluginPortal()

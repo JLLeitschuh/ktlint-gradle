@@ -82,14 +82,19 @@ setupPublishingEnvironment()
 
 gradlePlugin {
     (plugins) {
+        "ktlintBase" {
+            id = "org.jlleitschuh.gradle.ktlint-base"
+            implementationClass = "org.jlleitschuh.gradle.ktlint.KtlintBasePlugin"
+        }
+
         "ktlintPlugin" {
             id = "org.jlleitschuh.gradle.ktlint"
             implementationClass = "org.jlleitschuh.gradle.ktlint.KtlintPlugin"
         }
 
         "ktlintHelperPlugin" {
-            id = "org.jlleitschuh.gradle.ktlint-helper"
-            implementationClass = "org.jlleitschuh.gradle.ktlint.KtlintHelperPlugin"
+            id = "org.jlleitschuh.gradle.ktlint-idea"
+            implementationClass = "org.jlleitschuh.gradle.ktlint.KtlintIdeaPlugin"
         }
     }
 }
