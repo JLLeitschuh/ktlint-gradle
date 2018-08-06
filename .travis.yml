@@ -12,7 +12,7 @@ script:
   - ./plugin/gradlew -p ./plugin build --no-daemon
   - ./plugin/gradlew -p ./plugin ktlintCheck --no-daemon
   - ./gradlew ktlintCheck --no-daemon
-  - if [ -n "$TRAVIS_TAG" ]; then ./plugin/gradlew publishPlugins --no-daemon; fi
+  - if [ -n "$TRAVIS_TAG" ]; then ./plugin/gradlew -p ./plugin publishPlugins --no-daemon; fi
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
