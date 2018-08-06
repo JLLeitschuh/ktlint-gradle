@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [5.0.0-SNAPSHOT] - Unreleased
+## [5.0.0] - 2018-8-6
 ### Added
   - Split project into multiple smaller plugins. `ktlint-base`, `ktlint-idea` & `ktlint`
 ### Changed
@@ -13,8 +13,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Update Gradle to 4.8.1 version
 ### Removed
   - Does not automatically apply plugin tasks to all sub-projects (it breaks the Gradle plugin model).
-### Fixed
-  - ?
 
 ## [4.1.0] - 2018-6-13
 ### Added
