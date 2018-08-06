@@ -5,14 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [4.2.0-SNAPSHOT] - Unreleased
+## [5.0.0-SNAPSHOT] - Unreleased
 ### Added
-  - ?
+  - Split project into multiple smaller plugins. `ktlint-base`, `ktlint-idea` & `ktlint`
 ### Changed
   - Update Kotlin to 1.2.50 version
   - Update Gradle to 4.8.1 version
 ### Removed
-  - ?
+  - Does not automatically apply plugin tasks to all sub-projects (it breaks the Gradle plugin model).
 ### Fixed
   - ?
 

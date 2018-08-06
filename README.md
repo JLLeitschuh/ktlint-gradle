@@ -19,6 +19,8 @@ Minimal supported [ktlint](https://github.com/shyiko/ktlint) version: `0.10.0`
 
 ## How to use
 
+### Simple
+
 Build script snippet for use in all Gradle versions:
 ```groovy
 buildscript {
@@ -46,6 +48,25 @@ Optionally apply plugin to all project modules:
 ```groovy
 subprojects {
     apply plugin: "org.jlleitschuh.gradle.ktlint" // Version should be inherited from parent
+}
+```
+
+### IntelliJ Idea Only Plugin
+
+(This plugin is automatically applied by the `ktlint` plugin.)
+
+For all gradle versions:
+
+Use the same `buildscript` logic as above but with this instead of the above suggested `apply` line.
+
+```groovy
+apply plugin: "org.jlleitschuh.gradle.ktlint-idea"
+```
+
+Build script snippet for new, incubating, plugin mechanism introduced in Gradle 2.1:
+```groovy
+plugins {
+  id "org.jlleitschuh.gradle.ktlint-idea" version "5.0.0"
 }
 ```
 
