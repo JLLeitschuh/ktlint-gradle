@@ -1,5 +1,5 @@
 object PluginVersions {
-    val kotlin = "1.2.50"
+    val kotlin = "1.2.61"
     val ktlintPlugin = "4.1.0"
     val gradlePublishPlugin = "0.9.10"
     val androidPlugin = "3.1.2"
