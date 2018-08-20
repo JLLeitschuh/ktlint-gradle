@@ -9,9 +9,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
   - ?
 ### Changed
-  - Update Kotlin to 1.2.61 version
-  - Update Kotlin-native dependency to 0.8.2 version
-  - Update Gradle to 4.9.0 version
+  - Update Kotlin to `1.2.61` version
+  - Update Kotlin-native dependency to `0.8.2` version
+  - Update Gradle to `4.9.0` version
+  - Update default KtLint version to `0.27.0`
 ### Removed
   - ?
 ### Fixed
