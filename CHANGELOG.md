@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - ?
 ### Changed
   - Update Kotlin to 1.2.61 version
+  - Update Kotlin-native dependency to 0.8.2 version
 ### Removed
   - ?
 ### Fixed
