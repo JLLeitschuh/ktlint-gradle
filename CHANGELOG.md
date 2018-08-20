@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [5.1.0] - Unreleased
+### Added
+  - ?
+### Changed
+  - ?
+### Removed
+  - ?
+### Fixed
+  - ?
+
+
 ## [5.0.0] - 2018-8-6
 ### Added
   - Split project into multiple smaller plugins. `ktlint-base`, `ktlint-idea` & `ktlint`
