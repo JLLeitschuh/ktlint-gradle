@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [5.1.0] - Unreleased
 ### Added
-  - ?
+  - Support for new kotlin native experimental plugin (#119)
 ### Changed
   - Update Kotlin to `1.2.61` version
   - Update Kotlin-native dependency to `0.8.2` version
