@@ -26,8 +26,6 @@ import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import java.io.File
 import javax.inject.Inject
 
-private const val EDITORCONGIG_FILE_NAME = ".editorconfig"
-
 @CacheableTask
 open class KtlintCheck @Inject constructor(objectFactory: ObjectFactory) : DefaultTask() {
 
@@ -49,8 +47,7 @@ open class KtlintCheck @Inject constructor(objectFactory: ObjectFactory) : Defau
     @get:SkipWhenEmpty
     @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:InputFiles
-    internal val editorConfigFiles: FileCollection = project.rootProject.files(EDITORCONGIG_FILE_NAME)
-        .plus(project.files(EDITORCONGIG_FILE_NAME))
+    internal val editorConfigFiles: FileCollection = getEditorConfigFiles(project)
     @get:Input
     val verbose: Property<Boolean> = objectFactory.booleanProperty()
     @get:Input
