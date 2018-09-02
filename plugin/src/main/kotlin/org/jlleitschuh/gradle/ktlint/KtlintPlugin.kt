@@ -21,6 +21,7 @@ import org.gradle.api.tasks.StopExecutionException
 import org.jetbrains.kotlin.gradle.plugin.KonanArtifactContainer
 import org.jetbrains.kotlin.gradle.plugin.KonanExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
+import org.jetbrains.kotlin.gradle.plugin.experimental.KotlinNativeComponent
 import org.jetbrains.kotlin.gradle.plugin.tasks.KonanCompileTask
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import java.io.File
@@ -44,7 +45,11 @@ open class KtlintPlugin : Plugin<Project> {
         target.pluginManager.withPlugin("kotlin2js", applyKtLint(target, extension))
         target.pluginManager.withPlugin("kotlin-platform-common", applyKtLint(target, extension))
         target.pluginManager.withPlugin("kotlin-android", applyKtLintToAndroid(target, extension))
-        target.pluginManager.withPlugin("konan", applyKtLintNative(target, extension))
+        target.pluginManager.withPlugin("konan", applyKtLintKonanNative(target, extension))
+        target.pluginManager.withPlugin(
+            "org.jetbrains.kotlin.native",
+            applyKtLintNative(target, extension)
+        )
     }
 
     private fun applyKtLint(
@@ -115,12 +120,12 @@ open class KtlintPlugin : Plugin<Project> {
         }
     }
 
-    private fun applyKtLintNative(
+    private fun applyKtLintKonanNative(
         project: Project,
         extension: KtlintExtension
     ): (AppliedPlugin) -> Unit {
-        return {
-            project.afterEvaluate {
+        return { _ ->
+            project.afterEvaluate { _ ->
                 val ktLintConfig = createConfiguration(project, extension)
 
                 val compileTargets = project.theHelper<KonanExtension>().targets
@@ -135,19 +140,74 @@ open class KtlintPlugin : Plugin<Project> {
                         }
                     }
                     if (sourceDirectoriesList.isNotEmpty()) {
-                        val checkTask = createCheckTask(project, extension, it.name, ktLintConfig,
-                                sourceDirectoriesList)
+                        val checkTask = createCheckTask(
+                            project,
+                            extension,
+                            konanBuildingConfig.name,
+                            ktLintConfig,
+                            sourceDirectoriesList
+                        )
                         addKtlintCheckTaskToProjectMetaCheckTask(project, checkTask)
                         setCheckTaskDependsOnKtlintCheckTask(project, checkTask)
 
                         val kotlinSourceSet = sourceDirectoriesList.reduce { acc, fileCollection ->
-                            acc.add(fileCollection)
+                            acc.plus(fileCollection)
                         }
                         val runArgs = kotlinSourceSet.files.map { "${it.path}/**/*.kt" }.toMutableSet()
                         addAdditionalRunArgs(extension, runArgs)
 
-                        val ktlintSourceSetFormatTask = createFormatTask(project, it.name, ktLintConfig,
-                                kotlinSourceSet, runArgs)
+                        val ktlintSourceSetFormatTask = createFormatTask(
+                            project,
+                            konanBuildingConfig.name,
+                            ktLintConfig,
+                            kotlinSourceSet,
+                            runArgs
+                        )
+                        addKtlintFormatTaskToProjectMetaFormatTask(project, ktlintSourceSetFormatTask)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun applyKtLintNative(
+        project: Project,
+        extension: KtlintExtension
+    ): (AppliedPlugin) -> Unit {
+        return { _ ->
+            project.afterEvaluate { _ ->
+                val ktLintConfig = createConfiguration(project, extension)
+
+                project.components.withType(KotlinNativeComponent::class.java) { component ->
+                    val sourceDirectoriesList = mutableListOf<FileCollection>()
+                    component.konanTargets.get().forEach {
+                        sourceDirectoriesList.add(component.sources.getAllSources(it))
+                    }
+
+                    if (sourceDirectoriesList.isNotEmpty()) {
+                        val checkTask = createCheckTask(
+                            project,
+                            extension,
+                            component.name,
+                            ktLintConfig,
+                            sourceDirectoriesList
+                        )
+                        addKtlintCheckTaskToProjectMetaCheckTask(project, checkTask)
+                        setCheckTaskDependsOnKtlintCheckTask(project, checkTask)
+
+                        val kotlinSourceSet = sourceDirectoriesList.reduce { acc, fileCollection ->
+                            acc.plus(fileCollection)
+                        }
+                        val runArgs = kotlinSourceSet.files.map { "${it.path}/**/*.kt" }.toMutableSet()
+                        addAdditionalRunArgs(extension, runArgs)
+
+                        val ktlintSourceSetFormatTask = createFormatTask(
+                            project,
+                            component.name,
+                            ktLintConfig,
+                            kotlinSourceSet,
+                            runArgs
+                        )
                         addKtlintFormatTaskToProjectMetaFormatTask(project, ktlintSourceSetFormatTask)
                     }
                 }
