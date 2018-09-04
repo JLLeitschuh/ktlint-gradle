@@ -116,6 +116,34 @@ class KtlintPluginTest : AbstractPluginTest() {
     }
 
     @Test
+    fun `Check task should be up_to_date if editorconfig content not changed`() {
+        projectRoot.withCleanSources()
+        projectRoot.createEditorconfigFile()
+
+        build("ktlintCheck").apply {
+            assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.SUCCESS))
+        }
+        build("ktlintCheck").apply {
+            assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.UP_TO_DATE))
+        }
+    }
+
+    @Test
+    fun `Check task should rerun if editorconfig content changed`() {
+        projectRoot.withCleanSources()
+        projectRoot.createEditorconfigFile()
+
+        build("ktlintCheck").apply {
+            assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.SUCCESS))
+        }
+
+        projectRoot.modifyEditorconfigFile(100)
+        build("ktlintCheck").apply {
+            assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.SUCCESS))
+        }
+    }
+
+    @Test
     fun `check task is relocatable`() {
         val originalLocation = temporaryFolder.root.resolve("original")
         val relocatedLocation = temporaryFolder.root.resolve("relocated")
