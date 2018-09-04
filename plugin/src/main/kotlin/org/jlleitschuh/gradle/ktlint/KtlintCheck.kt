@@ -4,6 +4,7 @@ import net.swiftzer.semver.SemVer
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTree
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
@@ -42,6 +43,10 @@ open class KtlintCheck @Inject constructor(objectFactory: ObjectFactory) : Defau
             filterable.include("**/*.$it")
         }
     }
+
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    @get:InputFiles
+    internal val editorConfigFiles: FileCollection = getEditorConfigFiles(project)
 
     @get:Input
     val verbose: Property<Boolean> = objectFactory.booleanProperty()

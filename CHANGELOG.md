@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
   - ?
 ### Fixed
-  - ?
+  - `.editorconfig` file change doesn't reset `UP-TO-DATE` `ktlintCheck` task state (#106)
 
 
 ## [5.0.0] - 2018-8-6
