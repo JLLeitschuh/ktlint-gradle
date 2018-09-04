@@ -44,10 +44,10 @@ open class KtlintCheck @Inject constructor(objectFactory: ObjectFactory) : Defau
         }
     }
 
-    @get:SkipWhenEmpty
     @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:InputFiles
     internal val editorConfigFiles: FileCollection = getEditorConfigFiles(project)
+
     @get:Input
     val verbose: Property<Boolean> = objectFactory.booleanProperty()
     @get:Input
