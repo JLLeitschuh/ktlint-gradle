@@ -131,39 +131,16 @@ open class KtlintPlugin : Plugin<Project> {
                 val compileTargets = project.theHelper<KonanExtension>().targets
 
                 project.theHelper<KonanArtifactContainer>().forEach { konanBuildingConfig ->
-                    val sourceDirectoriesList = mutableListOf<FileCollection>()
-                    compileTargets.forEach { target ->
-                        val compileTask = konanBuildingConfig.findByTarget(target)
-                        if (compileTask != null) {
-                            val sourceFiles = (compileTask as KonanCompileTask).srcFiles
-                            sourceDirectoriesList.addAll(sourceFiles)
+                    addTasksForNativePlugin(project, extension, konanBuildingConfig.name, ktLintConfig) {
+                        compileTargets.fold(initial = emptyList()) { acc, target ->
+                            val compileTask = konanBuildingConfig.findByTarget(target)
+                            if (compileTask != null) {
+                                val sourceFiles = (compileTask as KonanCompileTask).srcFiles
+                                acc + sourceFiles
+                            } else {
+                                acc
+                            }
                         }
-                    }
-                    if (sourceDirectoriesList.isNotEmpty()) {
-                        val checkTask = createCheckTask(
-                            project,
-                            extension,
-                            konanBuildingConfig.name,
-                            ktLintConfig,
-                            sourceDirectoriesList
-                        )
-                        addKtlintCheckTaskToProjectMetaCheckTask(project, checkTask)
-                        setCheckTaskDependsOnKtlintCheckTask(project, checkTask)
-
-                        val kotlinSourceSet = sourceDirectoriesList.reduce { acc, fileCollection ->
-                            acc.plus(fileCollection)
-                        }
-                        val runArgs = kotlinSourceSet.files.map { "${it.path}/**/*.kt" }.toMutableSet()
-                        addAdditionalRunArgs(extension, runArgs)
-
-                        val ktlintSourceSetFormatTask = createFormatTask(
-                            project,
-                            konanBuildingConfig.name,
-                            ktLintConfig,
-                            kotlinSourceSet,
-                            runArgs
-                        )
-                        addKtlintFormatTaskToProjectMetaFormatTask(project, ktlintSourceSetFormatTask)
                     }
                 }
             }
@@ -179,39 +156,50 @@ open class KtlintPlugin : Plugin<Project> {
                 val ktLintConfig = createConfiguration(project, extension)
 
                 project.components.withType(KotlinNativeComponent::class.java) { component ->
-                    val sourceDirectoriesList = mutableListOf<FileCollection>()
-                    component.konanTargets.get().forEach {
-                        sourceDirectoriesList.add(component.sources.getAllSources(it))
-                    }
-
-                    if (sourceDirectoriesList.isNotEmpty()) {
-                        val checkTask = createCheckTask(
-                            project,
-                            extension,
-                            component.name,
-                            ktLintConfig,
-                            sourceDirectoriesList
-                        )
-                        addKtlintCheckTaskToProjectMetaCheckTask(project, checkTask)
-                        setCheckTaskDependsOnKtlintCheckTask(project, checkTask)
-
-                        val kotlinSourceSet = sourceDirectoriesList.reduce { acc, fileCollection ->
-                            acc.plus(fileCollection)
-                        }
-                        val runArgs = kotlinSourceSet.files.map { "${it.path}/**/*.kt" }.toMutableSet()
-                        addAdditionalRunArgs(extension, runArgs)
-
-                        val ktlintSourceSetFormatTask = createFormatTask(
-                            project,
-                            component.name,
-                            ktLintConfig,
-                            kotlinSourceSet,
-                            runArgs
-                        )
-                        addKtlintFormatTaskToProjectMetaFormatTask(project, ktlintSourceSetFormatTask)
+                    addTasksForNativePlugin(project, extension, component.name, ktLintConfig) {
+                        component.konanTargets.get()
+                            .fold(initial = emptyList()) { acc, konanTarget ->
+                                acc + listOf(component.sources.getAllSources(konanTarget))
+                            }
                     }
                 }
             }
+        }
+    }
+
+    private fun addTasksForNativePlugin(
+        project: Project,
+        extension: KtlintExtension,
+        sourceSetName: String,
+        ktlintConfiguration: Configuration,
+        gatherVariantSources: () -> List<FileCollection>
+    ) {
+        val sourceDirectoriesList = gatherVariantSources()
+        if (sourceDirectoriesList.isNotEmpty()) {
+            val checkTask = createCheckTask(
+                project,
+                extension,
+                sourceSetName,
+                ktlintConfiguration,
+                sourceDirectoriesList
+            )
+            addKtlintCheckTaskToProjectMetaCheckTask(project, checkTask)
+            setCheckTaskDependsOnKtlintCheckTask(project, checkTask)
+
+            val kotlinSourceSet = sourceDirectoriesList.reduce { acc, fileCollection ->
+                acc.plus(fileCollection)
+            }
+            val runArgs = kotlinSourceSet.files.map { "${it.path}/**/*.kt" }.toMutableSet()
+            addAdditionalRunArgs(extension, runArgs)
+
+            val ktlintSourceSetFormatTask = createFormatTask(
+                project,
+                sourceSetName,
+                ktlintConfiguration,
+                kotlinSourceSet,
+                runArgs
+            )
+            addKtlintFormatTaskToProjectMetaFormatTask(project, ktlintSourceSetFormatTask)
         }
     }
 
