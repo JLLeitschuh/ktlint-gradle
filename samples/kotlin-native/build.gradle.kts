@@ -13,6 +13,7 @@ kotlinNativeSourceSets["main"].component {
     if (this is KotlinNativeMainComponent) {
         outputKinds.set(listOf(OutputKind.EXECUTABLE))
         baseName.set("foo")
+        extraOpts(listOf("-entry", "org.jlleitschuh.gradle.ktlint.sample.native.main"))
     }
 }
 
