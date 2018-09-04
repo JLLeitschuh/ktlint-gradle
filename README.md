@@ -30,7 +30,7 @@ buildscript {
     }
   }
   dependencies {
-    classpath "gradle.plugin.org.jlleitschuh.gradle:ktlint-gradle:4.1.0"
+    classpath "gradle.plugin.org.jlleitschuh.gradle:ktlint-gradle:5.0.0"
   }
 }
 
