@@ -101,15 +101,15 @@ This plugin adds two tasks to every source set: `ktlint[source set name]Check` a
 Additionally, a simple `ktlintCheck` task has also been added that checks all of the source sets for that project.
 Similarly, a `ktlintFormat` task has been added that formats all of the source sets.
 
-If project has subprojects - plugin also adds two meta tasks `ktlintCheck` and `ktlintFormat` to the root project that
-triggers related tasks in subprojects.
+If the project has subprojects then the plugin also adds two meta tasks `ktlintCheck` and `ktlintFormat` to the root project that
+triggers the related tasks in the subprojects.
 
 ### Apply to IDEA
-Two another tasks added:
-- `ktlintApplyToIdea` - Task generates IntelliJ IDEA (or Android Studio) Kotlin
-                        style files in project `.idea/` folder.
-- `ktlintApplyToIdeaGlobally` - Task generates IntelliJ IDEA (or Android Studio) Kotlin
-                                style files in user home IDEA
+Two another tasks are added:
+- `ktlintApplyToIdea` - The task generates IntelliJ IDEA (or Android Studio) Kotlin
+                        style files in the project `.idea/` folder.
+- `ktlintApplyToIdeaGlobally` - The task generates IntelliJ IDEA (or Android Studio) Kotlin
+                                style files in the user home IDEA
                                 (or Android Studio) settings folder.
 
 They are always added only to the root project.
@@ -122,8 +122,8 @@ They are always added only to the root project.
 
 Import the [settings.gradle.kts](settings.gradle.kts) file into your IDE.
 
-To enable Android sample either define `ANDROID_HOME` environmental variable or
-add `local.properties` file to project root folder with following content:
+To enable the Android sample either define the `ANDROID_HOME` environmental variable or
+add a `local.properties` file to the project root folder with the following content:
 ```properties
 sdk.dir=<android-sdk-location>
 ```
@@ -132,7 +132,7 @@ sdk.dir=<android-sdk-location>
 
 Building the plugin: `./plugin/gradlew build`
 
-Running current plugin snapshot check on sample projects: `./gradlew ktlintCheck`
+On how to run the current plugin snapshot check on sample projects: `./gradlew ktlintCheck`
 
 ## Links
 
