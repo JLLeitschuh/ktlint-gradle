@@ -30,7 +30,7 @@ buildscript {
     }
   }
   dependencies {
-    classpath "gradle.plugin.org.jlleitschuh.gradle:ktlint-gradle:5.0.0"
+    classpath "gradle.plugin.org.jlleitschuh.gradle:ktlint-gradle:5.1.0"
   }
 }
 
@@ -40,7 +40,7 @@ apply plugin: "org.jlleitschuh.gradle.ktlint"
 Build script snippet for new, incubating, plugin mechanism introduced in Gradle 2.1:
 ```groovy
 plugins {
-  id "org.jlleitschuh.gradle.ktlint" version "5.0.0"
+  id "org.jlleitschuh.gradle.ktlint" version "5.1.0"
 }
 ```
 
@@ -66,7 +66,7 @@ apply plugin: "org.jlleitschuh.gradle.ktlint-idea"
 Build script snippet for new, incubating, plugin mechanism introduced in Gradle 2.1:
 ```groovy
 plugins {
-  id "org.jlleitschuh.gradle.ktlint-idea" version "5.0.0"
+  id "org.jlleitschuh.gradle.ktlint-idea" version "5.1.0"
 }
 ```
 
