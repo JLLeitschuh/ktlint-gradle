@@ -1,25 +1,69 @@
 # Ktlint Gradle
 
+**Provides a convenient wrapper plugin over the [KtLint](https://github.com/shyiko/ktlint) project.**
+
+Latest plugin version: [5.0.0](/CHANGELOG.md#500---2018-8-6)
+
 [![Join the chat at https://gitter.im/ktlint-gradle/Lobby](https://badges.gitter.im/ktlint-gradle/Lobby.svg)](https://gitter.im/ktlint-gradle/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/JLLeitschuh/ktlint-gradle.svg?branch=master)](https://travis-ci.org/JLLeitschuh/ktlint-gradle)
 
-Provides a convenient wrapper plugin over the [ktlint](https://github.com/shyiko/ktlint) project.
+This plugin creates convenient tasks in your Gradle project
+that run [KtLint](https://github.com/shyiko/ktlint) checks or do code
+auto format.
 
-This plugin can be applied to any project but only activates if that project has the kotlin plugin applied.
+Plugin can be applied to any project, but only activates if that project has the kotlin plugin applied.
 The assumption being that you would not want to lint code you weren't compiling.
 
-## Warning
+## Table of content
+- [Supported Kotlin plugins](#supported-kotlin-plugins)
+- [How to use](#how-to-use)
+  - [Minimal support versions](#minimal_supported_versions)
+  - [KtLint plugin](#ktlint-plugin)
+    - [Simple setup](#simple-setup)
+    - [Using new plugin api](#using-new-plugin-api)
+    - [How to apply to all subprojects](#applying-to-subprojects)
+  - [Intellij IDEA plugin](#intellij-idea-only-plugin)
+    - [Simple setup](#idea-plugin-simple-setup)
+    - [Using new plugin api](#idea-plugin-setup-using-new-plugin-api)
+  - [Plugin configuration](#configuration)
+  - [Samples](#samples)
+- [Task details](#task-added)
+  - [Main tasks](#main-tasks)
+  - [Additional tasks](#additional-helper-tasks)
+- [FAQ](#faq)
+- [Developers](#developers)
+  - [Importing the project](#importing)
+  - [Building the project](#building)
+- [Links](#links)
+
+## Supported Kotlin plugins
+
+This plugin supports following kotlin plugins:
+- "kotlin"
+- "kotlin-android"
+- "kotlin2js"
+- "kotlin-platform-common"
+- "kotlin-platform-js"
+- "kotlin-platform-jvm"
+- "konan"
+
+If you know any new Kotlin plugin that are not in this list - please,
+open a [new issue](https://github.com/JLLeitschuh/ktlint-gradle/issues/new).
+
+## How to use
+
+### Minimal supported versions
 
 This plugin was written using the new API available for gradle script kotlin builds.
 This API is available in new versions of gradle.
 
-Minimal supported Gradle version: `4.3`
+Minimal supported [Gradle](www.gradle.org) version: `4.3`
 
-Minimal supported [ktlint](https://github.com/shyiko/ktlint) version: `0.10.0`
+Minimal supported [KtLint](https://github.com/shyiko/ktlint) version: `0.10.0`
 
-## How to use
+### KtLint plugin
 
-### Simple
+#### Simple setup
 
 Build script snippet for use in all Gradle versions:
 ```groovy
@@ -30,19 +74,25 @@ buildscript {
     }
   }
   dependencies {
-    classpath "gradle.plugin.org.jlleitschuh.gradle:ktlint-gradle:5.0.0"
+    classpath "gradle.plugin.org.jlleitschuh.gradle:ktlint-gradle:<current_version>"
   }
 }
 
 apply plugin: "org.jlleitschuh.gradle.ktlint"
 ```
 
+
+#### Using new plugin api
+
 Build script snippet for new, incubating, plugin mechanism introduced in Gradle 2.1:
 ```groovy
 plugins {
-  id "org.jlleitschuh.gradle.ktlint" version "5.0.0"
+  id "org.jlleitschuh.gradle.ktlint" version "<current_version>"
 }
 ```
+
+
+#### Applying to subprojects
 
 Optionally apply plugin to all project modules:
 ```groovy
@@ -53,28 +103,40 @@ subprojects {
 
 ### IntelliJ Idea Only Plugin
 
-(This plugin is automatically applied by the `ktlint` plugin.)
+**Note:** This plugin is automatically applied by the main `KtLint` plugin.
+
+This plugin just adds [special tasks](#additional-helper-tasks) that can generate IntelliJ IDEA codestyle
+rules using KtLint.
+
+#### Idea plugin simple setup
 
 For all gradle versions:
 
-Use the same `buildscript` logic as above but with this instead of the above suggested `apply` line.
+Use the same `buildscript` logic as [above](#simple-setup), but with this instead of the above suggested `apply` line.
 
 ```groovy
 apply plugin: "org.jlleitschuh.gradle.ktlint-idea"
 ```
 
+#### Idea plugin setup using new plugin api
+
 Build script snippet for new, incubating, plugin mechanism introduced in Gradle 2.1:
 ```groovy
 plugins {
-  id "org.jlleitschuh.gradle.ktlint-idea" version "5.0.0"
+  id "org.jlleitschuh.gradle.ktlint-idea" version "<current_version>"
 }
 ```
 
-## Configuration
-The following configuration block is optional.
+### Configuration
+The following configuration block is _optional_.
 
-If you don't configure this the defaults defined in the [KtlintExtension](plugin/src/main/kotlin/org/jlleitschuh/gradle/ktlint/KtlintExtension.kt) object will be used.
-The version of Ktlint used by default may change between patch versions of this plugin. If you don't want to inherit these changes then make sure you lock your version here.
+If you don't configure this the defaults defined
+in the [KtlintExtension](plugin/src/main/kotlin/org/jlleitschuh/gradle/ktlint/KtlintExtension.kt)
+object will be used.
+
+The version of KtLint used by default _may change_ between patch versions of this plugin.
+If you don't want to inherit these changes then make sure you lock your version here.
+
 ```groovy
 ktlint {
     version = ""
@@ -91,11 +153,22 @@ ktlint {
 }
 ```
 
-## Samples
+### Samples
 
-Check [samples](samples/) folder that provides examples how-to apply plugin.
+This repository provides following examples how to setup this plugin:
+- [android-app](/samples/android-app) - applies plugin to android application project
+- [kotlin-gradle](/samples/kotlin-gradle) - applies plugin to plain Kotlin project that uses groovy in `build.gradle` files
+- [kotlin-js](/samples/kotlin-js) - applies plugin to kotlin js project
+- [kotlin-ks](/samples/kotlin-ks) - applies plugin to plain Kotlin project that uses Kotlin DSL in `build.gradle.kts` files
+- [kotlin-multiplatform-common](/samples/kotlin-multiplatform-common) - applies plugin to Kotlin common multiplatform module
+- [kotlin-multiplatform-js](/samples/kotlin-multiplatform-js) - applies plugin to Kotlin Javascript multiplatform module
+- [kotlin-multiplatform-jvm](/samples/kotlin-multiplatform-jvm) - applies plugin to Kotlin JVM multiplatform module
+- [kotlin-native](/samples/kotlin-native) - applies plugin to Kotlin native project
+- [kotlin-rulesets-using](/samples/kotlin-rulesets-using) - adds custom [example](/samples/kotlin-ruleset-creating) ruleset
 
 ## Tasks Added
+
+### Main tasks
 
 This plugin adds two tasks to every source set: `ktlint[source set name]Check` and `ktlint[source set name]Format`.
 Additionally, a simple `ktlintCheck` task has also been added that checks all of the source sets for that project.
@@ -104,7 +177,8 @@ Similarly, a `ktlintFormat` task has been added that formats all of the source s
 If project has subprojects - plugin also adds two meta tasks `ktlintCheck` and `ktlintFormat` to the root project that
 triggers related tasks in subprojects.
 
-### Apply to IDEA
+### Additional helper tasks
+
 Two another tasks added:
 - `ktlintApplyToIdea` - Task generates IntelliJ IDEA (or Android Studio) Kotlin
                         style files in project `.idea/` folder.
@@ -112,13 +186,17 @@ Two another tasks added:
                                 style files in user home IDEA
                                 (or Android Studio) settings folder.
 
-They are always added only to the root project.
+They are always added **only** to the root project.
 
 **Note** that this tasks will overwrite the existing style file.
 
+## FAQ
+
+To be added.
+
 ## Developers
 
-### IDE Support
+### Importing
 
 Import the [settings.gradle.kts](settings.gradle.kts) file into your IDE.
 
@@ -128,7 +206,7 @@ add `local.properties` file to project root folder with following content:
 sdk.dir=<android-sdk-location>
 ```
 
-#### Building
+### Building
 
 Building the plugin: `./plugin/gradlew build`
 
