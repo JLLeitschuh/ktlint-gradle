@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [5.1.0] - Unreleased
+## [5.1.0] - 2018-9-5
 ### Added
   - Support for new kotlin native experimental plugin (#119)
 ### Changed
@@ -13,8 +13,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Update Kotlin-native dependency to `0.8.2` version
   - Update Gradle to `4.9.0` version
   - Update default KtLint version to `0.27.0`
-### Removed
-  - ?
 ### Fixed
   - `.editorconfig` file change doesn't reset `UP-TO-DATE` `ktlintCheck` task state (#106)
 
