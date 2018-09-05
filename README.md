@@ -192,7 +192,19 @@ They are always added **only** to the root project.
 
 ## FAQ
 
-To be added.
+- Is it possible to not stop tasks execution if some of subprojects tasks failed?
+
+Yes. Just use gradle `--continue` option:
+```shell
+$ ./gradlew --continue ktlintCheck
+```
+
+- Can I mix old plugin and new plugin api setup in my project
+(see [simple-setup](#simple-setup) and [using new plugin api setup](#using-new-plugin-api))?
+
+No. This approaches are not equivalent how they work. The problem that
+plugin may not find some of kotlin plugins if both approaches are used
+in the project configuration. Especially it is related to Android plugin.
 
 ## Developers
 
