@@ -21,6 +21,7 @@ import org.gradle.api.tasks.StopExecutionException
 import org.jetbrains.kotlin.gradle.plugin.KonanArtifactContainer
 import org.jetbrains.kotlin.gradle.plugin.KonanExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
+import org.jetbrains.kotlin.gradle.plugin.experimental.KotlinNativeComponent
 import org.jetbrains.kotlin.gradle.plugin.tasks.KonanCompileTask
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import java.io.File
@@ -44,7 +45,11 @@ open class KtlintPlugin : Plugin<Project> {
         target.pluginManager.withPlugin("kotlin2js", applyKtLint(target, extension))
         target.pluginManager.withPlugin("kotlin-platform-common", applyKtLint(target, extension))
         target.pluginManager.withPlugin("kotlin-android", applyKtLintToAndroid(target, extension))
-        target.pluginManager.withPlugin("konan", applyKtLintNative(target, extension))
+        target.pluginManager.withPlugin("konan", applyKtLintKonanNative(target, extension))
+        target.pluginManager.withPlugin(
+            "org.jetbrains.kotlin.native",
+            applyKtLintNative(target, extension)
+        )
     }
 
     private fun applyKtLint(
@@ -115,43 +120,86 @@ open class KtlintPlugin : Plugin<Project> {
         }
     }
 
-    private fun applyKtLintNative(
+    private fun applyKtLintKonanNative(
         project: Project,
         extension: KtlintExtension
     ): (AppliedPlugin) -> Unit {
-        return {
-            project.afterEvaluate {
+        return { _ ->
+            project.afterEvaluate { _ ->
                 val ktLintConfig = createConfiguration(project, extension)
 
                 val compileTargets = project.theHelper<KonanExtension>().targets
 
                 project.theHelper<KonanArtifactContainer>().forEach { konanBuildingConfig ->
-                    val sourceDirectoriesList = mutableListOf<FileCollection>()
-                    compileTargets.forEach { target ->
-                        val compileTask = konanBuildingConfig.findByTarget(target)
-                        if (compileTask != null) {
-                            val sourceFiles = (compileTask as KonanCompileTask).srcFiles
-                            sourceDirectoriesList.addAll(sourceFiles)
+                    addTasksForNativePlugin(project, extension, konanBuildingConfig.name, ktLintConfig) {
+                        compileTargets.fold(initial = emptyList()) { acc, target ->
+                            val compileTask = konanBuildingConfig.findByTarget(target)
+                            if (compileTask != null) {
+                                val sourceFiles = (compileTask as KonanCompileTask).srcFiles
+                                acc + sourceFiles
+                            } else {
+                                acc
+                            }
                         }
-                    }
-                    if (sourceDirectoriesList.isNotEmpty()) {
-                        val checkTask = createCheckTask(project, extension, it.name, ktLintConfig,
-                                sourceDirectoriesList)
-                        addKtlintCheckTaskToProjectMetaCheckTask(project, checkTask)
-                        setCheckTaskDependsOnKtlintCheckTask(project, checkTask)
-
-                        val kotlinSourceSet = sourceDirectoriesList.reduce { acc, fileCollection ->
-                            acc.add(fileCollection)
-                        }
-                        val runArgs = kotlinSourceSet.files.map { "${it.path}/**/*.kt" }.toMutableSet()
-                        addAdditionalRunArgs(extension, runArgs)
-
-                        val ktlintSourceSetFormatTask = createFormatTask(project, it.name, ktLintConfig,
-                                kotlinSourceSet, runArgs)
-                        addKtlintFormatTaskToProjectMetaFormatTask(project, ktlintSourceSetFormatTask)
                     }
                 }
             }
+        }
+    }
+
+    private fun applyKtLintNative(
+        project: Project,
+        extension: KtlintExtension
+    ): (AppliedPlugin) -> Unit {
+        return { _ ->
+            project.afterEvaluate { _ ->
+                val ktLintConfig = createConfiguration(project, extension)
+
+                project.components.withType(KotlinNativeComponent::class.java) { component ->
+                    addTasksForNativePlugin(project, extension, component.name, ktLintConfig) {
+                        component.konanTargets.get()
+                            .fold(initial = emptyList()) { acc, konanTarget ->
+                                acc + listOf(component.sources.getAllSources(konanTarget))
+                            }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun addTasksForNativePlugin(
+        project: Project,
+        extension: KtlintExtension,
+        sourceSetName: String,
+        ktlintConfiguration: Configuration,
+        gatherVariantSources: () -> List<FileCollection>
+    ) {
+        val sourceDirectoriesList = gatherVariantSources()
+        if (sourceDirectoriesList.isNotEmpty()) {
+            val checkTask = createCheckTask(
+                project,
+                extension,
+                sourceSetName,
+                ktlintConfiguration,
+                sourceDirectoriesList
+            )
+            addKtlintCheckTaskToProjectMetaCheckTask(project, checkTask)
+            setCheckTaskDependsOnKtlintCheckTask(project, checkTask)
+
+            val kotlinSourceSet = sourceDirectoriesList.reduce { acc, fileCollection ->
+                acc.plus(fileCollection)
+            }
+            val runArgs = kotlinSourceSet.files.map { "${it.path}/**/*.kt" }.toMutableSet()
+            addAdditionalRunArgs(extension, runArgs)
+
+            val ktlintSourceSetFormatTask = createFormatTask(
+                project,
+                sourceSetName,
+                ktlintConfiguration,
+                kotlinSourceSet,
+                runArgs
+            )
+            addKtlintFormatTaskToProjectMetaFormatTask(project, ktlintSourceSetFormatTask)
         }
     }
 
