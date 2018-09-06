@@ -20,11 +20,11 @@ The assumption being that you would not want to lint code you weren't compiling.
   - [Minimal support versions](#minimal_supported_versions)
   - [KtLint plugin](#ktlint-plugin)
     - [Simple setup](#simple-setup)
-    - [Using new plugin api](#using-new-plugin-api)
+    - [Using new plugin API](#using-new-plugin-api)
     - [How to apply to all subprojects](#applying-to-subprojects)
   - [Intellij IDEA plugin](#intellij-idea-only-plugin)
     - [Simple setup](#idea-plugin-simple-setup)
-    - [Using new plugin api](#idea-plugin-setup-using-new-plugin-api)
+    - [Using new plugin API](#idea-plugin-setup-using-new-plugin-api)
   - [Plugin configuration](#configuration)
   - [Samples](#samples)
 - [Task details](#task-added)
@@ -83,7 +83,7 @@ apply plugin: "org.jlleitschuh.gradle.ktlint"
 ```
 
 
-#### Using new plugin api
+#### Using new plugin API
 
 Build script snippet for new, incubating, plugin mechanism introduced in Gradle 2.1:
 ```groovy
@@ -119,7 +119,7 @@ Use the same `buildscript` logic as [above](#simple-setup), but with this instea
 apply plugin: "org.jlleitschuh.gradle.ktlint-idea"
 ```
 
-#### Idea plugin setup using new plugin api
+#### Idea plugin setup using new plugin API
 
 Build script snippet for new, incubating, plugin mechanism introduced in Gradle 2.1:
 ```groovy
@@ -201,8 +201,8 @@ Yes. Just use gradle `--continue` option:
 $ ./gradlew --continue ktlintCheck
 ```
 
-- Can I mix old plugin and new plugin api setup in my project
-(see [simple-setup](#simple-setup) and [using new plugin api setup](#using-new-plugin-api))?
+- Can I mix old plugin and new plugin API setup in my project
+(see [simple-setup](#simple-setup) and [using new plugin API setup](#using-new-plugin-api))?
 
 No. This approaches are not equivalent how they work. The problem that
 plugin may not find some of kotlin plugins if both approaches are used
