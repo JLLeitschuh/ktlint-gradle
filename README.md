@@ -178,7 +178,6 @@ Similarly, a `ktlintFormat` task has been added that formats all of the source s
 If the project has subprojects then the plugin also adds two meta tasks `ktlintCheck` and `ktlintFormat` to the root project that
 triggers the related tasks in the subprojects.
 
-<<<<<<< HEAD
 ### Additional helper tasks
 
 Two another tasks are added:
