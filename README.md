@@ -2,7 +2,7 @@
 
 **Provides a convenient wrapper plugin over the [KtLint](https://github.com/shyiko/ktlint) project.**
 
-Latest plugin version: [5.0.0](/CHANGELOG.md#500---2018-8-6)
+Latest plugin version: [5.1.0](/CHANGELOG.md#510---2018-9-5)
 
 [![Join the chat at https://gitter.im/ktlint-gradle/Lobby](https://badges.gitter.im/ktlint-gradle/Lobby.svg)](https://gitter.im/ktlint-gradle/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/JLLeitschuh/ktlint-gradle.svg?branch=master)](https://travis-ci.org/JLLeitschuh/ktlint-gradle)
