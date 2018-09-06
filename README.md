@@ -1,6 +1,6 @@
 # Ktlint Gradle
 
-**Provides a convenient wrapper plugin over the [KtLint](https://github.com/shyiko/ktlint) project.**
+**Provides a convenient wrapper plugin over the [ktlint](https://github.com/shyiko/ktlint) project.**
 
 Latest plugin version: [5.1.0](/CHANGELOG.md#510---2018-9-5)
 
@@ -8,7 +8,7 @@ Latest plugin version: [5.1.0](/CHANGELOG.md#510---2018-9-5)
 [![Build Status](https://travis-ci.org/JLLeitschuh/ktlint-gradle.svg?branch=master)](https://travis-ci.org/JLLeitschuh/ktlint-gradle)
 
 This plugin creates convenient tasks in your Gradle project
-that run [KtLint](https://github.com/shyiko/ktlint) checks or do code
+that run [ktlint](https://github.com/shyiko/ktlint) checks or do code
 auto format.
 
 Plugin can be applied to any project, but only activates if that project has the kotlin plugin applied.
@@ -18,7 +18,7 @@ The assumption being that you would not want to lint code you weren't compiling.
 - [Supported Kotlin plugins](#supported-kotlin-plugins)
 - [How to use](#how-to-use)
   - [Minimal support versions](#minimal_supported_versions)
-  - [KtLint plugin](#ktlint-plugin)
+  - [Ktlint plugin](#ktlint-plugin)
     - [Simple setup](#simple-setup)
     - [Using new plugin API](#using-new-plugin-api)
     - [How to apply to all subprojects](#applying-to-subprojects)
@@ -60,9 +60,9 @@ This API is available in new versions of gradle.
 
 Minimal supported [Gradle](www.gradle.org) version: `4.3`
 
-Minimal supported [KtLint](https://github.com/shyiko/ktlint) version: `0.10.0`
+Minimal supported [ktlint](https://github.com/shyiko/ktlint) version: `0.10.0`
 
-### KtLint plugin
+### Ktlint plugin
 
 #### Simple setup
 
@@ -104,10 +104,10 @@ subprojects {
 
 ### IntelliJ Idea Only Plugin
 
-**Note:** This plugin is automatically applied by the main `KtLint` plugin.
+**Note:** This plugin is automatically applied by the main `ktlint` plugin.
 
 This plugin just adds [special tasks](#additional-helper-tasks) that can generate IntelliJ IDEA codestyle
-rules using KtLint.
+rules using ktlint.
 
 #### Idea plugin simple setup
 
@@ -135,7 +135,7 @@ If you don't configure this the defaults defined
 in the [KtlintExtension](plugin/src/main/kotlin/org/jlleitschuh/gradle/ktlint/KtlintExtension.kt)
 object will be used.
 
-The version of KtLint used by default _may change_ between patch versions of this plugin.
+The version of ktlint used by default _may change_ between patch versions of this plugin.
 If you don't want to inherit these changes then make sure you lock your version here.
 
 ```groovy
