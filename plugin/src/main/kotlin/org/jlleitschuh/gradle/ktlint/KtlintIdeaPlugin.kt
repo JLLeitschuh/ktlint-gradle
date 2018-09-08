@@ -20,7 +20,6 @@ open class KtlintIdeaPlugin : Plugin<Project> {
     }
 
     private fun addApplyToIdeaTasks(rootProject: Project, extension: KtlintExtension) {
-        rootProject.logger.warn("Creating idea helper tasks")
         val ktLintConfig = createConfiguration(rootProject, extension)
 
         if (extension.isApplyToIdeaPerProjectAvailable()) {
