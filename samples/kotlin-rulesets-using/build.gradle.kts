@@ -25,7 +25,5 @@ configure<KtlintExtension> {
     reporters = arrayOf(ReporterType.CHECKSTYLE, ReporterType.JSON)
 }
 
-afterEvaluate {
-    tasks.findByName("ktlintMainCheck")?.dependsOn(":samples:kotlin-rulesets-creating:build")
-    tasks.findByName("ktlintTestCheck")?.dependsOn(":samples:kotlin-rulesets-creating:build")
-}
+tasks.findByName("ktlintMainCheck")?.dependsOn(":samples:kotlin-rulesets-creating:build")
+tasks.findByName("ktlintTestCheck")?.dependsOn(":samples:kotlin-rulesets-creating:build")
