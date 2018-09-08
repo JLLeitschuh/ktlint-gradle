@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
   - ?
 ### Removed
-  - ?
+  - Usages of `afterEvaluate {}` in plugin and sample projects (#122)
 ### Fixed
   - ?
 
