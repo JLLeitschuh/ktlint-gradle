@@ -1,6 +1,5 @@
 package org.jlleitschuh.gradle.ktlint
 
-import groovy.lang.Closure
 import net.swiftzer.semver.SemVer
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -23,24 +22,6 @@ internal fun createConfiguration(target: Project, extension: KtlintExtension) =
 
 internal inline fun <reified T : Task> Project.taskHelper(name: String, noinline configuration: T.() -> Unit): T {
     return this.tasks.create(name, T::class.java, configuration)
-}
-
-internal inline fun <reified T : Task> Project.maybeCreateTask(
-    name: String,
-    noinline configuration: T.() -> Unit
-): T {
-    return tasks.maybeCreate(name, T::class.java).apply { configure(closureOf(configuration)) }
-}
-
-// Port from Kotlin DSL
-fun <T> Any.closureOf(action: T.() -> Unit): Closure<Any?> = KotlinClosure1(action, this, this)
-class KotlinClosure1<in T : Any?, V : Any>(
-    val function: T.() -> V?,
-    owner: Any? = null,
-    thisObject: Any? = null
-) : Closure<V?>(owner, thisObject) {
-    @Suppress("unused") // to be called dynamically by Groovy
-    fun doCall(it: T): V? = it.function()
 }
 
 internal const val EDITOR_CONFIG_FILE_NAME = ".editorconfig"

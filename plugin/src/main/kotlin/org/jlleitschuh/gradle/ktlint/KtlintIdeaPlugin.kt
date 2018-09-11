@@ -23,7 +23,7 @@ open class KtlintIdeaPlugin : Plugin<Project> {
         val ktLintConfig = createConfiguration(rootProject, extension)
 
         if (extension.isApplyToIdeaPerProjectAvailable()) {
-            rootProject.maybeCreateTask<KtlintApplyToIdeaTask>(APPLY_TO_IDEA_TASK_NAME) {
+            rootProject.taskHelper<KtlintApplyToIdeaTask>(APPLY_TO_IDEA_TASK_NAME) {
                 group = HELP_GROUP
                 description = "Generates IDEA built-in formatter rules and apply them to the project." +
                     "It will overwrite existing ones."
@@ -33,7 +33,7 @@ open class KtlintIdeaPlugin : Plugin<Project> {
             }
         }
 
-        rootProject.maybeCreateTask<KtlintApplyToIdeaTask>(APPLY_TO_IDEA_GLOBALLY_TASK_NAME) {
+        rootProject.taskHelper<KtlintApplyToIdeaTask>(APPLY_TO_IDEA_GLOBALLY_TASK_NAME) {
             group = HELP_GROUP
             description = "Generates IDEA built-in formatter rules and apply them globally " +
                 "(in IDEA user settings folder). It will overwrite existing ones."
