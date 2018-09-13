@@ -21,6 +21,7 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.TaskAction
+import org.gradle.process.JavaExecSpec
 import org.jlleitschuh.gradle.ktlint.reporter.KtlintReport
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import javax.inject.Inject
@@ -77,30 +78,38 @@ open class KtlintCheckTask @Inject constructor(objectFactory: ObjectFactory) : D
         checkMinimalSupportedKtlintVersion()
         checkOutputPathsWithSpacesSupported(reportsToProcess)
 
-        project.javaexec { javaExecSpec ->
-            javaExecSpec.classpath = classpath
-            javaExecSpec.main = "com.github.shyiko.ktlint.Main"
-            javaExecSpec.args(sourceDirectories.flatMap { dir ->
-                KOTLIN_EXTENSIONS.map { extension ->
-                    "${dir.path}/**/*.$extension"
-                }
-            })
-            if (verbose.get()) {
-                javaExecSpec.args("--verbose")
+        project.javaexec(generateJavaExecSpec(reportsToProcess, additionalConfig()))
+    }
+
+    protected open fun additionalConfig(): (JavaExecSpec) -> Unit = {}
+
+    private fun generateJavaExecSpec(
+        reportsToProcess: Collection<KtlintReport>,
+        additionalConfig: (JavaExecSpec) -> Unit
+    ): (JavaExecSpec) -> Unit = { javaExecSpec ->
+        javaExecSpec.classpath = classpath
+        javaExecSpec.main = "com.github.shyiko.ktlint.Main"
+        javaExecSpec.args(sourceDirectories.flatMap { dir ->
+            KOTLIN_EXTENSIONS.map { extension ->
+                "${dir.path}/**/*.$extension"
             }
-            if (debug.get()) {
-                javaExecSpec.args("--debug")
-            }
-            if (android.get() && ktlintVersion.isAndroidFlagAvailable()) {
-                javaExecSpec.args("--android")
-            }
-            if (outputToConsole.get()) {
-                javaExecSpec.args("--reporter=plain")
-            }
-            javaExecSpec.args(ruleSets.get().map { "--ruleset=$it" })
-            javaExecSpec.isIgnoreExitValue = ignoreFailures.get()
-            javaExecSpec.args(reportsToProcess.map { it.asArgument() })
+        })
+        if (verbose.get()) {
+            javaExecSpec.args("--verbose")
         }
+        if (debug.get()) {
+            javaExecSpec.args("--debug")
+        }
+        if (android.get() && ktlintVersion.isAndroidFlagAvailable()) {
+            javaExecSpec.args("--android")
+        }
+        if (outputToConsole.get()) {
+            javaExecSpec.args("--reporter=plain")
+        }
+        javaExecSpec.args(ruleSets.get().map { "--ruleset=$it" })
+        javaExecSpec.isIgnoreExitValue = ignoreFailures.get()
+        javaExecSpec.args(reportsToProcess.map { it.asArgument() })
+        additionalConfig(javaExecSpec)
     }
 
     private fun checkMinimalSupportedKtlintVersion() {
