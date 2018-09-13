@@ -1,6 +1,5 @@
 package org.jlleitschuh.gradle.ktlint
 
-import net.swiftzer.semver.SemVer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -22,15 +21,14 @@ open class KtlintIdeaPlugin : Plugin<Project> {
     private fun addApplyToIdeaTasks(rootProject: Project, extension: KtlintExtension) {
         val ktLintConfig = createConfiguration(rootProject, extension)
 
-        if (extension.isApplyToIdeaPerProjectAvailable()) {
-            rootProject.taskHelper<KtlintApplyToIdeaTask>(APPLY_TO_IDEA_TASK_NAME) {
-                group = HELP_GROUP
-                description = "Generates IDEA built-in formatter rules and apply them to the project." +
-                    "It will overwrite existing ones."
-                classpath.setFrom(ktLintConfig)
-                android.set(rootProject.provider { extension.isAndroidFlagEnabled() })
-                globally.set(rootProject.provider { false })
-            }
+        rootProject.taskHelper<KtlintApplyToIdeaTask>(APPLY_TO_IDEA_TASK_NAME) {
+            group = HELP_GROUP
+            description = "Generates IDEA built-in formatter rules and apply them to the project." +
+                "It will overwrite existing ones."
+            classpath.setFrom(ktLintConfig)
+            android.set(rootProject.provider { extension.isAndroidFlagEnabled() })
+            globally.set(rootProject.provider { false })
+            ktlintVersion.set(extension.version)
         }
 
         rootProject.taskHelper<KtlintApplyToIdeaTask>(APPLY_TO_IDEA_GLOBALLY_TASK_NAME) {
@@ -40,14 +38,7 @@ open class KtlintIdeaPlugin : Plugin<Project> {
             classpath.setFrom(ktLintConfig)
             android.set(rootProject.provider { extension.isAndroidFlagEnabled() })
             globally.set(rootProject.provider { true })
+            ktlintVersion.set(extension.version)
         }
     }
-
-    /**
-     * Checks if apply code style to IDEA IDE per project is available.
-     *
-     * Available since KtLint version `0.22.0`.
-     */
-    private fun KtlintExtension.isApplyToIdeaPerProjectAvailable() =
-        SemVer.parse(version) >= SemVer(0, 22, 0)
 }

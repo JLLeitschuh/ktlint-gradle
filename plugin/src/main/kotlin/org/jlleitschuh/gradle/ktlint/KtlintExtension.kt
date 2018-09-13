@@ -1,15 +1,20 @@
 package org.jlleitschuh.gradle.ktlint
 
+import org.gradle.api.Project
+import org.gradle.api.provider.Property
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 /**
  * Extension class for configuring the [KtlintPlugin].
  */
-open class KtlintExtension {
+open class KtlintExtension(
+    project: Project
+) {
     /**
      * The version of ktlint to use.
      */
-    var version = "0.27.0"
+    val version: Property<String> = project.objects.property()
+
     /**
      * Enable verbose mode.
      */
@@ -48,4 +53,8 @@ open class KtlintExtension {
      * Default is plain.
      */
     var reporters: Array<ReporterType> = arrayOf(ReporterType.PLAIN)
+
+    init {
+        version.set("0.27.0")
+    }
 }
