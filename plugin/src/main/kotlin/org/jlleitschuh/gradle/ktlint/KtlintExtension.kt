@@ -1,6 +1,6 @@
 package org.jlleitschuh.gradle.ktlint
 
-import org.gradle.api.Project
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
@@ -8,12 +8,12 @@ import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
  * Extension class for configuring the [KtlintPlugin].
  */
 open class KtlintExtension(
-    project: Project
+    objectFactory: ObjectFactory
 ) {
     /**
      * The version of ktlint to use.
      */
-    val version: Property<String> = project.objects.property()
+    val version: Property<String> = objectFactory.property()
 
     /**
      * Enable verbose mode.
