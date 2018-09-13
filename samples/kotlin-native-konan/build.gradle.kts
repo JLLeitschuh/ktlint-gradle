@@ -13,6 +13,6 @@ configure<KonanArtifactContainer> {
 }
 
 configure<KtlintExtension> {
-    verbose = true
+    verbose.set(true)
     outputToConsole = true
 }

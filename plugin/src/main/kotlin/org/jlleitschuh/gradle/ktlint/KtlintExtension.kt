@@ -18,7 +18,7 @@ open class KtlintExtension(
     /**
      * Enable verbose mode.
      */
-    var verbose = false
+    val verbose: Property<Boolean> = objectFactory.property()
     /**
      * Enable debug mode.
      */
@@ -57,5 +57,6 @@ open class KtlintExtension(
     init {
         version.set("0.27.0")
         android.set(false)
+        verbose.set(false)
     }
 }
