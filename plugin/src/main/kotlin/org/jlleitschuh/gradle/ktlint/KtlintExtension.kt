@@ -30,7 +30,7 @@ open class KtlintExtension(
     /**
      * Enable console output mode.
      */
-    var outputToConsole = true
+    val outputToConsole: Property<Boolean> = objectFactory.property()
     /**
      * Whether or not to allow the build to continue if there are warnings;
      * defaults to {@code false}, as for any other static code analysis tool.
@@ -59,5 +59,6 @@ open class KtlintExtension(
         android.set(false)
         verbose.set(false)
         debug.set(false)
+        outputToConsole.set(true)
     }
 }

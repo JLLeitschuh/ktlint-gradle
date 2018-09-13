@@ -274,7 +274,7 @@ open class KtlintPlugin : Plugin<Project> {
         debug.set(extension.debug)
         android.set(extension.android)
         ignoreFailures.set(target.provider { extension.ignoreFailures })
-        outputToConsole.set(target.provider { extension.outputToConsole })
+        outputToConsole.set(extension.outputToConsole)
         ruleSets.set(target.provider { extension.ruleSets.toList() })
         reports.forEach { _, report ->
             report.enabled.set(target.provider {

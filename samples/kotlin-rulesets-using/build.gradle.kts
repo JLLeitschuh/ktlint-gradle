@@ -20,7 +20,7 @@ dependencies {
 
 configure<KtlintExtension> {
     verbose.set(true)
-    outputToConsole = true
+    outputToConsole.set(true)
     ruleSets = arrayOf("../kotlin-rulesets-creating/build/libs/kotlin-rulesets-creating.jar")
     reporters = arrayOf(ReporterType.CHECKSTYLE, ReporterType.JSON)
 }
