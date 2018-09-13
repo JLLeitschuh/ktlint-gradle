@@ -271,7 +271,7 @@ open class KtlintPlugin : Plugin<Project> {
         sourceDirectories.setFrom(kotlinSourceDirectories)
         ktlintVersion.set(extension.version)
         verbose.set(extension.verbose)
-        debug.set(target.provider { extension.debug })
+        debug.set(extension.debug)
         android.set(extension.android)
         ignoreFailures.set(target.provider { extension.ignoreFailures })
         outputToConsole.set(target.provider { extension.outputToConsole })

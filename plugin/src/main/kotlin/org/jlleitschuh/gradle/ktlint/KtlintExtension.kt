@@ -22,7 +22,7 @@ open class KtlintExtension(
     /**
      * Enable debug mode.
      */
-    var debug = false
+    val debug: Property<Boolean> = objectFactory.property()
     /**
      * Enable android mode.
      */
@@ -58,5 +58,6 @@ open class KtlintExtension(
         version.set("0.27.0")
         android.set(false)
         verbose.set(false)
+        debug.set(false)
     }
 }
