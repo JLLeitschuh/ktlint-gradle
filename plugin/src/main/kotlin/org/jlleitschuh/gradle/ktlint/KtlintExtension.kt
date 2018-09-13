@@ -37,7 +37,7 @@ open class KtlintExtension(
      * <p>
      * Example: `ignoreFailures = true`
      */
-    var ignoreFailures = false
+    val ignoreFailures: Property<Boolean> = objectFactory.property()
     /**
      * The ruleset(s) of ktlint to use.
      */
@@ -60,5 +60,6 @@ open class KtlintExtension(
         verbose.set(false)
         debug.set(false)
         outputToConsole.set(true)
+        ignoreFailures.set(false)
     }
 }

@@ -273,7 +273,7 @@ open class KtlintPlugin : Plugin<Project> {
         verbose.set(extension.verbose)
         debug.set(extension.debug)
         android.set(extension.android)
-        ignoreFailures.set(target.provider { extension.ignoreFailures })
+        ignoreFailures.set(extension.ignoreFailures)
         outputToConsole.set(extension.outputToConsole)
         ruleSets.set(target.provider { extension.ruleSets.toList() })
         reports.forEach { _, report ->
