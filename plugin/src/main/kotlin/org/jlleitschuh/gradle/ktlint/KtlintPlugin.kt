@@ -288,7 +288,7 @@ open class KtlintPlugin : Plugin<Project> {
         ktLintConfig: Configuration,
         kotlinSourceDirectories: Iterable<*>
     ): Task {
-        return target.taskHelper<KtlintCheck>("ktlint${sourceSetName.capitalize()}Check") {
+        return target.taskHelper<KtlintCheckTask>("ktlint${sourceSetName.capitalize()}Check") {
             group = VERIFICATION_GROUP
             description = "Runs a check against all .kt files to ensure that they are formatted according to ktlint."
             classpath.setFrom(ktLintConfig)

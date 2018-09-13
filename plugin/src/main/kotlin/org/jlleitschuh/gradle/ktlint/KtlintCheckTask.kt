@@ -26,7 +26,7 @@ import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import javax.inject.Inject
 
 @CacheableTask
-open class KtlintCheck @Inject constructor(objectFactory: ObjectFactory) : DefaultTask() {
+open class KtlintCheckTask @Inject constructor(objectFactory: ObjectFactory) : DefaultTask() {
 
     @get:Classpath
     val classpath: ConfigurableFileCollection = project.files()
