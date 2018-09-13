@@ -237,7 +237,10 @@ open class KtlintPlugin : Plugin<Project> {
     private fun addAdditionalRunArgs(extension: KtlintExtension, runArgs: MutableSet<String>) {
         if (extension.verbose) runArgs.add("--verbose")
         if (extension.debug) runArgs.add("--debug")
-        if (extension.isAndroidFlagEnabled()) runArgs.add("--android")
+        if (extension.android.get() &&
+            extension.version.isAndroidFlagAvailable()) {
+            runArgs.add("--android")
+        }
         if (extension.ruleSets.isNotEmpty()) {
             extension.ruleSets.forEach { runArgs.add("--ruleset=$it") }
         }
@@ -290,9 +293,10 @@ open class KtlintPlugin : Plugin<Project> {
             description = "Runs a check against all .kt files to ensure that they are formatted according to ktlint."
             classpath.setFrom(ktLintConfig)
             sourceDirectories.setFrom(kotlinSourceDirectories)
+            ktlintVersion.set(extension.version)
             verbose.set(target.provider { extension.verbose })
             debug.set(target.provider { extension.debug })
-            android.set(target.provider { extension.isAndroidFlagEnabled() })
+            android.set(extension.android)
             ignoreFailures.set(target.provider { extension.ignoreFailures })
             outputToConsole.set(target.provider { extension.outputToConsole })
             ruleSets.set(target.provider { extension.ruleSets.toList() })

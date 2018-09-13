@@ -26,7 +26,7 @@ open class KtlintIdeaPlugin : Plugin<Project> {
             description = "Generates IDEA built-in formatter rules and apply them to the project." +
                 "It will overwrite existing ones."
             classpath.setFrom(ktLintConfig)
-            android.set(rootProject.provider { extension.isAndroidFlagEnabled() })
+            android.set(extension.android)
             globally.set(rootProject.provider { false })
             ktlintVersion.set(extension.version)
         }
@@ -36,7 +36,7 @@ open class KtlintIdeaPlugin : Plugin<Project> {
             description = "Generates IDEA built-in formatter rules and apply them globally " +
                 "(in IDEA user settings folder). It will overwrite existing ones."
             classpath.setFrom(ktLintConfig)
-            android.set(rootProject.provider { extension.isAndroidFlagEnabled() })
+            android.set(extension.android)
             globally.set(rootProject.provider { true })
             ktlintVersion.set(extension.version)
         }

@@ -6,6 +6,7 @@ import org.gradle.api.Task
 import org.gradle.api.file.FileCollection
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.HelpTasksPlugin
+import org.gradle.api.provider.Property
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import java.nio.file.Path
 
@@ -78,8 +79,8 @@ private fun Path.isRootEditorConfig(): Boolean {
 /**
  * Android option is available from ktlint 0.12.0.
  */
-internal fun KtlintExtension.isAndroidFlagEnabled() =
-    android && SemVer.parse(version.get()) >= SemVer(0, 12, 0)
+internal fun Property<String>.isAndroidFlagAvailable() =
+    SemVer.parse(get()) >= SemVer(0, 12, 0)
 
 internal const val VERIFICATION_GROUP = LifecycleBasePlugin.VERIFICATION_GROUP
 internal const val FORMATTING_GROUP = "Formatting"

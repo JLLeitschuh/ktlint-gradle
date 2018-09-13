@@ -44,5 +44,5 @@ dependencies {
 }
 
 configure<KtlintExtension> {
-    android = true
+    android.set(true)
 }

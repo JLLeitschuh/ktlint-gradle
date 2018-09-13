@@ -26,7 +26,7 @@ open class KtlintExtension(
     /**
      * Enable android mode.
      */
-    var android = false
+    val android: Property<Boolean> = objectFactory.property()
     /**
      * Enable console output mode.
      */
@@ -56,5 +56,6 @@ open class KtlintExtension(
 
     init {
         version.set("0.27.0")
+        android.set(false)
     }
 }

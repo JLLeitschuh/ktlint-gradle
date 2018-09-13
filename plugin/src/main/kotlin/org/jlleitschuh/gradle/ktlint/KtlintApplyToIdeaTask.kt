@@ -44,7 +44,7 @@ open class KtlintApplyToIdeaTask @Inject constructor(
             }
             // -y here to auto-overwrite existing IDEA code style
             it.args("-y")
-            if (android.get()) {
+            if (android.get() && ktlintVersion.isAndroidFlagAvailable()) {
                 it.args("--android")
             }
         }
