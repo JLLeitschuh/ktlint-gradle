@@ -91,4 +91,6 @@ internal const val APPLY_TO_IDEA_TASK_NAME = "ktlintApplyToIdea"
 internal const val APPLY_TO_IDEA_GLOBALLY_TASK_NAME = "ktlintApplyToIdeaGlobally"
 internal val KOTLIN_EXTENSIONS = listOf("kt", "kts")
 
-internal inline fun <reified T> ObjectFactory.property() = property(T::class.java)
+internal inline fun <reified T> ObjectFactory.property(
+    configuration: Property<T>.() -> Unit = {}
+) = property(T::class.java).apply(configuration)

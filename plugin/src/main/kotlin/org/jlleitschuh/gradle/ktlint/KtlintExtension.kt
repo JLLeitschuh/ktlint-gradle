@@ -13,31 +13,31 @@ open class KtlintExtension(
     /**
      * The version of ktlint to use.
      */
-    val version: Property<String> = objectFactory.property()
+    val version: Property<String> = objectFactory.property { set("0.27.0") }
 
     /**
      * Enable verbose mode.
      */
-    val verbose: Property<Boolean> = objectFactory.property()
+    val verbose: Property<Boolean> = objectFactory.property { set(false) }
     /**
      * Enable debug mode.
      */
-    val debug: Property<Boolean> = objectFactory.property()
+    val debug: Property<Boolean> = objectFactory.property { set(false) }
     /**
      * Enable android mode.
      */
-    val android: Property<Boolean> = objectFactory.property()
+    val android: Property<Boolean> = objectFactory.property { set(false) }
     /**
      * Enable console output mode.
      */
-    val outputToConsole: Property<Boolean> = objectFactory.property()
+    val outputToConsole: Property<Boolean> = objectFactory.property { set(true) }
     /**
      * Whether or not to allow the build to continue if there are warnings;
      * defaults to {@code false}, as for any other static code analysis tool.
      * <p>
      * Example: `ignoreFailures = true`
      */
-    val ignoreFailures: Property<Boolean> = objectFactory.property()
+    val ignoreFailures: Property<Boolean> = objectFactory.property { set(false) }
     /**
      * The ruleset(s) of ktlint to use.
      */
@@ -53,13 +53,4 @@ open class KtlintExtension(
      * Default is plain.
      */
     var reporters: Array<ReporterType> = arrayOf(ReporterType.PLAIN)
-
-    init {
-        version.set("0.27.0")
-        android.set(false)
-        verbose.set(false)
-        debug.set(false)
-        outputToConsole.set(true)
-        ignoreFailures.set(false)
-    }
 }
