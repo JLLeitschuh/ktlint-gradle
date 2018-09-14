@@ -1,6 +1,7 @@
 package org.jlleitschuh.gradle.ktlint
 
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
@@ -42,7 +43,7 @@ open class KtlintExtension(
     /**
      * The ruleset(s) of ktlint to use.
      */
-    var ruleSets: Array<String> = arrayOf()
+    val ruleSets: ListProperty<String> = objectFactory.listProperty { set(emptyList()) }
 
     /**
      * Report output formats.

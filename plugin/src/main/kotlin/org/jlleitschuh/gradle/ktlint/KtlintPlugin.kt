@@ -272,7 +272,7 @@ open class KtlintPlugin : Plugin<Project> {
         android.set(extension.android)
         ignoreFailures.set(extension.ignoreFailures)
         outputToConsole.set(extension.outputToConsole)
-        ruleSets.set(target.provider { extension.ruleSets.toList() })
+        ruleSets.set(extension.ruleSets)
         reporters.set(extension.reporters)
     }
 

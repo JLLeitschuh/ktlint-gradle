@@ -6,6 +6,7 @@ import org.gradle.api.Task
 import org.gradle.api.file.FileCollection
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.HelpTasksPlugin
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.language.base.plugins.LifecycleBasePlugin
@@ -99,3 +100,7 @@ internal inline fun <reified T> ObjectFactory.property(
 internal inline fun <reified T> ObjectFactory.setProperty(
     configuration: SetProperty<T>.() -> Unit = {}
 ) = setProperty(T::class.java).apply(configuration)
+
+internal inline fun <reified T> ObjectFactory.listProperty(
+    configuration: ListProperty<T>.() -> Unit = {}
+) = listProperty(T::class.java).apply(configuration)
