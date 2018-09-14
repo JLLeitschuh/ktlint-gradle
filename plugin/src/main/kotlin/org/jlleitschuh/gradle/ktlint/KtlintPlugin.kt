@@ -240,7 +240,7 @@ open class KtlintPlugin : Plugin<Project> {
         return target.taskHelper<KtlintFormatTask>("ktlint${sourceSetName.capitalize()}Format") {
             group = FORMATTING_GROUP
             description = "Runs a check against all .kt files to ensure that they are formatted according to ktlint."
-            configurePluginTask(target, extension, ktLintConfig, kotlinSourceDirectories)
+            configurePluginTask(extension, ktLintConfig, kotlinSourceDirectories)
         }
     }
 
@@ -254,12 +254,11 @@ open class KtlintPlugin : Plugin<Project> {
         return target.taskHelper<KtlintCheckTask>("ktlint${sourceSetName.capitalize()}Check") {
             group = VERIFICATION_GROUP
             description = "Runs a check against all .kt files to ensure that they are formatted according to ktlint."
-            configurePluginTask(target, extension, ktLintConfig, kotlinSourceDirectories)
+            configurePluginTask(extension, ktLintConfig, kotlinSourceDirectories)
         }
     }
 
     private fun KtlintCheckTask.configurePluginTask(
-        target: Project,
         extension: KtlintExtension,
         ktLintConfig: Configuration,
         kotlinSourceDirectories: Iterable<*>
