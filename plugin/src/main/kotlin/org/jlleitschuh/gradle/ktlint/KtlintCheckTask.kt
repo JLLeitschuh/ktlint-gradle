@@ -10,6 +10,7 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Console
@@ -27,7 +28,9 @@ import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import javax.inject.Inject
 
 @CacheableTask
-open class KtlintCheckTask @Inject constructor(objectFactory: ObjectFactory) : DefaultTask() {
+open class KtlintCheckTask @Inject constructor(
+    private val objectFactory: ObjectFactory
+) : DefaultTask() {
 
     @get:Classpath
     val classpath: ConfigurableFileCollection = project.files()
@@ -60,31 +63,34 @@ open class KtlintCheckTask @Inject constructor(objectFactory: ObjectFactory) : D
     val android: Property<Boolean> = objectFactory.property()
     @get:Input
     val ignoreFailures: Property<Boolean> = objectFactory.property()
+    @get:Internal
+    val reporters: SetProperty<ReporterType> = objectFactory.setProperty()
     @get:Console
     val outputToConsole: Property<Boolean> = objectFactory.property()
 
     @get:Internal
-    val reports: Map<ReporterType, KtlintReport> = ReporterType.values().map {
-        it to KtlintReport(objectFactory.property<Boolean>().apply { set(false) }, it, newOutputFile())
-    }.toMap()
-
-    @get:Internal
     val enabledReports
-        get() = reports.filterValues { it.enabled.get() }
+        get() = reporters.get()
+            .map {
+                KtlintReport(
+                    objectFactory.property() { set(it.isAvailable()) },
+                    it,
+                    newOutputFile().apply { set(it.getOutputFile()) }
+                )
+            }
+            .filter { it.enabled.get() }
 
     @TaskAction
     fun lint() {
-        val reportsToProcess = enabledReports.values
         checkMinimalSupportedKtlintVersion()
-        checkOutputPathsWithSpacesSupported(reportsToProcess)
+        checkOutputPathsWithSpacesSupported()
 
-        project.javaexec(generateJavaExecSpec(reportsToProcess, additionalConfig()))
+        project.javaexec(generateJavaExecSpec(additionalConfig()))
     }
 
     protected open fun additionalConfig(): (JavaExecSpec) -> Unit = {}
 
     private fun generateJavaExecSpec(
-        reportsToProcess: Collection<KtlintReport>,
         additionalConfig: (JavaExecSpec) -> Unit
     ): (JavaExecSpec) -> Unit = { javaExecSpec ->
         javaExecSpec.classpath = classpath
@@ -108,7 +114,7 @@ open class KtlintCheckTask @Inject constructor(objectFactory: ObjectFactory) : D
         }
         javaExecSpec.args(ruleSets.get().map { "--ruleset=$it" })
         javaExecSpec.isIgnoreExitValue = ignoreFailures.get()
-        javaExecSpec.args(reportsToProcess.map { it.asArgument() })
+        javaExecSpec.args(enabledReports.map { it.asArgument() })
         additionalConfig(javaExecSpec)
     }
 
@@ -118,9 +124,9 @@ open class KtlintCheckTask @Inject constructor(objectFactory: ObjectFactory) : D
         }
     }
 
-    private fun checkOutputPathsWithSpacesSupported(reportsToProcess: Collection<KtlintReport>) {
+    private fun checkOutputPathsWithSpacesSupported() {
         if (SemVer.parse(ktlintVersion.get()) < SemVer(0, 20, 0)) {
-            reportsToProcess.forEach {
+            enabledReports.forEach {
                 val reportOutputPath = it.outputFile.get().asFile.absolutePath
                 if (reportOutputPath.contains(" ")) {
                     throw GradleException(
@@ -130,7 +136,15 @@ open class KtlintCheckTask @Inject constructor(objectFactory: ObjectFactory) : D
         }
     }
 
+    private fun ReporterType.isAvailable() =
+        SemVer.parse(ktlintVersion.get()) >= availableSinceVersion
+
+    private fun ReporterType.getOutputFile() =
+        project.layout.buildDirectory.file(project.provider {
+            "reports/ktlint/${this@KtlintCheckTask.name}.$fileExtension"
+        })
+
     @get:OutputFiles
     val reportOutputFiles: Map<ReporterType, RegularFileProperty>
-        get() = enabledReports.mapValues { it.value.outputFile }
+        get() = enabledReports.associateTo(mutableMapOf()) { it.reporterType to it.outputFile }
 }

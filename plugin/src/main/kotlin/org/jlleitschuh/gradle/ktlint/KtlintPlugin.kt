@@ -6,7 +6,6 @@ import com.android.build.gradle.InstantAppPlugin
 import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.TestPlugin
 import com.android.build.gradle.internal.VariantManager
-import net.swiftzer.semver.SemVer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -21,7 +20,6 @@ import org.jetbrains.kotlin.gradle.plugin.KonanExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.experimental.KotlinNativeComponent
 import org.jetbrains.kotlin.gradle.plugin.tasks.KonanCompileTask
-import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import java.io.File
 import kotlin.reflect.KClass
 
@@ -242,7 +240,7 @@ open class KtlintPlugin : Plugin<Project> {
         return target.taskHelper<KtlintFormatTask>("ktlint${sourceSetName.capitalize()}Format") {
             group = FORMATTING_GROUP
             description = "Runs a check against all .kt files to ensure that they are formatted according to ktlint."
-            configurePluginTask(target, extension, sourceSetName, ktLintConfig, kotlinSourceDirectories)
+            configurePluginTask(target, extension, ktLintConfig, kotlinSourceDirectories)
         }
     }
 
@@ -256,14 +254,13 @@ open class KtlintPlugin : Plugin<Project> {
         return target.taskHelper<KtlintCheckTask>("ktlint${sourceSetName.capitalize()}Check") {
             group = VERIFICATION_GROUP
             description = "Runs a check against all .kt files to ensure that they are formatted according to ktlint."
-            configurePluginTask(target, extension, sourceSetName, ktLintConfig, kotlinSourceDirectories)
+            configurePluginTask(target, extension, ktLintConfig, kotlinSourceDirectories)
         }
     }
 
     private fun KtlintCheckTask.configurePluginTask(
         target: Project,
         extension: KtlintExtension,
-        sourceSetName: String,
         ktLintConfig: Configuration,
         kotlinSourceDirectories: Iterable<*>
     ) {
@@ -276,19 +273,8 @@ open class KtlintPlugin : Plugin<Project> {
         ignoreFailures.set(extension.ignoreFailures)
         outputToConsole.set(extension.outputToConsole)
         ruleSets.set(target.provider { extension.ruleSets.toList() })
-        reports.forEach { _, report ->
-            report.enabled.set(target.provider {
-                val reporterType = report.reporterType
-                reporterAvailable(extension.version.get(), reporterType) && extension.reporters.contains(reporterType)
-            })
-            report.outputFile.set(target.layout.buildDirectory.file(target.provider {
-                "reports/ktlint/ktlint-$sourceSetName.${report.reporterType.fileExtension}"
-            }))
-        }
+        reporters.set(extension.reporters)
     }
-
-    private fun reporterAvailable(version: String, reporter: ReporterType) =
-        SemVer.parse(version) >= reporter.availableSinceVersion
 
     private fun Project.getMetaKtlintCheckTask(): Task = this.tasks.findByName(CHECK_PARENT_TASK_NAME)
         ?: this.task(CHECK_PARENT_TASK_NAME).apply {

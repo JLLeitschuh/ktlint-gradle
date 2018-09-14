@@ -7,6 +7,7 @@ import org.gradle.api.file.FileCollection
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.HelpTasksPlugin
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.SetProperty
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import java.nio.file.Path
 
@@ -94,3 +95,7 @@ internal val KOTLIN_EXTENSIONS = listOf("kt", "kts")
 internal inline fun <reified T> ObjectFactory.property(
     configuration: Property<T>.() -> Unit = {}
 ) = property(T::class.java).apply(configuration)
+
+internal inline fun <reified T> ObjectFactory.setProperty(
+    configuration: SetProperty<T>.() -> Unit = {}
+) = setProperty(T::class.java).apply(configuration)

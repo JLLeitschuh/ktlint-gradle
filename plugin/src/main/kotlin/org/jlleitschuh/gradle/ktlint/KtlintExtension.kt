@@ -2,6 +2,7 @@ package org.jlleitschuh.gradle.ktlint
 
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.SetProperty
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 /**
@@ -52,5 +53,7 @@ open class KtlintExtension(
      *
      * Default is plain.
      */
-    var reporters: Array<ReporterType> = arrayOf(ReporterType.PLAIN)
+    val reporters: SetProperty<ReporterType> = objectFactory.setProperty {
+        set(setOf(ReporterType.PLAIN))
+    }
 }

@@ -22,7 +22,7 @@ configure<KtlintExtension> {
     verbose.set(true)
     outputToConsole.set(true)
     ruleSets = arrayOf("../kotlin-rulesets-creating/build/libs/kotlin-rulesets-creating.jar")
-    reporters = arrayOf(ReporterType.CHECKSTYLE, ReporterType.JSON)
+    reporters.set(setOf(ReporterType.CHECKSTYLE, ReporterType.JSON))
 }
 
 tasks.findByName("ktlintMainCheck")?.dependsOn(":samples:kotlin-rulesets-creating:build")
