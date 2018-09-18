@@ -27,7 +27,9 @@ class KtlintPluginTest : AbstractPluginTest() {
                     gradlePluginPortal()
                 }
 
-                ktlint.reporters = ["PLAIN", "CHECKSTYLE"]
+                import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+
+                ktlint.reporters = [ReporterType.CHECKSTYLE, ReporterType.PLAIN]
             """.trimIndent())
         }
     }
