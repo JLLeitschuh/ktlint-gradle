@@ -33,15 +33,15 @@ open class KtlintCheckTask @Inject constructor(
 ) : DefaultTask() {
 
     @get:Classpath
-    val classpath: ConfigurableFileCollection = project.files()
+    internal val classpath: ConfigurableFileCollection = project.files()
 
     @get:Internal
-    val sourceDirectories: ConfigurableFileCollection = project.files()
+    internal val sourceDirectories: ConfigurableFileCollection = project.files()
 
     @get:SkipWhenEmpty
     @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:InputFiles
-    val sources: FileTree = sourceDirectories.asFileTree.matching { filterable ->
+    internal val sources: FileTree = sourceDirectories.asFileTree.matching { filterable ->
         KOTLIN_EXTENSIONS.forEach {
             filterable.include("**/*.$it")
         }
@@ -52,24 +52,24 @@ open class KtlintCheckTask @Inject constructor(
     internal val editorConfigFiles: FileCollection = getEditorConfigFiles(project)
 
     @get:Input
-    val ktlintVersion: Property<String> = objectFactory.property()
+    internal val ktlintVersion: Property<String> = objectFactory.property()
     @get:Input
-    val verbose: Property<Boolean> = objectFactory.property()
+    internal val verbose: Property<Boolean> = objectFactory.property()
     @get:Input
-    val ruleSets: ListProperty<String> = objectFactory.listProperty(String::class.java)
+    internal val ruleSets: ListProperty<String> = objectFactory.listProperty(String::class.java)
     @get:Input
-    val debug: Property<Boolean> = objectFactory.property()
+    internal val debug: Property<Boolean> = objectFactory.property()
     @get:Input
-    val android: Property<Boolean> = objectFactory.property()
+    internal val android: Property<Boolean> = objectFactory.property()
     @get:Input
-    val ignoreFailures: Property<Boolean> = objectFactory.property()
+    internal val ignoreFailures: Property<Boolean> = objectFactory.property()
     @get:Internal
-    val reporters: SetProperty<ReporterType> = objectFactory.setProperty()
+    internal val reporters: SetProperty<ReporterType> = objectFactory.setProperty()
     @get:Console
-    val outputToConsole: Property<Boolean> = objectFactory.property()
+    internal val outputToConsole: Property<Boolean> = objectFactory.property()
 
     @get:Internal
-    val enabledReports
+    internal val enabledReports
         get() = reporters.get()
             .map {
                 KtlintReport(
