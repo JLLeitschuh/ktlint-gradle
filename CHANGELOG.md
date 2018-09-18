@@ -5,11 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [5.2.0] - Unreleased
+## [6.0.0] - Unreleased
 ### Added
-  - ?
+  - Separate KtlintFormatTask task (#111)
 ### Changed
-  - ?
+  - `ktlintApplyToIdea` task is always added, though it will fail on
+  ktlint versions less then `0.22.0`
+  - Plugin extension now uses Gradle properties for configuration
+  - `ktlint.reporters` extension property has to use imported `ReporterType`
+  in groovy Gradle build scripts.
+  - reporters output file name changed to be the same as task name. For example for `PLAIN`
+  it will be `ktlintMainCheck.txt`.
+  - format tasks now are also generate reports. For example: `ktlintMainFormat.txt`.
 ### Removed
   - Usages of `afterEvaluate {}` in plugin and sample projects (#122)
 ### Fixed
