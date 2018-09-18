@@ -33,6 +33,7 @@ dependencies {
 
     testImplementation(gradleTestKit())
     testImplementation("junit:junit:${PluginVersions.junit}")
+    testImplementation(kotlin("reflect"))
 }
 
 publishing {
