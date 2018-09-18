@@ -120,7 +120,7 @@ open class KtlintCheckTask @Inject constructor(
 
     private fun checkMinimalSupportedKtlintVersion() {
         if (SemVer.parse(ktlintVersion.get()) < SemVer(0, 10, 0)) {
-            throw GradleException("Ktlint versions less than 0.10.0 are not supported." +
+            throw GradleException("Ktlint versions less than 0.10.0 are not supported. " +
                 "Detected Ktlint version: ${ktlintVersion.get()}.")
         }
     }
