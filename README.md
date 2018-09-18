@@ -139,18 +139,39 @@ The version of ktlint used by default _may change_ between patch versions of thi
 If you don't want to inherit these changes then make sure you lock your version here.
 
 ```groovy
+import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+
 ktlint {
-    version = ""
+    version = "0.22.0"
     debug = true
     verbose = true
     android = false
     outputToConsole = true
-    reporters = ["PLAIN", "CHECKSTYLE"]
+    reporters = [ReporterType.PLAIN, ReporterType.CHECKSTYLE]
     ignoreFailures = true
     ruleSets = [
         "/path/to/custom/rulseset.jar",
         "com.github.username:rulseset:master-SNAPSHOT"
     ]
+}
+```
+
+or in kotlin script:
+```kotlin
+import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+
+ktlint {
+    version.set("0.22.0")
+    debug.set(true)
+    verbose.set(true)
+    android.set(false)
+    outputToConsole.set(true)
+    reporters.set(setOf(ReporterType.PLAIN, ReporterType.CHECKSTYLE))
+    ignoreFailures.set(true)
+    ruleSets.set(listOf(
+        "/path/to/custom/rulseset.jar",
+        "com.github.username:rulseset:master-SNAPSHOT"
+    ))
 }
 ```
 
