@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [6.0.0] - Unreleased
+## [6.0.0] - 2018-9-20
 ### Added
   - Separate KtlintFormatTask task (#111)
 ### Changed
@@ -19,8 +19,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - format tasks now are also generate reports. For example: `ktlintMainFormat.txt`.
 ### Removed
   - Usages of `afterEvaluate {}` in plugin and sample projects (#122)
-### Fixed
-  - ?
 
 ## [5.1.0] - 2018-9-5
 ### Added
