@@ -5,7 +5,7 @@ import com.android.build.gradle.FeaturePlugin
 import com.android.build.gradle.InstantAppPlugin
 import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.TestPlugin
-import net.swiftzer.semver.SemVer
+import com.android.build.gradle.internal.VariantManager
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -13,17 +13,13 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.internal.HasConvention
-import org.gradle.api.plugins.AppliedPlugin
 import org.gradle.api.plugins.Convention
 import org.gradle.api.plugins.JavaPluginConvention
-import org.gradle.api.tasks.JavaExec
-import org.gradle.api.tasks.StopExecutionException
 import org.jetbrains.kotlin.gradle.plugin.KonanArtifactContainer
 import org.jetbrains.kotlin.gradle.plugin.KonanExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.experimental.KotlinNativeComponent
 import org.jetbrains.kotlin.gradle.plugin.tasks.KonanCompileTask
-import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import java.io.File
 import kotlin.reflect.KClass
 
@@ -41,12 +37,12 @@ open class KtlintPlugin : Plugin<Project> {
     }
 
     private fun addKtLintTasksToKotlinPlugin(target: Project, extension: KtlintExtension) {
-        target.pluginManager.withPlugin("kotlin", applyKtLint(target, extension))
-        target.pluginManager.withPlugin("kotlin2js", applyKtLint(target, extension))
-        target.pluginManager.withPlugin("kotlin-platform-common", applyKtLint(target, extension))
-        target.pluginManager.withPlugin("kotlin-android", applyKtLintToAndroid(target, extension))
-        target.pluginManager.withPlugin("konan", applyKtLintKonanNative(target, extension))
-        target.pluginManager.withPlugin(
+        target.plugins.withId("kotlin", applyKtLint(target, extension))
+        target.plugins.withId("kotlin2js", applyKtLint(target, extension))
+        target.plugins.withId("kotlin-platform-common", applyKtLint(target, extension))
+        target.plugins.withId("kotlin-android", applyKtLintToAndroid(target, extension))
+        target.plugins.withId("konan", applyKtLintKonanNative(target, extension))
+        target.plugins.withId(
             "org.jetbrains.kotlin.native",
             applyKtLintNative(target, extension)
         )
@@ -55,28 +51,35 @@ open class KtlintPlugin : Plugin<Project> {
     private fun applyKtLint(
         target: Project,
         extension: KtlintExtension
-    ): (AppliedPlugin) -> Unit {
-        return {
-            target.afterEvaluate {
-                val ktLintConfig = createConfiguration(target, extension)
+    ): (Plugin<in Any>) -> Unit {
+        return { _ ->
+            val ktLintConfig = createConfiguration(target, extension)
 
-                target.theHelper<JavaPluginConvention>().sourceSets.forEach {
-                    val kotlinSourceSet: SourceDirectorySet = (it as HasConvention)
-                            .convention
-                            .getPluginHelper<KotlinSourceSet>()
-                            .kotlin
-                    val checkTask = createCheckTask(target, extension, it.name, ktLintConfig, kotlinSourceSet.sourceDirectories)
-                    addKtlintCheckTaskToProjectMetaCheckTask(target, checkTask)
-                    setCheckTaskDependsOnKtlintCheckTask(target, checkTask)
+            target.theHelper<JavaPluginConvention>().sourceSets.forEach { sourceSet ->
+                val kotlinSourceSet: SourceDirectorySet = (sourceSet as HasConvention)
+                    .convention
+                    .getPluginHelper<KotlinSourceSet>()
+                    .kotlin
+                val checkTask = createCheckTask(
+                    target,
+                    extension,
+                    sourceSet.name,
+                    ktLintConfig,
+                    kotlinSourceSet.sourceDirectories
+                )
 
-                    val runArgs = kotlinSourceSet.sourceDirectories.files.flatMap { baseDir ->
-                        KOTLIN_EXTENSIONS.map { "${baseDir.path}/**/*.$it" }
-                    }.toMutableSet()
-                    addAdditionalRunArgs(extension, runArgs)
+                addKtlintCheckTaskToProjectMetaCheckTask(target, checkTask)
+                setCheckTaskDependsOnKtlintCheckTask(target, checkTask)
 
-                    val ktlintSourceSetFormatTask = createFormatTask(target, it.name, ktLintConfig, kotlinSourceSet, runArgs)
-                    addKtlintFormatTaskToProjectMetaFormatTask(target, ktlintSourceSetFormatTask)
-                }
+                val ktlintSourceSetFormatTask = createFormatTask(
+                    target,
+                    extension,
+                    sourceSet.name,
+                    ktLintConfig,
+                    kotlinSourceSet.sourceDirectories
+                )
+
+                addKtlintFormatTaskToProjectMetaFormatTask(target, ktlintSourceSetFormatTask)
             }
         }
     }
@@ -84,38 +87,59 @@ open class KtlintPlugin : Plugin<Project> {
     private fun applyKtLintToAndroid(
         target: Project,
         extension: KtlintExtension
-    ): (AppliedPlugin) -> Unit {
-        return {
-            target.afterEvaluate {
-                val ktLintConfig = createConfiguration(target, extension)
+    ): (Plugin<in Any>) -> Unit {
+        return { _ ->
+            val ktLintConfig = createConfiguration(target, extension)
 
-                val variantManager = when {
-                    target.plugins.hasPlugin(AppPlugin::class.java) -> target.plugins.findPlugin(AppPlugin::class.java)?.variantManager
-                    target.plugins.hasPlugin(LibraryPlugin::class.java) -> target.plugins.findPlugin(LibraryPlugin::class.java)?.variantManager
-                    target.plugins.hasPlugin(InstantAppPlugin::class.java) -> target.plugins.findPlugin(InstantAppPlugin::class.java)?.variantManager
-                    target.plugins.hasPlugin(FeaturePlugin::class.java) -> target.plugins.findPlugin(FeaturePlugin::class.java)?.variantManager
-                    target.plugins.hasPlugin(TestPlugin::class.java) -> target.plugins.findPlugin(TestPlugin::class.java)?.variantManager
-                    else -> throw StopExecutionException("Must be applied with 'android' or 'android-library' plugin.")
-                }
+            val createTasks: (VariantManager) -> Unit = { variantManager ->
+                // If project has not been yet evaluated - variant data will be empty.
+                // Calling this will ensure that variant data is available.
+                variantManager.populateVariantDataList()
 
-                variantManager?.variantScopes?.forEach {
-                    val sourceDirs = it.variantData.javaSources
-                            .fold(mutableListOf<File>()) { acc, configurableFileTree ->
-                                acc.add(configurableFileTree.dir)
-                                acc
-                            }
-                    // Don't use it.variantData.javaSources directly as it will trigger some android tasks execution
-                    val kotlinSourceDir = target.files(*sourceDirs.toTypedArray())
-                    val runArgs = it.variantData.javaSources.map { "${it.dir.path}/**/*.kt" }.toMutableSet()
-                    addAdditionalRunArgs(extension, runArgs)
+                variantManager.variantScopes.forEach { variantScope ->
+                    val sourceDirs = variantScope.variantData.javaSources
+                        .fold(mutableListOf<File>()) { acc, configurableFileTree ->
+                            acc.add(configurableFileTree.dir)
+                            acc
+                        }
 
-                    val checkTask = createCheckTask(target, extension, it.fullVariantName, ktLintConfig, sourceDirs)
+                    val checkTask = createCheckTask(
+                        target,
+                        extension,
+                        variantScope.fullVariantName,
+                        ktLintConfig,
+                        sourceDirs
+                    )
+
                     addKtlintCheckTaskToProjectMetaCheckTask(target, checkTask)
                     setCheckTaskDependsOnKtlintCheckTask(target, checkTask)
 
-                    val ktlintSourceSetFormatTask = createFormatTask(target, it.fullVariantName, ktLintConfig, kotlinSourceDir, runArgs)
+                    val ktlintSourceSetFormatTask = createFormatTask(
+                        target,
+                        extension,
+                        variantScope.fullVariantName,
+                        ktLintConfig,
+                        sourceDirs
+                    )
+
                     addKtlintFormatTaskToProjectMetaFormatTask(target, ktlintSourceSetFormatTask)
                 }
+            }
+
+            target.plugins.withId("com.android.application") { plugin ->
+                (plugin as AppPlugin).variantManager.run(createTasks)
+            }
+            target.plugins.withId("com.android.library") { plugin ->
+                (plugin as LibraryPlugin).variantManager.run(createTasks)
+            }
+            target.plugins.withId("com.android.instantapp") { plugin ->
+                (plugin as InstantAppPlugin).variantManager.run(createTasks)
+            }
+            target.plugins.withId("com.android.feature") { plugin ->
+                (plugin as FeaturePlugin).variantManager.run(createTasks)
+            }
+            target.plugins.withId("com.android.test") { plugin ->
+                (plugin as TestPlugin).variantManager.run(createTasks)
             }
         }
     }
@@ -123,23 +147,20 @@ open class KtlintPlugin : Plugin<Project> {
     private fun applyKtLintKonanNative(
         project: Project,
         extension: KtlintExtension
-    ): (AppliedPlugin) -> Unit {
+    ): (Plugin<in Any>) -> Unit {
         return { _ ->
-            project.afterEvaluate { _ ->
-                val ktLintConfig = createConfiguration(project, extension)
+            val ktLintConfig = createConfiguration(project, extension)
 
-                val compileTargets = project.theHelper<KonanExtension>().targets
-
-                project.theHelper<KonanArtifactContainer>().forEach { konanBuildingConfig ->
-                    addTasksForNativePlugin(project, extension, konanBuildingConfig.name, ktLintConfig) {
-                        compileTargets.fold(initial = emptyList()) { acc, target ->
-                            val compileTask = konanBuildingConfig.findByTarget(target)
-                            if (compileTask != null) {
-                                val sourceFiles = (compileTask as KonanCompileTask).srcFiles
-                                acc + sourceFiles
-                            } else {
-                                acc
-                            }
+            val compileTargets = project.theHelper<KonanExtension>().targets
+            project.theHelper<KonanArtifactContainer>().whenObjectAdded { buildConfig ->
+                addTasksForNativePlugin(project, extension, buildConfig.name, ktLintConfig) {
+                    compileTargets.fold(initial = emptyList()) { acc, target ->
+                        val compileTask = buildConfig.findByTarget(target)
+                        if (compileTask != null) {
+                            val sourceFiles = (compileTask as KonanCompileTask).srcFiles
+                            acc + sourceFiles
+                        } else {
+                            acc
                         }
                     }
                 }
@@ -150,18 +171,16 @@ open class KtlintPlugin : Plugin<Project> {
     private fun applyKtLintNative(
         project: Project,
         extension: KtlintExtension
-    ): (AppliedPlugin) -> Unit {
+    ): (Plugin<in Any>) -> Unit {
         return { _ ->
-            project.afterEvaluate { _ ->
-                val ktLintConfig = createConfiguration(project, extension)
+            val ktLintConfig = createConfiguration(project, extension)
 
-                project.components.withType(KotlinNativeComponent::class.java) { component ->
-                    addTasksForNativePlugin(project, extension, component.name, ktLintConfig) {
-                        component.konanTargets.get()
-                            .fold(initial = emptyList()) { acc, konanTarget ->
-                                acc + listOf(component.sources.getAllSources(konanTarget))
-                            }
-                    }
+            project.components.withType(KotlinNativeComponent::class.java) { component ->
+                addTasksForNativePlugin(project, extension, component.name, ktLintConfig) {
+                    component.konanTargets.get()
+                        .fold(initial = emptyList()) { acc, nativeTarget ->
+                            acc + listOf(component.sources.getAllSources(nativeTarget))
+                        }
                 }
             }
         }
@@ -186,29 +205,14 @@ open class KtlintPlugin : Plugin<Project> {
             addKtlintCheckTaskToProjectMetaCheckTask(project, checkTask)
             setCheckTaskDependsOnKtlintCheckTask(project, checkTask)
 
-            val kotlinSourceSet = sourceDirectoriesList.reduce { acc, fileCollection ->
-                acc.plus(fileCollection)
-            }
-            val runArgs = kotlinSourceSet.files.map { "${it.path}/**/*.kt" }.toMutableSet()
-            addAdditionalRunArgs(extension, runArgs)
-
             val ktlintSourceSetFormatTask = createFormatTask(
                 project,
+                extension,
                 sourceSetName,
                 ktlintConfiguration,
-                kotlinSourceSet,
-                runArgs
+                sourceDirectoriesList
             )
             addKtlintFormatTaskToProjectMetaFormatTask(project, ktlintSourceSetFormatTask)
-        }
-    }
-
-    private fun addAdditionalRunArgs(extension: KtlintExtension, runArgs: MutableSet<String>) {
-        if (extension.verbose) runArgs.add("--verbose")
-        if (extension.debug) runArgs.add("--debug")
-        if (extension.isAndroidFlagEnabled()) runArgs.add("--android")
-        if (extension.ruleSets.isNotEmpty()) {
-            extension.ruleSets.forEach { runArgs.add("--ruleset=$it") }
         }
     }
 
@@ -228,22 +232,15 @@ open class KtlintPlugin : Plugin<Project> {
 
     private fun createFormatTask(
         target: Project,
+        extension: KtlintExtension,
         sourceSetName: String,
         ktLintConfig: Configuration,
-        kotlinSourceSet: FileCollection,
-        runArgs: MutableSet<String>
+        kotlinSourceDirectories: Iterable<*>
     ): Task {
-        return target.taskHelper<JavaExec>("ktlint${sourceSetName.capitalize()}Format") {
+        return target.taskHelper<KtlintFormatTask>("ktlint${sourceSetName.capitalize()}Format") {
             group = FORMATTING_GROUP
             description = "Runs a check against all .kt files to ensure that they are formatted according to ktlint."
-            main = "com.github.shyiko.ktlint.Main"
-            classpath = ktLintConfig
-            inputs.files(kotlinSourceSet)
-            // This copies the list
-            val sourcePathsWithFormatFlag = runArgs.toMutableList()
-            // Prepend the format flag to the beginning of the list
-            sourcePathsWithFormatFlag.add(0, "-F")
-            args(sourcePathsWithFormatFlag)
+            configurePluginTask(extension, ktLintConfig, kotlinSourceDirectories)
         }
     }
 
@@ -254,31 +251,29 @@ open class KtlintPlugin : Plugin<Project> {
         ktLintConfig: Configuration,
         kotlinSourceDirectories: Iterable<*>
     ): Task {
-        return target.taskHelper<KtlintCheck>("ktlint${sourceSetName.capitalize()}Check") {
+        return target.taskHelper<KtlintCheckTask>("ktlint${sourceSetName.capitalize()}Check") {
             group = VERIFICATION_GROUP
             description = "Runs a check against all .kt files to ensure that they are formatted according to ktlint."
-            classpath.setFrom(ktLintConfig)
-            sourceDirectories.setFrom(kotlinSourceDirectories)
-            verbose.set(target.provider { extension.verbose })
-            debug.set(target.provider { extension.debug })
-            android.set(target.provider { extension.isAndroidFlagEnabled() })
-            ignoreFailures.set(target.provider { extension.ignoreFailures })
-            outputToConsole.set(target.provider { extension.outputToConsole })
-            ruleSets.set(target.provider { extension.ruleSets.toList() })
-            reports.forEach { _, report ->
-                report.enabled.set(target.provider {
-                    val reporterType = report.reporterType
-                    reporterAvailable(extension.version, reporterType) && extension.reporters.contains(reporterType)
-                })
-                report.outputFile.set(target.layout.buildDirectory.file(target.provider {
-                    "reports/ktlint/ktlint-$sourceSetName.${report.reporterType.fileExtension}"
-                }))
-            }
+            configurePluginTask(extension, ktLintConfig, kotlinSourceDirectories)
         }
     }
 
-    private fun reporterAvailable(version: String, reporter: ReporterType) =
-        SemVer.parse(version) >= reporter.availableSinceVersion
+    private fun KtlintCheckTask.configurePluginTask(
+        extension: KtlintExtension,
+        ktLintConfig: Configuration,
+        kotlinSourceDirectories: Iterable<*>
+    ) {
+        classpath.setFrom(ktLintConfig)
+        sourceDirectories.setFrom(kotlinSourceDirectories)
+        ktlintVersion.set(extension.version)
+        verbose.set(extension.verbose)
+        debug.set(extension.debug)
+        android.set(extension.android)
+        ignoreFailures.set(extension.ignoreFailures)
+        outputToConsole.set(extension.outputToConsole)
+        ruleSets.set(extension.ruleSets)
+        reporters.set(extension.reporters)
+    }
 
     private fun Project.getMetaKtlintCheckTask(): Task = this.tasks.findByName(CHECK_PARENT_TASK_NAME)
         ?: this.task(CHECK_PARENT_TASK_NAME).apply {

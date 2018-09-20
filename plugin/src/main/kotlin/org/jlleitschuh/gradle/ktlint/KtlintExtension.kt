@@ -1,42 +1,49 @@
 package org.jlleitschuh.gradle.ktlint
 
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Property
+import org.gradle.api.provider.SetProperty
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 /**
  * Extension class for configuring the [KtlintPlugin].
  */
-open class KtlintExtension {
+open class KtlintExtension(
+    objectFactory: ObjectFactory
+) {
     /**
      * The version of ktlint to use.
      */
-    var version = "0.27.0"
+    val version: Property<String> = objectFactory.property { set("0.27.0") }
+
     /**
      * Enable verbose mode.
      */
-    var verbose = false
+    val verbose: Property<Boolean> = objectFactory.property { set(false) }
     /**
      * Enable debug mode.
      */
-    var debug = false
+    val debug: Property<Boolean> = objectFactory.property { set(false) }
     /**
      * Enable android mode.
      */
-    var android = false
+    val android: Property<Boolean> = objectFactory.property { set(false) }
     /**
      * Enable console output mode.
      */
-    var outputToConsole = true
+    val outputToConsole: Property<Boolean> = objectFactory.property { set(true) }
     /**
      * Whether or not to allow the build to continue if there are warnings;
      * defaults to {@code false}, as for any other static code analysis tool.
      * <p>
      * Example: `ignoreFailures = true`
      */
-    var ignoreFailures = false
+    val ignoreFailures: Property<Boolean> = objectFactory.property { set(false) }
     /**
      * The ruleset(s) of ktlint to use.
      */
-    var ruleSets: Array<String> = arrayOf()
+    val ruleSets: ListProperty<String> = objectFactory.listProperty { set(emptyList()) }
 
     /**
      * Report output formats.
@@ -47,5 +54,7 @@ open class KtlintExtension {
      *
      * Default is plain.
      */
-    var reporters: Array<ReporterType> = arrayOf(ReporterType.PLAIN)
+    val reporters: SetProperty<ReporterType> = objectFactory.setProperty {
+        set(setOf(ReporterType.PLAIN))
+    }
 }

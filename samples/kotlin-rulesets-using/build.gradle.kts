@@ -19,13 +19,11 @@ dependencies {
 }
 
 configure<KtlintExtension> {
-    verbose = true
-    outputToConsole = true
-    ruleSets = arrayOf("../kotlin-rulesets-creating/build/libs/kotlin-rulesets-creating.jar")
-    reporters = arrayOf(ReporterType.CHECKSTYLE, ReporterType.JSON)
+    verbose.set(true)
+    outputToConsole.set(true)
+    ruleSets.set(listOf("../kotlin-rulesets-creating/build/libs/kotlin-rulesets-creating.jar"))
+    reporters.set(setOf(ReporterType.CHECKSTYLE, ReporterType.JSON))
 }
 
-afterEvaluate {
-    tasks.findByName("ktlintMainCheck")?.dependsOn(":samples:kotlin-rulesets-creating:build")
-    tasks.findByName("ktlintTestCheck")?.dependsOn(":samples:kotlin-rulesets-creating:build")
-}
+tasks.findByName("ktlintMainCheck")?.dependsOn(":samples:kotlin-rulesets-creating:build")
+tasks.findByName("ktlintTestCheck")?.dependsOn(":samples:kotlin-rulesets-creating:build")

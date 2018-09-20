@@ -27,7 +27,9 @@ class KtlintPluginTest : AbstractPluginTest() {
                     gradlePluginPortal()
                 }
 
-                ktlint.reporters = ["PLAIN", "CHECKSTYLE"]
+                import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+
+                ktlint.reporters = [ReporterType.CHECKSTYLE, ReporterType.PLAIN]
             """.trimIndent())
         }
     }
@@ -42,7 +44,7 @@ class KtlintPluginTest : AbstractPluginTest() {
         projectRoot.withCleanSources()
 
         buildAndFail("ktlintCheck").apply {
-            assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.FAILED))
+            assertThat(task(":ktlintMainCheck")?.outcome, equalTo(TaskOutcome.FAILED))
             assertThat(output, containsString("Ktlint versions less than 0.10.0 are not supported. Detected Ktlint version: 0.9.0."))
         }
     }
@@ -66,7 +68,7 @@ class KtlintPluginTest : AbstractPluginTest() {
 
         projectRoot.buildFile().appendText("""
 
-            ktlint.reporters = ["PLAIN_GROUP_BY_FILE", "CHECKSTYLE", "JSON"]
+            ktlint.reporters = [ReporterType.PLAIN_GROUP_BY_FILE, ReporterType.CHECKSTYLE, ReporterType.JSON]
         """.trimIndent())
 
         buildAndFail("ktlintCheck").apply {
@@ -84,29 +86,39 @@ class KtlintPluginTest : AbstractPluginTest() {
 
         projectRoot.buildFile().appendText("""
 
-            ktlint.reporters = ["JSON", property("reportType")]
+            ktlint.reporters = [ReporterType.JSON, ReporterType.PLAIN]
         """.trimIndent())
 
-        build("ktlintCheck", "-PreportType=PLAIN").apply {
+        build("ktlintCheck").apply {
             assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.SUCCESS))
             assertReportCreated(ReporterType.PLAIN)
             assertReportCreated(ReporterType.JSON)
         }
 
-        build("ktlintCheck", "-PreportType=PLAIN").apply {
+        build("ktlintCheck").apply {
             assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.UP_TO_DATE))
             assertReportCreated(ReporterType.PLAIN)
             assertReportCreated(ReporterType.JSON)
             assertReportNotCreated(ReporterType.CHECKSTYLE)
         }
 
-        build("ktlintCheck", "-PreportType=PLAIN_GROUP_BY_FILE").apply {
+        projectRoot.buildFile().appendText("""
+
+            ktlint.reporters = [ReporterType.JSON, ReporterType.PLAIN_GROUP_BY_FILE]
+        """.trimIndent())
+
+        build("ktlintCheck").apply {
             assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.SUCCESS))
             assertReportCreated(ReporterType.PLAIN_GROUP_BY_FILE)
             assertReportCreated(ReporterType.JSON)
         }
 
-        build("ktlintCheck", "-PreportType=CHECKSTYLE").apply {
+        projectRoot.buildFile().appendText("""
+
+            ktlint.reporters = [ReporterType.JSON, ReporterType.CHECKSTYLE]
+        """.trimIndent())
+
+        build("ktlintCheck").apply {
             assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.SUCCESS))
             assertReportCreated(ReporterType.JSON)
             assertReportCreated(ReporterType.CHECKSTYLE)
@@ -162,7 +174,9 @@ class KtlintPluginTest : AbstractPluginTest() {
                         gradlePluginPortal()
                     }
 
-                    ktlint.reporters = ["PLAIN", "CHECKSTYLE"]
+                    import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+
+                    ktlint.reporters = [ReporterType.PLAIN, ReporterType.CHECKSTYLE]
                 """.trimIndent())
                 settingsFile().writeText("""
                     buildCache {
@@ -202,7 +216,7 @@ class KtlintPluginTest : AbstractPluginTest() {
     }
 
     private fun reportLocation(reportType: ReporterType) =
-            projectRoot.resolve("build/reports/ktlint/ktlint-main.${reportType.fileExtension}")
+            projectRoot.resolve("build/reports/ktlint/ktlintMainCheck.${reportType.fileExtension}")
 
     @Test
     fun `should succeed check on clean sources`() {
@@ -226,16 +240,16 @@ class KtlintPluginTest : AbstractPluginTest() {
     }
 
     @Test
-    fun `should not add ktlintApplyToIdea if ktlint version less then 0_22_0`() {
+    fun `should fail ktlintApplyToIdea if ktlint version less then 0_22_0`() {
         projectRoot.withCleanSources()
         projectRoot.buildFile().appendText("""
 
             ktlint.version = "0.10.0"
         """.trimIndent())
 
-        build(":tasks").apply {
-            // With space to not interfere with ktlintApplyToIdeaGlobally tasks
-            assertThat(output.contains("ktlintApplyToIdea ", ignoreCase = true), equalTo(false))
+        buildAndFail(":ktlintApplyToIdea").apply {
+            assertThat(task(":ktlintApplyToIdea")?.outcome, equalTo(TaskOutcome.FAILED))
+            assertThat(output, containsString("Apply per project in only available from ktlint 0.22.0"))
         }
     }
 

@@ -10,6 +10,10 @@ open class KtlintBasePlugin : Plugin<Project> {
     internal lateinit var extension: KtlintExtension
 
     override fun apply(target: Project) {
-        extension = target.extensions.create("ktlint", KtlintExtension::class.java)
+        extension = target.extensions.create(
+            "ktlint",
+            KtlintExtension::class.java,
+            target.objects
+        )
     }
 }

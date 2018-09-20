@@ -9,6 +9,7 @@ buildscript {
         classpath("org.jlleitschuh.gradle:ktlint-gradle:+")
     }
 }
+
 plugins {
     kotlin("jvm") version SamplesVersions.kotlin apply false
     id("com.android.application") version SamplesVersions.androidPlugin apply false
@@ -20,6 +21,10 @@ allprojects {
         jcenter()
         google()
     }
+}
+
+apply {
+    plugin("org.jlleitschuh.gradle.ktlint")
 }
 
 task<Wrapper>("wrapper") {

@@ -18,6 +18,6 @@ kotlinNativeSourceSets["main"].component {
 }
 
 configure<KtlintExtension> {
-    verbose = true
-    outputToConsole = true
+    verbose.set(true)
+    outputToConsole.set(true)
 }

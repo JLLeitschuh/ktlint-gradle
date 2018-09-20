@@ -4,7 +4,11 @@ import net.swiftzer.semver.SemVer
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.FileCollection
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.HelpTasksPlugin
+import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Property
+import org.gradle.api.provider.SetProperty
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import java.nio.file.Path
 
@@ -15,7 +19,7 @@ internal fun createConfiguration(target: Project, extension: KtlintExtension) =
             mapOf(
                 "group" to "com.github.shyiko",
                 "name" to "ktlint",
-                "version" to extension.version
+                "version" to extension.version.get()
             )
         )
     }
@@ -77,8 +81,8 @@ private fun Path.isRootEditorConfig(): Boolean {
 /**
  * Android option is available from ktlint 0.12.0.
  */
-internal fun KtlintExtension.isAndroidFlagEnabled() =
-    android && SemVer.parse(version) >= SemVer(0, 12, 0)
+internal fun Property<String>.isAndroidFlagAvailable() =
+    SemVer.parse(get()) >= SemVer(0, 12, 0)
 
 internal const val VERIFICATION_GROUP = LifecycleBasePlugin.VERIFICATION_GROUP
 internal const val FORMATTING_GROUP = "Formatting"
@@ -88,3 +92,15 @@ internal const val FORMAT_PARENT_TASK_NAME = "ktlintFormat"
 internal const val APPLY_TO_IDEA_TASK_NAME = "ktlintApplyToIdea"
 internal const val APPLY_TO_IDEA_GLOBALLY_TASK_NAME = "ktlintApplyToIdeaGlobally"
 internal val KOTLIN_EXTENSIONS = listOf("kt", "kts")
+
+internal inline fun <reified T> ObjectFactory.property(
+    configuration: Property<T>.() -> Unit = {}
+) = property(T::class.java).apply(configuration)
+
+internal inline fun <reified T> ObjectFactory.setProperty(
+    configuration: SetProperty<T>.() -> Unit = {}
+) = setProperty(T::class.java).apply(configuration)
+
+internal inline fun <reified T> ObjectFactory.listProperty(
+    configuration: ListProperty<T>.() -> Unit = {}
+) = listProperty(T::class.java).apply(configuration)

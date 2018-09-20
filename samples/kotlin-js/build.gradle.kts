@@ -11,7 +11,7 @@ dependencies {
 }
 
 configure<KtlintExtension> {
-    verbose = true
-    outputToConsole = true
-    reporters = arrayOf(ReporterType.CHECKSTYLE, ReporterType.JSON)
+    verbose.set(true)
+    outputToConsole.set(true)
+    reporters.set(setOf(ReporterType.CHECKSTYLE, ReporterType.JSON))
 }
