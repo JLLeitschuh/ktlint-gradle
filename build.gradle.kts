@@ -27,7 +27,7 @@ apply {
     plugin("org.jlleitschuh.gradle.ktlint")
 }
 
-task<Wrapper>("wrapper") {
+tasks.withType(Wrapper::class.java) {
     gradleVersion = SamplesVersions.gradleWrapper
     distributionType = Wrapper.DistributionType.ALL
 }
