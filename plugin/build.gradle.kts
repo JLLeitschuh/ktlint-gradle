@@ -118,7 +118,7 @@ pluginBundle {
     }
 }
 
-task<Wrapper>("wrapper") {
+tasks.withType(Wrapper::class.java) {
     gradleVersion = PluginVersions.gradleWrapper
 }
 
