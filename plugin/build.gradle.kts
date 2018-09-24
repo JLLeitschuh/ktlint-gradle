@@ -118,7 +118,7 @@ pluginBundle {
     }
 }
 
-tasks.withType(Wrapper::class.java) {
+tasks.withType(Wrapper::class.java).configureEach {
     gradleVersion = PluginVersions.gradleWrapper
 }
 
