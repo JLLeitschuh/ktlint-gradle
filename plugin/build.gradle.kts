@@ -83,17 +83,17 @@ setupPublishingEnvironment()
 
 gradlePlugin {
     (plugins) {
-        "ktlintPlugin" {
+        register("ktlintPlugin") {
             id = "org.jlleitschuh.gradle.ktlint"
             implementationClass = "org.jlleitschuh.gradle.ktlint.KtlintPlugin"
         }
 
-        "ktlintBasePlugin" {
+        register("ktlintBasePlugin") {
             id = "org.jlleitschuh.gradle.ktlint-base"
             implementationClass = "org.jlleitschuh.gradle.ktlint.KtlintBasePlugin"
         }
 
-        "ktlintIdeaPlugin" {
+        register("ktlintIdeaPlugin") {
             id = "org.jlleitschuh.gradle.ktlint-idea"
             implementationClass = "org.jlleitschuh.gradle.ktlint.KtlintIdeaPlugin"
         }
@@ -107,11 +107,11 @@ pluginBundle {
     tags = listOf("ktlint", "kotlin", "linting")
 
     (plugins) {
-        "ktlintPlugin" {
+        register("ktlintPlugin") {
             id = "org.jlleitschuh.gradle.ktlint"
             displayName = "Ktlint Gradle Plugin"
         }
-        "ktlintIdeaPlugin" {
+        register("ktlintIdeaPlugin") {
             id = "org.jlleitschuh.gradle.ktlint-idea"
             displayName = "Ktlint Gradle IntelliJ Configuration Plugin"
         }

@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - ?
 ### Changed
   - Update Kotlin to `1.2.71` version
+  - Update Gradle to `4.10.2` version
 ### Removed
   - ?
 ### Fixed
