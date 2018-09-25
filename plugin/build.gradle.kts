@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "org.jlleitschuh.gradle"
-version = "6.0.0"
+version = "6.1.0-SNAPSHOT"
 
 repositories {
     jcenter()
@@ -68,13 +68,13 @@ fun setupPublishingEnvironment() {
         logger
             .info("`$keyProperty` or `$secretProperty` were not set. Attempting to configure from environment variables")
 
-        val key: String? = System.getProperty(keyEnvironmentVariable)
-        val secret: String? = System.getProperty(secretEnvironmentVariable)
+        val key: String? = System.getenv(keyEnvironmentVariable)
+        val secret: String? = System.getenv(secretEnvironmentVariable)
         if (key != null && secret != null) {
             System.setProperty(keyProperty, key)
             System.setProperty(secretProperty, secret)
         } else {
-            logger.debug("key or secret was null")
+            logger.warn("key or secret was null")
         }
     }
 }
@@ -83,17 +83,17 @@ setupPublishingEnvironment()
 
 gradlePlugin {
     (plugins) {
-        "ktlintPlugin" {
+        register("ktlintPlugin") {
             id = "org.jlleitschuh.gradle.ktlint"
             implementationClass = "org.jlleitschuh.gradle.ktlint.KtlintPlugin"
         }
 
-        "ktlintBasePlugin" {
+        register("ktlintBasePlugin") {
             id = "org.jlleitschuh.gradle.ktlint-base"
             implementationClass = "org.jlleitschuh.gradle.ktlint.KtlintBasePlugin"
         }
 
-        "ktlintIdeaPlugin" {
+        register("ktlintIdeaPlugin") {
             id = "org.jlleitschuh.gradle.ktlint-idea"
             implementationClass = "org.jlleitschuh.gradle.ktlint.KtlintIdeaPlugin"
         }
@@ -107,18 +107,18 @@ pluginBundle {
     tags = listOf("ktlint", "kotlin", "linting")
 
     (plugins) {
-        "ktlintPlugin" {
+        register("ktlintPlugin") {
             id = "org.jlleitschuh.gradle.ktlint"
             displayName = "Ktlint Gradle Plugin"
         }
-        "ktlintIdeaPlugin" {
+        register("ktlintIdeaPlugin") {
             id = "org.jlleitschuh.gradle.ktlint-idea"
             displayName = "Ktlint Gradle IntelliJ Configuration Plugin"
         }
     }
 }
 
-tasks.withType(Wrapper::class.java) {
+tasks.withType(Wrapper::class.java).configureEach {
     gradleVersion = PluginVersions.gradleWrapper
 }
 

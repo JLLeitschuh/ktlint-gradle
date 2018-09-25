@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [6.1.0] - Unreleased
+### Added
+  - ?
+### Changed
+  - Update Kotlin to `1.2.71` version
+  - Update Gradle to `4.10.2` version
+  - Update default KtLint version to `0.27.0`
+### Removed
+  - ?
+### Fixed
+  - ?
+
 ## [6.0.0] - 2018-9-20
 ### Added
   - Separate KtlintFormatTask task (#111)

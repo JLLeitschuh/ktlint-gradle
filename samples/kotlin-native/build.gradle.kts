@@ -8,14 +8,14 @@ apply {
     plugin("org.jetbrains.kotlin.native")
 }
 
-kotlinNativeSourceSets["main"].component {
+kotlinNativeSourceSets["main"].component(Action {
     // https://github.com/JetBrains/kotlin-native/issues/1807
     if (this is KotlinNativeMainComponent) {
         outputKinds.set(listOf(OutputKind.EXECUTABLE))
         baseName.set("foo")
         extraOpts(listOf("-entry", "org.jlleitschuh.gradle.ktlint.sample.native.main"))
     }
-}
+})
 
 configure<KtlintExtension> {
     verbose.set(true)
