@@ -13,6 +13,7 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.internal.HasConvention
+import org.gradle.api.logging.configuration.ConsoleOutput
 import org.gradle.api.plugins.Convention
 import org.gradle.api.plugins.JavaPluginConvention
 import org.jetbrains.kotlin.gradle.plugin.KonanArtifactContainer
@@ -240,7 +241,7 @@ open class KtlintPlugin : Plugin<Project> {
         return target.taskHelper<KtlintFormatTask>("ktlint${sourceSetName.capitalize()}Format") {
             group = FORMATTING_GROUP
             description = "Runs a check against all .kt files to ensure that they are formatted according to ktlint."
-            configurePluginTask(extension, ktLintConfig, kotlinSourceDirectories)
+            configurePluginTask(target, extension, ktLintConfig, kotlinSourceDirectories)
         }
     }
 
@@ -254,11 +255,12 @@ open class KtlintPlugin : Plugin<Project> {
         return target.taskHelper<KtlintCheckTask>("ktlint${sourceSetName.capitalize()}Check") {
             group = VERIFICATION_GROUP
             description = "Runs a check against all .kt files to ensure that they are formatted according to ktlint."
-            configurePluginTask(extension, ktLintConfig, kotlinSourceDirectories)
+            configurePluginTask(target, extension, ktLintConfig, kotlinSourceDirectories)
         }
     }
 
     private fun KtlintCheckTask.configurePluginTask(
+        target: Project,
         extension: KtlintExtension,
         ktLintConfig: Configuration,
         kotlinSourceDirectories: Iterable<*>
@@ -271,6 +273,9 @@ open class KtlintPlugin : Plugin<Project> {
         android.set(extension.android)
         ignoreFailures.set(extension.ignoreFailures)
         outputToConsole.set(extension.outputToConsole)
+        if (!target.isConsolePlain()) {
+            coloredOutput.set(extension.coloredOutput)
+        }
         ruleSets.set(extension.ruleSets)
         reporters.set(extension.reporters)
     }
@@ -302,4 +307,6 @@ open class KtlintPlugin : Plugin<Project> {
         convention.findPlugin(extensionType.java) ?: convention.getByType(extensionType.java)
 
     private inline fun <reified T> Convention.getPluginHelper() = getPlugin(T::class.java)
+
+    private fun Project.isConsolePlain() = gradle.startParameter.consoleOutput == ConsoleOutput.Plain
 }
