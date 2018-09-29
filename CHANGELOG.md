@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Update Kotlin to `1.2.71` version
   - Update Gradle to `4.10.2` version
   - Update default KtLint version to `0.27.0`
+  - Hide specific source sets tasks
 ### Removed
   - ?
 ### Fixed
