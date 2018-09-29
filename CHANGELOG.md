@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
   - ?
 ### Fixed
-  - ?
+  - Fixed plugin fails to configure android project with flavors (#131)
 
 ## [6.0.0] - 2018-9-20
 ### Added

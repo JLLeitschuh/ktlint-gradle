@@ -26,6 +26,12 @@ configure<AppExtension> {
         }
     }
 
+    flavorDimensions("beer")
+    productFlavors {
+        register("weissbier")
+        register("kellerbier")
+    }
+
     compileOptions {
         setSourceCompatibility(JavaVersion.VERSION_1_8)
         setTargetCompatibility(JavaVersion.VERSION_1_8)
