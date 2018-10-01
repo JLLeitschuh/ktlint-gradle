@@ -111,9 +111,11 @@ open class KtlintPlugin : Plugin<Project> {
                 addKtlintFormatTaskToProjectMetaFormatTask(target, ktlintSourceSetFormatTask)
             }
 
-            // Variant manager returns all sources for variant,
-            // so most probably main source set maybe checked several times.
-            // This approach creates one check tasks per one source set.
+            /*
+            Variant manager returns all sources for variant,
+            so most probably main source set maybe checked several times.
+            This approach creates one check tasks per one source set.
+            */
             val pluginConfigure: (Plugin<Any>) -> Unit = { _ ->
                 target.extensions.configure(BaseExtension::class.java) { ext ->
                     ext.sourceSets { sourceSet ->
