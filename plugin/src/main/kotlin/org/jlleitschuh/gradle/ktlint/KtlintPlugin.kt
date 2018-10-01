@@ -116,7 +116,7 @@ open class KtlintPlugin : Plugin<Project> {
             so most probably main source set maybe checked several times.
             This approach creates one check tasks per one source set.
             */
-            val pluginConfigure: (Plugin<Any>) -> Unit = { _ ->
+            fun getPluginConfigureAction(): (Plugin<Any>) -> Unit = { _ ->
                 target.extensions.configure(BaseExtension::class.java) { ext ->
                     ext.sourceSets { sourceSet ->
                         sourceSet.all {
@@ -126,11 +126,11 @@ open class KtlintPlugin : Plugin<Project> {
                 }
             }
 
-            target.plugins.withId("com.android.application", pluginConfigure)
-            target.plugins.withId("com.android.library", pluginConfigure)
-            target.plugins.withId("com.android.instantapp", pluginConfigure)
-            target.plugins.withId("com.android.feature", pluginConfigure)
-            target.plugins.withId("com.android.test", pluginConfigure)
+            target.plugins.withId("com.android.application", getPluginConfigureAction())
+            target.plugins.withId("com.android.library", getPluginConfigureAction())
+            target.plugins.withId("com.android.instantapp", getPluginConfigureAction())
+            target.plugins.withId("com.android.feature", getPluginConfigureAction())
+            target.plugins.withId("com.android.test", getPluginConfigureAction())
         }
     }
 
