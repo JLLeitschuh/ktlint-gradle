@@ -36,7 +36,7 @@ open class KtlintExtension(
     /**
      * Enabled colored output to console.
      */
-    val coloredOutput: Property<Boolean> = objectFactory.property { set(false) }
+    val coloredOutput: Property<Boolean> = objectFactory.property { set(true) }
     /**
      * Whether or not to allow the build to continue if there are warnings;
      * defaults to {@code false}, as for any other static code analysis tool.
