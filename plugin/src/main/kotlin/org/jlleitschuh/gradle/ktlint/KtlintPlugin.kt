@@ -273,9 +273,14 @@ open class KtlintPlugin : Plugin<Project> {
         android.set(extension.android)
         ignoreFailures.set(extension.ignoreFailures)
         outputToConsole.set(extension.outputToConsole)
-        if (!target.isConsolePlain()) {
-            coloredOutput.set(extension.coloredOutput)
-        }
+        coloredOutput.set(extension.coloredOutput.map {
+            if (target.isConsolePlain()) {
+                target.logger.info("Console type is plain: disabling colored output")
+                false
+            } else {
+                it
+            }
+        })
         ruleSets.set(extension.ruleSets)
         reporters.set(extension.reporters)
     }
