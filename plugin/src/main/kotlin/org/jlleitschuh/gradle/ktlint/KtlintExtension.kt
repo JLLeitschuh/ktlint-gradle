@@ -15,7 +15,7 @@ open class KtlintExtension(
     /**
      * The version of ktlint to use.
      */
-    val version: Property<String> = objectFactory.property { set("0.28.0") }
+    val version: Property<String> = objectFactory.property { set("0.29.0") }
 
     /**
      * Enable verbose mode.
