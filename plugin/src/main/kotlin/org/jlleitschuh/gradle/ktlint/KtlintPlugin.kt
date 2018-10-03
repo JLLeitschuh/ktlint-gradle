@@ -1,11 +1,6 @@
 package org.jlleitschuh.gradle.ktlint
 
-import com.android.build.gradle.AppPlugin
-import com.android.build.gradle.FeaturePlugin
-import com.android.build.gradle.InstantAppPlugin
-import com.android.build.gradle.LibraryPlugin
-import com.android.build.gradle.TestPlugin
-import com.android.build.gradle.internal.VariantManager
+import com.android.build.gradle.BaseExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -21,7 +16,6 @@ import org.jetbrains.kotlin.gradle.plugin.KonanExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.experimental.KotlinNativeComponent
 import org.jetbrains.kotlin.gradle.plugin.tasks.KonanCompileTask
-import java.io.File
 import kotlin.reflect.KClass
 
 /**
@@ -92,56 +86,52 @@ open class KtlintPlugin : Plugin<Project> {
         return { _ ->
             val ktLintConfig = createConfiguration(target, extension)
 
-            val createTasks: (VariantManager) -> Unit = { variantManager ->
-                // If project has not been yet evaluated - variant data will be empty.
-                // Calling this will ensure that variant data is available.
-                variantManager.populateVariantDataList()
+            fun createTasks(
+                fullVariantName: String,
+                sources: FileCollection
+            ) {
+                val checkTask = createCheckTask(
+                    target,
+                    extension,
+                    fullVariantName,
+                    ktLintConfig,
+                    sources
+                )
 
-                variantManager.variantScopes.forEach { variantScope ->
-                    val sourceDirs = variantScope.variantData.javaSources
-                        .fold(mutableListOf<File>()) { acc, configurableFileTree ->
-                            acc.add(configurableFileTree.dir)
-                            acc
+                addKtlintCheckTaskToProjectMetaCheckTask(target, checkTask)
+                setCheckTaskDependsOnKtlintCheckTask(target, checkTask)
+
+                val ktlintSourceSetFormatTask = createFormatTask(
+                    target,
+                    extension,
+                    fullVariantName,
+                    ktLintConfig,
+                    sources
+                )
+
+                addKtlintFormatTaskToProjectMetaFormatTask(target, ktlintSourceSetFormatTask)
+            }
+
+            /*
+             * Variant manager returns all sources for variant,
+             * so most probably main source set maybe checked several times.
+             * This approach creates one check tasks per one source set.
+             */
+            fun getPluginConfigureAction(): (Plugin<Any>) -> Unit = { _ ->
+                target.extensions.configure(BaseExtension::class.java) { ext ->
+                    ext.sourceSets { sourceSet ->
+                        sourceSet.all {
+                            createTasks(it.name, target.files(it.java.srcDirs))
                         }
-
-                    val checkTask = createCheckTask(
-                        target,
-                        extension,
-                        variantScope.fullVariantName,
-                        ktLintConfig,
-                        sourceDirs
-                    )
-
-                    addKtlintCheckTaskToProjectMetaCheckTask(target, checkTask)
-                    setCheckTaskDependsOnKtlintCheckTask(target, checkTask)
-
-                    val ktlintSourceSetFormatTask = createFormatTask(
-                        target,
-                        extension,
-                        variantScope.fullVariantName,
-                        ktLintConfig,
-                        sourceDirs
-                    )
-
-                    addKtlintFormatTaskToProjectMetaFormatTask(target, ktlintSourceSetFormatTask)
+                    }
                 }
             }
 
-            target.plugins.withId("com.android.application") { plugin ->
-                (plugin as AppPlugin).variantManager.run(createTasks)
-            }
-            target.plugins.withId("com.android.library") { plugin ->
-                (plugin as LibraryPlugin).variantManager.run(createTasks)
-            }
-            target.plugins.withId("com.android.instantapp") { plugin ->
-                (plugin as InstantAppPlugin).variantManager.run(createTasks)
-            }
-            target.plugins.withId("com.android.feature") { plugin ->
-                (plugin as FeaturePlugin).variantManager.run(createTasks)
-            }
-            target.plugins.withId("com.android.test") { plugin ->
-                (plugin as TestPlugin).variantManager.run(createTasks)
-            }
+            target.plugins.withId("com.android.application", getPluginConfigureAction())
+            target.plugins.withId("com.android.library", getPluginConfigureAction())
+            target.plugins.withId("com.android.instantapp", getPluginConfigureAction())
+            target.plugins.withId("com.android.feature", getPluginConfigureAction())
+            target.plugins.withId("com.android.test", getPluginConfigureAction())
         }
     }
 
