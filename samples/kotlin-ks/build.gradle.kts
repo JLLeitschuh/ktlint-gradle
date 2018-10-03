@@ -21,5 +21,6 @@ dependencies {
 configure<KtlintExtension> {
     verbose.set(true)
     outputToConsole.set(true)
+    coloredOutput.set(true)
     reporters.set(setOf(ReporterType.CHECKSTYLE, ReporterType.JSON))
 }
