@@ -15,7 +15,7 @@ open class KtlintExtension(
     /**
      * The version of ktlint to use.
      */
-    val version: Property<String> = objectFactory.property { set("0.28.0") }
+    val version: Property<String> = objectFactory.property { set("0.29.0") }
 
     /**
      * Enable verbose mode.
@@ -33,6 +33,10 @@ open class KtlintExtension(
      * Enable console output mode.
      */
     val outputToConsole: Property<Boolean> = objectFactory.property { set(true) }
+    /**
+     * Enabled colored output to console.
+     */
+    val coloredOutput: Property<Boolean> = objectFactory.property { set(true) }
     /**
      * Whether or not to allow the build to continue if there are warnings;
      * defaults to {@code false}, as for any other static code analysis tool.

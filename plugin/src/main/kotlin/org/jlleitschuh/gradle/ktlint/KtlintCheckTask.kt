@@ -67,6 +67,8 @@ open class KtlintCheckTask @Inject constructor(
     internal val reporters: SetProperty<ReporterType> = objectFactory.setProperty()
     @get:Console
     internal val outputToConsole: Property<Boolean> = objectFactory.property()
+    @get:Console
+    internal val coloredOutput: Property<Boolean> = objectFactory.property()
 
     @get:Internal
     internal val enabledReports
@@ -111,6 +113,9 @@ open class KtlintCheckTask @Inject constructor(
         }
         if (outputToConsole.get()) {
             javaExecSpec.args("--reporter=plain")
+        }
+        if (coloredOutput.get()) {
+            javaExecSpec.args("--color")
         }
         javaExecSpec.args(ruleSets.get().map { "--ruleset=$it" })
         javaExecSpec.isIgnoreExitValue = ignoreFailures.get()
