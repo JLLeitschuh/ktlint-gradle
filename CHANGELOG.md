@@ -5,10 +5,6 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [6.1.1] - 2018-10-5
-### Fixed
-  - Fixed only snapshot of `6.1.0` release was published
-
 ## [6.1.0] - 2018-10-5
 ### Added
   - Console colored output (#50)
