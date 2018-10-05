@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [6.1.0] - Unreleased
+## [6.1.0] - 2018-10-5
 ### Added
   - Console colored output (#50)
 ### Changed
@@ -13,8 +13,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Update Gradle to `4.10.2` version
   - Update default KtLint version to `0.29.0`
   - Hide specific source sets tasks
-### Removed
-  - ?
 ### Fixed
   - Fixed plugin fails to configure android project with flavors (#131)
 
