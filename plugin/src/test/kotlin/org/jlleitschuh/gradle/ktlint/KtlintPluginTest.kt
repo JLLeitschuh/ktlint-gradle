@@ -4,6 +4,8 @@ import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.hasItems
+import org.hamcrest.CoreMatchers.startsWith
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertThat
@@ -260,6 +262,45 @@ class KtlintPluginTest : AbstractPluginTest() {
         build(":ktlintApplyToIdeaGlobally").apply {
             assertThat(task(":ktlintApplyToIdeaGlobally")?.outcome, equalTo(TaskOutcome.SUCCESS))
             assertThat(ideaRootDir.listFiles().isNotEmpty(), equalTo(true))
+        }
+    }
+
+    @Test
+    fun `should show only plugin meta tasks in task output`() {
+        projectRoot.withCleanSources()
+
+        build("tasks").apply {
+            val ktlintTasks = output
+                .lineSequence()
+                .filter { it.startsWith("ktlint") }
+                .toList()
+
+            assertThat(ktlintTasks.size, equalTo(4))
+            assertThat(ktlintTasks, hasItems(
+                startsWith(CHECK_PARENT_TASK_NAME),
+                startsWith(FORMAT_PARENT_TASK_NAME),
+                startsWith(APPLY_TO_IDEA_TASK_NAME),
+                startsWith(APPLY_TO_IDEA_GLOBALLY_TASK_NAME)
+            ))
+        }
+    }
+
+    @Test
+    fun `should show all ktlint tasks in task output`() {
+        build("tasks", "--all").apply {
+            val ktlintTasks = output
+                .lineSequence()
+                .filter { it.startsWith("ktlint") }
+                .toList()
+
+            // Plus for main and test sources format and check tasks
+            assertThat(ktlintTasks.size, equalTo(8))
+            assertThat(ktlintTasks, hasItems(
+                startsWith(CHECK_PARENT_TASK_NAME),
+                startsWith(FORMAT_PARENT_TASK_NAME),
+                startsWith(APPLY_TO_IDEA_TASK_NAME),
+                startsWith(APPLY_TO_IDEA_GLOBALLY_TASK_NAME)
+            ))
         }
     }
 }
