@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
   - ?
 ### Changed
-  - ?
+  - Update Android gradle plugin version to `3.2.0`
 ### Fixed
   - ?
 ### Removed
