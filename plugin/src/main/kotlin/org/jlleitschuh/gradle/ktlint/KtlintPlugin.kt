@@ -254,7 +254,7 @@ open class KtlintPlugin : Plugin<Project> {
         kotlinSourceDirectories: Iterable<*>
     ) {
         classpath.setFrom(ktLintConfig)
-        sourceDirectories.setFrom(kotlinSourceDirectories)
+        setSource(kotlinSourceDirectories)
         ktlintVersion.set(extension.version)
         verbose.set(extension.verbose)
         debug.set(extension.debug)
