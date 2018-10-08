@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [6.2.0] - Unreleased
+### Added
+  - ?
+### Changed
+  - Update Android gradle plugin version to `3.2.0`
+### Fixed
+  - ?
+### Removed
+  - ?
+
 ## [6.1.0] - 2018-10-5
 ### Added
   - Console colored output (#50)
