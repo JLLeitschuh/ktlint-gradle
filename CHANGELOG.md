@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - ?
 ### Changed
   - Update Android gradle plugin version to `3.2.0`
+  - Check and format tasks now extend `SourceTask` (#85)
 ### Fixed
   - ?
 ### Removed

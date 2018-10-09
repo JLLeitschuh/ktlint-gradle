@@ -1,7 +1,6 @@
 package org.jlleitschuh.gradle.ktlint
 
 import net.swiftzer.semver.SemVer
-import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
@@ -21,6 +20,7 @@ import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
+import org.gradle.api.tasks.SourceTask
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.JavaExecSpec
 import org.jlleitschuh.gradle.ktlint.reporter.KtlintReport
@@ -30,22 +30,10 @@ import javax.inject.Inject
 @CacheableTask
 open class KtlintCheckTask @Inject constructor(
     private val objectFactory: ObjectFactory
-) : DefaultTask() {
+) : SourceTask() {
 
     @get:Classpath
     internal val classpath: ConfigurableFileCollection = project.files()
-
-    @get:Internal
-    internal val sourceDirectories: ConfigurableFileCollection = project.files()
-
-    @get:SkipWhenEmpty
-    @get:PathSensitive(PathSensitivity.RELATIVE)
-    @get:InputFiles
-    internal val sources: FileTree = sourceDirectories.asFileTree.matching { filterable ->
-        KOTLIN_EXTENSIONS.forEach {
-            filterable.include("**/*.$it")
-        }
-    }
 
     @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:InputFiles
@@ -75,12 +63,23 @@ open class KtlintCheckTask @Inject constructor(
         get() = reporters.get()
             .map {
                 KtlintReport(
-                    objectFactory.property() { set(it.isAvailable()) },
+                    objectFactory.property { set(it.isAvailable()) },
                     it,
                     newOutputFile().apply { set(it.getOutputFile()) }
                 )
             }
             .filter { it.enabled.get() }
+
+    init {
+        KOTLIN_EXTENSIONS.forEach {
+            include("**/*.$it")
+        }
+    }
+
+    @InputFiles
+    @SkipWhenEmpty
+    @PathSensitive(PathSensitivity.RELATIVE)
+    override fun getSource(): FileTree { return super.getSource() }
 
     @TaskAction
     fun lint() {
@@ -97,11 +96,7 @@ open class KtlintCheckTask @Inject constructor(
     ): (JavaExecSpec) -> Unit = { javaExecSpec ->
         javaExecSpec.classpath = classpath
         javaExecSpec.main = "com.github.shyiko.ktlint.Main"
-        javaExecSpec.args(sourceDirectories.flatMap { dir ->
-            KOTLIN_EXTENSIONS.map { extension ->
-                "${dir.path}/**/*.$extension"
-            }
-        })
+        javaExecSpec.args(getSource())
         if (verbose.get()) {
             javaExecSpec.args("--verbose")
         }
