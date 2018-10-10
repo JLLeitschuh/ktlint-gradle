@@ -154,6 +154,9 @@ ktlint {
         "/path/to/custom/rulseset.jar",
         "com.github.username:rulseset:master-SNAPSHOT"
     ]
+    exclude = [
+        "**/generated/**"
+    ]
 }
 ```
 
@@ -173,6 +176,7 @@ ktlint {
         "/path/to/custom/rulseset.jar",
         "com.github.username:rulseset:master-SNAPSHOT"
     ))
+    exclude.set(setOf("**/generated/**")
 }
 ```
 

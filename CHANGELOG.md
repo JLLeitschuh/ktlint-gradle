@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [6.2.0] - Unreleased
 ### Added
-  - ?
+  - Allow to exclude sources from check (#97)
 ### Changed
   - Update Android gradle plugin version to `3.2.0`
   - Check and format tasks now extend `SourceTask` (#85)
