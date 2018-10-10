@@ -23,4 +23,5 @@ configure<KtlintExtension> {
     outputToConsole.set(true)
     coloredOutput.set(true)
     reporters.set(setOf(ReporterType.CHECKSTYLE, ReporterType.JSON))
+    exclude.set(setOf("**/style-violations.kt"))
 }
