@@ -61,4 +61,12 @@ open class KtlintExtension(
     val reporters: SetProperty<ReporterType> = objectFactory.setProperty {
         set(setOf(ReporterType.PLAIN))
     }
+
+    /**
+     * Exclude sources under given source patterns.
+     *
+     * See [PatternFilterable](https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/util/PatternFilterable.html)
+     * for details how source patterns should look.
+     */
+    val exclude: SetProperty<String> = objectFactory.setProperty()
 }

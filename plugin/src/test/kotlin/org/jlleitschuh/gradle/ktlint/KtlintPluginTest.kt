@@ -303,4 +303,19 @@ class KtlintPluginTest : AbstractPluginTest() {
             ))
         }
     }
+
+    @Test
+    fun `Should ignore excluded sources`() {
+        projectRoot.withCleanSources()
+        projectRoot.withFailingSources()
+
+        projectRoot.buildFile().appendText("""
+
+            ktlint.exclude = ["**/fail-source.kt"]
+        """.trimIndent())
+
+        build(":ktlintCheck").apply {
+            assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.SUCCESS))
+        }
+    }
 }

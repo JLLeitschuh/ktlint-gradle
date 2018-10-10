@@ -255,6 +255,7 @@ open class KtlintPlugin : Plugin<Project> {
     ) {
         classpath.setFrom(ktLintConfig)
         setSource(kotlinSourceDirectories)
+        exclude.set(extension.exclude)
         ktlintVersion.set(extension.version)
         verbose.set(extension.verbose)
         debug.set(extension.debug)

@@ -61,10 +61,10 @@ abstract class AbstractPluginTest {
     }
 
     protected
-    fun File.withCleanSources() = createSourceFile("src/main/kotlin/source.kt", """val foo = "bar"""")
+    fun File.withCleanSources() = createSourceFile("src/main/kotlin/clean-source.kt", """val foo = "bar"""")
 
     protected
-    fun File.withFailingSources() = createSourceFile("src/main/kotlin/source.kt", """val  foo    =     "bar"""")
+    fun File.withFailingSources() = createSourceFile("src/main/kotlin/fail-source.kt", """val  foo    =     "bar"""")
 
     private
     fun File.createSourceFile(sourceFilePath: String, contents: String) {

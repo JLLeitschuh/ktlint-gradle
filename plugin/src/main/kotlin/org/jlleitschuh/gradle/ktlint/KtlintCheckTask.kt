@@ -57,6 +57,8 @@ open class KtlintCheckTask @Inject constructor(
     internal val outputToConsole: Property<Boolean> = objectFactory.property()
     @get:Console
     internal val coloredOutput: Property<Boolean> = objectFactory.property()
+    @get:Internal
+    internal val exclude: SetProperty<String> = objectFactory.setProperty()
 
     @get:Internal
     internal val enabledReports
@@ -85,6 +87,7 @@ open class KtlintCheckTask @Inject constructor(
     fun lint() {
         checkMinimalSupportedKtlintVersion()
         checkOutputPathsWithSpacesSupported()
+        exclude(exclude.get())
 
         project.javaexec(generateJavaExecSpec(additionalConfig()))
     }
