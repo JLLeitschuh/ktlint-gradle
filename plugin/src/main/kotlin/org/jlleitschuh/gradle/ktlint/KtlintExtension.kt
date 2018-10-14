@@ -1,9 +1,11 @@
 package org.jlleitschuh.gradle.ktlint
 
+import org.gradle.api.Action
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
+import org.gradle.api.tasks.util.PatternFilterable
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 /**
@@ -62,11 +64,16 @@ open class KtlintExtension(
         set(setOf(ReporterType.PLAIN))
     }
 
+    internal val filterAction: Property<Action<PatternFilterable>> = objectFactory
+        .property { set(Action {}) }
+
     /**
-     * Exclude sources under given source patterns.
+     * Filters sources using given source patterns.
      *
      * See [PatternFilterable](https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/util/PatternFilterable.html)
      * for details how source patterns should look.
      */
-    val exclude: SetProperty<String> = objectFactory.setProperty()
+    fun filter(filterAction: Action<PatternFilterable>) {
+        this.filterAction.set(filterAction)
+    }
 }

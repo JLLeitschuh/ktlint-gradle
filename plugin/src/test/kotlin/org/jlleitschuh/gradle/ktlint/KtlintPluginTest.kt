@@ -311,7 +311,7 @@ class KtlintPluginTest : AbstractPluginTest() {
 
         projectRoot.buildFile().appendText("""
 
-            ktlint.exclude = ["**/fail-source.kt"]
+            ktlint.filter { exclude("**/fail-source.kt") }
         """.trimIndent())
 
         build(":ktlintCheck").apply {
