@@ -73,9 +73,6 @@ open class KtlintCheckTask @Inject constructor(
             }
             .filter { it.enabled.get() }
 
-    @get:Nested
-    internal val filterAction: Property<Action<PatternFilterable>> = objectFactory.property()
-
     init {
         KOTLIN_EXTENSIONS.forEach {
             include("**/*.$it")
@@ -92,7 +89,6 @@ open class KtlintCheckTask @Inject constructor(
         logger.warn("Lint action")
         checkMinimalSupportedKtlintVersion()
         checkOutputPathsWithSpacesSupported()
-        filterAction.get().execute(this)
 
         project.javaexec(generateJavaExecSpec(additionalConfig()))
     }

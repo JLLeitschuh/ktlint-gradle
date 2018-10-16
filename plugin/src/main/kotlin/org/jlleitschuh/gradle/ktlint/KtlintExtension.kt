@@ -10,9 +10,12 @@ import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 /**
  * Extension class for configuring the [KtlintPlugin].
+ * @param filterTargetApplier When [KtlintExtension.filter] is called, this function is executed.
  */
-open class KtlintExtension(
-    objectFactory: ObjectFactory
+open class KtlintExtension
+internal constructor(
+    objectFactory: ObjectFactory,
+    private val filterTargetApplier: (Action<PatternFilterable>) -> Unit
 ) {
     /**
      * The version of ktlint to use.
@@ -64,9 +67,6 @@ open class KtlintExtension(
         set(setOf(ReporterType.PLAIN))
     }
 
-    internal val filterAction: Property<Action<PatternFilterable>> = objectFactory
-        .property { set(Action {}) }
-
     /**
      * Filters sources using given source patterns.
      *
@@ -74,6 +74,6 @@ open class KtlintExtension(
      * for details how source patterns should look.
      */
     fun filter(filterAction: Action<PatternFilterable>) {
-        this.filterAction.set(filterAction)
+        filterTargetApplier(filterAction)
     }
 }
