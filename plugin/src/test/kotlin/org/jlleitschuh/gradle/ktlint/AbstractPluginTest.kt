@@ -43,11 +43,11 @@ abstract class AbstractPluginTest {
     fun buildAndFail(vararg arguments: String): BuildResult =
         gradleRunnerFor(*arguments).forwardOutput().buildAndFail()
 
-    protected
+    protected open
     fun gradleRunnerFor(vararg arguments: String): GradleRunner =
         GradleRunner.create()
             .withProjectDir(projectRoot)
-            .withArguments(arguments.toList())
+            .withArguments(arguments.toList() + "--stacktrace")
 
     private
     val testRepositoryPath
