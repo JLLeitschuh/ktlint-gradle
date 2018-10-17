@@ -2,9 +2,14 @@ package org.jlleitschuh.gradle.ktlint
 
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
-import org.hamcrest.CoreMatchers.*
+import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.hasItems
+import org.hamcrest.CoreMatchers.startsWith
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
-import org.junit.Assert.*
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertThat
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
