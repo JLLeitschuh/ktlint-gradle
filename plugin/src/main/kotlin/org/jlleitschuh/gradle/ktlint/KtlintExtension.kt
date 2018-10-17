@@ -15,7 +15,7 @@ import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 open class KtlintExtension
 internal constructor(
     objectFactory: ObjectFactory,
-    private val filterTargetApplier: (Action<PatternFilterable>) -> Unit
+    private val filterTargetApplier: FilterApplier
 ) {
     /**
      * The version of ktlint to use.
@@ -68,10 +68,10 @@ internal constructor(
     }
 
     /**
-     * Filters sources using given source patterns.
+     * Filter sources by applying exclude or include specs/patterns.
      *
      * See [PatternFilterable](https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/util/PatternFilterable.html)
-     * for details how source patterns should look.
+     * for details how apply exclude or include specs/patterns.
      */
     fun filter(filterAction: Action<PatternFilterable>) {
         filterTargetApplier(filterAction)
