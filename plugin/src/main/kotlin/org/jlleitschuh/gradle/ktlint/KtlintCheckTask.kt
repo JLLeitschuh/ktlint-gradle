@@ -1,7 +1,6 @@
 package org.jlleitschuh.gradle.ktlint
 
 import net.swiftzer.semver.SemVer
-import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
@@ -17,14 +16,12 @@ import org.gradle.api.tasks.Console
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.SourceTask
 import org.gradle.api.tasks.TaskAction
-import org.gradle.api.tasks.util.PatternFilterable
 import org.gradle.process.JavaExecSpec
 import org.jlleitschuh.gradle.ktlint.reporter.KtlintReport
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
@@ -86,7 +83,6 @@ open class KtlintCheckTask @Inject constructor(
 
     @TaskAction
     fun lint() {
-        logger.warn("Lint action")
         checkMinimalSupportedKtlintVersion()
         checkOutputPathsWithSpacesSupported()
 
