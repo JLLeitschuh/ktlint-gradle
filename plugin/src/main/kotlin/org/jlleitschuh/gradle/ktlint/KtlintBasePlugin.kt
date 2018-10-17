@@ -6,7 +6,7 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.util.PatternFilterable
 import org.gradle.util.GradleVersion
 
-typealias FilterApplier = (Action<PatternFilterable>) -> Unit
+internal typealias FilterApplier = (Action<PatternFilterable>) -> Unit
 
 /**
  * The base Ktlint plugin that all other plugins are built on.
