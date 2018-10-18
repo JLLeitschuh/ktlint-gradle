@@ -13,7 +13,19 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
-class KtlintPluginTest : AbstractPluginTest() {
+/**
+ * Runs the tests with the current version of Gradle.
+ */
+class GradleCurrentKtlintPluginTest : BaseKtlintPluginTest()
+
+@Suppress("ClassName")
+class Gradle4_8KtlintPluginTest : BaseKtlintPluginTest() {
+
+    override fun gradleRunnerFor(vararg arguments: String): GradleRunner =
+            super.gradleRunnerFor(*arguments).withGradleVersion("4.8")
+}
+
+abstract class BaseKtlintPluginTest : AbstractPluginTest() {
 
     @Before
     fun setupBuild() {
@@ -271,16 +283,16 @@ class KtlintPluginTest : AbstractPluginTest() {
 
         build("tasks").apply {
             val ktlintTasks = output
-                .lineSequence()
-                .filter { it.startsWith("ktlint") }
-                .toList()
+                    .lineSequence()
+                    .filter { it.startsWith("ktlint") }
+                    .toList()
 
             assertThat(ktlintTasks.size, equalTo(4))
             assertThat(ktlintTasks, hasItems(
-                startsWith(CHECK_PARENT_TASK_NAME),
-                startsWith(FORMAT_PARENT_TASK_NAME),
-                startsWith(APPLY_TO_IDEA_TASK_NAME),
-                startsWith(APPLY_TO_IDEA_GLOBALLY_TASK_NAME)
+                    startsWith(CHECK_PARENT_TASK_NAME),
+                    startsWith(FORMAT_PARENT_TASK_NAME),
+                    startsWith(APPLY_TO_IDEA_TASK_NAME),
+                    startsWith(APPLY_TO_IDEA_GLOBALLY_TASK_NAME)
             ))
         }
     }
@@ -289,18 +301,33 @@ class KtlintPluginTest : AbstractPluginTest() {
     fun `should show all ktlint tasks in task output`() {
         build("tasks", "--all").apply {
             val ktlintTasks = output
-                .lineSequence()
-                .filter { it.startsWith("ktlint") }
-                .toList()
+                    .lineSequence()
+                    .filter { it.startsWith("ktlint") }
+                    .toList()
 
             // Plus for main and test sources format and check tasks
             assertThat(ktlintTasks.size, equalTo(8))
             assertThat(ktlintTasks, hasItems(
-                startsWith(CHECK_PARENT_TASK_NAME),
-                startsWith(FORMAT_PARENT_TASK_NAME),
-                startsWith(APPLY_TO_IDEA_TASK_NAME),
-                startsWith(APPLY_TO_IDEA_GLOBALLY_TASK_NAME)
+                    startsWith(CHECK_PARENT_TASK_NAME),
+                    startsWith(FORMAT_PARENT_TASK_NAME),
+                    startsWith(APPLY_TO_IDEA_TASK_NAME),
+                    startsWith(APPLY_TO_IDEA_GLOBALLY_TASK_NAME)
             ))
+        }
+    }
+
+    @Test
+    fun `Should ignore excluded sources`() {
+        projectRoot.withCleanSources()
+        projectRoot.withFailingSources()
+
+        projectRoot.buildFile().appendText("""
+
+            ktlint.filter { exclude("**/fail-source.kt") }
+        """.trimIndent())
+
+        build(":ktlintCheck").apply {
+            assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.SUCCESS))
         }
     }
 }

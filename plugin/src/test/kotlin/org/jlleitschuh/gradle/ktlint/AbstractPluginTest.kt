@@ -43,11 +43,11 @@ abstract class AbstractPluginTest {
     fun buildAndFail(vararg arguments: String): BuildResult =
         gradleRunnerFor(*arguments).forwardOutput().buildAndFail()
 
-    protected
+    protected open
     fun gradleRunnerFor(vararg arguments: String): GradleRunner =
         GradleRunner.create()
             .withProjectDir(projectRoot)
-            .withArguments(arguments.toList())
+            .withArguments(arguments.toList() + "--stacktrace")
 
     private
     val testRepositoryPath
@@ -61,10 +61,10 @@ abstract class AbstractPluginTest {
     }
 
     protected
-    fun File.withCleanSources() = createSourceFile("src/main/kotlin/source.kt", """val foo = "bar"""")
+    fun File.withCleanSources() = createSourceFile("src/main/kotlin/clean-source.kt", """val foo = "bar"""")
 
     protected
-    fun File.withFailingSources() = createSourceFile("src/main/kotlin/source.kt", """val  foo    =     "bar"""")
+    fun File.withFailingSources() = createSourceFile("src/main/kotlin/fail-source.kt", """val  foo    =     "bar"""")
 
     private
     fun File.createSourceFile(sourceFilePath: String, contents: String) {

@@ -154,6 +154,10 @@ ktlint {
         "/path/to/custom/rulseset.jar",
         "com.github.username:rulseset:master-SNAPSHOT"
     ]
+    filter {
+        exclude("**/generated/**")
+        include("**/kotlin/**")
+    }
 }
 ```
 
@@ -173,6 +177,10 @@ ktlint {
         "/path/to/custom/rulseset.jar",
         "com.github.username:rulseset:master-SNAPSHOT"
     ))
+    filter {
+        exclude("**/generated/**")
+        include("**/kotlin/**")
+    }
 }
 ```
 

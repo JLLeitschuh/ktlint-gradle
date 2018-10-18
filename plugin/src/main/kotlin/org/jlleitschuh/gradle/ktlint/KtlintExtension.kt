@@ -1,16 +1,21 @@
 package org.jlleitschuh.gradle.ktlint
 
+import org.gradle.api.Action
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
+import org.gradle.api.tasks.util.PatternFilterable
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 /**
  * Extension class for configuring the [KtlintPlugin].
+ * @param filterTargetApplier When [KtlintExtension.filter] is called, this function is executed.
  */
-open class KtlintExtension(
-    objectFactory: ObjectFactory
+open class KtlintExtension
+internal constructor(
+    objectFactory: ObjectFactory,
+    private val filterTargetApplier: FilterApplier
 ) {
     /**
      * The version of ktlint to use.
@@ -60,5 +65,15 @@ open class KtlintExtension(
      */
     val reporters: SetProperty<ReporterType> = objectFactory.setProperty {
         set(setOf(ReporterType.PLAIN))
+    }
+
+    /**
+     * Filter sources by applying exclude or include specs/patterns.
+     *
+     * See [PatternFilterable](https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/util/PatternFilterable.html)
+     * for details how apply exclude or include specs/patterns.
+     */
+    fun filter(filterAction: Action<PatternFilterable>) {
+        filterTargetApplier(filterAction)
     }
 }
