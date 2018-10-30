@@ -66,6 +66,10 @@ abstract class AbstractPluginTest {
     protected
     fun File.withFailingSources() = createSourceFile("src/main/kotlin/fail-source.kt", """val  foo    =     "bar"""")
 
+    protected
+    fun File.withAlternativeFailingSources(baseDir: String) =
+        createSourceFile("$baseDir/fail-source.kt", """val  foo    =     "bar"""")
+
     private
     fun File.createSourceFile(sourceFilePath: String, contents: String) {
         val sourceFile = resolve(sourceFilePath)

@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
   - ?
 ### Fixed
-  - ?
+  - Fixed additional android source dirs for SourceSet are not checked (#153)
 
 ## [6.2.0] - 2018-10-18
 ### Added

@@ -36,6 +36,11 @@ configure<AppExtension> {
         setSourceCompatibility(JavaVersion.VERSION_1_8)
         setTargetCompatibility(JavaVersion.VERSION_1_8)
     }
+
+    sourceSets {
+        val kotlinAddintionalSourceSets = project.file("src/main/kotlin")
+        findByName("main")?.java?.srcDirs(kotlinAddintionalSourceSets)
+    }
 }
 
 dependencies {

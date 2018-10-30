@@ -330,4 +330,22 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.SUCCESS))
         }
     }
+
+    @Test
+    fun `Should fail on additional source set directories files style violation`() {
+        projectRoot.withCleanSources()
+        val alternativeDirectory = "src/main/shared"
+        projectRoot.withAlternativeFailingSources(alternativeDirectory)
+
+        projectRoot.buildFile().appendText("""
+
+            sourceSets {
+                findByName("main")?.java?.srcDirs(project.file("$alternativeDirectory"))
+            }
+        """.trimIndent())
+
+        buildAndFail(":ktlintCheck").apply {
+            assertThat(task(":ktlintMainCheck")!!.outcome, equalTo(TaskOutcome.FAILED))
+        }
+    }
 }
