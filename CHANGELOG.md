@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [6.3.0] - Unreleased
+### Added
+  - ?
+### Changed
+  - Update Kotlin to `1.3.0` version
+### Removed
+  - ?
+### Fixed
+  - ?
+
 ## [6.2.1] - 2018-10-30
 ### Fixed
   - Fixed additional android source dirs for SourceSet are not checked (#153)
