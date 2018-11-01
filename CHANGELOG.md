@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - ?
 ### Changed
   - Update Kotlin to `1.3.0` version
+  - Sync native plugins version with kotlin main release version
 ### Removed
   - ?
 ### Fixed

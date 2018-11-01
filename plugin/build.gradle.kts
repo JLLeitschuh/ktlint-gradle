@@ -22,7 +22,7 @@ dependencies {
     compileOnly(gradleApi())
     compileOnly(kotlin("gradle-plugin", PluginVersions.kotlin))
     compileOnly("com.android.tools.build:gradle:${PluginVersions.androidPlugin}")
-    compileOnly("org.jetbrains.kotlin:kotlin-native-gradle-plugin:${PluginVersions.kotlinNativePlugin}")
+    compileOnly("org.jetbrains.kotlin:kotlin-native-gradle-plugin:${PluginVersions.kotlin}")
     implementation("net.swiftzer.semver:semver:${PluginVersions.semver}")
 
     /*

@@ -1,7 +1,6 @@
 object SamplesVersions {
     val kotlin = PluginVersions.kotlin
     val androidPlugin = PluginVersions.androidPlugin
-    val kotlinNativePlugin = PluginVersions.kotlinNativePlugin
     val gradleWrapper = PluginVersions.gradleWrapper
     val ktlintCore = "0.29.0"
     val junit = PluginVersions.junit

@@ -25,6 +25,7 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.process.JavaExecSpec
 import org.jlleitschuh.gradle.ktlint.reporter.KtlintReport
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+import java.io.File
 import javax.inject.Inject
 
 @CacheableTask
@@ -96,7 +97,7 @@ open class KtlintCheckTask @Inject constructor(
     ): (JavaExecSpec) -> Unit = { javaExecSpec ->
         javaExecSpec.classpath = classpath
         javaExecSpec.main = "com.github.shyiko.ktlint.Main"
-        javaExecSpec.args(getSource())
+        javaExecSpec.args(getSource().toRelativeFilesList())
         if (verbose.get()) {
             javaExecSpec.args("--verbose")
         }
@@ -144,6 +145,11 @@ open class KtlintCheckTask @Inject constructor(
         project.layout.buildDirectory.file(project.provider {
             "reports/ktlint/${this@KtlintCheckTask.name}.$fileExtension"
         })
+
+    private fun FileTree.toRelativeFilesList(): List<File> {
+        val baseDir = project.projectDir
+        return files.map { it.relativeTo(baseDir) }
+    }
 
     @get:OutputFiles
     val reportOutputFiles: Map<ReporterType, RegularFileProperty>

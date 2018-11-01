@@ -13,7 +13,7 @@ buildscript {
 plugins {
     kotlin("jvm") version SamplesVersions.kotlin apply false
     id("com.android.application") version SamplesVersions.androidPlugin apply false
-    id("konan") version SamplesVersions.kotlinNativePlugin apply false
+    id("konan") version SamplesVersions.kotlin apply false
 }
 
 allprojects {

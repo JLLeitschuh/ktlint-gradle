@@ -11,11 +11,11 @@ import org.gradle.api.internal.HasConvention
 import org.gradle.api.logging.configuration.ConsoleOutput
 import org.gradle.api.plugins.Convention
 import org.gradle.api.plugins.JavaPluginConvention
-import org.jetbrains.kotlin.gradle.plugin.KonanArtifactContainer
-import org.jetbrains.kotlin.gradle.plugin.KonanExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.experimental.KotlinNativeComponent
-import org.jetbrains.kotlin.gradle.plugin.tasks.KonanCompileTask
+import org.jetbrains.kotlin.gradle.plugin.konan.KonanArtifactContainer
+import org.jetbrains.kotlin.gradle.plugin.konan.KonanExtension
+import shadow.org.jetbrains.kotlin.gradle.plugin.tasks.KonanCompileTask
 import java.util.concurrent.Callable
 import kotlin.reflect.KClass
 
@@ -48,7 +48,7 @@ open class KtlintPlugin : Plugin<Project> {
         target: Project,
         extension: KtlintExtension
     ): (Plugin<in Any>) -> Unit {
-        return { _ ->
+        return {
             val ktLintConfig = createConfiguration(target, extension)
 
             target.theHelper<JavaPluginConvention>().sourceSets.forEach { sourceSet ->
@@ -84,7 +84,7 @@ open class KtlintPlugin : Plugin<Project> {
         target: Project,
         extension: KtlintExtension
     ): (Plugin<in Any>) -> Unit {
-        return { _ ->
+        return {
             val ktLintConfig = createConfiguration(target, extension)
 
             fun createTasks(
@@ -118,16 +118,19 @@ open class KtlintPlugin : Plugin<Project> {
              * so most probably main source set maybe checked several times.
              * This approach creates one check tasks per one source set.
              */
-            fun getPluginConfigureAction(): (Plugin<Any>) -> Unit = { _ ->
+            fun getPluginConfigureAction(): (Plugin<Any>) -> Unit = {
                 target.extensions.configure(BaseExtension::class.java) { ext ->
                     ext.sourceSets { sourceSet ->
-                        sourceSet.all {
+                        sourceSet.all { androidSourceSet ->
                             // Passing Callable, so returned FileCollection, will lazy evaluate it
                             // only when task will need it.
                             // Solves the problem of having additional source dirs in
                             // current AndroidSourceSet, that are not available on eager
                             // evaluation.
-                            createTasks(it.name, target.files(Callable { it.java.srcDirs }))
+                            createTasks(
+                                androidSourceSet.name,
+                                target.files(Callable { androidSourceSet.java.srcDirs })
+                            )
                         }
                     }
                 }
@@ -145,7 +148,7 @@ open class KtlintPlugin : Plugin<Project> {
         project: Project,
         extension: KtlintExtension
     ): (Plugin<in Any>) -> Unit {
-        return { _ ->
+        return {
             val ktLintConfig = createConfiguration(project, extension)
 
             val compileTargets = project.theHelper<KonanExtension>().targets
@@ -169,7 +172,7 @@ open class KtlintPlugin : Plugin<Project> {
         project: Project,
         extension: KtlintExtension
     ): (Plugin<in Any>) -> Unit {
-        return { _ ->
+        return {
             val ktLintConfig = createConfiguration(project, extension)
 
             project.components.withType(KotlinNativeComponent::class.java) { component ->
