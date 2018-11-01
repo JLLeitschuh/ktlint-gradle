@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
   - ?
 ### Changed
-  - ?
+  - Update Kotlin to `1.3.0` version
 ### Removed
   - ?
 ### Fixed
