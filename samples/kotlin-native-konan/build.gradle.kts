@@ -1,6 +1,5 @@
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
-import org.jetbrains.kotlin.gradle.plugin.KonanArtifactContainer
-import org.jetbrains.kotlin.gradle.plugin.KonanProgram
+import org.jetbrains.kotlin.gradle.plugin.konan.KonanArtifactContainer
 
 plugins.apply("org.jlleitschuh.gradle.ktlint")
 apply {
