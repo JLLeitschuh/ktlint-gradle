@@ -107,11 +107,11 @@ pluginBundle {
     tags = listOf("ktlint", "kotlin", "linting")
 
     (plugins) {
-        register("ktlintPlugin") {
+        "ktlintPlugin" {
             id = "org.jlleitschuh.gradle.ktlint"
             displayName = "Ktlint Gradle Plugin"
         }
-        register("ktlintIdeaPlugin") {
+        "ktlintIdeaPlugin" {
             id = "org.jlleitschuh.gradle.ktlint-idea"
             displayName = "Ktlint Gradle IntelliJ Configuration Plugin"
         }
