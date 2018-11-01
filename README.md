@@ -48,6 +48,7 @@ This plugin supports following kotlin plugins:
 - "kotlin-platform-jvm"
 - "konan"
 - "org.jetbrains.kotlin.native"
+- "kotlin-multiplatform"
 
 If you know any new Kotlin plugin that are not in this list - please,
 open a [new issue](https://github.com/JLLeitschuh/ktlint-gradle/issues/new).
