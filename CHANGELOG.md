@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [6.3.0] - Unreleased
 ### Added
-  - ?
+  - Added support for new kotlin multiplatform plugin (#144)
 ### Changed
   - Update Kotlin to `1.3.0` version
   - Sync native plugins version with kotlin main release version

@@ -11,6 +11,7 @@ import org.gradle.api.internal.HasConvention
 import org.gradle.api.logging.configuration.ConsoleOutput
 import org.gradle.api.plugins.Convention
 import org.gradle.api.plugins.JavaPluginConvention
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.experimental.KotlinNativeComponent
 import org.jetbrains.kotlin.gradle.plugin.konan.KonanArtifactContainer
@@ -42,6 +43,41 @@ open class KtlintPlugin : Plugin<Project> {
             "org.jetbrains.kotlin.native",
             applyKtLintNative(target, extension)
         )
+        target.plugins.withId(
+            "org.jetbrains.kotlin.multiplatform",
+            applyKtlintMultiplatform(target, extension)
+        )
+    }
+
+    private fun applyKtlintMultiplatform(
+        target: Project,
+        extension: KtlintExtension
+    ): (Plugin<in Any>) -> Unit = {
+        val ktLintConfig = createConfiguration(target, extension)
+        val multiplatformExtension = target.extensions.getByType(KotlinMultiplatformExtension::class.java)
+
+        multiplatformExtension.sourceSets.all { sourceSet ->
+            val checkTask = createCheckTask(
+                target,
+                extension,
+                sourceSet.name,
+                ktLintConfig,
+                sourceSet.kotlin.sourceDirectories
+            )
+
+            addKtlintCheckTaskToProjectMetaCheckTask(target, checkTask)
+            setCheckTaskDependsOnKtlintCheckTask(target, checkTask)
+
+            val ktlintSourceSetFormatTask = createFormatTask(
+                target,
+                extension,
+                sourceSet.name,
+                ktLintConfig,
+                sourceSet.kotlin.sourceDirectories
+            )
+
+            addKtlintFormatTaskToProjectMetaFormatTask(target, ktlintSourceSetFormatTask)
+        }
     }
 
     private fun applyKtLint(
