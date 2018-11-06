@@ -107,6 +107,10 @@ pluginBundle {
     tags = listOf("ktlint", "kotlin", "linting")
 
     (plugins) {
+        "ktlintBasePlugin" {
+            id = "org.jlleitschuh.gradle.ktlint-base"
+            displayName = "Ktlint Gradle Base Plugin"
+        }
         "ktlintPlugin" {
             id = "org.jlleitschuh.gradle.ktlint"
             displayName = "Ktlint Gradle Plugin"
