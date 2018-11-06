@@ -5,16 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [6.3.0] - Unreleased
+## [6.3.0] - 2018-11-06
 ### Added
   - Added support for new kotlin multiplatform plugin (#144)
 ### Changed
   - Update Kotlin to `1.3.0` version
   - Sync native plugins version with kotlin main release version
-### Removed
-  - ?
 ### Fixed
-  - ?
+  -  Failure on Windows due to long argument line (#156)
 
 ## [6.2.1] - 2018-10-30
 ### Fixed
