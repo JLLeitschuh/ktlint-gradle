@@ -87,12 +87,6 @@ gradlePlugin {
             id = "org.jlleitschuh.gradle.ktlint"
             implementationClass = "org.jlleitschuh.gradle.ktlint.KtlintPlugin"
         }
-
-        register("ktlintBasePlugin") {
-            id = "org.jlleitschuh.gradle.ktlint-base"
-            implementationClass = "org.jlleitschuh.gradle.ktlint.KtlintBasePlugin"
-        }
-
         register("ktlintIdeaPlugin") {
             id = "org.jlleitschuh.gradle.ktlint-idea"
             implementationClass = "org.jlleitschuh.gradle.ktlint.KtlintIdeaPlugin"
