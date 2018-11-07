@@ -87,12 +87,6 @@ gradlePlugin {
             id = "org.jlleitschuh.gradle.ktlint"
             implementationClass = "org.jlleitschuh.gradle.ktlint.KtlintPlugin"
         }
-
-        register("ktlintBasePlugin") {
-            id = "org.jlleitschuh.gradle.ktlint-base"
-            implementationClass = "org.jlleitschuh.gradle.ktlint.KtlintBasePlugin"
-        }
-
         register("ktlintIdeaPlugin") {
             id = "org.jlleitschuh.gradle.ktlint-idea"
             implementationClass = "org.jlleitschuh.gradle.ktlint.KtlintIdeaPlugin"
@@ -107,10 +101,6 @@ pluginBundle {
     tags = listOf("ktlint", "kotlin", "linting")
 
     (plugins) {
-        "ktlintBasePlugin" {
-            id = "org.jlleitschuh.gradle.ktlint-base"
-            displayName = "Ktlint Gradle Base Plugin"
-        }
         "ktlintPlugin" {
             id = "org.jlleitschuh.gradle.ktlint"
             displayName = "Ktlint Gradle Plugin"
