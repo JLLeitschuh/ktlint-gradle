@@ -1,6 +1,13 @@
 package org.jlleitschuh.gradle.ktlint
 
+import com.android.build.gradle.AppExtension
+import com.android.build.gradle.BaseExtension
+import com.android.build.gradle.FeatureExtension
+import com.android.build.gradle.LibraryExtension
+import com.android.build.gradle.TestExtension
+import com.android.build.gradle.api.BaseVariant
 import net.swiftzer.semver.SemVer
+import org.gradle.api.DomainObjectSet
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.FileCollection
@@ -104,3 +111,12 @@ internal inline fun <reified T> ObjectFactory.setProperty(
 internal inline fun <reified T> ObjectFactory.listProperty(
     configuration: ListProperty<T>.() -> Unit = {}
 ) = listProperty(T::class.java).apply(configuration)
+
+internal val BaseExtension.variants
+    get(): DomainObjectSet<out BaseVariant> = when (this) {
+        is AppExtension -> applicationVariants
+        is LibraryExtension -> libraryVariants
+        is FeatureExtension -> featureVariants
+        is TestExtension -> applicationVariants
+        else -> throw IllegalStateException("Not supported Android extension: $this")
+    }

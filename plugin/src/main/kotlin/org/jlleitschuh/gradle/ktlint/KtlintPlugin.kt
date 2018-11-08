@@ -17,7 +17,6 @@ import org.jetbrains.kotlin.gradle.plugin.experimental.KotlinNativeComponent
 import org.jetbrains.kotlin.gradle.plugin.konan.KonanArtifactContainer
 import org.jetbrains.kotlin.gradle.plugin.konan.KonanExtension
 import shadow.org.jetbrains.kotlin.gradle.plugin.tasks.KonanCompileTask
-import java.util.concurrent.Callable
 import kotlin.reflect.KClass
 
 /**
@@ -156,18 +155,9 @@ open class KtlintPlugin : Plugin<Project> {
              */
             fun getPluginConfigureAction(): (Plugin<Any>) -> Unit = {
                 target.extensions.configure(BaseExtension::class.java) { ext ->
-                    ext.sourceSets { sourceSet ->
-                        sourceSet.all { androidSourceSet ->
-                            // Passing Callable, so returned FileCollection, will lazy evaluate it
-                            // only when task will need it.
-                            // Solves the problem of having additional source dirs in
-                            // current AndroidSourceSet, that are not available on eager
-                            // evaluation.
-                            createTasks(
-                                androidSourceSet.name,
-                                target.files(Callable { androidSourceSet.java.srcDirs })
-                            )
-                        }
+                    ext.variants.all { variant ->
+                        val files = variant.sourceSets.flatMap { sourceSet -> sourceSet.javaDirectories }
+                        createTasks(variant.name, target.files(files))
                     }
                 }
             }
