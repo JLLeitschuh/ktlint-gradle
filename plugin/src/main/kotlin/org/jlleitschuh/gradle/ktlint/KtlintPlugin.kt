@@ -157,7 +157,7 @@ open class KtlintPlugin : Plugin<Project> {
                 target.extensions.configure(BaseExtension::class.java) { ext ->
                     ext.variants.all { variant ->
                         val filesCallable = Callable { variant.sourceSets.flatMap { sourceSet -> sourceSet.javaDirectories } }
-                        createTasks(variant.name, target.files(files))
+                        createTasks(variant.name, target.files(filesCallable))
                     }
                 }
             }
