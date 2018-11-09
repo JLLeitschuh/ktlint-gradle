@@ -17,6 +17,7 @@ import org.jetbrains.kotlin.gradle.plugin.experimental.KotlinNativeComponent
 import org.jetbrains.kotlin.gradle.plugin.konan.KonanArtifactContainer
 import org.jetbrains.kotlin.gradle.plugin.konan.KonanExtension
 import shadow.org.jetbrains.kotlin.gradle.plugin.tasks.KonanCompileTask
+import java.util.concurrent.Callable
 import kotlin.reflect.KClass
 
 /**
@@ -156,7 +157,9 @@ open class KtlintPlugin : Plugin<Project> {
             fun getPluginConfigureAction(): (Plugin<Any>) -> Unit = {
                 target.extensions.configure(BaseExtension::class.java) { ext ->
                     ext.variants.all { variant ->
-                        val filesCallable = Callable { variant.sourceSets.flatMap { sourceSet -> sourceSet.javaDirectories } }
+                        val filesCallable = Callable {
+                            variant.sourceSets.flatMap { sourceSet -> sourceSet.javaDirectories }
+                        }
                         createTasks(variant.name, target.files(filesCallable))
                     }
                 }
