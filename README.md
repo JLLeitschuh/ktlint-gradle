@@ -238,6 +238,16 @@ No. This approaches are not equivalent how they work. The problem that
 plugin may not find some of kotlin plugins if both approaches are used
 in the project configuration. Especially it is related to Android plugin.
 
+- How can I import `ReporterType` in my external Gradle script?
+
+Gradle doesn't allow to have import statements in external gradle script files (for example: `quality/foo.gradle`).
+To solve this - add following line in your root `build.gradle` file:
+
+``` gradle
+ext.ReporterType = org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+```
+Then `ReporterType` will be available in your external Gradle script without any import line.
+
 ## Developers
 
 ### Importing
