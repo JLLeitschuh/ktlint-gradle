@@ -77,7 +77,7 @@ buildscript {
     }
   }
   dependencies {
-    classpath "gradle.plugin.org.jlleitschuh.gradle:ktlint-gradle:<current_version>"
+    classpath "org.jlleitschuh.gradle:ktlint-gradle:<current_version>"
   }
 }
 
