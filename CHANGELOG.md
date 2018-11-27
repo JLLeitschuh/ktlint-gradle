@@ -5,15 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
-### Added
-  - ?
-### Changed
-  - ?
-### Removed
-  - ?
+## [6.3.1] - 2018-11-27
 ### Fixed
-  - ?
+  - Updated SemVer dependency to `1.1.1` version (#162)
 
 ## [6.3.0] - 2018-11-06
 ### Added
