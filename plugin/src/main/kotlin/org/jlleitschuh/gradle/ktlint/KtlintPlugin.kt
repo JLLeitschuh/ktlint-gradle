@@ -124,13 +124,13 @@ open class KtlintPlugin : Plugin<Project> {
             val ktLintConfig = createConfiguration(target, extension)
 
             fun createTasks(
-                fullVariantName: String,
+                sourceSetName: String,
                 sources: FileCollection
             ) {
                 val checkTask = createCheckTask(
                     target,
                     extension,
-                    fullVariantName,
+                    sourceSetName,
                     ktLintConfig,
                     sources
                 )
@@ -141,7 +141,7 @@ open class KtlintPlugin : Plugin<Project> {
                 val ktlintSourceSetFormatTask = createFormatTask(
                     target,
                     extension,
-                    fullVariantName,
+                    sourceSetName,
                     ktLintConfig,
                     sources
                 )
@@ -273,7 +273,7 @@ open class KtlintPlugin : Plugin<Project> {
         ktLintConfig: Configuration,
         kotlinSourceDirectories: Iterable<*>
     ): Task {
-        return target.taskHelper<KtlintFormatTask>("ktlint${sourceSetName.capitalize()}Format") {
+        return target.taskHelper<KtlintFormatTask>(sourceSetName.sourceSetFormatTaskName()) {
             description = "Runs a check against all .kt files to ensure that they are formatted according to ktlint."
             configurePluginTask(target, extension, ktLintConfig, kotlinSourceDirectories)
         }
@@ -286,7 +286,7 @@ open class KtlintPlugin : Plugin<Project> {
         ktLintConfig: Configuration,
         kotlinSourceDirectories: Iterable<*>
     ): Task {
-        return target.taskHelper<KtlintCheckTask>("ktlint${sourceSetName.capitalize()}Check") {
+        return target.taskHelper<KtlintCheckTask>(sourceSetName.sourceSetCheckTaskName()) {
             description = "Runs a check against all .kt files to ensure that they are formatted according to ktlint."
             configurePluginTask(target, extension, ktLintConfig, kotlinSourceDirectories)
         }
