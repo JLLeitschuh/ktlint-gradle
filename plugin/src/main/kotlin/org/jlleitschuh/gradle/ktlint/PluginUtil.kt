@@ -104,3 +104,13 @@ internal inline fun <reified T> ObjectFactory.setProperty(
 internal inline fun <reified T> ObjectFactory.listProperty(
     configuration: ListProperty<T>.() -> Unit = {}
 ) = listProperty(T::class.java).apply(configuration)
+
+/**
+ * Create check task name from source set name.
+ */
+internal fun String.sourceSetCheckTaskName() = "ktlint${capitalize()}SourceSetCheck"
+
+/**
+ * Create format task name from source set name.
+ */
+internal fun String.sourceSetFormatTaskName() = "ktlint${capitalize()}SourceSetFormat"

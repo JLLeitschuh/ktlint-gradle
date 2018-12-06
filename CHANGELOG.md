@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - ?
 ### Changed
   - Update Kotlin to `1.3.10` version
+  - Breaking: check/format tasks for specific source sets
+  and according reports outputs now include `SourceSet` in their name(#170)
 ### Deleted
   - ?
 ### Fixed
