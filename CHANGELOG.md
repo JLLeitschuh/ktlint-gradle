@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
-  - ?
+  - Meta tasks to run check or format on all sources in android variant. (#170)
+  Example: In an Android project with `foo` flavor,
+  `ktlintFooDebugSourceSetCheck` task will check the `foo` sourceSet (not main).
+  `ktlintFooDebugCheck` meta task will check all the sourceSets for `fooDebug` build variant.
 ### Changed
   - Update Kotlin to `1.3.10` version
   - Breaking: check/format tasks for specific source sets
