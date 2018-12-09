@@ -169,6 +169,15 @@ open class KtlintPlugin : Plugin<Project> {
                             )
                         }
                     }
+
+                    ext.variants?.all { variant ->
+                        val variantCheckTask = target.getAndroidVariantMetaKtlintCheckTask(variant.name)
+                        val variantFormatTask = target.getAndroidVariantMetaKtlintFormatTask(variant.name)
+                        variant.sourceSets.forEach { sourceSet ->
+                            variantCheckTask.dependsOn(sourceSet.name.sourceSetCheckTaskName())
+                            variantFormatTask.dependsOn(sourceSet.name.sourceSetFormatTaskName())
+                        }
+                    }
                 }
             }
 
@@ -324,10 +333,27 @@ open class KtlintPlugin : Plugin<Project> {
             description = "Runs ktlint on all kotlin sources in this project."
         }
 
+    private fun Project.getAndroidVariantMetaKtlintCheckTask(
+        variantName: String
+    ): Task = tasks.findByName("ktlint${variantName.capitalize()}Check")
+        ?: task("ktlint${variantName.capitalize()}Check").apply {
+            group = VERIFICATION_GROUP
+            description = "Runs ktlint on all kotlin sources for android $variantName variant in this project."
+        }
+
     private fun Project.getMetaKtlintFormatTask(): Task = this.tasks.findByName(FORMAT_PARENT_TASK_NAME)
         ?: this.task(FORMAT_PARENT_TASK_NAME).apply {
             group = FORMATTING_GROUP
             description = "Runs the ktlint formatter on all kotlin sources in this project."
+        }
+
+    private fun Project.getAndroidVariantMetaKtlintFormatTask(
+        variantName: String
+    ): Task = tasks.findByName("ktlint${variantName.capitalize()}Format")
+        ?: task("ktlint${variantName.capitalize()}Format").apply {
+            group = FORMATTING_GROUP
+            description = "Runs ktlint formatter on all kotlin sources for android $variantName" +
+                " variant in this project."
         }
 
     private fun setCheckTaskDependsOnKtlintCheckTask(project: Project, ktlintCheck: Task) {
