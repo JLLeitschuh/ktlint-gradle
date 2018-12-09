@@ -12,6 +12,7 @@ import org.gradle.api.logging.configuration.ConsoleOutput
 import org.gradle.api.plugins.Convention
 import org.gradle.api.plugins.JavaPluginConvention
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.experimental.KotlinNativeComponent
 import org.jetbrains.kotlin.gradle.plugin.konan.KonanArtifactContainer
@@ -77,6 +78,24 @@ open class KtlintPlugin : Plugin<Project> {
             )
 
             addKtlintFormatTaskToProjectMetaFormatTask(target, ktlintSourceSetFormatTask)
+        }
+
+        multiplatformExtension.targets.all { kotlinTarget ->
+            when (kotlinTarget.platformType) {
+                KotlinPlatformType.androidJvm -> {
+                    val androidConfigureAction: (Plugin<Any>) -> Unit = {
+                        target.extensions.configure(BaseExtension::class.java) { ext ->
+                            ext.addVariantsMetaTasks(target, kotlinTarget.targetName)
+                        }
+                    }
+                    target.plugins.withId("com.android.application", androidConfigureAction)
+                    target.plugins.withId("com.android.library", androidConfigureAction)
+                    target.plugins.withId("com.android.instantapp", androidConfigureAction)
+                    target.plugins.withId("com.android.feature", androidConfigureAction)
+                    target.plugins.withId("com.android.test", androidConfigureAction)
+                }
+                else -> Unit
+            }
         }
     }
 
@@ -154,7 +173,7 @@ open class KtlintPlugin : Plugin<Project> {
              * so most probably main source set maybe checked several times.
              * This approach creates one check tasks per one source set.
              */
-            fun getPluginConfigureAction(): (Plugin<Any>) -> Unit = {
+            val pluginConfigureAction: (Plugin<Any>) -> Unit = {
                 target.extensions.configure(BaseExtension::class.java) { ext ->
                     ext.sourceSets { sourceSet ->
                         sourceSet.all { androidSourceSet ->
@@ -170,22 +189,30 @@ open class KtlintPlugin : Plugin<Project> {
                         }
                     }
 
-                    ext.variants?.all { variant ->
-                        val variantCheckTask = target.getAndroidVariantMetaKtlintCheckTask(variant.name)
-                        val variantFormatTask = target.getAndroidVariantMetaKtlintFormatTask(variant.name)
-                        variant.sourceSets.forEach { sourceSet ->
-                            variantCheckTask.dependsOn(sourceSet.name.sourceSetCheckTaskName())
-                            variantFormatTask.dependsOn(sourceSet.name.sourceSetFormatTaskName())
-                        }
-                    }
+                    ext.addVariantsMetaTasks(target)
                 }
             }
 
-            target.plugins.withId("com.android.application", getPluginConfigureAction())
-            target.plugins.withId("com.android.library", getPluginConfigureAction())
-            target.plugins.withId("com.android.instantapp", getPluginConfigureAction())
-            target.plugins.withId("com.android.feature", getPluginConfigureAction())
-            target.plugins.withId("com.android.test", getPluginConfigureAction())
+            target.plugins.withId("com.android.application", pluginConfigureAction)
+            target.plugins.withId("com.android.library", pluginConfigureAction)
+            target.plugins.withId("com.android.instantapp", pluginConfigureAction)
+            target.plugins.withId("com.android.feature", pluginConfigureAction)
+            target.plugins.withId("com.android.test", pluginConfigureAction)
+        }
+    }
+
+    private fun BaseExtension.addVariantsMetaTasks(
+        target: Project,
+        multiplatformTargetName: String? = null
+    ) {
+        variants?.all { variant ->
+            val variantCheckTask = target.getAndroidVariantMetaKtlintCheckTask(variant.name, multiplatformTargetName)
+            val variantFormatTask = target.getAndroidVariantMetaKtlintFormatTask(variant.name, multiplatformTargetName)
+            variant.sourceSets.forEach { sourceSet ->
+                val sourceSetName = "${multiplatformTargetName?.capitalize() ?: ""}${sourceSet.name.capitalize()}"
+                variantCheckTask.dependsOn(sourceSetName.sourceSetCheckTaskName())
+                variantFormatTask.dependsOn(sourceSetName.sourceSetFormatTaskName())
+            }
         }
     }
 
@@ -334,12 +361,15 @@ open class KtlintPlugin : Plugin<Project> {
         }
 
     private fun Project.getAndroidVariantMetaKtlintCheckTask(
-        variantName: String
-    ): Task = tasks.findByName("ktlint${variantName.capitalize()}Check")
-        ?: task("ktlint${variantName.capitalize()}Check").apply {
+        variantName: String,
+        multiplatformTargetName: String? = null
+    ): Task {
+        val taskName = "ktlint${variantName.capitalize()}${multiplatformTargetName?.capitalize() ?: ""}Check"
+        return tasks.findByName(taskName) ?: task(taskName).apply {
             group = VERIFICATION_GROUP
             description = "Runs ktlint on all kotlin sources for android $variantName variant in this project."
         }
+    }
 
     private fun Project.getMetaKtlintFormatTask(): Task = this.tasks.findByName(FORMAT_PARENT_TASK_NAME)
         ?: this.task(FORMAT_PARENT_TASK_NAME).apply {
@@ -348,13 +378,16 @@ open class KtlintPlugin : Plugin<Project> {
         }
 
     private fun Project.getAndroidVariantMetaKtlintFormatTask(
-        variantName: String
-    ): Task = tasks.findByName("ktlint${variantName.capitalize()}Format")
-        ?: task("ktlint${variantName.capitalize()}Format").apply {
+        variantName: String,
+        multiplatformTargetName: String? = null
+    ): Task {
+        val taskName = "ktlint${variantName.capitalize()}${multiplatformTargetName?.capitalize() ?: ""}Format"
+        return tasks.findByName(taskName) ?: task(taskName).apply {
             group = FORMATTING_GROUP
             description = "Runs ktlint formatter on all kotlin sources for android $variantName" +
                 " variant in this project."
         }
+    }
 
     private fun setCheckTaskDependsOnKtlintCheckTask(project: Project, ktlintCheck: Task) {
         project.tasks.findByName("check")?.dependsOn(ktlintCheck)
@@ -363,7 +396,6 @@ open class KtlintPlugin : Plugin<Project> {
     /*
      * Helper functions used until Gradle Script Kotlin solidifies it's plugin API.
      */
-
     private inline fun <reified T : Any> Project.theHelper() =
         theHelper(T::class)
 
