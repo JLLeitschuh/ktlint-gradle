@@ -365,7 +365,7 @@ open class KtlintPlugin : Plugin<Project> {
         multiplatformTargetName: String? = null
     ): Task {
         val taskName = "ktlint${variantName.capitalize()}${multiplatformTargetName?.capitalize() ?: ""}Check"
-        return tasks.findByName(taskName) ?: task(taskName).apply {
+        return tasks.maybeCreate(taskName).apply {
             group = VERIFICATION_GROUP
             description = "Runs ktlint on all kotlin sources for android $variantName variant in this project."
         }
@@ -382,7 +382,7 @@ open class KtlintPlugin : Plugin<Project> {
         multiplatformTargetName: String? = null
     ): Task {
         val taskName = "ktlint${variantName.capitalize()}${multiplatformTargetName?.capitalize() ?: ""}Format"
-        return tasks.findByName(taskName) ?: task(taskName).apply {
+        return tasks.maybeCreate(taskName).apply {
             group = FORMATTING_GROUP
             description = "Runs ktlint formatter on all kotlin sources for android $variantName" +
                 " variant in this project."
