@@ -396,6 +396,7 @@ open class KtlintPlugin : Plugin<Project> {
     /*
      * Helper functions used until Gradle Script Kotlin solidifies it's plugin API.
      */
+
     private inline fun <reified T : Any> Project.theHelper() =
         theHelper(T::class)
 
