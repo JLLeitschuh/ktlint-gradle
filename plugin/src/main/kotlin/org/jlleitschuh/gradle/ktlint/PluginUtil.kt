@@ -1,6 +1,13 @@
 package org.jlleitschuh.gradle.ktlint
 
+import com.android.build.gradle.AppExtension
+import com.android.build.gradle.BaseExtension
+import com.android.build.gradle.FeatureExtension
+import com.android.build.gradle.LibraryExtension
+import com.android.build.gradle.TestExtension
+import com.android.build.gradle.api.BaseVariant
 import net.swiftzer.semver.SemVer
+import org.gradle.api.DomainObjectSet
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.FileCollection
@@ -114,3 +121,14 @@ internal fun String.sourceSetCheckTaskName() = "ktlint${capitalize()}SourceSetCh
  * Create format task name from source set name.
  */
 internal fun String.sourceSetFormatTaskName() = "ktlint${capitalize()}SourceSetFormat"
+
+/**
+ * Get specific android variants from [BaseExtension].
+ */
+internal val BaseExtension.variants: DomainObjectSet<out BaseVariant>? get() = when (this) {
+    is AppExtension -> applicationVariants
+    is LibraryExtension -> libraryVariants
+    is FeatureExtension -> featureVariants
+    is TestExtension -> applicationVariants
+    else -> null // Instant app extension doesn't provide variants access
+}

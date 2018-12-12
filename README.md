@@ -202,12 +202,16 @@ This repository provides following examples how to setup this plugin:
 
 ### Main tasks
 
-This plugin adds two tasks to every source set: `ktlint[source set name]Check` and `ktlint[source set name]Format`.
+This plugin adds two tasks to every source set: `ktlint[source set name]SourceSetCheck` and `ktlint[source set name]SourceSetFormat`.
 Additionally, a simple `ktlintCheck` task has also been added that checks all of the source sets for that project.
 Similarly, a `ktlintFormat` task has been added that formats all of the source sets.
 
 If the project has subprojects then the plugin also adds two meta tasks `ktlintCheck` and `ktlintFormat` to the root project that
 triggers the related tasks in the subprojects.
+
+Android projects, additionally, will have meta tasks for Android variants, that will process all source sets in variant.
+For example, if app has `foo` flavor, following meta tasks will be added:
+`ktlintFooDebugCheck`, `ktlintFooReleaseCheck`, `ktlintFooDebugFormat`, `ktlintFooReleaseFormat`.
 
 ### Additional helper tasks
 
