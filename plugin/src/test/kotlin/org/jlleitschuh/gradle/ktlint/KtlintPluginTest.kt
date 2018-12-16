@@ -19,10 +19,10 @@ import org.junit.Test
 class GradleCurrentKtlintPluginTest : BaseKtlintPluginTest()
 
 @Suppress("ClassName")
-class Gradle4_8KtlintPluginTest : BaseKtlintPluginTest() {
+class Gradle4_10KtlintPluginTest : BaseKtlintPluginTest() {
 
     override fun gradleRunnerFor(vararg arguments: String): GradleRunner =
-            super.gradleRunnerFor(*arguments).withGradleVersion("4.8")
+            super.gradleRunnerFor(*arguments).withGradleVersion("4.10")
 }
 
 abstract class BaseKtlintPluginTest : AbstractPluginTest() {
