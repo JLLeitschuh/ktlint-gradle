@@ -16,6 +16,7 @@ import org.gradle.api.plugins.HelpTasksPlugin
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import java.nio.file.Path
 
@@ -31,8 +32,11 @@ internal fun createConfiguration(target: Project, extension: KtlintExtension) =
         )
     }
 
-internal inline fun <reified T : Task> Project.taskHelper(name: String, noinline configuration: T.() -> Unit): T {
-    return this.tasks.create(name, T::class.java, configuration)
+internal inline fun <reified T : Task> Project.taskHelper(
+    name: String,
+    noinline configuration: T.() -> Unit
+): TaskProvider<T> {
+    return this.tasks.register(name, T::class.java, configuration)
 }
 
 internal const val EDITOR_CONFIG_FILE_NAME = ".editorconfig"

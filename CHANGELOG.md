@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   Example: In an Android project with `foo` flavor,
   `ktlintFooDebugSourceSetCheck` task will check the `foo` sourceSet (not main).
   `ktlintFooDebugCheck` meta task will check all the sourceSets for `fooDebug` build variant.
+  - Plugin tasks configuration avoidance
 ### Changed
   - Update Kotlin to `1.3.10` version
   - Breaking: check/format tasks for specific source sets

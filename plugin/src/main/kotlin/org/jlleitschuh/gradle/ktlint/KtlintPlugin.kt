@@ -4,6 +4,7 @@ import com.android.build.gradle.BaseExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.UnknownDomainObjectException
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.SourceDirectorySet
@@ -11,6 +12,7 @@ import org.gradle.api.internal.HasConvention
 import org.gradle.api.logging.configuration.ConsoleOutput
 import org.gradle.api.plugins.Convention
 import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
@@ -210,8 +212,8 @@ open class KtlintPlugin : Plugin<Project> {
             val variantFormatTask = target.getAndroidVariantMetaKtlintFormatTask(variant.name, multiplatformTargetName)
             variant.sourceSets.forEach { sourceSet ->
                 val sourceSetName = "${multiplatformTargetName?.capitalize() ?: ""}${sourceSet.name.capitalize()}"
-                variantCheckTask.dependsOn(sourceSetName.sourceSetCheckTaskName())
-                variantFormatTask.dependsOn(sourceSetName.sourceSetFormatTaskName())
+                variantCheckTask.configure { it.dependsOn(sourceSetName.sourceSetCheckTaskName()) }
+                variantFormatTask.configure { it.dependsOn(sourceSetName.sourceSetFormatTaskName()) }
             }
         }
     }
@@ -288,17 +290,23 @@ open class KtlintPlugin : Plugin<Project> {
         }
     }
 
-    private fun addKtlintCheckTaskToProjectMetaCheckTask(target: Project, checkTask: Task) {
-        target.getMetaKtlintCheckTask().dependsOn(checkTask)
+    private fun addKtlintCheckTaskToProjectMetaCheckTask(
+        target: Project,
+        checkTask: TaskProvider<KtlintCheckTask>
+    ) {
+        target.getMetaKtlintCheckTask().configure { it.dependsOn(checkTask) }
         if (target.rootProject != target) {
-            target.rootProject.getMetaKtlintCheckTask().dependsOn(checkTask)
+            target.rootProject.getMetaKtlintCheckTask().configure { it.dependsOn(checkTask) }
         }
     }
 
-    private fun addKtlintFormatTaskToProjectMetaFormatTask(target: Project, formatTask: Task) {
-        target.getMetaKtlintFormatTask().dependsOn(formatTask)
+    private fun addKtlintFormatTaskToProjectMetaFormatTask(
+        target: Project,
+        formatTask: TaskProvider<KtlintFormatTask>
+    ) {
+        target.getMetaKtlintFormatTask().configure { it.dependsOn(formatTask) }
         if (target.rootProject != target) {
-            target.rootProject.getMetaKtlintFormatTask().dependsOn(formatTask)
+            target.rootProject.getMetaKtlintFormatTask().configure { it.dependsOn(formatTask) }
         }
     }
 
@@ -308,8 +316,8 @@ open class KtlintPlugin : Plugin<Project> {
         sourceSetName: String,
         ktLintConfig: Configuration,
         kotlinSourceDirectories: Iterable<*>
-    ): Task {
-        return target.taskHelper<KtlintFormatTask>(sourceSetName.sourceSetFormatTaskName()) {
+    ): TaskProvider<KtlintFormatTask> {
+        return target.taskHelper(sourceSetName.sourceSetFormatTaskName()) {
             description = "Runs a check against all .kt files to ensure that they are formatted according to ktlint."
             configurePluginTask(target, extension, ktLintConfig, kotlinSourceDirectories)
         }
@@ -321,8 +329,8 @@ open class KtlintPlugin : Plugin<Project> {
         sourceSetName: String,
         ktLintConfig: Configuration,
         kotlinSourceDirectories: Iterable<*>
-    ): Task {
-        return target.taskHelper<KtlintCheckTask>(sourceSetName.sourceSetCheckTaskName()) {
+    ): TaskProvider<KtlintCheckTask> {
+        return target.taskHelper(sourceSetName.sourceSetCheckTaskName()) {
             description = "Runs a check against all .kt files to ensure that they are formatted according to ktlint."
             configurePluginTask(target, extension, ktLintConfig, kotlinSourceDirectories)
         }
@@ -354,43 +362,64 @@ open class KtlintPlugin : Plugin<Project> {
         reporters.set(extension.reporters)
     }
 
-    private fun Project.getMetaKtlintCheckTask(): Task = this.tasks.findByName(CHECK_PARENT_TASK_NAME)
-        ?: this.task(CHECK_PARENT_TASK_NAME).apply {
+    private fun Project.getMetaKtlintCheckTask(): TaskProvider<Task> = try {
+        this.tasks.named(CHECK_PARENT_TASK_NAME)
+    } catch (ignored: UnknownDomainObjectException) {
+        taskHelper(CHECK_PARENT_TASK_NAME) {
             group = VERIFICATION_GROUP
             description = "Runs ktlint on all kotlin sources in this project."
         }
+    }
 
     private fun Project.getAndroidVariantMetaKtlintCheckTask(
         variantName: String,
         multiplatformTargetName: String? = null
-    ): Task {
+    ): TaskProvider<Task> {
         val taskName = "ktlint${variantName.capitalize()}${multiplatformTargetName?.capitalize() ?: ""}Check"
-        return tasks.maybeCreate(taskName).apply {
-            group = VERIFICATION_GROUP
-            description = "Runs ktlint on all kotlin sources for android $variantName variant in this project."
+        return try {
+            tasks.named(taskName)
+        } catch (ignored: UnknownDomainObjectException) {
+            taskHelper(taskName) {
+                group = VERIFICATION_GROUP
+                description = "Runs ktlint on all kotlin sources for android $variantName variant in this project."
+            }
         }
     }
 
-    private fun Project.getMetaKtlintFormatTask(): Task = this.tasks.findByName(FORMAT_PARENT_TASK_NAME)
-        ?: this.task(FORMAT_PARENT_TASK_NAME).apply {
+    private fun Project.getMetaKtlintFormatTask(): TaskProvider<Task> = try {
+        this.tasks.named(FORMAT_PARENT_TASK_NAME)
+    } catch (ignored: UnknownDomainObjectException) {
+        taskHelper(FORMAT_PARENT_TASK_NAME) {
             group = FORMATTING_GROUP
             description = "Runs the ktlint formatter on all kotlin sources in this project."
         }
+    }
 
     private fun Project.getAndroidVariantMetaKtlintFormatTask(
         variantName: String,
         multiplatformTargetName: String? = null
-    ): Task {
+    ): TaskProvider<Task> {
         val taskName = "ktlint${variantName.capitalize()}${multiplatformTargetName?.capitalize() ?: ""}Format"
-        return tasks.maybeCreate(taskName).apply {
-            group = FORMATTING_GROUP
-            description = "Runs ktlint formatter on all kotlin sources for android $variantName" +
-                " variant in this project."
+        return try {
+            tasks.named(taskName)
+        } catch (ignored: UnknownDomainObjectException) {
+            taskHelper(taskName) {
+                group = FORMATTING_GROUP
+                description = "Runs ktlint formatter on all kotlin sources for android $variantName" +
+                    " variant in this project."
+            }
         }
     }
 
-    private fun setCheckTaskDependsOnKtlintCheckTask(project: Project, ktlintCheck: Task) {
-        project.tasks.findByName("check")?.dependsOn(ktlintCheck)
+    private fun setCheckTaskDependsOnKtlintCheckTask(
+        project: Project,
+        ktlintCheck: TaskProvider<KtlintCheckTask>
+    ) {
+        try {
+            project.tasks.named("check").configure { it.dependsOn(ktlintCheck) }
+        } catch (e: UnknownDomainObjectException) {
+            project.logger.info("Check task is not available.")
+        }
     }
 
     /*
