@@ -127,6 +127,20 @@ internal fun String.sourceSetCheckTaskName() = "ktlint${capitalize()}SourceSetCh
 internal fun String.sourceSetFormatTaskName() = "ktlint${capitalize()}SourceSetFormat"
 
 /**
+ * Create check task name for android variant name with optional android multiplatform target name addition.
+ */
+internal fun String.androidVariantMetaCheckTaskName(
+    multiplatformTargetName: String? = null
+) = "ktlint${capitalize()}${multiplatformTargetName?.capitalize() ?: ""}Check"
+
+/**
+ * Create format task name for android variant name with optional android multiplatform target name addition.
+ */
+internal fun String.androidVariantMetaFormatTaskName(
+    multiplatformTargetName: String? = null
+) = "ktlint${capitalize()}${multiplatformTargetName?.capitalize() ?: ""}Format"
+
+/**
  * Get specific android variants from [BaseExtension].
  */
 internal val BaseExtension.variants: DomainObjectSet<out BaseVariant>? get() = when (this) {
