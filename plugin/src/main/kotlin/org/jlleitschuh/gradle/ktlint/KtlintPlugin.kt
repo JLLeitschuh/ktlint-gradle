@@ -343,7 +343,7 @@ open class KtlintPlugin : Plugin<Project> {
         ktLintConfig: Configuration,
         kotlinSourceDirectories: Iterable<*>
     ): TaskProvider<KtlintFormatTask> {
-        return target.taskHelper(sourceSetName.sourceSetFormatTaskName()) {
+        return target.registerTask(sourceSetName.sourceSetFormatTaskName()) {
             description = "Runs a check against all .kt files to ensure that they are formatted according to ktlint."
             configurePluginTask(target, extension, ktLintConfig, kotlinSourceDirectories)
         }
@@ -356,7 +356,7 @@ open class KtlintPlugin : Plugin<Project> {
         ktLintConfig: Configuration,
         kotlinSourceDirectories: Iterable<*>
     ): TaskProvider<KtlintCheckTask> {
-        return target.taskHelper(sourceSetName.sourceSetCheckTaskName()) {
+        return target.registerTask(sourceSetName.sourceSetCheckTaskName()) {
             description = "Runs a check against all .kt files to ensure that they are formatted according to ktlint."
             configurePluginTask(target, extension, ktLintConfig, kotlinSourceDirectories)
         }
@@ -389,7 +389,7 @@ open class KtlintPlugin : Plugin<Project> {
     }
 
     private fun Project.createMetaKtlintCheckTask() {
-        taskHelper<Task>(CHECK_PARENT_TASK_NAME) {
+        registerTask<Task>(CHECK_PARENT_TASK_NAME) {
             group = VERIFICATION_GROUP
             description = "Runs ktlint on all kotlin sources in this project."
         }
@@ -400,13 +400,13 @@ open class KtlintPlugin : Plugin<Project> {
     private fun Project.createAndroidVariantMetaKtlintCheckTask(
         variantName: String,
         multiplatformTargetName: String? = null
-    ): TaskProvider<Task> = taskHelper(variantName.androidVariantMetaCheckTaskName(multiplatformTargetName)) {
+    ): TaskProvider<Task> = registerTask(variantName.androidVariantMetaCheckTaskName(multiplatformTargetName)) {
         group = VERIFICATION_GROUP
         description = "Runs ktlint on all kotlin sources for android $variantName variant in this project."
     }
 
     private fun Project.createMetaKtlintFormatTask() {
-        taskHelper<Task>(FORMAT_PARENT_TASK_NAME) {
+        registerTask<Task>(FORMAT_PARENT_TASK_NAME) {
             group = FORMATTING_GROUP
             description = "Runs the ktlint formatter on all kotlin sources in this project."
         }
@@ -417,7 +417,7 @@ open class KtlintPlugin : Plugin<Project> {
     private fun Project.createAndroidVariantMetaKtlintFormatTask(
         variantName: String,
         multiplatformTargetName: String? = null
-    ): TaskProvider<Task> = taskHelper(variantName.androidVariantMetaFormatTaskName(multiplatformTargetName)) {
+    ): TaskProvider<Task> = registerTask(variantName.androidVariantMetaFormatTaskName(multiplatformTargetName)) {
         group = FORMATTING_GROUP
         description = "Runs ktlint formatter on all kotlin sources for android $variantName" +
             " variant in this project."

@@ -32,7 +32,7 @@ internal fun createConfiguration(target: Project, extension: KtlintExtension) =
         )
     }
 
-internal inline fun <reified T : Task> Project.taskHelper(
+internal inline fun <reified T : Task> Project.registerTask(
     name: String,
     noinline configuration: T.() -> Unit
 ): TaskProvider<T> {
