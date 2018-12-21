@@ -13,6 +13,7 @@ import org.gradle.api.logging.configuration.ConsoleOutput
 import org.gradle.api.plugins.Convention
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
@@ -415,10 +416,10 @@ open class KtlintPlugin : Plugin<Project> {
         project: Project,
         ktlintCheck: TaskProvider<KtlintCheckTask>
     ) {
-        try {
-            project.tasks.named("check").configure { it.dependsOn(ktlintCheck) }
-        } catch (e: UnknownDomainObjectException) {
-            project.logger.info("Check task is not available.")
+        project.plugins.withType(LifecycleBasePlugin::class.java) {
+            project.tasks.named(LifecycleBasePlugin.CHECK_TASK_NAME).configure { task ->
+                task.dependsOn(ktlintCheck)
+            }
         }
     }
 
