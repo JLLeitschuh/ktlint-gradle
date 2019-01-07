@@ -58,7 +58,7 @@ open class KtlintPlugin : Plugin<Project> {
         val ktLintConfig = createConfiguration(target, extension)
         val multiplatformExtension = target.extensions.getByType(KotlinMultiplatformExtension::class.java)
 
-        val diffTask = createDiffFormatTask(target, extension, ktLintConfig, emptyList<Unit>())
+        val diffTask = createFormatFileTask(target, extension, ktLintConfig, emptyList<Unit>())
 
         multiplatformExtension.sourceSets.all { sourceSet ->
             val checkTask = createCheckTask(
@@ -111,7 +111,7 @@ open class KtlintPlugin : Plugin<Project> {
         return {
             val ktLintConfig = createConfiguration(target, extension)
 
-            val diffTask = createDiffFormatTask(target, extension, ktLintConfig, emptyList<Unit>())
+            val diffTask = createFormatFileTask(target, extension, ktLintConfig, emptyList<Unit>())
 
             target.theHelper<JavaPluginConvention>().sourceSets.forEach { sourceSet ->
                 val kotlinSourceSet: SourceDirectorySet = (sourceSet as HasConvention)
@@ -151,7 +151,7 @@ open class KtlintPlugin : Plugin<Project> {
         return {
             val ktLintConfig = createConfiguration(target, extension)
 
-            val diffTask = createDiffFormatTask(target, extension, ktLintConfig, emptyList<Unit>())
+            val diffTask = createFormatFileTask(target, extension, ktLintConfig, emptyList<Unit>())
 
             fun createTasks(
                 sourceSetName: String,
@@ -299,7 +299,7 @@ open class KtlintPlugin : Plugin<Project> {
             )
             addKtlintFormatTaskToProjectMetaFormatTask(project, ktlintSourceSetFormatTask)
 
-            createDiffFormatTask(project, extension, ktlintConfiguration, sourceDirectoriesList)
+            createFormatFileTask(project, extension, ktlintConfiguration, sourceDirectoriesList)
         }
     }
 
@@ -330,13 +330,13 @@ open class KtlintPlugin : Plugin<Project> {
         }
     }
 
-    private fun createDiffFormatTask(
+    private fun createFormatFileTask(
         target: Project,
         extension: KtlintExtension,
         ktLintConfig: Configuration,
         kotlinSourceDirectories: Iterable<*>
     ): SourceTask {
-        return target.taskHelper<KtlintFormatFilesTask>(FORMAT_FILE_TASK_NAME) {
+        return target.tasks.maybeCreate(FORMAT_FILE_TASK_NAME, KtlintFormatFilesTask::class.java).apply {
             description = "Runs a check against specified .kt files to ensure that they are formatted according to ktlint."
             configurePluginTask(target, extension, ktLintConfig, kotlinSourceDirectories)
         }

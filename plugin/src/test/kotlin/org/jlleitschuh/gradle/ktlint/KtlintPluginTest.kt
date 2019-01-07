@@ -306,10 +306,11 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
                     .toList()
 
             // Plus for main and test sources format and check tasks
-            assertThat(ktlintTasks.size, equalTo(8))
+            assertThat(ktlintTasks.size, equalTo(9))
             assertThat(ktlintTasks, hasItems(
                     startsWith(CHECK_PARENT_TASK_NAME),
                     startsWith(FORMAT_PARENT_TASK_NAME),
+                    startsWith(FORMAT_FILE_TASK_NAME),
                     startsWith(APPLY_TO_IDEA_TASK_NAME),
                     startsWith(APPLY_TO_IDEA_GLOBALLY_TASK_NAME)
             ))
