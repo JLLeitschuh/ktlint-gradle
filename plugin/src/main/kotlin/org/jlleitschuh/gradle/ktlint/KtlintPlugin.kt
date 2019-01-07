@@ -11,6 +11,7 @@ import org.gradle.api.internal.HasConvention
 import org.gradle.api.logging.configuration.ConsoleOutput
 import org.gradle.api.plugins.Convention
 import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.tasks.SourceTask
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
@@ -57,6 +58,8 @@ open class KtlintPlugin : Plugin<Project> {
         val ktLintConfig = createConfiguration(target, extension)
         val multiplatformExtension = target.extensions.getByType(KotlinMultiplatformExtension::class.java)
 
+        val diffTask = createDiffFormatTask(target, extension, ktLintConfig, emptyList<Unit>())
+
         multiplatformExtension.sourceSets.all { sourceSet ->
             val checkTask = createCheckTask(
                 target,
@@ -78,6 +81,8 @@ open class KtlintPlugin : Plugin<Project> {
             )
 
             addKtlintFormatTaskToProjectMetaFormatTask(target, ktlintSourceSetFormatTask)
+
+            diffTask.source(sourceSet.kotlin.sourceDirectories)
         }
 
         multiplatformExtension.targets.all { kotlinTarget ->
@@ -106,6 +111,8 @@ open class KtlintPlugin : Plugin<Project> {
         return {
             val ktLintConfig = createConfiguration(target, extension)
 
+            val diffTask = createDiffFormatTask(target, extension, ktLintConfig, emptyList<Unit>())
+
             target.theHelper<JavaPluginConvention>().sourceSets.forEach { sourceSet ->
                 val kotlinSourceSet: SourceDirectorySet = (sourceSet as HasConvention)
                     .convention
@@ -131,6 +138,8 @@ open class KtlintPlugin : Plugin<Project> {
                 )
 
                 addKtlintFormatTaskToProjectMetaFormatTask(target, ktlintSourceSetFormatTask)
+
+                diffTask.source(kotlinSourceSet.sourceDirectories)
             }
         }
     }
@@ -141,6 +150,8 @@ open class KtlintPlugin : Plugin<Project> {
     ): (Plugin<in Any>) -> Unit {
         return {
             val ktLintConfig = createConfiguration(target, extension)
+
+            val diffTask = createDiffFormatTask(target, extension, ktLintConfig, emptyList<Unit>())
 
             fun createTasks(
                 sourceSetName: String,
@@ -166,6 +177,8 @@ open class KtlintPlugin : Plugin<Project> {
                 )
 
                 addKtlintFormatTaskToProjectMetaFormatTask(target, ktlintSourceSetFormatTask)
+
+                diffTask.source(sources)
             }
 
             /*
@@ -285,6 +298,8 @@ open class KtlintPlugin : Plugin<Project> {
                 sourceDirectoriesList
             )
             addKtlintFormatTaskToProjectMetaFormatTask(project, ktlintSourceSetFormatTask)
+
+            createDiffFormatTask(project, extension, ktlintConfiguration, sourceDirectoriesList)
         }
     }
 
@@ -311,6 +326,18 @@ open class KtlintPlugin : Plugin<Project> {
     ): Task {
         return target.taskHelper<KtlintFormatTask>(sourceSetName.sourceSetFormatTaskName()) {
             description = "Runs a check against all .kt files to ensure that they are formatted according to ktlint."
+            configurePluginTask(target, extension, ktLintConfig, kotlinSourceDirectories)
+        }
+    }
+
+    private fun createDiffFormatTask(
+        target: Project,
+        extension: KtlintExtension,
+        ktLintConfig: Configuration,
+        kotlinSourceDirectories: Iterable<*>
+    ): SourceTask {
+        return target.taskHelper<KtlintFormatFilesTask>(FORMAT_FILE_TASK_NAME) {
+            description = "Runs a check against specified .kt files to ensure that they are formatted according to ktlint."
             configurePluginTask(target, extension, ktLintConfig, kotlinSourceDirectories)
         }
     }

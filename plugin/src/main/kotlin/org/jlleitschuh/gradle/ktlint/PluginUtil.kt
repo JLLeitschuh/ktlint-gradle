@@ -96,6 +96,7 @@ internal const val FORMATTING_GROUP = "Formatting"
 internal const val HELP_GROUP = HelpTasksPlugin.HELP_GROUP
 internal const val CHECK_PARENT_TASK_NAME = "ktlintCheck"
 internal const val FORMAT_PARENT_TASK_NAME = "ktlintFormat"
+internal const val FORMAT_FILE_TASK_NAME = "ktlintFileFormat"
 internal const val APPLY_TO_IDEA_TASK_NAME = "ktlintApplyToIdea"
 internal const val APPLY_TO_IDEA_GLOBALLY_TASK_NAME = "ktlintApplyToIdeaGlobally"
 internal val KOTLIN_EXTENSIONS = listOf("kt", "kts")

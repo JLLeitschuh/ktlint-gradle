@@ -44,7 +44,7 @@ configure<AppExtension> {
 }
 
 dependencies {
-    "implementation"("org.jetbrains.kotlin:kotlin-stdlib-jre7:${SamplesVersions.kotlin}")
+    "implementation"("org.jetbrains.kotlin:kotlin-stdlib-jdk7:${SamplesVersions.kotlin}")
     "implementation"("com.android.support:appcompat-v7:${SamplesVersions.androidSupport}")
     "implementation"("com.android.support:support-v4:${SamplesVersions.androidSupport}")
     "implementation"("com.android.support:recyclerview-v7:${SamplesVersions.androidSupport}")
