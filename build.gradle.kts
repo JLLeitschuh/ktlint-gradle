@@ -1,7 +1,7 @@
 buildscript {
     repositories {
-        jcenter()
         google()
+        jcenter()
         maven("https://dl.bintray.com/jetbrains/kotlin-native-dependencies")
     }
 
@@ -18,8 +18,8 @@ plugins {
 
 allprojects {
     repositories {
-        jcenter()
         google()
+        jcenter()
     }
 }
 
