@@ -19,7 +19,6 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.experimental.KotlinNativeComponent
 import org.jetbrains.kotlin.gradle.plugin.konan.KonanArtifactContainer
 import org.jetbrains.kotlin.gradle.plugin.konan.KonanExtension
-import org.jetbrains.kotlin.utils.addToStdlib.ifNotEmpty
 import shadow.org.jetbrains.kotlin.gradle.plugin.tasks.KonanCompileTask
 import java.util.concurrent.Callable
 import kotlin.reflect.KClass
@@ -60,7 +59,7 @@ open class KtlintPlugin : Plugin<Project> {
         val ktLintConfig = createConfiguration(target, extension)
         val multiplatformExtension = target.extensions.getByType(KotlinMultiplatformExtension::class.java)
 
-        multiplatformExtension.sourceSets.ifNotEmpty {
+        if (multiplatformExtension.sourceSets.isNotEmpty()) {
             target.createMetaKtlintCheckTask()
             target.createMetaKtlintFormatTask()
         }
@@ -116,7 +115,7 @@ open class KtlintPlugin : Plugin<Project> {
 
             val sourceSets = target.theHelper<JavaPluginConvention>().sourceSets
 
-            sourceSets.ifNotEmpty {
+            if (sourceSets.isNotEmpty()) {
                 target.createMetaKtlintCheckTask()
                 target.createMetaKtlintFormatTask()
             }
@@ -190,7 +189,7 @@ open class KtlintPlugin : Plugin<Project> {
              */
             val pluginConfigureAction: (Plugin<Any>) -> Unit = {
                 target.extensions.configure(BaseExtension::class.java) { ext ->
-                    ext.sourceSets.ifNotEmpty {
+                    if (ext.sourceSets.isNotEmpty()) {
                         target.createMetaKtlintCheckTask()
                         target.createMetaKtlintFormatTask()
                     }
@@ -276,7 +275,7 @@ open class KtlintPlugin : Plugin<Project> {
         return {
             val ktLintConfig = createConfiguration(project, extension)
 
-            project.components.withType(KotlinNativeComponent::class.java).ifNotEmpty {
+            if (project.components.withType(KotlinNativeComponent::class.java).isNotEmpty()) {
                 project.createMetaKtlintCheckTask()
                 project.createMetaKtlintFormatTask()
             }
