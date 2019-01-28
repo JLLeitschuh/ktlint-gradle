@@ -26,14 +26,32 @@ import kotlin.reflect.KClass
 /**
  * Plugin that provides a wrapper over the `ktlint` project.
  */
+@Suppress("UnstableApiUsage")
 open class KtlintPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
+        project = target
         val extension = target.plugins.apply(KtlintBasePlugin::class.java).extension
         // Apply the idea plugin
         target.plugins.apply(KtlintIdeaPlugin::class.java)
 
         addKtLintTasksToKotlinPlugin(target, extension)
+    }
+
+    private lateinit var project: Project
+
+    private val metaKtlintCheckTask: TaskProvider<Task> by lazy {
+        project.registerTask<Task>(CHECK_PARENT_TASK_NAME) {
+            group = VERIFICATION_GROUP
+            description = "Runs ktlint on all kotlin sources in this project."
+        }
+    }
+
+    private val metaKtlintFormatTask: TaskProvider<Task> by lazy {
+        project.registerTask<Task>(FORMAT_PARENT_TASK_NAME) {
+            group = FORMATTING_GROUP
+            description = "Runs the ktlint formatter on all kotlin sources in this project."
+        }
     }
 
     private fun addKtLintTasksToKotlinPlugin(target: Project, extension: KtlintExtension) {
@@ -59,11 +77,6 @@ open class KtlintPlugin : Plugin<Project> {
         val ktLintConfig = createConfiguration(target, extension)
         val multiplatformExtension = target.extensions.getByType(KotlinMultiplatformExtension::class.java)
 
-        if (multiplatformExtension.sourceSets.isNotEmpty()) {
-            target.createMetaKtlintCheckTask()
-            target.createMetaKtlintFormatTask()
-        }
-
         multiplatformExtension.sourceSets.all { sourceSet ->
             val checkTask = createCheckTask(
                 target,
@@ -73,7 +86,7 @@ open class KtlintPlugin : Plugin<Project> {
                 sourceSet.kotlin.sourceDirectories
             )
 
-            addKtlintCheckTaskToProjectMetaCheckTask(target, checkTask)
+            checkTask.addKtlintCheckTaskToProjectMetaCheckTask()
             setCheckTaskDependsOnKtlintCheckTask(target, checkTask)
 
             val ktlintSourceSetFormatTask = createFormatTask(
@@ -84,7 +97,7 @@ open class KtlintPlugin : Plugin<Project> {
                 sourceSet.kotlin.sourceDirectories
             )
 
-            addKtlintFormatTaskToProjectMetaFormatTask(target, ktlintSourceSetFormatTask)
+            ktlintSourceSetFormatTask.addKtlintFormatTaskToProjectMetaFormatTask()
         }
 
         multiplatformExtension.targets.all { kotlinTarget ->
@@ -115,11 +128,6 @@ open class KtlintPlugin : Plugin<Project> {
 
             val sourceSets = target.theHelper<JavaPluginConvention>().sourceSets
 
-            if (sourceSets.isNotEmpty()) {
-                target.createMetaKtlintCheckTask()
-                target.createMetaKtlintFormatTask()
-            }
-
             sourceSets.all { sourceSet ->
                 val kotlinSourceSet: SourceDirectorySet = (sourceSet as HasConvention)
                     .convention
@@ -133,7 +141,7 @@ open class KtlintPlugin : Plugin<Project> {
                     kotlinSourceSet.sourceDirectories
                 )
 
-                addKtlintCheckTaskToProjectMetaCheckTask(target, checkTask)
+                checkTask.addKtlintCheckTaskToProjectMetaCheckTask()
                 setCheckTaskDependsOnKtlintCheckTask(target, checkTask)
 
                 val ktlintSourceSetFormatTask = createFormatTask(
@@ -144,7 +152,7 @@ open class KtlintPlugin : Plugin<Project> {
                     kotlinSourceSet.sourceDirectories
                 )
 
-                addKtlintFormatTaskToProjectMetaFormatTask(target, ktlintSourceSetFormatTask)
+                ktlintSourceSetFormatTask.addKtlintFormatTaskToProjectMetaFormatTask()
             }
         }
     }
@@ -168,7 +176,7 @@ open class KtlintPlugin : Plugin<Project> {
                     sources
                 )
 
-                addKtlintCheckTaskToProjectMetaCheckTask(target, checkTask)
+                checkTask.addKtlintCheckTaskToProjectMetaCheckTask()
                 setCheckTaskDependsOnKtlintCheckTask(target, checkTask)
 
                 val ktlintSourceSetFormatTask = createFormatTask(
@@ -179,7 +187,7 @@ open class KtlintPlugin : Plugin<Project> {
                     sources
                 )
 
-                addKtlintFormatTaskToProjectMetaFormatTask(target, ktlintSourceSetFormatTask)
+                ktlintSourceSetFormatTask.addKtlintFormatTaskToProjectMetaFormatTask()
             }
 
             /*
@@ -189,11 +197,6 @@ open class KtlintPlugin : Plugin<Project> {
              */
             val pluginConfigureAction: (Plugin<Any>) -> Unit = {
                 target.extensions.configure(BaseExtension::class.java) { ext ->
-                    if (ext.sourceSets.isNotEmpty()) {
-                        target.createMetaKtlintCheckTask()
-                        target.createMetaKtlintFormatTask()
-                    }
-
                     ext.sourceSets { sourceSet ->
                         sourceSet.all { androidSourceSet ->
                             // Passing Callable, so returned FileCollection, will lazy evaluate it
@@ -250,9 +253,6 @@ open class KtlintPlugin : Plugin<Project> {
 
             val compileTargets = project.theHelper<KonanExtension>().targets
             project.theHelper<KonanArtifactContainer>().whenObjectAdded { buildConfig ->
-                project.createMetaKtlintCheckTask()
-                project.createMetaKtlintFormatTask()
-
                 addTasksForNativePlugin(project, extension, buildConfig.name, ktLintConfig) {
                     compileTargets.fold(initial = emptyList()) { acc, target ->
                         val compileTask = buildConfig.findByTarget(target)
@@ -274,12 +274,6 @@ open class KtlintPlugin : Plugin<Project> {
     ): (Plugin<in Any>) -> Unit {
         return {
             val ktLintConfig = createConfiguration(project, extension)
-
-            if (project.components.withType(KotlinNativeComponent::class.java).isNotEmpty()) {
-                project.createMetaKtlintCheckTask()
-                project.createMetaKtlintFormatTask()
-            }
-
             project.components.withType(KotlinNativeComponent::class.java) { component ->
                 addTasksForNativePlugin(project, extension, component.name, ktLintConfig) {
                     component.konanTargets.get()
@@ -307,7 +301,7 @@ open class KtlintPlugin : Plugin<Project> {
                 ktlintConfiguration,
                 sourceDirectoriesList
             )
-            addKtlintCheckTaskToProjectMetaCheckTask(project, checkTask)
+            checkTask.addKtlintCheckTaskToProjectMetaCheckTask()
             setCheckTaskDependsOnKtlintCheckTask(project, checkTask)
 
             val ktlintSourceSetFormatTask = createFormatTask(
@@ -317,22 +311,16 @@ open class KtlintPlugin : Plugin<Project> {
                 ktlintConfiguration,
                 sourceDirectoriesList
             )
-            addKtlintFormatTaskToProjectMetaFormatTask(project, ktlintSourceSetFormatTask)
+            ktlintSourceSetFormatTask.addKtlintFormatTaskToProjectMetaFormatTask()
         }
     }
 
-    private fun addKtlintCheckTaskToProjectMetaCheckTask(
-        target: Project,
-        checkTask: TaskProvider<KtlintCheckTask>
-    ) {
-        target.getMetaKtlintCheckTask().configure { it.dependsOn(checkTask) }
+    private fun TaskProvider<KtlintCheckTask>.addKtlintCheckTaskToProjectMetaCheckTask() {
+        metaKtlintCheckTask.configure { it.dependsOn(this) }
     }
 
-    private fun addKtlintFormatTaskToProjectMetaFormatTask(
-        target: Project,
-        formatTask: TaskProvider<KtlintFormatTask>
-    ) {
-        target.getMetaKtlintFormatTask().configure { it.dependsOn(formatTask) }
+    private fun TaskProvider<KtlintFormatTask>.addKtlintFormatTaskToProjectMetaFormatTask() {
+        metaKtlintFormatTask.configure { it.dependsOn(this) }
     }
 
     private fun createFormatTask(
@@ -387,15 +375,6 @@ open class KtlintPlugin : Plugin<Project> {
         reporters.set(extension.reporters)
     }
 
-    private fun Project.createMetaKtlintCheckTask() {
-        registerTask<Task>(CHECK_PARENT_TASK_NAME) {
-            group = VERIFICATION_GROUP
-            description = "Runs ktlint on all kotlin sources in this project."
-        }
-    }
-
-    private fun Project.getMetaKtlintCheckTask(): TaskProvider<Task> = this.tasks.named(CHECK_PARENT_TASK_NAME)
-
     private fun Project.createAndroidVariantMetaKtlintCheckTask(
         variantName: String,
         multiplatformTargetName: String? = null
@@ -403,15 +382,6 @@ open class KtlintPlugin : Plugin<Project> {
         group = VERIFICATION_GROUP
         description = "Runs ktlint on all kotlin sources for android $variantName variant in this project."
     }
-
-    private fun Project.createMetaKtlintFormatTask() {
-        registerTask<Task>(FORMAT_PARENT_TASK_NAME) {
-            group = FORMATTING_GROUP
-            description = "Runs the ktlint formatter on all kotlin sources in this project."
-        }
-    }
-
-    private fun Project.getMetaKtlintFormatTask(): TaskProvider<Task> = this.tasks.named(FORMAT_PARENT_TASK_NAME)
 
     private fun Project.createAndroidVariantMetaKtlintFormatTask(
         variantName: String,
