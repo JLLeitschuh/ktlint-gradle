@@ -13,8 +13,8 @@ group = "org.jlleitschuh.gradle"
 version = "6.4.0-SNAPSHOT"
 
 repositories {
-    jcenter()
     google()
+    jcenter()
     maven("https://dl.bintray.com/jetbrains/kotlin-native-dependencies")
 }
 
