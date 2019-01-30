@@ -348,4 +348,33 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             assertThat(task(":ktlintMainSourceSetCheck")!!.outcome, equalTo(TaskOutcome.FAILED))
         }
     }
+
+    @Test
+    fun `Should always format again restored to pre-format state sources`() {
+        projectRoot.withFailingSources()
+        build(":ktlintFormat").apply {
+            assertThat(task(":ktlintMainSourceSetFormat")!!.outcome, equalTo(TaskOutcome.SUCCESS))
+        }
+
+        projectRoot.restoreFailingSources()
+
+        build(":ktlintFormat").apply {
+            assertThat(task(":ktlintMainSourceSetFormat")!!.outcome, equalTo(TaskOutcome.SUCCESS))
+        }
+    }
+
+    @Test
+    fun `Format task should be up-to-date on 3rd run`() {
+        projectRoot.withFailingSources()
+
+        build(":ktlintFormat").apply {
+            assertThat(task(":ktlintMainSourceSetFormat")!!.outcome, equalTo(TaskOutcome.SUCCESS))
+        }
+        build(":ktlintFormat").apply {
+            assertThat(task(":ktlintMainSourceSetFormat")!!.outcome, equalTo(TaskOutcome.SUCCESS))
+        }
+        build(":ktlintFormat").apply {
+            assertThat(task(":ktlintMainSourceSetFormat")!!.outcome, equalTo(TaskOutcome.UP_TO_DATE))
+        }
+    }
 }

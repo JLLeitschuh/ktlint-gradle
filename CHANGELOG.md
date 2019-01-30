@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
   - Adding explicit meta check and format tasks to the root project
 ### Fixed
-  - ?
+  - Format task may produce up-to-date state if sources was restored to pre-format state (#194)
 
 ## [6.3.1] - 2018-11-27
 ### Fixed
