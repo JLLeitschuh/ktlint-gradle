@@ -6,7 +6,6 @@ import com.android.build.gradle.FeatureExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.TestExtension
 import com.android.build.gradle.api.BaseVariant
-import net.swiftzer.semver.SemVer
 import org.gradle.api.DomainObjectSet
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -88,12 +87,6 @@ private fun Path.isRootEditorConfig(): Boolean {
 
     return false
 }
-
-/**
- * Android option is available from ktlint 0.12.0.
- */
-internal fun Property<String>.isAndroidFlagAvailable() =
-    SemVer.parse(get()) >= SemVer(0, 12, 0)
 
 internal const val VERIFICATION_GROUP = LifecycleBasePlugin.VERIFICATION_GROUP
 internal const val FORMATTING_GROUP = "Formatting"
