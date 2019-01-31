@@ -16,6 +16,7 @@ import org.gradle.api.plugins.HelpTasksPlugin
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import java.nio.file.Path
 
@@ -31,8 +32,11 @@ internal fun createConfiguration(target: Project, extension: KtlintExtension) =
         )
     }
 
-internal inline fun <reified T : Task> Project.taskHelper(name: String, noinline configuration: T.() -> Unit): T {
-    return this.tasks.create(name, T::class.java, configuration)
+internal inline fun <reified T : Task> Project.registerTask(
+    name: String,
+    noinline configuration: T.() -> Unit
+): TaskProvider<T> {
+    return this.tasks.register(name, T::class.java, configuration)
 }
 
 internal const val EDITOR_CONFIG_FILE_NAME = ".editorconfig"
@@ -121,6 +125,20 @@ internal fun String.sourceSetCheckTaskName() = "ktlint${capitalize()}SourceSetCh
  * Create format task name from source set name.
  */
 internal fun String.sourceSetFormatTaskName() = "ktlint${capitalize()}SourceSetFormat"
+
+/**
+ * Create check task name for android variant name with optional android multiplatform target name addition.
+ */
+internal fun String.androidVariantMetaCheckTaskName(
+    multiplatformTargetName: String? = null
+) = "ktlint${capitalize()}${multiplatformTargetName?.capitalize() ?: ""}Check"
+
+/**
+ * Create format task name for android variant name with optional android multiplatform target name addition.
+ */
+internal fun String.androidVariantMetaFormatTaskName(
+    multiplatformTargetName: String? = null
+) = "ktlint${capitalize()}${multiplatformTargetName?.capitalize() ?: ""}Format"
 
 /**
  * Get specific android variants from [BaseExtension].
