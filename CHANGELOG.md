@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [7.0.0] - 2019-01-31
 ### Added
   - Meta tasks to run check or format on all sources in android variant. (#170)
   Example: In an Android project with `foo` flavor,
