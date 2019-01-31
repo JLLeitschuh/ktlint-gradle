@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Breaking: check/format tasks for specific source sets
   and according reports outputs now include `SourceSet` in their name(#170)
   - Breaking: minimal supported Gradle version is `4.10`
+  - Breaking: minimal supported ktlint version is `0.22.0`
 ### Removed
   - Adding explicit meta check and format tasks to the root project
 ### Fixed

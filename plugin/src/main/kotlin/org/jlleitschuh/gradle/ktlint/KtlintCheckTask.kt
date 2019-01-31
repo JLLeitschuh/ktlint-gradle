@@ -28,6 +28,7 @@ import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import java.io.File
 import javax.inject.Inject
 
+@Suppress("UnstableApiUsage")
 @CacheableTask
 open class KtlintCheckTask @Inject constructor(
     private val objectFactory: ObjectFactory
@@ -85,7 +86,6 @@ open class KtlintCheckTask @Inject constructor(
     @TaskAction
     fun lint() {
         checkMinimalSupportedKtlintVersion()
-        checkOutputPathsWithSpacesSupported()
 
         project.javaexec(generateJavaExecSpec(additionalConfig()))
     }
@@ -104,7 +104,7 @@ open class KtlintCheckTask @Inject constructor(
         if (debug.get()) {
             javaExecSpec.args("--debug")
         }
-        if (android.get() && ktlintVersion.isAndroidFlagAvailable()) {
+        if (android.get()) {
             javaExecSpec.args("--android")
         }
         if (outputToConsole.get()) {
@@ -120,21 +120,9 @@ open class KtlintCheckTask @Inject constructor(
     }
 
     private fun checkMinimalSupportedKtlintVersion() {
-        if (SemVer.parse(ktlintVersion.get()) < SemVer(0, 10, 0)) {
-            throw GradleException("Ktlint versions less than 0.10.0 are not supported. " +
+        if (SemVer.parse(ktlintVersion.get()) < SemVer(0, 22, 0)) {
+            throw GradleException("Ktlint versions less than 0.22.0 are not supported. " +
                 "Detected Ktlint version: ${ktlintVersion.get()}.")
-        }
-    }
-
-    private fun checkOutputPathsWithSpacesSupported() {
-        if (SemVer.parse(ktlintVersion.get()) < SemVer(0, 20, 0)) {
-            enabledReports.forEach {
-                val reportOutputPath = it.outputFile.get().asFile.absolutePath
-                if (reportOutputPath.contains(" ")) {
-                    throw GradleException(
-                        "The output path passed `$reportOutputPath` contains spaces. Ktlint versions less than 0.20.0 do not support this.")
-                }
-            }
         }
     }
 

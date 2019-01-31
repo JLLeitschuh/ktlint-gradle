@@ -49,17 +49,17 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
     }
 
     @Test
-    fun `fails on versions older than 0_10`() {
+    fun `fails on versions older than 0_22_0`() {
         projectRoot.buildFile().appendText("""
 
-            ktlint.version = "0.9.0"
+            ktlint.version = "0.21.0"
         """.trimIndent())
 
         projectRoot.withCleanSources()
 
         buildAndFail("ktlintCheck").apply {
             assertThat(task(":ktlintMainSourceSetCheck")?.outcome, equalTo(TaskOutcome.FAILED))
-            assertThat(output, containsString("Ktlint versions less than 0.10.0 are not supported. Detected Ktlint version: 0.9.0."))
+            assertThat(output, containsString("Ktlint versions less than 0.22.0 are not supported. Detected Ktlint version: 0.21.0."))
         }
     }
 
@@ -250,20 +250,6 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         build("ktlintApplyToIdea").apply {
             assertThat(task(":ktlintApplyToIdea")?.outcome, equalTo(TaskOutcome.SUCCESS))
             assertThat(ideaRootDir.listFiles().isNotEmpty(), equalTo(true))
-        }
-    }
-
-    @Test
-    fun `should fail ktlintApplyToIdea if ktlint version less then 0_22_0`() {
-        projectRoot.withCleanSources()
-        projectRoot.buildFile().appendText("""
-
-            ktlint.version = "0.10.0"
-        """.trimIndent())
-
-        buildAndFail(":ktlintApplyToIdea").apply {
-            assertThat(task(":ktlintApplyToIdea")?.outcome, equalTo(TaskOutcome.FAILED))
-            assertThat(output, containsString("Apply per project in only available from ktlint 0.22.0"))
         }
     }
 
