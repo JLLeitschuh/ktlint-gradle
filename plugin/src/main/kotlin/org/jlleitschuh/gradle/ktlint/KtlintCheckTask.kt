@@ -86,6 +86,7 @@ open class KtlintCheckTask @Inject constructor(
     @TaskAction
     fun lint() {
         checkMinimalSupportedKtlintVersion()
+        checkCWEKtlintVersion()
 
         project.javaexec(generateJavaExecSpec(additionalConfig()))
     }
@@ -123,6 +124,17 @@ open class KtlintCheckTask @Inject constructor(
         if (SemVer.parse(ktlintVersion.get()) < SemVer(0, 22, 0)) {
             throw GradleException("Ktlint versions less than 0.22.0 are not supported. " +
                 "Detected Ktlint version: ${ktlintVersion.get()}.")
+        }
+    }
+
+    private fun checkCWEKtlintVersion() {
+        if (!ruleSets.get().isNullOrEmpty() &&
+            SemVer.parse(ktlintVersion.get()) < SemVer(0, 30, 0)) {
+            logger.warn(
+                "You are using ktlint version ${ktlintVersion.get()} that has the security vulnerability " +
+                    "'CWE-494: Download of Code Without Integrity Check'.\n" +
+                    "Consider upgrading to versions consider upgrading to versions >= 0.30.0"
+            )
         }
     }
 
