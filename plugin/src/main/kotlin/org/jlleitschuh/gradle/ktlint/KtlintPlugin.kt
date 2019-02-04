@@ -197,27 +197,6 @@ open class KtlintPlugin : Plugin<Project> {
         }
     }
 
-    private fun BaseExtension.addVariantsMetaTasks(
-        target: Project,
-        multiplatformTargetName: String? = null
-    ) {
-        variants?.all { variant ->
-            val variantCheckTask = target.createAndroidVariantMetaKtlintCheckTask(
-                variant.name,
-                multiplatformTargetName
-            )
-            val variantFormatTask = target.createAndroidVariantMetaKtlintFormatTask(
-                variant.name,
-                multiplatformTargetName
-            )
-            variant.sourceSets.forEach { sourceSet ->
-                val sourceSetName = "${multiplatformTargetName?.capitalize() ?: ""}${sourceSet.name.capitalize()}"
-                variantCheckTask.configure { it.dependsOn(sourceSetName.sourceSetCheckTaskName()) }
-                variantFormatTask.configure { it.dependsOn(sourceSetName.sourceSetFormatTaskName()) }
-            }
-        }
-    }
-
     private fun PluginHolder.applyKtLintKonanNative(): (Plugin<in Any>) -> Unit {
         return {
             val ktLintConfig = createConfiguration(target, extension)
@@ -345,23 +324,6 @@ open class KtlintPlugin : Plugin<Project> {
         reporters.set(extension.reporters)
     }
 
-    private fun Project.createAndroidVariantMetaKtlintCheckTask(
-        variantName: String,
-        multiplatformTargetName: String? = null
-    ): TaskProvider<Task> = registerTask(variantName.androidVariantMetaCheckTaskName(multiplatformTargetName)) {
-        group = VERIFICATION_GROUP
-        description = "Runs ktlint on all kotlin sources for android $variantName variant in this project."
-    }
-
-    private fun Project.createAndroidVariantMetaKtlintFormatTask(
-        variantName: String,
-        multiplatformTargetName: String? = null
-    ): TaskProvider<Task> = registerTask(variantName.androidVariantMetaFormatTaskName(multiplatformTargetName)) {
-        group = FORMATTING_GROUP
-        description = "Runs ktlint formatter on all kotlin sources for android $variantName" +
-            " variant in this project."
-    }
-
     private fun setCheckTaskDependsOnKtlintCheckTask(
         project: Project,
         ktlintCheck: TaskProvider<KtlintCheckTask>
@@ -406,4 +368,47 @@ open class KtlintPlugin : Plugin<Project> {
             }
         }
     }
+}
+
+/**
+ * This is not scoped inside of [KtlintPlugin] because of these issues:
+ *  - https://github.com/JLLeitschuh/ktlint-gradle/issues/201
+ *  - https://github.com/gradle/gradle/issues/8411
+ */
+private fun BaseExtension.addVariantsMetaTasks(
+    target: Project,
+    multiplatformTargetName: String? = null
+) {
+    variants?.all { variant ->
+        val variantCheckTask = target.createAndroidVariantMetaKtlintCheckTask(
+            variant.name,
+            multiplatformTargetName
+        )
+        val variantFormatTask = target.createAndroidVariantMetaKtlintFormatTask(
+            variant.name,
+            multiplatformTargetName
+        )
+        variant.sourceSets.forEach { sourceSet ->
+            val sourceSetName = "${multiplatformTargetName?.capitalize() ?: ""}${sourceSet.name.capitalize()}"
+            variantCheckTask.configure { it.dependsOn(sourceSetName.sourceSetCheckTaskName()) }
+            variantFormatTask.configure { it.dependsOn(sourceSetName.sourceSetFormatTaskName()) }
+        }
+    }
+}
+
+private fun Project.createAndroidVariantMetaKtlintCheckTask(
+    variantName: String,
+    multiplatformTargetName: String? = null
+): TaskProvider<Task> = registerTask(variantName.androidVariantMetaCheckTaskName(multiplatformTargetName)) {
+    group = VERIFICATION_GROUP
+    description = "Runs ktlint on all kotlin sources for android $variantName variant in this project."
+}
+
+private fun Project.createAndroidVariantMetaKtlintFormatTask(
+    variantName: String,
+    multiplatformTargetName: String? = null
+): TaskProvider<Task> = registerTask(variantName.androidVariantMetaFormatTaskName(multiplatformTargetName)) {
+    group = FORMATTING_GROUP
+    description = "Runs ktlint formatter on all kotlin sources for android $variantName" +
+        " variant in this project."
 }
