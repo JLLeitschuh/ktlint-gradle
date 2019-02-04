@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unrelased]
+### Fixed
+  - Used ktlint version is always default one (#198)
+
 ## [7.0.0] - 2019-01-31
 ### Added
   - Meta tasks to run check or format on all sources in android variant. (#170)

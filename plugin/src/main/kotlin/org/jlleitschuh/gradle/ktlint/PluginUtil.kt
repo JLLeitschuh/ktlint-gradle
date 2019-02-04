@@ -21,14 +21,17 @@ import java.nio.file.Path
 
 internal fun createConfiguration(target: Project, extension: KtlintExtension) =
     target.configurations.maybeCreate("ktlint").apply {
-        target.dependencies.add(
-            this.name,
-            mapOf(
-                "group" to "com.github.shyiko",
-                "name" to "ktlint",
-                "version" to extension.version.get()
+        this.incoming.beforeResolve {
+            target.logger.info("Add dependency: ktlint version ${extension.version.get()}")
+            target.dependencies.add(
+                this.name,
+                mapOf(
+                    "group" to "com.github.shyiko",
+                    "name" to "ktlint",
+                    "version" to extension.version.get()
+                )
             )
-        )
+        }
     }
 
 internal inline fun <reified T : Task> Project.registerTask(
