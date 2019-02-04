@@ -363,4 +363,19 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             assertThat(task(":ktlintMainSourceSetFormat")!!.outcome, equalTo(TaskOutcome.UP_TO_DATE))
         }
     }
+
+    @Test
+    fun `Should apply ktlint version from extension`() {
+        projectRoot.withCleanSources()
+
+        projectRoot.buildFile().appendText("""
+
+            ktlint.version = "0.26.0"
+        """.trimIndent())
+
+        build(":dependencies").apply {
+            assertTrue(output.contains("ktlint\n" +
+                "\\--- com.github.shyiko:ktlint:0.26.0\n"))
+        }
+    }
 }
