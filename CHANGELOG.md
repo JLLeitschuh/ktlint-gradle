@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unrelased]
+### Added
+  - Warning about using vulnerable ktlint version
 ### Fixed
   - Used ktlint version is always default one (#198)
 
