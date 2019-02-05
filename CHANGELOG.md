@@ -5,11 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unrelased]
+## [7.1.0] - 2019-02-05
 ### Added
   - Warning about using vulnerable ktlint version
+### Changed
+  - Default ktlint version is set to `0.30.0`
 ### Fixed
   - Used ktlint version is always default one (#198)
+  - Gradle `5.2` fails the build in pure kotlin project (#201)
 
 ## [7.0.0] - 2019-01-31
 ### Added
