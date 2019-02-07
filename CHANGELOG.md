@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - ?
 ### Changed
   - Update Kotlin to `1.3.21` version
+  - Update Android gradle plugin to `3.3.0` version
 ### Removed
   - ?
 ### Fixed
