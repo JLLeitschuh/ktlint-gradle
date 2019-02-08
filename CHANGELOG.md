@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+### Added
+  - ?
+### Changed
+  - Update Kotlin to `1.3.21` version
+  - Update Android gradle plugin to `3.3.0` version
+### Removed
+  - ?
+### Fixed
+  - ?
+
 ## [7.1.0] - 2019-02-05
 ### Added
   - Warning about using vulnerable ktlint version

@@ -102,6 +102,11 @@ Optionally apply plugin to all project modules:
 ```groovy
 subprojects {
     apply plugin: "org.jlleitschuh.gradle.ktlint" // Version should be inherited from parent
+    
+    // Optionally configure plugin
+    ktlint {
+       debug = true
+    }
 }
 ```
 
