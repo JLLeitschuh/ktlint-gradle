@@ -32,8 +32,12 @@ dependencies {
      */
 
     testImplementation(gradleTestKit())
-    testImplementation("junit:junit:${PluginVersions.junit}")
+    testImplementation("org.junit.jupiter:junit-jupiter:${PluginVersions.junit5}")
     testImplementation(kotlin("reflect"))
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
 }
 
 publishing {
