@@ -1,10 +1,9 @@
 package org.jlleitschuh.gradle.ktlint
 
+import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testkit.runner.TaskOutcome
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.MatcherAssert.assertThat
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import java.io.File
 
 class KtlintPluginVersionTest : AbstractPluginTest() {
@@ -29,7 +28,7 @@ class KtlintPluginVersionTest : AbstractPluginTest() {
             """.trimIndent())
     }
 
-    @Before
+    @BeforeEach
     fun setup() {
         projectRoot.withCleanSources()
     }
@@ -38,7 +37,7 @@ class KtlintPluginVersionTest : AbstractPluginTest() {
     fun `with ktlint version equal to 0_22`() {
         projectRoot.buildScriptUsingKtlintVersion("0.22.0")
         build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome, equalTo(TaskOutcome.SUCCESS))
+            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -46,7 +45,7 @@ class KtlintPluginVersionTest : AbstractPluginTest() {
     fun `with ktlint version less than 0_22`() {
         projectRoot.buildScriptUsingKtlintVersion("0.21.0")
         buildAndFail("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome, equalTo(TaskOutcome.FAILED))
+            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.FAILED)
         }
     }
 }

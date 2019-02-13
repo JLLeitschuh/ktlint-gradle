@@ -1,12 +1,11 @@
 package org.jlleitschuh.gradle.ktlint
 
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.MatcherAssert.assertThat
-import org.junit.Before
-import org.junit.Test
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 class KtlintIdeaPluginTest : AbstractPluginTest() {
-    @Before
+    @BeforeEach
     fun setupBuild() {
         projectRoot.apply {
             buildFile().writeText(
@@ -28,9 +27,9 @@ class KtlintIdeaPluginTest : AbstractPluginTest() {
     @Test
     fun `applying helper plugin does not add the ktlint check task`() {
         build(":tasks").apply {
-            assertThat(output.contains("ktlintCheck"), equalTo(false))
+            assertThat(output).doesNotContain("ktlintCheck")
             // With space to not interfere with ktlintApplyToIdeaGlobally tasks
-            assertThat(output.contains("ktlintApplyToIdea ", ignoreCase = true), equalTo(true))
+            assertThat(output).containsIgnoringCase("ktlintApplyToIdea")
         }
     }
 }

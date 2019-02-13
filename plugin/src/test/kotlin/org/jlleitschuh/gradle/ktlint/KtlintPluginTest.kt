@@ -1,17 +1,11 @@
 package org.jlleitschuh.gradle.ktlint
 
+import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
-import org.hamcrest.CoreMatchers.containsString
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.CoreMatchers.hasItems
-import org.hamcrest.CoreMatchers.startsWith
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertThat
-import org.junit.Assert.assertTrue
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 /**
  * Runs the tests with the current version of Gradle.
@@ -27,7 +21,7 @@ class Gradle4_10KtlintPluginTest : BaseKtlintPluginTest() {
 
 abstract class BaseKtlintPluginTest : AbstractPluginTest() {
 
-    @Before
+    @BeforeEach
     fun setupBuild() {
         projectRoot.apply {
             buildFile().writeText("""
@@ -58,8 +52,9 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         projectRoot.withCleanSources()
 
         buildAndFail("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")?.outcome, equalTo(TaskOutcome.FAILED))
-            assertThat(output, containsString("Ktlint versions less than 0.22.0 are not supported. Detected Ktlint version: 0.21.0."))
+            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertThat(output)
+                .contains("Ktlint versions less than 0.22.0 are not supported. Detected Ktlint version: 0.21.0.")
         }
     }
 
@@ -68,8 +63,8 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         projectRoot.withFailingSources()
 
         buildAndFail("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome, equalTo(TaskOutcome.FAILED))
-            assertThat(output, containsString("Unnecessary space(s)"))
+            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertThat(output).contains("Unnecessary space(s)")
             assertReportCreated(ReporterType.PLAIN)
             assertReportCreated(ReporterType.CHECKSTYLE)
             assertReportNotCreated(ReporterType.JSON)
@@ -86,8 +81,8 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         """.trimIndent())
 
         buildAndFail("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome, equalTo(TaskOutcome.FAILED))
-            assertThat(output, containsString("Unnecessary space(s)"))
+            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertThat(output).contains("Unnecessary space(s)")
             assertReportCreated(ReporterType.PLAIN_GROUP_BY_FILE)
             assertReportCreated(ReporterType.CHECKSTYLE)
             assertReportCreated(ReporterType.JSON)
@@ -104,13 +99,13 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         """.trimIndent())
 
         build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome, equalTo(TaskOutcome.SUCCESS))
+            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertReportCreated(ReporterType.PLAIN)
             assertReportCreated(ReporterType.JSON)
         }
 
         build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome, equalTo(TaskOutcome.UP_TO_DATE))
+            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
             assertReportCreated(ReporterType.PLAIN)
             assertReportCreated(ReporterType.JSON)
             assertReportNotCreated(ReporterType.CHECKSTYLE)
@@ -122,7 +117,7 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         """.trimIndent())
 
         build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome, equalTo(TaskOutcome.SUCCESS))
+            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertReportCreated(ReporterType.PLAIN_GROUP_BY_FILE)
             assertReportCreated(ReporterType.JSON)
         }
@@ -133,7 +128,7 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         """.trimIndent())
 
         build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome, equalTo(TaskOutcome.SUCCESS))
+            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertReportCreated(ReporterType.JSON)
             assertReportCreated(ReporterType.CHECKSTYLE)
             // TODO: Stale reports are not cleaned up
@@ -147,10 +142,10 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         projectRoot.createEditorconfigFile()
 
         build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome, equalTo(TaskOutcome.SUCCESS))
+            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
         build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome, equalTo(TaskOutcome.UP_TO_DATE))
+            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
         }
     }
 
@@ -160,20 +155,20 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         projectRoot.createEditorconfigFile()
 
         build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome, equalTo(TaskOutcome.SUCCESS))
+            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
 
         projectRoot.modifyEditorconfigFile(100)
         build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome, equalTo(TaskOutcome.SUCCESS))
+            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
     @Test
     fun `check task is relocatable`() {
-        val originalLocation = temporaryFolder.root.resolve("original")
-        val relocatedLocation = temporaryFolder.root.resolve("relocated")
-        val localBuildCacheDirectory = temporaryFolder.root.resolve("build-cache")
+        val originalLocation = temporaryFolder.resolve("original")
+        val relocatedLocation = temporaryFolder.resolve("relocated")
+        val localBuildCacheDirectory = temporaryFolder.resolve("build-cache")
         listOf(originalLocation, relocatedLocation).forEach {
             it.apply {
                 withCleanSources()
@@ -207,7 +202,7 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
                 .withArguments("ktlintCheck", "--build-cache")
                 .forwardOutput()
                 .build().apply {
-                    assertThat(task(":ktlintMainSourceSetCheck")!!.outcome, equalTo(TaskOutcome.SUCCESS))
+                    assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
                 }
 
         GradleRunner.create()
@@ -215,18 +210,18 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
                 .withArguments("ktlintCheck", "--build-cache")
                 .forwardOutput()
                 .build().apply {
-                    assertThat(task(":ktlintMainSourceSetCheck")!!.outcome, equalTo(TaskOutcome.FROM_CACHE))
+                    assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.FROM_CACHE)
                 }
     }
 
     private
     fun assertReportCreated(reportType: ReporterType) {
-        assertTrue(reportLocation(reportType).isFile)
+        assertThat(reportLocation(reportType).isFile).isTrue()
     }
 
     private
     fun assertReportNotCreated(reportType: ReporterType) {
-        assertFalse(reportLocation(reportType).isFile)
+        assertThat(reportLocation(reportType).isFile).isFalse()
     }
 
     private fun reportLocation(reportType: ReporterType) =
@@ -238,7 +233,7 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         projectRoot.withCleanSources()
 
         build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome, equalTo(TaskOutcome.SUCCESS))
+            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -248,8 +243,8 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         val ideaRootDir = projectRoot.resolve(".idea").apply { mkdir() }
 
         build("ktlintApplyToIdea").apply {
-            assertThat(task(":ktlintApplyToIdea")?.outcome, equalTo(TaskOutcome.SUCCESS))
-            assertThat(ideaRootDir.listFiles().isNotEmpty(), equalTo(true))
+            assertThat(task(":ktlintApplyToIdea")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(ideaRootDir.listFiles().isNotEmpty()).isTrue()
         }
     }
 
@@ -258,8 +253,8 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         val ideaRootDir = projectRoot.resolve(".idea").apply { mkdir() }
 
         build(":ktlintApplyToIdeaGlobally").apply {
-            assertThat(task(":ktlintApplyToIdeaGlobally")?.outcome, equalTo(TaskOutcome.SUCCESS))
-            assertThat(ideaRootDir.listFiles().isNotEmpty(), equalTo(true))
+            assertThat(task(":ktlintApplyToIdeaGlobally")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(ideaRootDir.listFiles().isNotEmpty()).isTrue()
         }
     }
 
@@ -273,13 +268,11 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
                     .filter { it.startsWith("ktlint") }
                     .toList()
 
-            assertThat(ktlintTasks.size, equalTo(4))
-            assertThat(ktlintTasks, hasItems(
-                    startsWith(CHECK_PARENT_TASK_NAME),
-                    startsWith(FORMAT_PARENT_TASK_NAME),
-                    startsWith(APPLY_TO_IDEA_TASK_NAME),
-                    startsWith(APPLY_TO_IDEA_GLOBALLY_TASK_NAME)
-            ))
+            assertThat(ktlintTasks).hasSize(4)
+            assertThat(ktlintTasks).anyMatch { it.startsWith(CHECK_PARENT_TASK_NAME) }
+            assertThat(ktlintTasks).anyMatch { it.startsWith(FORMAT_PARENT_TASK_NAME) }
+            assertThat(ktlintTasks).anyMatch { it.startsWith(APPLY_TO_IDEA_TASK_NAME) }
+            assertThat(ktlintTasks).anyMatch { it.startsWith(APPLY_TO_IDEA_GLOBALLY_TASK_NAME) }
         }
     }
 
@@ -292,13 +285,11 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
                     .toList()
 
             // Plus for main and test sources format and check tasks
-            assertThat(ktlintTasks.size, equalTo(8))
-            assertThat(ktlintTasks, hasItems(
-                    startsWith(CHECK_PARENT_TASK_NAME),
-                    startsWith(FORMAT_PARENT_TASK_NAME),
-                    startsWith(APPLY_TO_IDEA_TASK_NAME),
-                    startsWith(APPLY_TO_IDEA_GLOBALLY_TASK_NAME)
-            ))
+            assertThat(ktlintTasks).hasSize(8)
+            assertThat(ktlintTasks).anyMatch { it.startsWith(CHECK_PARENT_TASK_NAME) }
+            assertThat(ktlintTasks).anyMatch { it.startsWith(FORMAT_PARENT_TASK_NAME) }
+            assertThat(ktlintTasks).anyMatch { it.startsWith(APPLY_TO_IDEA_TASK_NAME) }
+            assertThat(ktlintTasks).anyMatch { it.startsWith(APPLY_TO_IDEA_GLOBALLY_TASK_NAME) }
         }
     }
 
@@ -313,7 +304,7 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         """.trimIndent())
 
         build(":ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome, equalTo(TaskOutcome.SUCCESS))
+            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -331,7 +322,7 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         """.trimIndent())
 
         buildAndFail(":ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome, equalTo(TaskOutcome.FAILED))
+            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.FAILED)
         }
     }
 
@@ -339,13 +330,13 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
     fun `Should always format again restored to pre-format state sources`() {
         projectRoot.withFailingSources()
         build(":ktlintFormat").apply {
-            assertThat(task(":ktlintMainSourceSetFormat")!!.outcome, equalTo(TaskOutcome.SUCCESS))
+            assertThat(task(":ktlintMainSourceSetFormat")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
 
         projectRoot.restoreFailingSources()
 
         build(":ktlintFormat").apply {
-            assertThat(task(":ktlintMainSourceSetFormat")!!.outcome, equalTo(TaskOutcome.SUCCESS))
+            assertThat(task(":ktlintMainSourceSetFormat")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -354,13 +345,13 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         projectRoot.withFailingSources()
 
         build(":ktlintFormat").apply {
-            assertThat(task(":ktlintMainSourceSetFormat")!!.outcome, equalTo(TaskOutcome.SUCCESS))
+            assertThat(task(":ktlintMainSourceSetFormat")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
         build(":ktlintFormat").apply {
-            assertThat(task(":ktlintMainSourceSetFormat")!!.outcome, equalTo(TaskOutcome.SUCCESS))
+            assertThat(task(":ktlintMainSourceSetFormat")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
         build(":ktlintFormat").apply {
-            assertThat(task(":ktlintMainSourceSetFormat")!!.outcome, equalTo(TaskOutcome.UP_TO_DATE))
+            assertThat(task(":ktlintMainSourceSetFormat")!!.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
         }
     }
 
@@ -374,8 +365,8 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         """.trimIndent())
 
         build(":dependencies").apply {
-            assertTrue(output.contains("ktlint\n" +
-                "\\--- com.github.shyiko:ktlint:0.26.0\n"))
+            assertThat(output).contains("ktlint\n" +
+                "\\--- com.github.shyiko:ktlint:0.26.0\n")
         }
     }
 }

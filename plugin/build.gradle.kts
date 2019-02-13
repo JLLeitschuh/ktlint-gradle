@@ -33,6 +33,7 @@ dependencies {
 
     testImplementation(gradleTestKit())
     testImplementation("org.junit.jupiter:junit-jupiter:${PluginVersions.junit5}")
+    testImplementation("org.assertj:assertj-core:${PluginVersions.assertJ}")
     testImplementation(kotlin("reflect"))
 }
 

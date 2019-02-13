@@ -3,18 +3,17 @@ package org.jlleitschuh.gradle.ktlint
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.util.TextUtil.normaliseFileSeparators
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
+import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import java.util.Properties
 
 abstract class AbstractPluginTest {
 
-    @get:Rule
-    val temporaryFolder = TemporaryFolder()
+    @TempDir
+    lateinit var temporaryFolder: File
 
     val projectRoot: File
-        get() = temporaryFolder.root.resolve("plugin-test").apply { mkdirs() }
+        get() = temporaryFolder.resolve("plugin-test").apply { mkdirs() }
 
     protected
     fun buildscriptBlockWithUnderTestPlugin() =
