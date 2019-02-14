@@ -1,6 +1,3 @@
-import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.api.tasks.wrapper.Wrapper
-
 plugins {
     kotlin("jvm") version PluginVersions.kotlin
     id("com.gradle.plugin-publish") version PluginVersions.gradlePublishPlugin
@@ -37,7 +34,7 @@ dependencies {
     testImplementation(kotlin("reflect"))
 }
 
-tasks.withType<Test> {
+tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
 
