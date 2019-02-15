@@ -1,6 +1,3 @@
-import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.api.tasks.wrapper.Wrapper
-
 plugins {
     kotlin("jvm") version PluginVersions.kotlin
     id("com.gradle.plugin-publish") version PluginVersions.gradlePublishPlugin
@@ -32,8 +29,13 @@ dependencies {
      */
 
     testImplementation(gradleTestKit())
-    testImplementation("junit:junit:${PluginVersions.junit}")
+    testImplementation("org.junit.jupiter:junit-jupiter:${PluginVersions.junit5}")
+    testImplementation("org.assertj:assertj-core:${PluginVersions.assertJ}")
     testImplementation(kotlin("reflect"))
+}
+
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
 }
 
 publishing {

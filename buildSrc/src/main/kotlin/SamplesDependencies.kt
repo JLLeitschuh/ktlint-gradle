@@ -3,7 +3,7 @@ object SamplesVersions {
     val androidPlugin = PluginVersions.androidPlugin
     val gradleWrapper = PluginVersions.gradleWrapper
     val ktlintCore = "0.29.0"
-    val junit = PluginVersions.junit
+    val junit = "4.12"
 
     // Android sample dependencies
     val androidSupport = "27.0.2"
