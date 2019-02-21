@@ -10,11 +10,7 @@ class KtlintIdeaPluginTest : AbstractPluginTest() {
         projectRoot.apply {
             buildFile().writeText(
                 """
-                ${buildscriptBlockWithUnderTestPlugin()}
-
-                ${pluginsBlockWithKotlinJvmPlugin()}
-
-                apply plugin: "org.jlleitschuh.gradle.ktlint-idea"
+                ${pluginsBlockWithIdeaPlugin()}
 
                 repositories {
                     gradlePluginPortal()

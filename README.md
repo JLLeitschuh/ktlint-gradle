@@ -276,6 +276,17 @@ Building the plugin: `./plugin/gradlew build`
 
 On how to run the current plugin snapshot check on sample projects: `./gradlew ktlintCheck`
 
+### Running tests from [IDEA IDE](https://www.jetbrains.com/idea/)
+
+To run tests in [IDEA IDE](https://www.jetbrains.com/idea/), 
+firstly you need to run following gradle task (or after any dependency change):
+
+```bash
+$ ./plugin/gradlew pluginUnderTestMetadata
+```
+
+Optionally you can add this step test run configuration.
+
 ## Links
 
 [Ktlint Gradle Plugin on the Gradle Plugin Registry](https://plugins.gradle.org/plugin/org.jlleitschuh.gradle.ktlint)

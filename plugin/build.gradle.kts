@@ -15,6 +15,10 @@ repositories {
     maven("https://dl.bintray.com/jetbrains/kotlin-native-dependencies")
 }
 
+tasks.withType<PluginUnderTestMetadata>().configureEach {
+    pluginClasspath.from(configurations.compileOnly)
+}
+
 dependencies {
     compileOnly(gradleApi())
     compileOnly(kotlin("gradle-plugin", PluginVersions.kotlin))
@@ -116,20 +120,4 @@ pluginBundle {
 
 tasks.withType(Wrapper::class.java).configureEach {
     gradleVersion = PluginVersions.gradleWrapper
-}
-
-tasks {
-    val publishPluginsToTestRepository by creating {
-        dependsOn("publishPluginMavenPublicationToTestRepository")
-    }
-    val processTestResources: ProcessResources by getting
-    val writeTestProperties by creating(WriteProperties::class) {
-        outputFile = processTestResources.destinationDir.resolve("test.properties")
-        property("version", version)
-        property("kotlinVersion", PluginVersions.kotlin)
-    }
-    processTestResources.dependsOn(writeTestProperties)
-    "test" {
-        dependsOn(publishPluginsToTestRepository)
-    }
 }
