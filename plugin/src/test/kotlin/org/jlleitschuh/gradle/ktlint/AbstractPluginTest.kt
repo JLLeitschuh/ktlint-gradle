@@ -2,10 +2,8 @@ package org.jlleitschuh.gradle.ktlint
 
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
-import org.gradle.util.TextUtil.normaliseFileSeparators
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
-import java.util.Properties
 
 abstract class AbstractPluginTest {
 
@@ -15,22 +13,18 @@ abstract class AbstractPluginTest {
     val projectRoot: File
         get() = temporaryFolder.resolve("plugin-test").apply { mkdirs() }
 
-    protected
-    fun buildscriptBlockWithUnderTestPlugin() =
+    protected fun pluginsBlockWithIdeaPlugin() =
         """
-            buildscript {
-                repositories { maven { url = "$testRepositoryPath" } }
-                dependencies {
-                    classpath("org.jlleitschuh.gradle:ktlint-gradle:${testProperties["version"]}")
-                }
+            plugins {
+                id("org.jlleitschuh.gradle.ktlint-idea")
             }
         """.trimIndent()
 
-    protected
-    fun pluginsBlockWithKotlinJvmPlugin() =
+    protected fun pluginsBlockWithMainPluginAndKotlinJvm() =
         """
             plugins {
-                id("org.jetbrains.kotlin.jvm") version "${testProperties["kotlinVersion"]}"
+                id 'org.jetbrains.kotlin.jvm'
+                id 'org.jlleitschuh.gradle.ktlint'
             }
         """.trimIndent()
 
@@ -46,18 +40,8 @@ abstract class AbstractPluginTest {
     fun gradleRunnerFor(vararg arguments: String): GradleRunner =
         GradleRunner.create()
             .withProjectDir(projectRoot)
+            .withPluginClasspath()
             .withArguments(arguments.toList() + "--stacktrace")
-
-    private
-    val testRepositoryPath
-        get() = normaliseFileSeparators(File("build/plugin-test-repository").absolutePath)
-
-    protected
-    val testProperties: Properties by lazy {
-        javaClass.getResourceAsStream("/test.properties").use {
-            Properties().apply { load(it) }
-        }
-    }
 
     protected
     fun File.withCleanSources() = createSourceFile("src/main/kotlin/clean-source.kt", """val foo = "bar"""")

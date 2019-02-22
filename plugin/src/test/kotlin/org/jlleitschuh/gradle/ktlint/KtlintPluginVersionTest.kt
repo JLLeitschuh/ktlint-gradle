@@ -10,11 +10,7 @@ class KtlintPluginVersionTest : AbstractPluginTest() {
 
     private fun File.buildScriptUsingKtlintVersion(version: String) {
         buildFile().writeText("""
-                ${buildscriptBlockWithUnderTestPlugin()}
-
-                ${pluginsBlockWithKotlinJvmPlugin()}
-
-                apply plugin: "org.jlleitschuh.gradle.ktlint"
+                ${pluginsBlockWithMainPluginAndKotlinJvm()}
 
                 repositories {
                     gradlePluginPortal()

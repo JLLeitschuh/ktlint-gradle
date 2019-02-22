@@ -25,11 +25,7 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
     fun setupBuild() {
         projectRoot.apply {
             buildFile().writeText("""
-                ${buildscriptBlockWithUnderTestPlugin()}
-
-                ${pluginsBlockWithKotlinJvmPlugin()}
-
-                apply plugin: "org.jlleitschuh.gradle.ktlint"
+                ${pluginsBlockWithMainPluginAndKotlinJvm()}
 
                 repositories {
                     gradlePluginPortal()
@@ -173,11 +169,7 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             it.apply {
                 withCleanSources()
                 buildFile().writeText("""
-                    ${buildscriptBlockWithUnderTestPlugin()}
-
-                    ${pluginsBlockWithKotlinJvmPlugin()}
-
-                    apply plugin: "org.jlleitschuh.gradle.ktlint"
+                    ${pluginsBlockWithMainPluginAndKotlinJvm()}
 
                     repositories {
                         gradlePluginPortal()
@@ -198,20 +190,22 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         }
 
         GradleRunner.create()
-                .withProjectDir(originalLocation)
-                .withArguments("ktlintCheck", "--build-cache")
-                .forwardOutput()
-                .build().apply {
-                    assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
-                }
+            .withProjectDir(originalLocation)
+            .withPluginClasspath()
+            .withArguments("ktlintCheck", "--build-cache")
+            .forwardOutput()
+            .build().apply {
+                assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
 
         GradleRunner.create()
-                .withProjectDir(relocatedLocation)
-                .withArguments("ktlintCheck", "--build-cache")
-                .forwardOutput()
-                .build().apply {
-                    assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.FROM_CACHE)
-                }
+            .withProjectDir(relocatedLocation)
+            .withPluginClasspath()
+            .withArguments("ktlintCheck", "--build-cache")
+            .forwardOutput()
+            .build().apply {
+                assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.FROM_CACHE)
+            }
     }
 
     private
