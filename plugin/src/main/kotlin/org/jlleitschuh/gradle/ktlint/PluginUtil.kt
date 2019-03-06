@@ -98,6 +98,8 @@ internal const val CHECK_PARENT_TASK_NAME = "ktlintCheck"
 internal const val FORMAT_PARENT_TASK_NAME = "ktlintFormat"
 internal const val APPLY_TO_IDEA_TASK_NAME = "ktlintApplyToIdea"
 internal const val APPLY_TO_IDEA_GLOBALLY_TASK_NAME = "ktlintApplyToIdeaGlobally"
+internal const val KOTLIN_SCRIPT_CHECK_TASK = "ktlintKotlinScriptCheck"
+internal const val KOTLIN_SCRIPT_FORMAT_TASK = "ktlintKotlinScriptFormat"
 internal val KOTLIN_EXTENSIONS = listOf("kt", "kts")
 
 internal inline fun <reified T> ObjectFactory.property(
