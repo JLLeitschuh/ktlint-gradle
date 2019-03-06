@@ -161,6 +161,57 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
     }
 
     @Test
+    internal fun `Check task should rerun if root editorconfig content changed`() {
+        val projectWithModulesLocation = temporaryFolder.resolve("modularized")
+        projectWithModulesLocation.mkdirs()
+        val moduleLocation = projectWithModulesLocation.resolve("test/module1")
+        moduleLocation.mkdirs()
+
+        projectWithModulesLocation.settingsFile().writeText("""
+            include ":test:module1"
+        """.trimIndent())
+        projectWithModulesLocation.buildFile().writeText("""
+            ${pluginsBlockWithMainPluginAndKotlinJvm()}
+
+            repositories {
+                gradlePluginPortal()
+            }
+
+            allprojects {
+                repositories {
+                    jcenter()
+                }
+            }
+        """.trimIndent())
+        projectWithModulesLocation.createEditorconfigFile()
+        moduleLocation.buildFile().writeText("""
+            apply plugin: "kotlin"
+            apply plugin: "org.jlleitschuh.gradle.ktlint"
+        """.trimIndent())
+        moduleLocation.withCleanSources()
+
+        val gradleRunner = GradleRunner.create()
+            .withProjectDir(projectWithModulesLocation)
+            .withPluginClasspath()
+
+        gradleRunner
+            .withArguments(":test:module1:ktlintCheck")
+            .forwardOutput()
+            .build().apply {
+                assertThat(task(":test:module1:ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+
+        projectWithModulesLocation.modifyEditorconfigFile(100)
+
+        gradleRunner
+            .withArguments(":test:module1:ktlintCheck")
+            .forwardOutput()
+            .build().apply {
+                assertThat(task(":test:module1:ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+    }
+
+    @Test
     fun `check task is relocatable`() {
         val originalLocation = temporaryFolder.resolve("original")
         val relocatedLocation = temporaryFolder.resolve("relocated")

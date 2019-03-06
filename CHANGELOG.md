@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
   - ?
 ### Fixed
-  - ?
+  - `.editorconfig` file in project root dir is not considered as tasks input (#209)
 
 ## [7.1.0] - 2019-02-05
 ### Added

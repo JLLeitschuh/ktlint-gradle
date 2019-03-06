@@ -39,7 +39,10 @@ open class KtlintCheckTask @Inject constructor(
 
     @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:InputFiles
-    internal val editorConfigFiles: FileCollection = getEditorConfigFiles(project)
+    internal val editorConfigFiles: FileCollection by lazy(LazyThreadSafetyMode.NONE) {
+        // Gradle will lazy evaluate this task input only on task execution
+        getEditorConfigFiles(project)
+    }
 
     @get:Input
     internal val ktlintVersion: Property<String> = objectFactory.property()

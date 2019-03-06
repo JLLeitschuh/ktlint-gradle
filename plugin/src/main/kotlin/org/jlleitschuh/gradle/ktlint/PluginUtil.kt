@@ -57,7 +57,7 @@ private tailrec fun searchEditorConfigFiles(
     fileCollection: FileCollection
 ): FileCollection {
     val editorConfigFC = projectPath.resolve(EDITOR_CONFIG_FILE_NAME)
-    val outputCollection = if (editorConfigFC != null) {
+    val outputCollection = if (editorConfigFC.toFile().exists()) {
         fileCollection.plus(project.files(editorConfigFC))
     } else {
         fileCollection
@@ -65,7 +65,7 @@ private tailrec fun searchEditorConfigFiles(
 
     val parentDir = projectPath.parent
     return if (parentDir != null &&
-        parentDir != project.rootDir.toPath() &&
+        projectPath != project.rootDir.toPath() &&
         !editorConfigFC.isRootEditorConfig()) {
         searchEditorConfigFiles(project, parentDir, outputCollection)
     } else {
