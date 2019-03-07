@@ -1,6 +1,7 @@
 package org.jlleitschuh.gradle.ktlint
 
 import org.gradle.api.Action
+import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
@@ -15,7 +16,8 @@ import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 open class KtlintExtension
 internal constructor(
     objectFactory: ObjectFactory,
-    private val filterTargetApplier: FilterApplier
+    private val filterTargetApplier: FilterApplier,
+    private val kotlinScriptAdditionalPathApplier: KotlinScriptAdditionalPathApplier
 ) {
     /**
      * The version of ktlint to use.
@@ -67,6 +69,15 @@ internal constructor(
         set(setOf(ReporterType.PLAIN))
     }
 
+    private val kscriptExtension = KScriptExtension(kotlinScriptAdditionalPathApplier)
+
+    /**
+     * Provide additional, relative to the project base dir, paths that contains kotlin script files.
+     */
+    fun kotlinScriptAdditionalPaths(action: Action<KScriptExtension>) {
+        action.execute(kscriptExtension)
+    }
+
     /**
      * Filter sources by applying exclude or include specs/patterns.
      *
@@ -75,5 +86,16 @@ internal constructor(
      */
     fun filter(filterAction: Action<PatternFilterable>) {
         filterTargetApplier(filterAction)
+    }
+
+    class KScriptExtension(
+        private val ksApplier: KotlinScriptAdditionalPathApplier
+    ) {
+        /**
+         * Adds given [fileTree] to [KOTLIN_SCRIPT_CHECK_TASK]/[KOTLIN_SCRIPT_FORMAT_TASK] tasks search.
+         */
+        fun include(fileTree: ConfigurableFileTree) {
+            ksApplier(fileTree)
+        }
     }
 }

@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
-  - ?
+  - Tasks to check and format kotlin script files (#98)
 ### Changed
   - Update Kotlin to `1.3.21` version
   - Update Android gradle plugin to `3.3.0` version

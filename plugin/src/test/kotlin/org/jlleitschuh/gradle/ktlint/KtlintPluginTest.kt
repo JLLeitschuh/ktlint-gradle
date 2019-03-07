@@ -448,4 +448,19 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             assertThat(task(":$KOTLIN_SCRIPT_CHECK_TASK")?.outcome).isEqualTo(TaskOutcome.NO_SOURCE)
         }
     }
+
+    @Test
+    internal fun `Should check kts file in configured child project folder`() {
+        projectRoot.withCleanSources()
+        val additionalFolder = projectRoot.resolve("scripts/")
+        additionalFolder.withCleanKotlinScript()
+        projectRoot.buildFile().appendText("""
+
+            ktlint.kotlinScriptAdditionalPaths { include fileTree("scripts/") }
+        """.trimIndent())
+
+        build(":$KOTLIN_SCRIPT_CHECK_TASK").apply {
+            assertThat(task(":$KOTLIN_SCRIPT_CHECK_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        }
+    }
 }

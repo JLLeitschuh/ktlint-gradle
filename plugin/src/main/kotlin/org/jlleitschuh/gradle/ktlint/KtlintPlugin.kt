@@ -346,9 +346,8 @@ open class KtlintPlugin : Plugin<Project> {
     private fun PluginHolder.addKotlinScriptTasks() {
         val ktLintConfig = createConfiguration(target, extension)
 
-        val projectDirectoryScriptFiles = target.fileTree(target.projectDir) {
-            it.include("*.kts")
-        }
+        val projectDirectoryScriptFiles = target.fileTree(target.projectDir)
+        projectDirectoryScriptFiles.include("*.kts")
 
         val checkTask = createKotlinScriptCheckTask(target, extension, ktLintConfig, projectDirectoryScriptFiles)
         addKtlintCheckTaskToProjectMetaCheckTask(checkTask)
