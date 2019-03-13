@@ -5,14 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [7.2.0] - 2019-03-13
 ### Added
   - Tasks to check and format kotlin script files (#98)
 ### Changed
   - Update Kotlin to `1.3.21` version
   - Update Android gradle plugin to `3.3.0` version
-### Removed
-  - ?
 ### Fixed
   - `.editorconfig` file in project root dir is not considered as tasks input (#209)
 
