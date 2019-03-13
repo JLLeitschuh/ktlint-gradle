@@ -27,3 +27,4 @@ configure<KtlintExtension> {
 
 tasks.findByName("ktlintMainSourceSetCheck")?.dependsOn(":samples:kotlin-rulesets-creating:build")
 tasks.findByName("ktlintTestSourceSetCheck")?.dependsOn(":samples:kotlin-rulesets-creating:build")
+tasks.findByName("ktlintKotlinScriptCheck")?.dependsOn(":samples:kotlin-rulesets-creating:build")

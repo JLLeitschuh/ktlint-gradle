@@ -330,11 +330,14 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
                     .toList()
 
             // Plus for main and test sources format and check tasks
-            assertThat(ktlintTasks).hasSize(8)
+            // Plus two kotlin script tasks
+            assertThat(ktlintTasks).hasSize(10)
             assertThat(ktlintTasks).anyMatch { it.startsWith(CHECK_PARENT_TASK_NAME) }
             assertThat(ktlintTasks).anyMatch { it.startsWith(FORMAT_PARENT_TASK_NAME) }
             assertThat(ktlintTasks).anyMatch { it.startsWith(APPLY_TO_IDEA_TASK_NAME) }
             assertThat(ktlintTasks).anyMatch { it.startsWith(APPLY_TO_IDEA_GLOBALLY_TASK_NAME) }
+            assertThat(ktlintTasks).anyMatch { it.startsWith(KOTLIN_SCRIPT_CHECK_TASK) }
+            assertThat(ktlintTasks).anyMatch { it.startsWith(KOTLIN_SCRIPT_FORMAT_TASK) }
         }
     }
 
@@ -412,6 +415,52 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         build(":dependencies").apply {
             assertThat(output).contains("ktlint\n" +
                 "\\--- com.github.shyiko:ktlint:0.26.0\n")
+        }
+    }
+
+    @Test
+    internal fun `Should check kotlin script file in project folder`() {
+        projectRoot.withCleanSources()
+        projectRoot.withCleanKotlinScript()
+
+        build(":$KOTLIN_SCRIPT_CHECK_TASK").apply {
+            assertThat(task(":$KOTLIN_SCRIPT_CHECK_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        }
+    }
+
+    @Test
+    internal fun `Should fail check of kotlin script file in project folder`() {
+        projectRoot.withCleanSources()
+        projectRoot.withFailingKotlinScript()
+
+        buildAndFail(":$KOTLIN_SCRIPT_CHECK_TASK").apply {
+            assertThat(task(":$KOTLIN_SCRIPT_CHECK_TASK")?.outcome).isEqualTo(TaskOutcome.FAILED)
+        }
+    }
+
+    @Test
+    internal fun `Should not check kotlin script file in child project folder`() {
+        projectRoot.withCleanSources()
+        val additionalFolder = projectRoot.resolve("scripts/")
+        additionalFolder.withFailingKotlinScript()
+
+        build(":$KOTLIN_SCRIPT_CHECK_TASK").apply {
+            assertThat(task(":$KOTLIN_SCRIPT_CHECK_TASK")?.outcome).isEqualTo(TaskOutcome.NO_SOURCE)
+        }
+    }
+
+    @Test
+    internal fun `Should check kts file in configured child project folder`() {
+        projectRoot.withCleanSources()
+        val additionalFolder = projectRoot.resolve("scripts/")
+        additionalFolder.withCleanKotlinScript()
+        projectRoot.buildFile().appendText("""
+
+            ktlint.kotlinScriptAdditionalPaths { include fileTree("scripts/") }
+        """.trimIndent())
+
+        build(":$KOTLIN_SCRIPT_CHECK_TASK").apply {
+            assertThat(task(":$KOTLIN_SCRIPT_CHECK_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 }

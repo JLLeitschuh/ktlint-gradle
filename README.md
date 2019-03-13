@@ -50,6 +50,7 @@ This plugin supports following kotlin plugins:
 - "konan"
 - "org.jetbrains.kotlin.native"
 - "kotlin-multiplatform"
+- project kotlin script files
 
 If you know any new Kotlin plugin that are not in this list - please,
 open a [new issue](https://github.com/JLLeitschuh/ktlint-gradle/issues/new).
@@ -161,6 +162,9 @@ ktlint {
         "/path/to/custom/rulseset.jar",
         "com.github.username:rulseset:master-SNAPSHOT"
     ]
+    kotlinScriptAdditionalPaths {
+        include fileTree("scripts/")
+    }
     filter {
         exclude("**/generated/**")
         include("**/kotlin/**")
@@ -184,6 +188,9 @@ ktlint {
         "/path/to/custom/rulseset.jar",
         "com.github.username:rulseset:master-SNAPSHOT"
     ))
+    kotlinScriptAdditionalPaths {
+        include(fileTree("scripts/"))
+    }
     filter {
         exclude("**/generated/**")
         include("**/kotlin/**")
@@ -208,16 +215,15 @@ This repository provides following examples how to setup this plugin:
 
 ### Main tasks
 
-This plugin adds two tasks to every source set: `ktlint[source set name]SourceSetCheck` and `ktlint[source set name]SourceSetFormat`.
+This plugin adds two maintasks to every source set: `ktlint[source set name]SourceSetCheck` and `ktlint[source set name]SourceSetFormat`.
 Additionally, a simple `ktlintCheck` task has also been added that checks all of the source sets for that project.
 Similarly, a `ktlintFormat` task has been added that formats all of the source sets.
-
-If the project has subprojects then the plugin also adds two meta tasks `ktlintCheck` and `ktlintFormat` to the root project that
-triggers the related tasks in the subprojects.
 
 Android projects, additionally, will have meta tasks for Android variants, that will process all source sets in variant.
 For example, if app has `foo` flavor, following meta tasks will be added:
 `ktlintFooDebugCheck`, `ktlintFooReleaseCheck`, `ktlintFooDebugFormat`, `ktlintFooReleaseFormat`.
+
+Additionally plugin adds two task for project kotlin script files: `ktlintKotlinScriptCheck` and `ktlintKotlinScriptFormat`.
 
 ### Additional helper tasks
 
