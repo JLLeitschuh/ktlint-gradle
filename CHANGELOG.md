@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased - 7.3.0-SNAPSHOT]
+### Added
+  - ?
+### Changed
+  - ?
+### Removed
+  - ?
+### Fixed
+  - ?
+
 ## [7.2.0] - 2019-03-13
 ### Added
   - Tasks to check and format kotlin script files (#98)
