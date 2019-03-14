@@ -51,7 +51,9 @@ dependencies {
     "implementation"("com.android.support:design:${SamplesVersions.androidSupport}")
     "testImplementation"("junit:junit:${SamplesVersions.junit}")
     "androidTestImplementation"("com.android.support.test:runner:${SamplesVersions.espressoRunner}")
-    "androidTestImplementation"("com.android.support.test.espresso:espresso-core:${SamplesVersions.espresso}")
+    "androidTestImplementation"(
+        "com.android.support.test.espresso:espresso-core:${SamplesVersions.espresso}"
+    )
 }
 
 configure<KtlintExtension> {

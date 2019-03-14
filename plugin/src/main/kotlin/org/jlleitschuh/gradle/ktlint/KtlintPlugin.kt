@@ -285,7 +285,6 @@ open class KtlintPlugin : Plugin<Project> {
             description = "Runs a check against all .kt files to ensure that they are formatted according to ktlint."
             configurePluginTask(target, extension, ktLintConfig) {
                 setSource(kotlinSourceDirectories)
-                android.set(extension.android)
             }
         }
     }
@@ -301,7 +300,6 @@ open class KtlintPlugin : Plugin<Project> {
             description = "Runs a check against all .kt files to ensure that they are formatted according to ktlint."
             configurePluginTask(target, extension, ktLintConfig) {
                 setSource(kotlinSourceDirectories)
-                android.set(extension.android)
             }
         }
     }
@@ -328,6 +326,7 @@ open class KtlintPlugin : Plugin<Project> {
         })
         ruleSets.set(extension.ruleSets)
         reporters.set(extension.reporters)
+        android.set(extension.android)
 
         additionalConfig()
     }
