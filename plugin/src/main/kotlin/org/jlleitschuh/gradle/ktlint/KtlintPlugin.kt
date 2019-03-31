@@ -37,6 +37,7 @@ open class KtlintPlugin : Plugin<Project> {
 
         holder.addKtLintTasksToKotlinPlugin()
         holder.addKotlinScriptTasks()
+        holder.addGitHookTasks()
     }
 
     private fun PluginHolder.addKtLintTasksToKotlinPlugin() {
@@ -400,7 +401,7 @@ open class KtlintPlugin : Plugin<Project> {
 
     private fun Project.isConsolePlain() = gradle.startParameter.consoleOutput == ConsoleOutput.Plain
 
-    private class PluginHolder(
+    internal class PluginHolder(
         val target: Project
     ) {
         val extension = target.plugins.apply(KtlintBasePlugin::class.java).extension
