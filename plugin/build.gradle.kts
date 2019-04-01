@@ -1,13 +1,13 @@
 plugins {
     kotlin("jvm") version PluginVersions.kotlin
     id("com.gradle.plugin-publish") version PluginVersions.gradlePublishPlugin
-    id("java-gradle-plugin")
-    id("maven-publish")
+    `java-gradle-plugin`
+    `maven-publish`
     id("org.jlleitschuh.gradle.ktlint") version PluginVersions.ktlintPlugin
 }
 
 group = "org.jlleitschuh.gradle"
-version = "7.2.1"
+version = "7.3.0-SNAPSHOT"
 
 repositories {
     google()
@@ -40,22 +40,6 @@ dependencies {
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
-}
-
-publishing {
-    repositories {
-        // Work around Gradle TestKit limitations in order to allow for compileOnly dependencies
-        maven {
-            name = "test"
-            url = uri("$buildDir/plugin-test-repository")
-        }
-    }
-
-    publications {
-        create<MavenPublication>("mavenJar") {
-            from(components.getByName("java"))
-        }
-    }
 }
 
 /**
@@ -108,11 +92,9 @@ pluginBundle {
 
     (plugins) {
         "ktlintPlugin" {
-            id = "org.jlleitschuh.gradle.ktlint"
             displayName = "Ktlint Gradle Plugin"
         }
         "ktlintIdeaPlugin" {
-            id = "org.jlleitschuh.gradle.ktlint-idea"
             displayName = "Ktlint Gradle IntelliJ Configuration Plugin"
         }
     }
