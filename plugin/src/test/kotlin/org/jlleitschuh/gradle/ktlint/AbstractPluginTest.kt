@@ -62,7 +62,7 @@ abstract class AbstractPluginTest {
     fun File.withAlternativeFailingSources(baseDir: String) =
         createSourceFile("$baseDir/fail-source.kt", """val  foo    =     "bar"""")
 
-    private
+    protected
     fun File.createSourceFile(sourceFilePath: String, contents: String) {
         val sourceFile = resolve(sourceFilePath)
         sourceFile.parentFile.mkdirs()

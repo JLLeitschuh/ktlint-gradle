@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Git pre-commit hook (#101):
 
     Current implementation does not support `buildSrc` or composite builds.
+  - Flag to enable experimental rules (#215)
 ### Changed
   - ?
 ### Removed
