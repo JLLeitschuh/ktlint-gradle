@@ -158,6 +158,7 @@ ktlint {
     outputToConsole = true
     reporters = [ReporterType.PLAIN, ReporterType.CHECKSTYLE]
     ignoreFailures = true
+    enableExperimentalRules = true
     ruleSets = [
         "/path/to/custom/rulseset.jar",
         "com.github.username:rulseset:master-SNAPSHOT"
@@ -184,6 +185,7 @@ ktlint {
     outputToConsole.set(true)
     reporters.set(setOf(ReporterType.PLAIN, ReporterType.CHECKSTYLE))
     ignoreFailures.set(true)
+    enableExperimentalRules.set(true)
     ruleSets.set(listOf(
         "/path/to/custom/rulseset.jar",
         "com.github.username:rulseset:master-SNAPSHOT"

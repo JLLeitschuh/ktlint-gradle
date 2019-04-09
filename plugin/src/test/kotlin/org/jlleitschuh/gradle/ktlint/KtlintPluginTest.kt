@@ -504,4 +504,45 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.NO_SOURCE)
         }
     }
+
+    @Test
+    internal fun `Should enable experimental indentation rule`() {
+        projectRoot.createSourceFile(
+            "src/main/kotlin/C.kt",
+            """
+                class C {
+
+                    private val Any.className
+                        get() = this.javaClass.name
+                            .fn()
+
+                    private fun String.escape() =
+                        this.fn()
+                }
+            """.trimIndent()
+        )
+        projectRoot.buildFile().appendText("""
+
+            ktlint.enableExperimentalRules = true
+        """.trimIndent())
+
+        buildAndFail(":$CHECK_PARENT_TASK_NAME").apply {
+            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.FAILED)
+        }
+    }
+
+    @Test
+    internal fun `Should fail the build if ktlint version is less then 0_31_0 and experimental rules are enabled`() {
+        projectRoot.withCleanSources()
+        projectRoot.buildFile().appendText("""
+
+            ktlint.version = "0.30.0"
+            ktlint.enableExperimentalRules = true
+        """.trimIndent())
+
+        buildAndFail(":$CHECK_PARENT_TASK_NAME").apply {
+            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertThat(output).contains("Experimental rules are supported since 0.31.0 ktlint version.")
+        }
+    }
 }

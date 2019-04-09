@@ -328,6 +328,7 @@ open class KtlintPlugin : Plugin<Project> {
         ruleSets.set(extension.ruleSets)
         reporters.set(extension.reporters)
         android.set(extension.android)
+        enableExperimentalRules.set(extension.enableExperimentalRules)
 
         additionalConfig()
     }

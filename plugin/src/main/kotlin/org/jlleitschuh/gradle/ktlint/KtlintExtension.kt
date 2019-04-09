@@ -69,6 +69,18 @@ internal constructor(
         set(setOf(ReporterType.PLAIN))
     }
 
+    /**
+     * Enable experimental ktlint rules.
+     *
+     * You can find [here](https://github.com/pinterest/ktlint/blob/master/ktlint-ruleset-experimental/src/main/kotlin/com/github/shyiko/ktlint/ruleset/experimental/ExperimentalRuleSetProvider.kt)
+     * list of experimental rules that will be enabled.
+     *
+     * @since ktlint `0.31.0`
+     */
+    val enableExperimentalRules: Property<Boolean> = objectFactory.property {
+        set(false)
+    }
+
     private val kscriptExtension = KScriptExtension(kotlinScriptAdditionalPathApplier)
 
     /**

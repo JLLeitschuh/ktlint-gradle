@@ -62,6 +62,8 @@ open class KtlintCheckTask @Inject constructor(
     internal val outputToConsole: Property<Boolean> = objectFactory.property()
     @get:Console
     internal val coloredOutput: Property<Boolean> = objectFactory.property()
+    @get:Input
+    internal val enableExperimentalRules: Property<Boolean> = objectFactory.property()
 
     @get:Internal
     internal val enabledReports
@@ -94,6 +96,7 @@ open class KtlintCheckTask @Inject constructor(
     fun lint() {
         checkMinimalSupportedKtlintVersion()
         checkCWEKtlintVersion()
+        checkExperimentalRulesSupportedKtlintVersion()
 
         project.javaexec(generateJavaExecSpec(additionalConfig()))
     }
@@ -121,6 +124,9 @@ open class KtlintCheckTask @Inject constructor(
         if (coloredOutput.get()) {
             javaExecSpec.args("--color")
         }
+        if (enableExperimentalRules.get()) {
+            javaExecSpec.args("--experimental")
+        }
         javaExecSpec.args(ruleSets.get().map { "--ruleset=$it" })
         javaExecSpec.isIgnoreExitValue = ignoreFailures.get()
         javaExecSpec.args(enabledReports.map { it.asArgument() })
@@ -142,6 +148,13 @@ open class KtlintCheckTask @Inject constructor(
                     "'CWE-494: Download of Code Without Integrity Check'.\n" +
                     "Consider upgrading to versions consider upgrading to versions >= 0.30.0"
             )
+        }
+    }
+
+    private fun checkExperimentalRulesSupportedKtlintVersion() {
+        if (enableExperimentalRules.get() &&
+            SemVer.parse(ktlintVersion.get()) < SemVer(0, 31, 0)) {
+            throw GradleException("Experimental rules are supported since 0.31.0 ktlint version.")
         }
     }
 
