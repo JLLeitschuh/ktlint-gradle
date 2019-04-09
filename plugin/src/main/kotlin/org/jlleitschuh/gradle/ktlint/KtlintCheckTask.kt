@@ -76,8 +76,12 @@ open class KtlintCheckTask @Inject constructor(
             .filter { it.enabled.get() }
 
     init {
-        KOTLIN_EXTENSIONS.forEach {
-            include("**/*.$it")
+        if (project.hasProperty(FILTER_INCLUDE_PROPERTY_NAME)) {
+            applyGitFilter()
+        } else {
+            KOTLIN_EXTENSIONS.forEach {
+                include("**/*.$it")
+            }
         }
     }
 

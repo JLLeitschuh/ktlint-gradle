@@ -227,16 +227,18 @@ Additionally plugin adds two task for project kotlin script files: `ktlintKotlin
 
 ### Additional helper tasks
 
-Two another tasks are added:
+Following additional  tasks are added:
 - `ktlintApplyToIdea` - The task generates IntelliJ IDEA (or Android Studio) Kotlin
-                        style files in the project `.idea/` folder.
+                        style files in the project `.idea/` folder. **Note** that this tasks will overwrite the existing style file.
 - `ktlintApplyToIdeaGlobally` - The task generates IntelliJ IDEA (or Android Studio) Kotlin
                                 style files in the user home IDEA
-                                (or Android Studio) settings folder.
+                                (or Android Studio) settings folder. **Note** that this task will overwrite the existing style file.
+- `addKtlintCheckGitPreCommitHook` - adds [Git](https://www.git-scm.com/) `pre-commit` hook, 
+that runs ktlint check over staged files.
+- `addKtlintFormatGitPreCommitHook` - adds [Git](https://www.git-scm.com/) `pre-commit` hook, 
+that runs ktlint format over staged files and adds fixed files back to commit.
 
-They are always added **only** to the root project.
-
-**Note** that this tasks will overwrite the existing style file.
+All this additional tasks are always added **only** to the root project.
 
 ## FAQ
 

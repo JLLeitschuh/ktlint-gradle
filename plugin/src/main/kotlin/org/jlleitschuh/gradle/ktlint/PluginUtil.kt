@@ -100,6 +100,8 @@ internal const val APPLY_TO_IDEA_TASK_NAME = "ktlintApplyToIdea"
 internal const val APPLY_TO_IDEA_GLOBALLY_TASK_NAME = "ktlintApplyToIdeaGlobally"
 internal const val KOTLIN_SCRIPT_CHECK_TASK = "ktlintKotlinScriptCheck"
 internal const val KOTLIN_SCRIPT_FORMAT_TASK = "ktlintKotlinScriptFormat"
+internal const val INSTALL_GIT_HOOK_CHECK_TASK = "addKtlintCheckGitPreCommitHook"
+internal const val INSTALL_GIT_HOOK_FORMAT_TASK = "addKtlintFormatGitPreCommitHook"
 internal val KOTLIN_EXTENSIONS = listOf("kt", "kts")
 
 internal inline fun <reified T> ObjectFactory.property(

@@ -463,4 +463,45 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             assertThat(task(":$KOTLIN_SCRIPT_CHECK_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
+
+    @Test
+    internal fun `Should apply internal git filter to check task`() {
+        projectRoot.withCleanSources()
+        projectRoot.withFailingSources()
+
+        build(
+            ":$CHECK_PARENT_TASK_NAME",
+            "-P$FILTER_INCLUDE_PROPERTY_NAME=src/main/kotlin/clean-source.kt"
+        ).run {
+            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        }
+    }
+
+    @Test
+    internal fun `Git filter should respect already applied filters`() {
+        projectRoot.withFailingSources()
+        projectRoot.buildFile().appendText("""
+
+            ktlint.filter { exclude("**/fail-source.kt") }
+        """.trimIndent())
+
+        build(
+            ":$CHECK_PARENT_TASK_NAME",
+            "-P$FILTER_INCLUDE_PROPERTY_NAME=src/main/kotlin/fail-source.kt"
+        ).run {
+            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.NO_SOURCE)
+        }
+    }
+
+    @Test
+    internal fun `Git filter should ignore task if no files related to it`() {
+        projectRoot.withCleanSources()
+
+        build(
+            ":$CHECK_PARENT_TASK_NAME",
+            "-P$FILTER_INCLUDE_PROPERTY_NAME=src/main/kotlin/failing-sources.kt"
+        ).run {
+            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.NO_SOURCE)
+        }
+    }
 }
