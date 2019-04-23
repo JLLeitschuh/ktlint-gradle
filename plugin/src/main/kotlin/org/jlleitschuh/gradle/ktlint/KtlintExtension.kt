@@ -22,7 +22,7 @@ internal constructor(
     /**
      * The version of ktlint to use.
      */
-    val version: Property<String> = objectFactory.property { set("0.31.0") }
+    val version: Property<String> = objectFactory.property { set("0.32.0") }
 
     /**
      * Enable verbose mode.
@@ -72,7 +72,7 @@ internal constructor(
     /**
      * Enable experimental ktlint rules.
      *
-     * You can find [here](https://github.com/pinterest/ktlint/blob/master/ktlint-ruleset-experimental/src/main/kotlin/com/github/shyiko/ktlint/ruleset/experimental/ExperimentalRuleSetProvider.kt)
+     * You can find [here](https://github.com/pinterest/ktlint/blob/master/ktlint-ruleset-experimental/src/main/kotlin/com/pinterest/ktlint/ruleset/experimental/ExperimentalRuleSetProvider.kt)
      * list of experimental rules that will be enabled.
      *
      * @since ktlint `0.31.0`

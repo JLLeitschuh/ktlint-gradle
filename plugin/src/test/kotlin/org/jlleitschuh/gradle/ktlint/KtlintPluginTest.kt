@@ -259,13 +259,11 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             }
     }
 
-    private
-    fun assertReportCreated(reportType: ReporterType) {
+    private fun assertReportCreated(reportType: ReporterType) {
         assertThat(reportLocation(reportType).isFile).isTrue()
     }
 
-    private
-    fun assertReportNotCreated(reportType: ReporterType) {
+    private fun assertReportNotCreated(reportType: ReporterType) {
         assertThat(reportLocation(reportType).isFile).isFalse()
     }
 
@@ -415,6 +413,25 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         build(":dependencies").apply {
             assertThat(output).contains("ktlint\n" +
                 "\\--- com.github.shyiko:ktlint:0.26.0\n")
+        }
+    }
+
+    @Test
+    fun `Should apply pinterest ktlint version from extension when the requested version is 0_32_0`() {
+        projectRoot.withCleanSources()
+
+        projectRoot.buildFile().appendText(
+            """
+
+            ktlint.version = "0.32.0"
+        """.trimIndent()
+        )
+
+        build(":dependencies").apply {
+            assertThat(output).contains(
+                "ktlint\n" +
+                        "\\--- com.pinterest:ktlint:0.32.0\n"
+            )
         }
     }
 
