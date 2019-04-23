@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+### Added
+ - Support different ktlint group/package name after pinterest ownership of ktlint project (#228)
+### Changed
+ - Default ktlint version to `0.32.0`. 
+
 ## [7.3.0] - 2019-04-10
 ### Added
   - Git pre-commit hook (#101):

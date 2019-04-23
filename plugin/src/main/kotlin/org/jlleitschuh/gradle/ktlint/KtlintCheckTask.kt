@@ -107,7 +107,7 @@ open class KtlintCheckTask @Inject constructor(
         additionalConfig: (JavaExecSpec) -> Unit
     ): (JavaExecSpec) -> Unit = { javaExecSpec ->
         javaExecSpec.classpath = classpath
-        javaExecSpec.main = "com.github.shyiko.ktlint.Main"
+        javaExecSpec.main = resolveMainClassName(ktlintVersion.get())
         javaExecSpec.args(getSource().toRelativeFilesList())
         if (verbose.get()) {
             javaExecSpec.args("--verbose")

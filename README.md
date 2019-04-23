@@ -1,6 +1,6 @@
 # Ktlint Gradle
 
-**Provides a convenient wrapper plugin over the [ktlint](https://github.com/shyiko/ktlint) project.**
+**Provides a convenient wrapper plugin over the [ktlint](https://github.com/pinterest/ktlint) project.**
 
 Latest plugin version: [7.3.0](/CHANGELOG.md#730---2019-04-10)
 
@@ -10,7 +10,7 @@ Latest plugin version: [7.3.0](/CHANGELOG.md#730---2019-04-10)
 [![Gradle Plugin Portal](https://img.shields.io/maven-metadata/v/https/plugins.gradle.org/m2/org/jlleitschuh/gradle/ktlint/org.jlleitschuh.gradle.ktlint.gradle.plugin/maven-metadata.xml.svg?colorB=007ec6&label=gradlePluginPortal)](https://plugins.gradle.org/plugin/org.jlleitschuh.gradle.ktlint)
 
 This plugin creates convenient tasks in your Gradle project
-that run [ktlint](https://github.com/shyiko/ktlint) checks or do code
+that run [ktlint](https://github.com/pinterest/ktlint) checks or do code
 auto format.
 
 Plugin can be applied to any project, but only activates if that project has the kotlin plugin applied.
@@ -64,7 +64,7 @@ This API is available in new versions of gradle.
 
 Minimal supported [Gradle](www.gradle.org) version: `4.10`
 
-Minimal supported [ktlint](https://github.com/shyiko/ktlint) version: `0.22.0`
+Minimal supported [ktlint](https://github.com/pinterest/ktlint) version: `0.22.0`
 
 ### Ktlint plugin
 

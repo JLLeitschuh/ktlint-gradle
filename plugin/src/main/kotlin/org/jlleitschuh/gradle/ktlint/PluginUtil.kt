@@ -6,6 +6,7 @@ import com.android.build.gradle.FeatureExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.TestExtension
 import com.android.build.gradle.api.BaseVariant
+import net.swiftzer.semver.SemVer
 import org.gradle.api.DomainObjectSet
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -22,17 +23,28 @@ import java.nio.file.Path
 internal fun createConfiguration(target: Project, extension: KtlintExtension) =
     target.configurations.maybeCreate("ktlint").apply {
         this.incoming.beforeResolve {
-            target.logger.info("Add dependency: ktlint version ${extension.version.get()}")
+            val ktlintVersion = extension.version.get()
+            target.logger.info("Add dependency: ktlint version $ktlintVersion")
             target.dependencies.add(
                 this.name,
                 mapOf(
-                    "group" to "com.github.shyiko",
+                    "group" to resolveGroup(ktlintVersion),
                     "name" to "ktlint",
-                    "version" to extension.version.get()
+                    "version" to ktlintVersion
                 )
             )
         }
     }
+
+private fun resolveGroup(ktlintVersion: String) = when {
+    SemVer.parse(ktlintVersion) < SemVer(0, 32, 0) -> "com.github.shyiko"
+    else -> "com.pinterest"
+}
+
+internal fun resolveMainClassName(ktlintVersion: String) = when {
+    SemVer.parse(ktlintVersion) < SemVer(0, 32, 0) -> "com.github.shyiko.ktlint.Main"
+    else -> "com.pinterest.ktlint.Main"
+}
 
 internal inline fun <reified T : Task> Project.registerTask(
     name: String,
@@ -66,7 +78,8 @@ private tailrec fun searchEditorConfigFiles(
     val parentDir = projectPath.parent
     return if (parentDir != null &&
         projectPath != project.rootDir.toPath() &&
-        !editorConfigFC.isRootEditorConfig()) {
+        !editorConfigFC.isRootEditorConfig()
+    ) {
         searchEditorConfigFiles(project, parentDir, outputCollection)
     } else {
         outputCollection
@@ -143,10 +156,11 @@ internal fun String.androidVariantMetaFormatTaskName(
 /**
  * Get specific android variants from [BaseExtension].
  */
-internal val BaseExtension.variants: DomainObjectSet<out BaseVariant>? get() = when (this) {
-    is AppExtension -> applicationVariants
-    is LibraryExtension -> libraryVariants
-    is FeatureExtension -> featureVariants
-    is TestExtension -> applicationVariants
-    else -> null // Instant app extension doesn't provide variants access
-}
+internal val BaseExtension.variants: DomainObjectSet<out BaseVariant>?
+    get() = when (this) {
+        is AppExtension -> applicationVariants
+        is LibraryExtension -> libraryVariants
+        is FeatureExtension -> featureVariants
+        is TestExtension -> applicationVariants
+        else -> null // Instant app extension doesn't provide variants access
+    }

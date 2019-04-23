@@ -30,7 +30,7 @@ open class KtlintApplyToIdeaTask @Inject constructor(
     fun generate() {
         project.javaexec {
             it.classpath = classpath
-            it.main = "com.github.shyiko.ktlint.Main"
+            it.main = resolveMainClassName(ktlintVersion.get())
             if (globally.get()) {
                 it.args("--apply-to-idea")
             } else {
