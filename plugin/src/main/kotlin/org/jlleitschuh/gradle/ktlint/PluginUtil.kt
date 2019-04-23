@@ -41,6 +41,11 @@ private fun resolveGroup(ktlintVersion: String) = when {
     else -> "com.pinterest"
 }
 
+internal fun resolveMainClassName(ktlintVersion: String) = when {
+    SemVer.parse(ktlintVersion) < SemVer(0, 32, 0) -> "com.github.shyiko.ktlint.Main"
+    else -> "com.pinterest.ktlint.Main"
+}
+
 internal inline fun <reified T : Task> Project.registerTask(
     name: String,
     noinline configuration: T.() -> Unit

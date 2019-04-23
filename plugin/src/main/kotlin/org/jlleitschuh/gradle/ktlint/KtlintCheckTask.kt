@@ -107,7 +107,7 @@ open class KtlintCheckTask @Inject constructor(
         additionalConfig: (JavaExecSpec) -> Unit
     ): (JavaExecSpec) -> Unit = { javaExecSpec ->
         javaExecSpec.classpath = classpath
-        javaExecSpec.main = resolveMainClassName()
+        javaExecSpec.main = resolveMainClassName(ktlintVersion.get())
         javaExecSpec.args(getSource().toRelativeFilesList())
         if (verbose.get()) {
             javaExecSpec.args("--verbose")
@@ -156,11 +156,6 @@ open class KtlintCheckTask @Inject constructor(
             SemVer.parse(ktlintVersion.get()) < SemVer(0, 31, 0)) {
             throw GradleException("Experimental rules are supported since 0.31.0 ktlint version.")
         }
-    }
-
-    private fun resolveMainClassName() = when {
-        SemVer.parse(ktlintVersion.get()) < SemVer(0, 32, 0) -> "com.github.shyiko.ktlint.Main"
-        else -> "com.pinterest.ktlint.Main"
     }
 
     private fun ReporterType.isAvailable() =

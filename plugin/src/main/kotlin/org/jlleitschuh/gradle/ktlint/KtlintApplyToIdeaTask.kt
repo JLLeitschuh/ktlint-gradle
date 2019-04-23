@@ -1,6 +1,5 @@
 package org.jlleitschuh.gradle.ktlint
 
-import net.swiftzer.semver.SemVer
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.model.ObjectFactory
@@ -31,7 +30,7 @@ open class KtlintApplyToIdeaTask @Inject constructor(
     fun generate() {
         project.javaexec {
             it.classpath = classpath
-            it.main = resolveMainClassName()
+            it.main = resolveMainClassName(ktlintVersion.get())
             if (globally.get()) {
                 it.args("--apply-to-idea")
             } else {
@@ -43,10 +42,5 @@ open class KtlintApplyToIdeaTask @Inject constructor(
                 it.args("--android")
             }
         }
-    }
-
-    private fun resolveMainClassName() = when {
-        SemVer.parse(ktlintVersion.get()) < SemVer(0, 32, 0) -> "com.github.shyiko.ktlint.Main"
-        else -> "com.pinterest.ktlint.Main"
     }
 }
