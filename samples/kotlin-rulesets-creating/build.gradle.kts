@@ -1,6 +1,6 @@
-plugins.apply("org.jlleitschuh.gradle.ktlint")
-apply {
-    plugin("kotlin")
+plugins {
+    id("org.jlleitschuh.gradle.ktlint")
+    kotlin("jvm")
 }
 
 dependencies {

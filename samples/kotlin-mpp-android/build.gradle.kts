@@ -1,37 +1,33 @@
-import com.android.build.gradle.LibraryExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jlleitschuh.gradle.ktlint.KtlintExtension
-
-plugins.apply("org.jlleitschuh.gradle.ktlint")
-
-apply {
-    plugin("kotlin-multiplatform")
-    plugin("android-library")
+plugins {
+    kotlin("multiplatform")
+    id("com.android.library")
+    id("org.jlleitschuh.gradle.ktlint")
 }
 
-configure<KotlinMultiplatformExtension> {
-    targets.add(presets["android"].createTarget("androidLib"))
+kotlin {
+    android()
 
-    sourceSets["commonMain"].apply {
-        dependencies {
-            implementation("org.jetbrains.kotlin:kotlin-stdlib-common")
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+                implementation(kotlin("stdlib-common"))
+            }
         }
-    }
-    sourceSets["androidLibMain"].apply {
-        dependsOn(sourceSets["commonMain"])
 
-        dependencies {
-            implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+        val androidMain by getting {
+            dependencies {
+                implementation(kotlin("stdlib"))
+            }
         }
     }
 }
 
-configure<KtlintExtension> {
+ktlint {
     verbose.set(true)
     outputToConsole.set(true)
 }
 
-configure<LibraryExtension> {
+android {
     compileSdkVersion(27)
 
     defaultConfig {

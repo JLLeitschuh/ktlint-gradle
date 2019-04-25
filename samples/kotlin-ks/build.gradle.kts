@@ -1,13 +1,9 @@
-import org.jlleitschuh.gradle.ktlint.KtlintExtension
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
     application
-}
-
-plugins.apply("org.jlleitschuh.gradle.ktlint")
-apply {
-    plugin("kotlin")
+    kotlin("jvm")
+    id("org.jlleitschuh.gradle.ktlint")
 }
 
 application {
@@ -18,7 +14,7 @@ dependencies {
     compile(kotlin("stdlib"))
 }
 
-configure<KtlintExtension> {
+ktlint {
     verbose.set(true)
     outputToConsole.set(true)
     coloredOutput.set(true)

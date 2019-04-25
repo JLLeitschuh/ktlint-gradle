@@ -1,15 +1,13 @@
-import org.jlleitschuh.gradle.ktlint.KtlintExtension
-
-plugins.apply("org.jlleitschuh.gradle.ktlint")
-apply {
-    plugin("kotlin-platform-common")
+plugins {
+    id("kotlin-platform-common")
+    id("org.jlleitschuh.gradle.ktlint")
 }
 
 dependencies {
     "implementation"(kotlin("stdlib-common"))
 }
 
-configure<KtlintExtension> {
+ktlint {
     verbose.set(true)
     outputToConsole.set(true)
 }

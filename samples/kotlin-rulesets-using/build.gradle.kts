@@ -1,13 +1,9 @@
-import org.jlleitschuh.gradle.ktlint.KtlintExtension
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
     application
-}
-
-plugins.apply("org.jlleitschuh.gradle.ktlint")
-apply {
-    plugin("kotlin")
+    id("org.jlleitschuh.gradle.ktlint")
+    kotlin("jvm")
 }
 
 application {
@@ -18,7 +14,7 @@ dependencies {
     compile(kotlin("stdlib"))
 }
 
-configure<KtlintExtension> {
+ktlint {
     verbose.set(true)
     outputToConsole.set(true)
     ruleSets.set(listOf("../kotlin-rulesets-creating/build/libs/kotlin-rulesets-creating.jar"))
