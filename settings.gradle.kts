@@ -11,8 +11,6 @@ pluginManagement {
             when (requested.id.id) {
                 "com.android.application" ->
                     useModule("com.android.tools.build:gradle:${requested.version}")
-                "konan" ->
-                    useModule("org.jetbrains.kotlin:kotlin-native-gradle-plugin:${requested.version}")
             }
         }
     }
