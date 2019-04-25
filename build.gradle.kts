@@ -29,5 +29,5 @@ apply {
 
 tasks.withType(Wrapper::class.java).configureEach {
     gradleVersion = SamplesVersions.gradleWrapper
-    distributionType = Wrapper.DistributionType.ALL
+    distributionType = Wrapper.DistributionType.BIN
 }
