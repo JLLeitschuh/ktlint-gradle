@@ -102,4 +102,5 @@ pluginBundle {
 
 tasks.withType(Wrapper::class.java).configureEach {
     gradleVersion = PluginVersions.gradleWrapper
+    distributionType = Wrapper.DistributionType.ALL
 }
