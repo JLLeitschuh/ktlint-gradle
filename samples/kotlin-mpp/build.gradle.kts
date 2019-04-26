@@ -1,41 +1,31 @@
-import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jlleitschuh.gradle.ktlint.KtlintExtension
-
-plugins.apply("org.jlleitschuh.gradle.ktlint")
 plugins {
     application
+    kotlin("multiplatform")
+    id("org.jlleitschuh.gradle.ktlint")
 }
 
-apply {
-    plugin("kotlin-multiplatform")
-}
+kotlin {
+    jvm()
+    js()
+    linuxX64()
 
-configure<KotlinMultiplatformExtension> {
-    targets.add(presets["jvmWithJava"].createTarget("jvm"))
-    targets.add(presets["js"].createTarget("js"))
-    targets.add(presets["linuxX64"].createTarget("linux"))
-
-    sourceSets["commonMain"].apply {
-        dependencies {
-            implementation("org.jetbrains.kotlin:kotlin-stdlib-common")
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+                implementation(kotlin("stdlib-common"))
+            }
         }
-    }
-    sourceSets["jvmMain"].apply {
-        dependsOn(sourceSets["commonMain"])
-
-        dependencies {
-            implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+        val jvmMain by getting {
+            dependencies {
+                implementation(kotlin("stdlib-jdk8"))
+            }
         }
-    }
-    sourceSets["jsMain"].apply {
-        dependsOn(sourceSets["commonMain"])
-
-        dependencies {
-            implementation("org.jetbrains.kotlin:kotlin-stdlib-js")
+        val jsMain by getting {
+            dependencies {
+                implementation(kotlin("stdlib-js"))
+            }
         }
-    }
-    sourceSets["linuxMain"].apply {
-        dependsOn(sourceSets["commonMain"])
+        val linuxX64Main by getting {}
     }
 }
 
@@ -43,7 +33,7 @@ application {
     mainClassName = "org.jlleitschuh.gradle.ktlint.sample.mpp.MainKt"
 }
 
-configure<KtlintExtension> {
+ktlint {
     verbose.set(true)
     outputToConsole.set(true)
 }

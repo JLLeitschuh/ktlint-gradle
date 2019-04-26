@@ -1,14 +1,11 @@
-import com.android.build.gradle.AppExtension
-import org.jlleitschuh.gradle.ktlint.KtlintExtension
-
-apply {
-    plugin("android")
-    plugin("kotlin-android")
-    plugin("kotlin-android-extensions")
-    plugins.apply("org.jlleitschuh.gradle.ktlint")
+plugins {
+    id("com.android.application")
+    kotlin("android")
+    kotlin("android.extensions")
+    id("org.jlleitschuh.gradle.ktlint")
 }
 
-configure<AppExtension> {
+android {
     compileSdkVersion(27)
 
     defaultConfig {
@@ -56,6 +53,6 @@ dependencies {
     )
 }
 
-configure<KtlintExtension> {
+ktlint {
     android.set(true)
 }

@@ -1,9 +1,8 @@
-import org.jlleitschuh.gradle.ktlint.KtlintExtension
 import org.jetbrains.kotlin.gradle.plugin.konan.KonanArtifactContainer
 
-plugins.apply("org.jlleitschuh.gradle.ktlint")
-apply {
-    plugin("konan")
+plugins {
+    id("org.jlleitschuh.gradle.ktlint")
+    id("konan")
 }
 
 configure<KonanArtifactContainer> {
@@ -12,7 +11,7 @@ configure<KonanArtifactContainer> {
     })
 }
 
-configure<KtlintExtension> {
+ktlint {
     verbose.set(true)
     outputToConsole.set(true)
 }

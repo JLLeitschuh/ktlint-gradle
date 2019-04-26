@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+### Added
+  - ?
+### Changed
+  - Update Kotlin to `1.3.30` version
+### Fixed
+  - ?
+### Removed
+  - ?
+
 ## [7.4.0] - 2019-04-23
 ### Added
  - Support different ktlint group/package name after pinterest ownership of ktlint project (#228)
