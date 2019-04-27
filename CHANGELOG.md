@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
   - Update Kotlin to `1.3.30` version
 ### Fixed
-  - ?
+  - Proper lazy adding ktlint dependency (#219)
 ### Removed
   - ?
 
