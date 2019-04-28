@@ -23,6 +23,7 @@ import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.SourceTask
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.JavaExecSpec
+import org.gradle.util.GradleVersion
 import org.jlleitschuh.gradle.ktlint.reporter.KtlintReport
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import java.io.File
@@ -72,7 +73,7 @@ open class KtlintCheckTask @Inject constructor(
                 KtlintReport(
                     objectFactory.property { set(it.isAvailable()) },
                     it,
-                    newOutputFile().apply { set(it.getOutputFile()) }
+                    newFileProperty().apply { set(it.getOutputFile()) }
                 )
             }
             .filter { it.enabled.get() }
@@ -86,6 +87,14 @@ open class KtlintCheckTask @Inject constructor(
             }
         }
     }
+
+    @Suppress("DEPRECATION")
+    private val newFileProperty: () -> RegularFileProperty =
+        if (GradleVersion.current() >= GradleVersion.version("5.0")) {
+            objectFactory::fileProperty
+        } else {
+            ::newOutputFile
+        }
 
     @InputFiles
     @SkipWhenEmpty
