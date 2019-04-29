@@ -411,7 +411,7 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         """.trimIndent())
 
         build(":dependencies").apply {
-            assertThat(output).contains("ktlint\n" +
+            assertThat(output).contains("$KTLINT_CONFIGURATION_NAME - $KTLINT_CONFIGURATION_DESCRIPTION\n" +
                 "\\--- com.github.shyiko:ktlint:0.26.0\n")
         }
     }
@@ -429,7 +429,7 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
 
         build(":dependencies").apply {
             assertThat(output).contains(
-                "ktlint\n" +
+                "$KTLINT_CONFIGURATION_NAME - $KTLINT_CONFIGURATION_DESCRIPTION\n" +
                         "\\--- com.pinterest:ktlint:0.32.0\n"
             )
         }
