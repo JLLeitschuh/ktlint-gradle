@@ -57,7 +57,7 @@ open class KtlintPlugin : Plugin<Project> {
     }
 
     private fun PluginHolder.applyKtlintMultiplatform(): (Plugin<in Any>) -> Unit = {
-        val ktLintConfig = createConfiguration(target, extension)
+        val ktLintConfig = createKtlintConfiguration(target, extension)
         val multiplatformExtension = target.extensions.getByType(KotlinMultiplatformExtension::class.java)
 
         multiplatformExtension.sourceSets.all { sourceSet ->
@@ -104,7 +104,7 @@ open class KtlintPlugin : Plugin<Project> {
 
     private fun PluginHolder.applyKtLint(): (Plugin<in Any>) -> Unit {
         return {
-            val ktLintConfig = createConfiguration(target, extension)
+            val ktLintConfig = createKtlintConfiguration(target, extension)
 
             val sourceSets = target.theHelper<JavaPluginConvention>().sourceSets
 
@@ -139,7 +139,7 @@ open class KtlintPlugin : Plugin<Project> {
 
     private fun PluginHolder.applyKtLintToAndroid(): (Plugin<in Any>) -> Unit {
         return {
-            val ktLintConfig = createConfiguration(target, extension)
+            val ktLintConfig = createKtlintConfiguration(target, extension)
 
             fun createTasks(
                 sourceSetName: String,
@@ -202,7 +202,7 @@ open class KtlintPlugin : Plugin<Project> {
 
     private fun PluginHolder.applyKtLintKonanNative(): (Plugin<in Any>) -> Unit {
         return {
-            val ktLintConfig = createConfiguration(target, extension)
+            val ktLintConfig = createKtlintConfiguration(target, extension)
 
             val compileTargets = target.theHelper<KonanExtension>().targets
             target.theHelper<KonanArtifactContainer>().whenObjectAdded { buildConfig ->
@@ -223,7 +223,7 @@ open class KtlintPlugin : Plugin<Project> {
 
     private fun PluginHolder.applyKtLintNative(): (Plugin<in Any>) -> Unit {
         return {
-            val ktLintConfig = createConfiguration(target, extension)
+            val ktLintConfig = createKtlintConfiguration(target, extension)
             target.components.withType(KotlinNativeComponent::class.java) { component ->
                 addTasksForNativePlugin(component.name, ktLintConfig) {
                     component.konanTargets.get()
@@ -345,7 +345,7 @@ open class KtlintPlugin : Plugin<Project> {
     }
 
     private fun PluginHolder.addKotlinScriptTasks() {
-        val ktLintConfig = createConfiguration(target, extension)
+        val ktLintConfig = createKtlintConfiguration(target, extension)
 
         val projectDirectoryScriptFiles = target.fileTree(target.projectDir)
         projectDirectoryScriptFiles.include("*.kts")
