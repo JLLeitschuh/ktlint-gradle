@@ -294,6 +294,7 @@ open class KtlintPlugin : Plugin<Project> {
             }
         })
         ruleSets.set(pluginHolder.extension.ruleSets)
+        ruleSetsClasspath.setFrom(pluginHolder.ktlintRulesetConfiguration)
         reporters.set(pluginHolder.extension.reporters)
         android.set(pluginHolder.extension.android)
         enableExperimentalRules.set(pluginHolder.extension.enableExperimentalRules)
@@ -383,7 +384,8 @@ open class KtlintPlugin : Plugin<Project> {
             }
         }
 
-        val ktlintConfiguration by lazy { createKtlintConfiguration(target, extension) }
+        val ktlintConfiguration by lazy(LazyThreadSafetyMode.NONE) { createKtlintConfiguration(target, extension) }
+        val ktlintRulesetConfiguration = createKtlintRulesetConfiguration(target)
     }
 }
 
