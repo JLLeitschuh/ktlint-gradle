@@ -5,6 +5,7 @@ import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTree
+import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
@@ -23,7 +24,6 @@ import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.SourceTask
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.JavaExecSpec
-import org.gradle.util.GradleVersion
 import org.jlleitschuh.gradle.ktlint.reporter.KtlintReport
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import java.io.File
@@ -32,7 +32,8 @@ import javax.inject.Inject
 @Suppress("UnstableApiUsage")
 @CacheableTask
 open class KtlintCheckTask @Inject constructor(
-    private val objectFactory: ObjectFactory
+    private val objectFactory: ObjectFactory,
+    private val projectLayout: ProjectLayout
 ) : SourceTask() {
 
     @get:Classpath
@@ -73,7 +74,9 @@ open class KtlintCheckTask @Inject constructor(
                 KtlintReport(
                     objectFactory.property { set(it.isAvailable()) },
                     it,
-                    newFileProperty().apply { set(it.getOutputFile()) }
+                    newFileProperty(objectFactory, projectLayout).apply {
+                        set(it.getOutputFile())
+                    }
                 )
             }
             .filter { it.enabled.get() }
@@ -87,14 +90,6 @@ open class KtlintCheckTask @Inject constructor(
             }
         }
     }
-
-    @Suppress("DEPRECATION")
-    private val newFileProperty: () -> RegularFileProperty =
-        if (GradleVersion.current() >= GradleVersion.version("5.0")) {
-            objectFactory::fileProperty
-        } else {
-            ::newOutputFile
-        }
 
     @InputFiles
     @SkipWhenEmpty

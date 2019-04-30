@@ -1,6 +1,7 @@
 package org.jlleitschuh.gradle.ktlint
 
 import org.gradle.api.file.FileTree
+import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.OutputFiles
@@ -12,8 +13,9 @@ import javax.inject.Inject
 
 @CacheableTask
 open class KtlintFormatTask @Inject constructor(
-    objectFactory: ObjectFactory
-) : KtlintCheckTask(objectFactory) {
+    objectFactory: ObjectFactory,
+    projectLayout: ProjectLayout
+) : KtlintCheckTask(objectFactory, projectLayout) {
     override fun additionalConfig(): (JavaExecSpec) -> Unit = {
         it.args("-F")
     }
