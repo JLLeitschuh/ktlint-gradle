@@ -10,7 +10,6 @@ import net.swiftzer.semver.SemVer
 import org.gradle.api.DomainObjectSet
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.gradle.api.artifacts.Dependency
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
@@ -23,30 +22,6 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.util.GradleVersion
 import java.nio.file.Path
-
-internal const val KTLINT_CONFIGURATION_NAME = "ktlint"
-internal const val KTLINT_CONFIGURATION_DESCRIPTION = "Main ktlint-gradle configuration"
-internal fun createConfiguration(target: Project, extension: KtlintExtension) =
-    target.configurations.maybeCreate(KTLINT_CONFIGURATION_NAME).apply {
-        description = KTLINT_CONFIGURATION_DESCRIPTION
-        val dependencyProvider = target.provider<Dependency> {
-            val ktlintVersion = extension.version.get()
-            target.logger.info("Add dependency: ktlint version $ktlintVersion")
-            target.dependencies.create(
-                mapOf(
-                    "group" to resolveGroup(ktlintVersion),
-                    "name" to "ktlint",
-                    "version" to ktlintVersion
-                )
-            )
-        }
-        dependencies.addLater(dependencyProvider)
-    }
-
-private fun resolveGroup(ktlintVersion: String) = when {
-    SemVer.parse(ktlintVersion) < SemVer(0, 32, 0) -> "com.github.shyiko"
-    else -> "com.pinterest"
-}
 
 internal fun resolveMainClassName(ktlintVersion: String) = when {
     SemVer.parse(ktlintVersion) < SemVer(0, 32, 0) -> "com.github.shyiko.ktlint.Main"

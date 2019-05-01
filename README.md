@@ -159,10 +159,6 @@ ktlint {
     reporters = [ReporterType.PLAIN, ReporterType.CHECKSTYLE]
     ignoreFailures = true
     enableExperimentalRules = true
-    ruleSets = [
-        "/path/to/custom/rulseset.jar",
-        "com.github.username:rulseset:master-SNAPSHOT"
-    ]
     kotlinScriptAdditionalPaths {
         include fileTree("scripts/")
     }
@@ -170,6 +166,12 @@ ktlint {
         exclude("**/generated/**")
         include("**/kotlin/**")
     }
+}
+
+dependencies {
+    ktlintRuleset "com.github.username:rulseset:master-SNAPSHOT"
+    ktlintRuleset files("/path/to/custom/rulseset.jar")
+    ktlintRuleset project(":chore:project-ruleset") 
 }
 ```
 
@@ -186,10 +188,6 @@ ktlint {
     reporters.set(setOf(ReporterType.PLAIN, ReporterType.CHECKSTYLE))
     ignoreFailures.set(true)
     enableExperimentalRules.set(true)
-    ruleSets.set(listOf(
-        "/path/to/custom/rulseset.jar",
-        "com.github.username:rulseset:master-SNAPSHOT"
-    ))
     kotlinScriptAdditionalPaths {
         include(fileTree("scripts/"))
     }
@@ -197,6 +195,12 @@ ktlint {
         exclude("**/generated/**")
         include("**/kotlin/**")
     }
+}
+
+dependencies {
+    ktlintRuleset("com.github.username:rulseset:master-SNAPSHOT")
+    ktlintRuleset(files("/path/to/custom/rulseset.jar"))
+    ktlintRuleset(project(":chore:project-ruleset")) 
 }
 ```
 

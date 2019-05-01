@@ -19,7 +19,7 @@ open class KtlintIdeaPlugin : Plugin<Project> {
     }
 
     private fun addApplyToIdeaTasks(rootProject: Project, extension: KtlintExtension) {
-        val ktLintConfig = createConfiguration(rootProject, extension)
+        val ktLintConfig = createKtlintConfiguration(rootProject, extension)
 
         rootProject.registerTask<KtlintApplyToIdeaTask>(APPLY_TO_IDEA_TASK_NAME) {
             group = HELP_GROUP

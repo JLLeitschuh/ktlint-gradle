@@ -12,15 +12,11 @@ application {
 
 dependencies {
     compile(kotlin("stdlib"))
+    ktlintRuleset(project(":samples:kotlin-rulesets-creating"))
 }
 
 ktlint {
     verbose.set(true)
     outputToConsole.set(true)
-    ruleSets.set(listOf("../kotlin-rulesets-creating/build/libs/kotlin-rulesets-creating.jar"))
     reporters.set(setOf(ReporterType.CHECKSTYLE, ReporterType.JSON))
 }
-
-tasks.findByName("ktlintMainSourceSetCheck")?.dependsOn(":samples:kotlin-rulesets-creating:build")
-tasks.findByName("ktlintTestSourceSetCheck")?.dependsOn(":samples:kotlin-rulesets-creating:build")
-tasks.findByName("ktlintKotlinScriptCheck")?.dependsOn(":samples:kotlin-rulesets-creating:build")

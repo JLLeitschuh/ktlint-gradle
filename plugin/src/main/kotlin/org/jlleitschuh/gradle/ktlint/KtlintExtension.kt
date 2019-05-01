@@ -53,7 +53,15 @@ internal constructor(
     val ignoreFailures: Property<Boolean> = objectFactory.property { set(false) }
     /**
      * The ruleset(s) of ktlint to use.
+     *
+     * Deprecated - please, use instead ktlint ruleset configuration:
+     * ```kotlin
+     * dependencies {
+     *     ktlintRuleset("some:ktlint-rule:0.0.1")
+     * }
+     * ```
      */
+    @Deprecated("Please use $KTLINT_RULESET_CONFIGURATION_NAME configuration")
     val ruleSets: ListProperty<String> = objectFactory.listProperty { set(emptyList()) }
 
     /**
