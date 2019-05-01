@@ -51,6 +51,8 @@ open class KtlintCheckTask @Inject constructor(
     internal val verbose: Property<Boolean> = objectFactory.property()
     @get:Input
     internal val ruleSets: ListProperty<String> = objectFactory.listProperty(String::class.java)
+    @get:Classpath
+    internal val ruleSetsClasspath: ConfigurableFileCollection = project.files()
     @get:Input
     internal val debug: Property<Boolean> = objectFactory.property()
     @get:Input
@@ -137,6 +139,7 @@ open class KtlintCheckTask @Inject constructor(
             javaExecSpec.args("--experimental")
         }
         javaExecSpec.args(ruleSets.get().map { "--ruleset=$it" })
+        javaExecSpec.args(ruleSetsClasspath.files.map { "--ruleset=${it.absolutePath}" })
         javaExecSpec.isIgnoreExitValue = ignoreFailures.get()
         javaExecSpec.args(enabledReports.map { it.asArgument() })
         additionalConfig(javaExecSpec)

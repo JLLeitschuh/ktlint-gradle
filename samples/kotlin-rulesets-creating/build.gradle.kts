@@ -4,8 +4,8 @@ plugins {
 }
 
 dependencies {
-    "compileOnly"(kotlin("stdlib"))
-    "compileOnly"(kotlin("reflect"))
-    "compileOnly"(kotlin("script-runtime"))
-    "compileOnly"("com.pinterest.ktlint:ktlint-core:${SamplesVersions.ktlintCore}")
+    compileOnly(kotlin("stdlib"))
+    compileOnly(kotlin("reflect"))
+    compileOnly(kotlin("script-runtime"))
+    compileOnly("com.pinterest.ktlint:ktlint-core:${SamplesVersions.ktlintCore}")
 }
