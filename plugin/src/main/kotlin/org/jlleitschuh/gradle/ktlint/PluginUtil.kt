@@ -11,6 +11,8 @@ import org.gradle.api.DomainObjectSet
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.FileCollection
+import org.gradle.api.file.ProjectLayout
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.HelpTasksPlugin
 import org.gradle.api.provider.ListProperty
@@ -18,6 +20,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.language.base.plugins.LifecycleBasePlugin
+import org.gradle.util.GradleVersion
 import java.nio.file.Path
 
 internal fun resolveMainClassName(ktlintVersion: String) = when {
@@ -142,4 +145,15 @@ internal val BaseExtension.variants: DomainObjectSet<out BaseVariant>?
         is FeatureExtension -> featureVariants
         is TestExtension -> applicationVariants
         else -> null // Instant app extension doesn't provide variants access
+    }
+
+@Suppress("DEPRECATION")
+internal fun newFileProperty(
+    objectFactory: ObjectFactory,
+    projectLayout: ProjectLayout
+): RegularFileProperty =
+    if (GradleVersion.current() >= GradleVersion.version("5.0")) {
+        objectFactory.fileProperty()
+    } else {
+        projectLayout.fileProperty()
     }

@@ -95,7 +95,7 @@ open class KtlintInstallGitHookTask @Inject constructor(
     internal val taskName: Property<String> = objectFactory.property(String::class.java)
 
     @get:OutputFile
-    internal val gitHook: RegularFileProperty = projectLayout.fileProperty()
+    internal val gitHook: RegularFileProperty = newFileProperty(objectFactory, projectLayout)
 
     @TaskAction
     fun installHook() {
