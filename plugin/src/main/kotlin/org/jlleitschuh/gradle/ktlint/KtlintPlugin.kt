@@ -275,9 +275,9 @@ open class KtlintPlugin : Plugin<Project> {
         }
     }
 
-    private fun KtlintCheckTask.configurePluginTask(
+    private fun BaseKtlintCheckTask.configurePluginTask(
         pluginHolder: PluginHolder,
-        additionalConfig: KtlintCheckTask.() -> Unit
+        additionalTaskConfig: BaseKtlintCheckTask.() -> Unit
     ) {
         classpath.setFrom(pluginHolder.ktlintConfiguration)
         ktlintVersion.set(pluginHolder.extension.version)
@@ -299,7 +299,7 @@ open class KtlintPlugin : Plugin<Project> {
         android.set(pluginHolder.extension.android)
         enableExperimentalRules.set(pluginHolder.extension.enableExperimentalRules)
 
-        additionalConfig()
+        additionalTaskConfig()
     }
 
     private fun setCheckTaskDependsOnKtlintCheckTask(

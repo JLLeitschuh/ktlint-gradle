@@ -131,7 +131,7 @@ open class KtlintInstallGitHookTask @Inject constructor(
     }
 }
 
-internal fun KtlintCheckTask.applyGitFilter() {
+internal fun BaseKtlintCheckTask.applyGitFilter() {
     val projectRelativePath = project.rootDir.toPath()
         .relativize(project.projectDir.toPath())
         .toString()

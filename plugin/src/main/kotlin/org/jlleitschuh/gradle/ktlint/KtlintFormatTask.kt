@@ -15,7 +15,7 @@ import javax.inject.Inject
 open class KtlintFormatTask @Inject constructor(
     objectFactory: ObjectFactory,
     projectLayout: ProjectLayout
-) : KtlintCheckTask(objectFactory, projectLayout) {
+) : BaseKtlintCheckTask(objectFactory, projectLayout) {
     override fun additionalConfig(): (JavaExecSpec) -> Unit = {
         it.args("-F")
     }
