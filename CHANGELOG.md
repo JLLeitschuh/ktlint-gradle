@@ -5,18 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [8.0.0] - 2019-05-06
 ### Added
   - `ktlintRuleset` configuration to provide 3rd party ktlint rules (#71)
 ### Changed
   - Update Kotlin to `1.3.30` version
   - Deprecated providing 3rd party ktlint rules via extension (#71)
-  - Change tasks inheritance - now `KtlintFormat` and `KtlintCheck` extend `BaseKtlintCheckTask` (#225) 
+  - Breaking: Change tasks inheritance - now `KtlintFormat` and `KtlintCheck` extend `BaseKtlintCheckTask` (#225) 
   - Update Android Gradle plugin to `3.4.0` version
 ### Fixed
   - Proper lazy adding ktlint dependency (#219)
-### Removed
-  - ?
+  - Gradle 5.x deprecation messages (#208)
 
 ## [7.4.0] - 2019-04-23
 ### Added
