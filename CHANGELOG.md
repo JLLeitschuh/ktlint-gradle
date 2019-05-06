@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
   - Update Kotlin to `1.3.30` version
   - Deprecated providing 3rd party ktlint rules via extension (#71)
+  - Change tasks inheritance - now `KtlintFormat` and `KtlintCheck` extend `BaseKtlintCheckTask` (#225) 
 ### Fixed
   - Proper lazy adding ktlint dependency (#219)
 ### Removed
