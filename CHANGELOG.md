@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+### Added
+  - ?
+### Changed
+  - ?
+### Fixed
+  - ?
+### Removed
+  - ?
+
 ## [8.0.0] - 2019-05-06
 ### Added
   - `ktlintRuleset` configuration to provide 3rd party ktlint rules (#71)
