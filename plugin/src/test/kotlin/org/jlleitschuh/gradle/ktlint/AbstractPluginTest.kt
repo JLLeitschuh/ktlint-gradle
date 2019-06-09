@@ -86,6 +86,5 @@ abstract class AbstractPluginTest {
         createEditorconfigFile(maxLineLength)
     }
 
-    fun File.buildFile() = resolve("build.gradle")
     fun File.settingsFile() = resolve("settings.gradle")
 }
