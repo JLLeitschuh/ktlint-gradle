@@ -69,22 +69,5 @@ abstract class AbstractPluginTest {
         sourceFile.writeText(contents)
     }
 
-    protected fun File.createEditorconfigFile(
-        maxLineLength: Int = 120
-    ) = createSourceFile(".editorconfig", """
-        [*.{kt,kts}]
-        max_line_length=$maxLineLength
-    """.trimIndent())
-
-    protected fun File.modifyEditorconfigFile(
-        maxLineLength: Int
-    ) {
-        val editorconfigFile = resolve(".editorconfig")
-        if (editorconfigFile.exists()) {
-            editorconfigFile.delete()
-        }
-        createEditorconfigFile(maxLineLength)
-    }
-
     fun File.settingsFile() = resolve("settings.gradle")
 }
