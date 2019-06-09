@@ -36,11 +36,14 @@ abstract class BaseKtlintCheckTask(
     @get:Classpath
     internal val classpath: ConfigurableFileCollection = project.files()
 
+    @get:Internal
+    internal val additionalEditorconfigFile: RegularFileProperty = newFileProperty(objectFactory, projectLayout)
+
     @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:InputFiles
     internal val editorConfigFiles: FileCollection by lazy(LazyThreadSafetyMode.NONE) {
         // Gradle will lazy evaluate this task input only on task execution
-        getEditorConfigFiles(project)
+        getEditorConfigFiles(project, additionalEditorconfigFile)
     }
 
     @get:Input

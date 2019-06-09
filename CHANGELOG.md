@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 ### Added
-  - ?
+  - `additionalEditorconfigFile` property to plugin extension (#210)
 ### Changed
   - ?
 ### Fixed
