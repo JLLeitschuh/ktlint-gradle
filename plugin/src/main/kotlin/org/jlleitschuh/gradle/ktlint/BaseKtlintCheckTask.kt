@@ -133,6 +133,9 @@ abstract class BaseKtlintCheckTask(
         if (enableExperimentalRules.get()) {
             javaExecSpec.args("--experimental")
         }
+        if (additionalEditorconfigFile.isPresent) {
+            javaExecSpec.args("--editorconfig=${additionalEditorconfigFile.get().asFile.absolutePath}")
+        }
         javaExecSpec.args(ruleSets.get().map { "--ruleset=$it" })
         javaExecSpec.args(ruleSetsClasspath.files.map { "--ruleset=${it.absolutePath}" })
         javaExecSpec.isIgnoreExitValue = ignoreFailures.get()
