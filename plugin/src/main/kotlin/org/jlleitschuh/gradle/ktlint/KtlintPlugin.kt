@@ -282,6 +282,7 @@ open class KtlintPlugin : Plugin<Project> {
         classpath.setFrom(pluginHolder.ktlintConfiguration)
         ktlintVersion.set(pluginHolder.extension.version)
         verbose.set(pluginHolder.extension.verbose)
+        additionalEditorconfigFile.set(pluginHolder.extension.additionalEditorconfigFile)
         debug.set(pluginHolder.extension.debug)
         ignoreFailures.set(pluginHolder.extension.ignoreFailures)
         outputToConsole.set(pluginHolder.extension.outputToConsole)

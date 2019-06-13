@@ -159,6 +159,7 @@ ktlint {
     reporters = [ReporterType.PLAIN, ReporterType.CHECKSTYLE]
     ignoreFailures = true
     enableExperimentalRules = true
+    additionalEditorconfigFile = file("/some/additional/.editorconfig")
     kotlinScriptAdditionalPaths {
         include fileTree("scripts/")
     }
@@ -188,6 +189,7 @@ ktlint {
     reporters.set(setOf(ReporterType.PLAIN, ReporterType.CHECKSTYLE))
     ignoreFailures.set(true)
     enableExperimentalRules.set(true)
+    additionalEditorconfigFile.set(file("/some/additional/.editorconfig"))
     kotlinScriptAdditionalPaths {
         include(fileTree("scripts/"))
     }

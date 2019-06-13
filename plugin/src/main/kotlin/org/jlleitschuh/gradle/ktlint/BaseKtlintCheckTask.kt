@@ -36,11 +36,14 @@ abstract class BaseKtlintCheckTask(
     @get:Classpath
     internal val classpath: ConfigurableFileCollection = project.files()
 
+    @get:Internal
+    internal val additionalEditorconfigFile: RegularFileProperty = newFileProperty(objectFactory, projectLayout)
+
     @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:InputFiles
     internal val editorConfigFiles: FileCollection by lazy(LazyThreadSafetyMode.NONE) {
         // Gradle will lazy evaluate this task input only on task execution
-        getEditorConfigFiles(project)
+        getEditorConfigFiles(project, additionalEditorconfigFile)
     }
 
     @get:Input
@@ -129,6 +132,9 @@ abstract class BaseKtlintCheckTask(
         }
         if (enableExperimentalRules.get()) {
             javaExecSpec.args("--experimental")
+        }
+        if (additionalEditorconfigFile.isPresent) {
+            javaExecSpec.args("--editorconfig=${additionalEditorconfigFile.get().asFile.absolutePath}")
         }
         javaExecSpec.args(ruleSets.get().map { "--ruleset=$it" })
         javaExecSpec.args(ruleSetsClasspath.files.map { "--ruleset=${it.absolutePath}" })
