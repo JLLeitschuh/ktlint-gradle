@@ -450,6 +450,7 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         projectRoot.buildFile().appendText("""
 
             ktlint.enableExperimentalRules = true
+            ktlint.version = "0.32.0"
         """.trimIndent())
 
         buildAndFail(":$CHECK_PARENT_TASK_NAME").apply {
