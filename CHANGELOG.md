@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Added
   - `additionalEditorconfigFile` property to plugin extension (#210)
 ### Changed
-  - ?
+  - Default ktlint version to `0.33.0`.
 ### Fixed
   - ?
 ### Removed
