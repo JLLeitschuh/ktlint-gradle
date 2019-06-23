@@ -25,12 +25,12 @@ set -e
 internal const val startHookSection = "######## KTLINT-GRADLE HOOK START ########\n"
 internal const val endHookSection = "######## KTLINT-GRADLE HOOK END ########\n"
 
-@Language("Bash")
+@Language("Sh")
 internal fun generateGitHook(taskName: String) = """
 
 CHANGED_FILES="${'$'}(git --no-pager diff --name-status --no-color --cached | awk '$1 != "D" && $2 ~ /\.kts|\.kt/ { print $2}')"
 
-if [[ -z "${'$'}CHANGED_FILES" ]]; then
+if [ -z "${'$'}CHANGED_FILES" ]; then
     echo "No Kotlin staged files."
     exit 0
 fi;
@@ -42,11 +42,11 @@ echo "${'$'}CHANGED_FILES"
 
 echo "Completed ktlint run."
 
-while read -r file; do
-    if [[ -f ${'$'}file ]]; then
+echo "${'$'}CHANGED_FILES" | while read -r file; do
+    if [ -f ${'$'}file ]; then
         git add ${'$'}file
     fi
-done <<< "${'$'}CHANGED_FILES"
+done
 
 echo "Completed ktlint hook."
 
