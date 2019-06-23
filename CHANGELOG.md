@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+### Added
+  - ?
+### Changed
+  - Update Kotlin to `1.3.40` version
+### Removed
+  - ?
+### Fixed
+  - ?
+
 ## [8.1.0] - 2019-06-16
 ### Added
   - `additionalEditorconfigFile` property to plugin extension (#210)
