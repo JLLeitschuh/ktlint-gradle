@@ -1,6 +1,9 @@
 language: android
 jdk:
   - oraclejdk8
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq devscripts
 install:
   - yes | sdkmanager --verbose "build-tools;26.0.2"
   - yes | sdkmanager --verbose "platform-tools"
@@ -12,6 +15,7 @@ script:
   - ./plugin/gradlew -p ./plugin build --no-daemon
   - ./plugin/gradlew -p ./plugin ktlintCheck --no-daemon
   - ./gradlew ktlintCheck --no-daemon
+  - ./gradlew addKtlintCheckGitPreCommitHook --no-daemon && checkbashisms .git/hooks/pre-commit
   - if [ -n "$TRAVIS_TAG" ]; then ./plugin/gradlew -p ./plugin publishPlugins --no-daemon; fi
 
 before_cache:
