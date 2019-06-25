@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Removed
   - ?
 ### Fixed
-  - ?
+  - Usage of bashisms in git hook script (#251)
 
 ## [8.1.0] - 2019-06-16
 ### Added
