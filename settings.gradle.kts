@@ -37,6 +37,7 @@ include("samples:kotlin-gradle")
 if (isAndroidSdkAvailable()) {
     include("samples:android-app")
 }
+include("samples:kotlin-kotlin2js")
 include("samples:kotlin-js")
 include("samples:kotlin-multiplatform-common")
 include("samples:kotlin-multiplatform-jvm")

@@ -6,20 +6,28 @@ import java.io.File
 fun File.buildFile() = resolve("build.gradle")
 
 @Language("Groovy")
-val pluginsBlockWithMainPluginAndKotlinJvm =
+private fun pluginsBlockWithMainPluginAndKotlinPlugin(
+    kotlinPluginId: String
+) =
     """
         plugins {
-            id 'org.jetbrains.kotlin.jvm'
+            id '$kotlinPluginId'
             id 'org.jlleitschuh.gradle.ktlint'
         }
     """.trimIndent()
 
 fun File.defaultProjectSetup() {
+    kotlinPluginProjectSetup("org.jetbrains.kotlin.jvm")
+}
+
+fun File.kotlinPluginProjectSetup(
+    kotlinPluginId: String
+) {
     //language=Groovy
     buildFile().writeText(
         """
-            $pluginsBlockWithMainPluginAndKotlinJvm
-
+            ${pluginsBlockWithMainPluginAndKotlinPlugin(kotlinPluginId)}
+            
             repositories {
                 gradlePluginPortal()
             }
@@ -27,5 +35,6 @@ fun File.defaultProjectSetup() {
             import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
             ktlint.reporters = [ReporterType.CHECKSTYLE, ReporterType.PLAIN]
-        """.trimIndent())
+        """.trimIndent()
+    )
 }

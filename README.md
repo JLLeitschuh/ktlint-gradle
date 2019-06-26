@@ -51,6 +51,7 @@ This plugin supports following kotlin plugins:
 - "org.jetbrains.kotlin.native"
 - "kotlin-multiplatform"
 - project kotlin script files
+- "org.jetbrains.kotlin.js"
 
 If you know any new Kotlin plugin that are not in this list - please,
 open a [new issue](https://github.com/JLLeitschuh/ktlint-gradle/issues/new).
