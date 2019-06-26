@@ -6,16 +6,13 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTree
-import org.gradle.api.file.SourceDirectorySet
-import org.gradle.api.internal.HasConvention
 import org.gradle.api.logging.configuration.ConsoleOutput
 import org.gradle.api.plugins.Convention
-import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.experimental.KotlinNativeComponent
 import org.jetbrains.kotlin.gradle.plugin.konan.KonanArtifactContainer
 import org.jetbrains.kotlin.gradle.plugin.konan.KonanExtension
@@ -42,6 +39,7 @@ open class KtlintPlugin : Plugin<Project> {
     private fun PluginHolder.addKtLintTasksToKotlinPlugin() {
         target.plugins.withId("kotlin", applyKtLint())
         target.plugins.withId("kotlin2js", applyKtLint())
+        target.plugins.withId("org.jetbrains.kotlin.js", applyKtLint())
         target.plugins.withId("kotlin-platform-common", applyKtLint())
         target.plugins.withId("kotlin-android", applyKtLintToAndroid())
         target.plugins.withId("konan", applyKtLintKonanNative())
@@ -98,17 +96,14 @@ open class KtlintPlugin : Plugin<Project> {
 
     private fun PluginHolder.applyKtLint(): (Plugin<in Any>) -> Unit {
         return {
-            val sourceSets = target.theHelper<JavaPluginConvention>().sourceSets
+            val sourceSets = target.theHelper<KotlinProjectExtension>().sourceSets
 
             sourceSets.all { sourceSet ->
-                val kotlinSourceSet: SourceDirectorySet = (sourceSet as HasConvention)
-                    .convention
-                    .getPluginHelper<KotlinSourceSet>()
-                    .kotlin
+                val kotlinSourceDirectories = sourceSet.kotlin.sourceDirectories
                 val checkTask = createCheckTask(
                     this,
                     sourceSet.name,
-                    kotlinSourceSet.sourceDirectories
+                    kotlinSourceDirectories
                 )
 
                 addKtlintCheckTaskToProjectMetaCheckTask(checkTask)
@@ -117,7 +112,7 @@ open class KtlintPlugin : Plugin<Project> {
                 val ktlintSourceSetFormatTask = createFormatTask(
                     this,
                     sourceSet.name,
-                    kotlinSourceSet.sourceDirectories
+                    kotlinSourceDirectories
                 )
 
                 addKtlintFormatTaskToProjectMetaFormatTask(ktlintSourceSetFormatTask)
