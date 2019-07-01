@@ -46,6 +46,8 @@ include("samples:kotlin-native")
 include("samples:kotlin-native-konan")
 include("samples:kotlin-rulesets-creating")
 include("samples:kotlin-rulesets-using")
+include("samples:kotlin-reporter-creating")
+include("samples:kotlin-reporter-using")
 include("samples:kotlin-mpp")
 if (isAndroidSdkAvailable()) {
     include("samples:kotlin-mpp-android")
