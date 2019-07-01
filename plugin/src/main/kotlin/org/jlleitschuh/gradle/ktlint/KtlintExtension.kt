@@ -1,6 +1,7 @@
 package org.jlleitschuh.gradle.ktlint
 
 import org.gradle.api.Action
+import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
@@ -9,6 +10,7 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.util.PatternFilterable
+import org.jlleitschuh.gradle.ktlint.reporter.CustomReporter
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 /**
@@ -19,6 +21,7 @@ open class KtlintExtension
 internal constructor(
     objectFactory: ObjectFactory,
     projectLayout: ProjectLayout,
+    private val dependencyHandler: DependencyHandler,
     private val filterTargetApplier: FilterApplier,
     private val kotlinScriptAdditionalPathApplier: KotlinScriptAdditionalPathApplier
 ) {
@@ -80,6 +83,15 @@ internal constructor(
         set(setOf(ReporterType.PLAIN))
     }
 
+    internal val customReportersSet: SetProperty<CustomReporter> = objectFactory.setProperty()
+
+    /**
+     * Add custom reporters.
+     */
+    fun customReporters(action: Action<CustomReporterExtension>) {
+        action.execute(CustomReporterExtension())
+    }
+
     /**
      * Enable experimental ktlint rules.
      *
@@ -124,6 +136,35 @@ internal constructor(
          */
         fun include(fileTree: ConfigurableFileTree) {
             ksApplier(fileTree)
+        }
+    }
+
+    inner class CustomReporterExtension {
+        /**
+         * Add 3rd party reporter.
+         *
+         * @param reporterId should be an id that reporter exposes for ktlint `ServiceLocator`
+         * @param reporterFileExtension generated report file extension
+         * @param reporterDependencyNotation reporter
+         * [dependency notation](https://docs.gradle.org/current/dsl/org.gradle.api.artifacts.dsl.DependencyHandler.html#N17198).
+         * For example it could be:
+         * ```
+         * "some.group:reporter:0.1.0"
+         * project(":custom:reporter")
+         * ```
+         */
+        fun reporter(
+            reporterId: String,
+            reporterFileExtension: String,
+            reporterDependencyNotation: Any
+        ) {
+            customReportersSet.add(
+                CustomReporter(
+                    reporterId,
+                    reporterFileExtension,
+                    dependencyHandler.create(reporterDependencyNotation)
+                )
+            )
         }
     }
 }

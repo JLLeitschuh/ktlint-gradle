@@ -168,6 +168,9 @@ ktlint {
         exclude("**/generated/**")
         include("**/kotlin/**")
     }
+    customReporters {
+        reporter "csv", "csv", project(":csv-reporter")
+    }
 }
 
 dependencies {
@@ -197,6 +200,9 @@ ktlint {
     filter {
         exclude("**/generated/**")
         include("**/kotlin/**")
+    }
+    customReporters {
+        reporter("csv", "csv", project(":samples:kotlin-reporter-creating"))
     }
 }
 

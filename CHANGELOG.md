@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 ### Added
   - Support for new JS plugin: "org.jetbrains.kotlin.js" (#252)
+  - Add support for 3rd party reporters (#125)
 ### Changed
   - Update Kotlin to `1.3.40` version
 ### Removed
