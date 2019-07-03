@@ -52,54 +52,6 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
     }
 
     @Test
-    fun `check task is relocatable`() {
-        val originalLocation = temporaryFolder.resolve("original")
-        val relocatedLocation = temporaryFolder.resolve("relocated")
-        val localBuildCacheDirectory = temporaryFolder.resolve("build-cache")
-        listOf(originalLocation, relocatedLocation).forEach {
-            it.apply {
-                withCleanSources()
-                buildFile().writeText("""
-                    ${pluginsBlockWithMainPluginAndKotlinJvm()}
-
-                    repositories {
-                        gradlePluginPortal()
-                    }
-
-                    import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
-
-                    ktlint.reporters = [ReporterType.PLAIN, ReporterType.CHECKSTYLE]
-                """.trimIndent())
-                settingsFile().writeText("""
-                    buildCache {
-                        local {
-                            directory = '${localBuildCacheDirectory.toURI()}'
-                        }
-                    }
-                """.trimIndent())
-            }
-        }
-
-        GradleRunner.create()
-            .withProjectDir(originalLocation)
-            .withPluginClasspath()
-            .withArguments("ktlintCheck", "--build-cache")
-            .forwardOutput()
-            .build().apply {
-                assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            }
-
-        GradleRunner.create()
-            .withProjectDir(relocatedLocation)
-            .withPluginClasspath()
-            .withArguments("ktlintCheck", "--build-cache")
-            .forwardOutput()
-            .build().apply {
-                assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.FROM_CACHE)
-            }
-    }
-
-    @Test
     fun `should succeed check on clean sources`() {
 
         projectRoot.withCleanSources()
