@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Added
   - Support for new JS plugin: "org.jetbrains.kotlin.js" (#252)
 ### Changed
-  - Update Kotlin to `1.3.40` version
+  - Update Kotlin to `1.3.41` version
 ### Removed
   - ?
 ### Fixed
