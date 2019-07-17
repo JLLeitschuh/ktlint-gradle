@@ -88,6 +88,7 @@ open class KtlintPlugin : Plugin<Project> {
                     target.plugins.withId("com.android.instantapp", androidConfigureAction)
                     target.plugins.withId("com.android.feature", androidConfigureAction)
                     target.plugins.withId("com.android.test", androidConfigureAction)
+                    target.plugins.withId("com.android.dynamic-feature", androidConfigureAction)
                 }
                 else -> Unit
             }
@@ -174,6 +175,7 @@ open class KtlintPlugin : Plugin<Project> {
             target.plugins.withId("com.android.instantapp", pluginConfigureAction)
             target.plugins.withId("com.android.feature", pluginConfigureAction)
             target.plugins.withId("com.android.test", pluginConfigureAction)
+            target.plugins.withId("com.android.dynamic-feature", pluginConfigureAction)
         }
     }
 
