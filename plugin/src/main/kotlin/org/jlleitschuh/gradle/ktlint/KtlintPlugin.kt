@@ -7,16 +7,11 @@ import org.gradle.api.Task
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTree
 import org.gradle.api.logging.configuration.ConsoleOutput
-import org.gradle.api.plugins.Convention
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
-import org.jetbrains.kotlin.gradle.plugin.experimental.KotlinNativeComponent
-import org.jetbrains.kotlin.gradle.plugin.konan.KonanArtifactContainer
-import org.jetbrains.kotlin.gradle.plugin.konan.KonanExtension
-import shadow.org.jetbrains.kotlin.gradle.plugin.tasks.KonanCompileTask
 import java.util.concurrent.Callable
 import kotlin.reflect.KClass
 
@@ -42,11 +37,6 @@ open class KtlintPlugin : Plugin<Project> {
         target.plugins.withId("org.jetbrains.kotlin.js", applyKtLint())
         target.plugins.withId("kotlin-platform-common", applyKtLint())
         target.plugins.withId("kotlin-android", applyKtLintToAndroid())
-        target.plugins.withId("konan", applyKtLintKonanNative())
-        target.plugins.withId(
-            "org.jetbrains.kotlin.native",
-            applyKtLintNative()
-        )
         target.plugins.withId(
             "org.jetbrains.kotlin.multiplatform",
             applyKtlintMultiplatform()
@@ -179,61 +169,6 @@ open class KtlintPlugin : Plugin<Project> {
         }
     }
 
-    private fun PluginHolder.applyKtLintKonanNative(): (Plugin<in Any>) -> Unit {
-        return {
-            val compileTargets = target.theHelper<KonanExtension>().targets
-            target.theHelper<KonanArtifactContainer>().whenObjectAdded { buildConfig ->
-                addTasksForNativePlugin(buildConfig.name) {
-                    compileTargets.fold(initial = emptyList()) { acc, target ->
-                        val compileTask = buildConfig.findByTarget(target)
-                        if (compileTask != null) {
-                            val sourceFiles = (compileTask as KonanCompileTask).srcFiles
-                            acc + sourceFiles
-                        } else {
-                            acc
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun PluginHolder.applyKtLintNative(): (Plugin<in Any>) -> Unit {
-        return {
-            target.components.withType(KotlinNativeComponent::class.java) { component ->
-                addTasksForNativePlugin(component.name) {
-                    component.konanTargets.get()
-                        .fold(initial = emptyList()) { acc, nativeTarget ->
-                            acc + listOf(component.sources.getAllSources(nativeTarget))
-                        }
-                }
-            }
-        }
-    }
-
-    private fun PluginHolder.addTasksForNativePlugin(
-        sourceSetName: String,
-        gatherVariantSources: () -> List<FileCollection>
-    ) {
-        val sourceDirectoriesList = gatherVariantSources()
-        if (sourceDirectoriesList.isNotEmpty()) {
-            val checkTask = createCheckTask(
-                this,
-                sourceSetName,
-                sourceDirectoriesList
-            )
-            addKtlintCheckTaskToProjectMetaCheckTask(checkTask)
-            setCheckTaskDependsOnKtlintCheckTask(target, checkTask)
-
-            val ktlintSourceSetFormatTask = createFormatTask(
-                this,
-                sourceSetName,
-                sourceDirectoriesList
-            )
-            addKtlintFormatTaskToProjectMetaFormatTask(ktlintSourceSetFormatTask)
-        }
-    }
-
     private fun PluginHolder.addKtlintCheckTaskToProjectMetaCheckTask(
         checkTask: TaskProvider<KtlintCheckTask>
     ) {
@@ -358,8 +293,6 @@ open class KtlintPlugin : Plugin<Project> {
 
     private fun <T : Any> Project.theHelper(extensionType: KClass<T>) =
         convention.findPlugin(extensionType.java) ?: convention.getByType(extensionType.java)
-
-    private inline fun <reified T> Convention.getPluginHelper() = getPlugin(T::class.java)
 
     private fun Project.isConsolePlain() = gradle.startParameter.consoleOutput == ConsoleOutput.Plain
 

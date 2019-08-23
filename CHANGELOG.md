@@ -10,8 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   - ?
 ### Changed
   - Update Gradle to `5.6` version
+  - Update Kotlin to `1.3.50` version
 ### Removed
-  - ?
+  - Support for "konan" plugin
+  - Support for "kotlin-native-gradle-plugin" plugin
 ### Fixed
   - ?
 
