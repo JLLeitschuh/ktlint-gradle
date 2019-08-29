@@ -47,8 +47,6 @@ This plugin supports following kotlin plugins:
 - "kotlin-platform-common"
 - "kotlin-platform-js"
 - "kotlin-platform-jvm"
-- "konan"
-- "org.jetbrains.kotlin.native"
 - "kotlin-multiplatform"
 - project kotlin script files
 - "org.jetbrains.kotlin.js"
