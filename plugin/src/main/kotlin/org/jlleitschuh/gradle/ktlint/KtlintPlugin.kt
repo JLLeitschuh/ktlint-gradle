@@ -226,7 +226,6 @@ open class KtlintPlugin : Plugin<Project> {
                 it
             }
         })
-        ruleSets.set(pluginHolder.extension.ruleSets)
         ruleSetsClasspath.setFrom(pluginHolder.ktlintRulesetConfiguration)
         reporters.set(pluginHolder.extension.reporters)
         android.set(pluginHolder.extension.android)

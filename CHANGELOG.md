@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Removed
   - Support for "konan" plugin
   - Support for "kotlin-native-gradle-plugin" plugin
+  - Deprecated `ruleset` extension property, please use `ruleset` configuration instead
 ### Fixed
   - ?
 

@@ -5,7 +5,6 @@ import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.util.PatternFilterable
@@ -54,18 +53,6 @@ internal constructor(
      * Example: `ignoreFailures = true`
      */
     val ignoreFailures: Property<Boolean> = objectFactory.property { set(false) }
-    /**
-     * The ruleset(s) of ktlint to use.
-     *
-     * Deprecated - please, use instead ktlint ruleset configuration:
-     * ```kotlin
-     * dependencies {
-     *     ktlintRuleset("some:ktlint-rule:0.0.1")
-     * }
-     * ```
-     */
-    @Deprecated("Please use $KTLINT_RULESET_CONFIGURATION_NAME configuration")
-    val ruleSets: ListProperty<String> = objectFactory.listProperty { set(emptyList()) }
 
     /**
      * Report output formats.
