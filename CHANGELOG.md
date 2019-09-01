@@ -7,12 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 ### Added
-  - Support for new JS plugin: "org.jetbrains.kotlin.js" (#252)
   - Add support for 3rd party reporters (#125)
 ### Changed
-  - Update Kotlin to `1.3.40` version
+  - Update Gradle to `5.6` version
+  - Update Kotlin to `1.3.50` version
 ### Removed
+  - Support for "konan" plugin
+  - Support for "kotlin-native-gradle-plugin" plugin
+  - Deprecated `ruleset` extension property, please use `ruleset` configuration instead
+### Fixed
   - ?
+
+## [8.2.0] - 2019-07-18
+### Added
+  - Support for new JS plugin: "org.jetbrains.kotlin.js" (#252)
+  - Support for android "com.android.dynamic-feature" plugin (#260)
+### Changed
+  - Update Kotlin to `1.3.41` version
 ### Fixed
   - Usage of bashisms in git hook script (#251)
 

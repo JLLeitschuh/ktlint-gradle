@@ -7,12 +7,11 @@ plugins {
 }
 
 group = "org.jlleitschuh.gradle"
-version = "8.2.0-SNAPSHOT"
+version = "8.3.0-SNAPSHOT"
 
 repositories {
     google()
     jcenter()
-    maven("https://dl.bintray.com/jetbrains/kotlin-native-dependencies")
 }
 
 tasks.withType<PluginUnderTestMetadata>().configureEach {
@@ -23,7 +22,6 @@ dependencies {
     compileOnly(gradleApi())
     compileOnly(kotlin("gradle-plugin", PluginVersions.kotlin))
     compileOnly("com.android.tools.build:gradle:${PluginVersions.androidPlugin}")
-    compileOnly("org.jetbrains.kotlin:kotlin-native-gradle-plugin:${PluginVersions.kotlin}")
     implementation("net.swiftzer.semver:semver:${PluginVersions.semver}")
 
     /*

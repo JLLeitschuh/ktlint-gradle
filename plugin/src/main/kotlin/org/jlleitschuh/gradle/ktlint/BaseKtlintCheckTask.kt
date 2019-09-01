@@ -8,7 +8,6 @@ import org.gradle.api.file.FileTree
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Classpath
@@ -51,8 +50,6 @@ abstract class BaseKtlintCheckTask(
     internal val ktlintVersion: Property<String> = objectFactory.property()
     @get:Input
     internal val verbose: Property<Boolean> = objectFactory.property()
-    @get:Input
-    internal val ruleSets: ListProperty<String> = objectFactory.listProperty(String::class.java)
     @get:Classpath
     internal val ruleSetsClasspath: ConfigurableFileCollection = project.files()
     @get:Input
@@ -169,7 +166,6 @@ abstract class BaseKtlintCheckTask(
         if (additionalEditorconfigFile.isPresent) {
             javaExecSpec.args("--editorconfig=${additionalEditorconfigFile.get().asFile.absolutePath}")
         }
-        javaExecSpec.args(ruleSets.get().map { "--ruleset=$it" })
         javaExecSpec.args(ruleSetsClasspath.files.map { "--ruleset=${it.absolutePath}" })
         javaExecSpec.isIgnoreExitValue = ignoreFailures.get()
         javaExecSpec.args(allReports.map { it.asArgument() })
@@ -184,7 +180,7 @@ abstract class BaseKtlintCheckTask(
     }
 
     private fun checkCWEKtlintVersion() {
-        if (!ruleSets.get().isNullOrEmpty() &&
+        if (!ruleSetsClasspath.isEmpty &&
             SemVer.parse(ktlintVersion.get()) < SemVer(0, 30, 0)) {
             logger.warn(
                 "You are using ktlint version ${ktlintVersion.get()} that has the security vulnerability " +
