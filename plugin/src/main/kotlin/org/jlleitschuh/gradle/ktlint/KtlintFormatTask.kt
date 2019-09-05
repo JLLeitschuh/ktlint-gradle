@@ -8,7 +8,7 @@ import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
-import org.gradle.process.JavaExecSpec
+import java.io.PrintWriter
 import javax.inject.Inject
 
 @CacheableTask
@@ -16,8 +16,8 @@ open class KtlintFormatTask @Inject constructor(
     objectFactory: ObjectFactory,
     projectLayout: ProjectLayout
 ) : BaseKtlintCheckTask(objectFactory, projectLayout) {
-    override fun additionalConfig(): (JavaExecSpec) -> Unit = {
-        it.args("-F")
+    override fun additionalConfig(): (PrintWriter) -> Unit = {
+        it.println("-F")
     }
 
     /**

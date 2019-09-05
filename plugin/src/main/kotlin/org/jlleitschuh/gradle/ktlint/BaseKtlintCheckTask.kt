@@ -25,6 +25,7 @@ import org.gradle.process.JavaExecSpec
 import org.jlleitschuh.gradle.ktlint.reporter.KtlintReport
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import java.io.File
+import java.io.PrintWriter
 
 @Suppress("UnstableApiUsage")
 abstract class BaseKtlintCheckTask(
@@ -104,39 +105,54 @@ abstract class BaseKtlintCheckTask(
         project.javaexec(generateJavaExecSpec(additionalConfig()))
     }
 
-    abstract fun additionalConfig(): (JavaExecSpec) -> Unit
+    @OutputFiles
+    private val ktlintArgsFile = newFileProperty(objectFactory, projectLayout).apply {
+        set(
+            project.layout.buildDirectory.file(
+                project.provider {
+                    "ktlint/${this@BaseKtlintCheckTask.name}.args"
+                }
+            )
+        )
+    }
+
+    abstract fun additionalConfig(): (PrintWriter) -> Unit
 
     private fun generateJavaExecSpec(
-        additionalConfig: (JavaExecSpec) -> Unit
+        additionalConfig: (PrintWriter) -> Unit
     ): (JavaExecSpec) -> Unit = { javaExecSpec ->
         javaExecSpec.classpath = classpath
         javaExecSpec.main = resolveMainClassName(ktlintVersion.get())
-        javaExecSpec.args(getSource().toRelativeFilesList())
-        if (verbose.get()) {
-            javaExecSpec.args("--verbose")
-        }
-        if (debug.get()) {
-            javaExecSpec.args("--debug")
-        }
-        if (android.get()) {
-            javaExecSpec.args("--android")
-        }
-        if (outputToConsole.get()) {
-            javaExecSpec.args("--reporter=plain")
-        }
-        if (coloredOutput.get()) {
-            javaExecSpec.args("--color")
-        }
-        if (enableExperimentalRules.get()) {
-            javaExecSpec.args("--experimental")
-        }
-        if (additionalEditorconfigFile.isPresent) {
-            javaExecSpec.args("--editorconfig=${additionalEditorconfigFile.get().asFile.absolutePath}")
-        }
-        javaExecSpec.args(ruleSetsClasspath.files.map { "--ruleset=${it.absolutePath}" })
         javaExecSpec.isIgnoreExitValue = ignoreFailures.get()
-        javaExecSpec.args(enabledReports.map { it.asArgument() })
-        additionalConfig(javaExecSpec)
+
+        val argsConfigFile = ktlintArgsFile.get().asFile
+        if (!argsConfigFile.exists()) {
+            argsConfigFile.parentFile.mkdirs()
+            argsConfigFile.createNewFile()
+        }
+        argsConfigFile.printWriter().use { argsWriter ->
+            if (verbose.get()) argsWriter.println("--verbose")
+            if (debug.get()) argsWriter.println("--debug")
+            if (android.get()) argsWriter.println("--android")
+            if (outputToConsole.get()) argsWriter.println("--reporter=plain")
+            if (coloredOutput.get()) argsWriter.println("--color")
+            if (enableExperimentalRules.get()) argsWriter.println("--experimental")
+            if (additionalEditorconfigFile.isPresent) {
+                argsWriter.println("--editorconfig=${additionalEditorconfigFile.get().asFile.absolutePath}")
+            }
+            ruleSetsClasspath
+                .files
+                .map { "--ruleset=${it.absolutePath}" }
+                .forEach { argsWriter.println(it) }
+            enabledReports
+                .map { it.asArgument() }
+                .forEach { argsWriter.println(it) }
+            getSource()
+                .toRelativeFilesList()
+                .forEach { argsWriter.println(it) }
+            additionalConfig(argsWriter)
+        }
+        javaExecSpec.args("@$argsConfigFile")
     }
 
     private fun checkMinimalSupportedKtlintVersion() {
