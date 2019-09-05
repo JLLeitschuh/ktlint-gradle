@@ -24,7 +24,7 @@ internal constructor(
     /**
      * The version of ktlint to use.
      */
-    val version: Property<String> = objectFactory.property { set("0.33.0") }
+    val version: Property<String> = objectFactory.property { set("0.34.2") }
 
     /**
      * Enable verbose mode.
