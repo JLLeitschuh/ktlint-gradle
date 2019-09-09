@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   - Support for "kotlin-native-gradle-plugin" plugin
   - Deprecated `ruleset` extension property, please use `ruleset` configuration instead
 ### Fixed
-  - Task may fail on command line arguments limit (#233)
+  - Task failing when command line arguments limit was reached (#233)
 
 ## [8.2.0] - 2019-07-18
 ### Added
