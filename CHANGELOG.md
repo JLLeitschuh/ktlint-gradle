@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 ### Added
-  - ?
+  - `disabledRules` extension property to disable rules usage by id (#267)
 ### Changed
   - Update Gradle to `5.6` version
   - Update Kotlin to `1.3.50` version

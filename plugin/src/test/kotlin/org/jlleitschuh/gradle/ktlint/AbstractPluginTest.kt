@@ -44,13 +44,37 @@ abstract class AbstractPluginTest {
             .withArguments(arguments.toList() + "--stacktrace")
 
     protected
-    fun File.withCleanSources() = createSourceFile("src/main/kotlin/clean-source.kt", """val foo = "bar"""")
+    fun File.withCleanSources() = createSourceFile(
+        "src/main/kotlin/clean-source.kt",
+        """
+            val foo = "bar"
+            
+        """.trimIndent())
 
     protected
-    fun File.withFailingSources() = createSourceFile("src/main/kotlin/fail-source.kt", """val  foo    =     "bar"""")
+    fun File.withFailingSources() = createSourceFile(
+        "src/main/kotlin/fail-source.kt",
+        """
+            val  foo    =     "bar"
+            
+        """.trimIndent()
+    )
 
-    protected fun File.withCleanKotlinScript() = createSourceFile("kotlin-script.kts", """println("zzz")""")
-    protected fun File.withFailingKotlinScript() = createSourceFile("kotlin-script-fail.kts", """println("zzz") """)
+    protected fun File.withCleanKotlinScript() = createSourceFile(
+        "kotlin-script.kts",
+        """
+            println("zzz")
+            
+        """.trimIndent()
+    )
+
+    protected fun File.withFailingKotlinScript() = createSourceFile(
+        "kotlin-script-fail.kts",
+        """
+            println("zzz") 
+            
+        """.trimIndent()
+    )
 
     protected fun File.restoreFailingSources() {
         val sourceFile = resolve("src/main/kotlin/fail-source.kt")
