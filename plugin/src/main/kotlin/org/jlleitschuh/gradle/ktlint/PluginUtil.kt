@@ -23,12 +23,16 @@ import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.util.GradleVersion
 import java.nio.file.Path
 
-// The latest commit on ktlint's master branch is automatically uploaded to Sonatype's snapshots repository
-// https://github.com/pinterest/ktlint#access-to-the-latest-master-snapshot
-private const val KtlintMasterSnapshotVersion = "0.0.0-SNAPSHOT"
+/**
+ * The version identifier for ktlint's master snapshots
+ *
+ * The latest commit on ktlint's master branch is automatically uploaded to Sonatype's snapshots repository
+ * https://github.com/pinterest/ktlint#access-to-the-latest-master-snapshot
+ */
+private const val ktlintMasterSnapshotVersion = "0.0.0-SNAPSHOT"
 
 internal fun ktlintVersionLessThan(expectedVersion: SemVer, ktlintVersion: String) =
-    ktlintVersion != KtlintMasterSnapshotVersion &&
+    ktlintVersion != ktlintMasterSnapshotVersion &&
         SemVer.parse(ktlintVersion) < expectedVersion
 
 internal fun resolveMainClassName(ktlintVersion: String) = when {
