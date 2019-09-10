@@ -156,7 +156,7 @@ abstract class BaseKtlintCheckTask(
     }
 
     private fun checkMinimalSupportedKtlintVersion() {
-        if (SemVer.parse(ktlintVersion.get()) < SemVer(0, 22, 0)) {
+        if (ktlintVersionLessThan(0, 22, 0)) {
             throw GradleException("Ktlint versions less than 0.22.0 are not supported. " +
                 "Detected Ktlint version: ${ktlintVersion.get()}.")
         }
@@ -164,7 +164,7 @@ abstract class BaseKtlintCheckTask(
 
     private fun checkCWEKtlintVersion() {
         if (!ruleSetsClasspath.isEmpty &&
-            SemVer.parse(ktlintVersion.get()) < SemVer(0, 30, 0)) {
+            ktlintVersionLessThan(0, 30, 0)) {
             logger.warn(
                 "You are using ktlint version ${ktlintVersion.get()} that has the security vulnerability " +
                     "'CWE-494: Download of Code Without Integrity Check'.\n" +
@@ -175,13 +175,16 @@ abstract class BaseKtlintCheckTask(
 
     private fun checkExperimentalRulesSupportedKtlintVersion() {
         if (enableExperimentalRules.get() &&
-            SemVer.parse(ktlintVersion.get()) < SemVer(0, 31, 0)) {
+            ktlintVersionLessThan(0, 31, 0)) {
             throw GradleException("Experimental rules are supported since 0.31.0 ktlint version.")
         }
     }
 
+    private fun ktlintVersionLessThan(major: Int, minor: Int, patch: Int) =
+        ktlintVersionLessThan(SemVer(major, minor, patch), ktlintVersion.get())
+
     private fun ReporterType.isAvailable() =
-        SemVer.parse(ktlintVersion.get()) >= availableSinceVersion
+        !ktlintVersionLessThan(availableSinceVersion, ktlintVersion.get())
 
     private fun ReporterType.getOutputFile() =
         project.layout.buildDirectory.file(project.provider {

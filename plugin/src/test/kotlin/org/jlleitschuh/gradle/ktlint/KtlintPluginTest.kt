@@ -43,6 +43,23 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
     }
 
     @Test
+    fun `accepts ktlint's master snapshot`() {
+        projectRoot.buildFile().appendText("""
+
+            ktlint.version = "0.0.0-SNAPSHOT"
+            repositories { maven {
+                url = uri("https://oss.sonatype.org/content/repositories/snapshots")
+            } }
+        """.trimIndent())
+
+        projectRoot.withCleanSources()
+
+        build("ktlintCheck").apply {
+            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        }
+    }
+
+    @Test
     fun `should fail check on failing sources`() {
         projectRoot.withFailingSources()
 
