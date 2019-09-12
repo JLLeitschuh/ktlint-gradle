@@ -230,6 +230,7 @@ open class KtlintPlugin : Plugin<Project> {
         reporters.set(pluginHolder.extension.reporters)
         android.set(pluginHolder.extension.android)
         enableExperimentalRules.set(pluginHolder.extension.enableExperimentalRules)
+        disabledRules.set(pluginHolder.extension.disabledRules)
 
         additionalTaskConfig()
     }
