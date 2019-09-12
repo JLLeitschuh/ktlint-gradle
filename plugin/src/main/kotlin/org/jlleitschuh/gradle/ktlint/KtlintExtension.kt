@@ -24,7 +24,7 @@ internal constructor(
     /**
      * The version of ktlint to use.
      */
-    val version: Property<String> = objectFactory.property { set("0.33.0") }
+    val version: Property<String> = objectFactory.property { set("0.34.2") }
 
     /**
      * Enable verbose mode.
@@ -83,6 +83,15 @@ internal constructor(
      * Provide additional `.editorconfig` file, that are not in the project or project parent folders.
      */
     val additionalEditorconfigFile: RegularFileProperty = newFileProperty(objectFactory, projectLayout)
+
+    /**
+     * Disable particular rules, by default enabled in ktlint, using rule id.
+     *
+     * @since ktlint `0.34.2`
+     */
+    val disabledRules: SetProperty<String> = objectFactory.setProperty {
+        set(emptySet())
+    }
 
     private val kscriptExtension = KScriptExtension(kotlinScriptAdditionalPathApplier)
 

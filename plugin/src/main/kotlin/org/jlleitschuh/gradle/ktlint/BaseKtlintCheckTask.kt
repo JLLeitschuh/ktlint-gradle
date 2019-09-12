@@ -66,6 +66,8 @@ abstract class BaseKtlintCheckTask(
     internal val coloredOutput: Property<Boolean> = objectFactory.property()
     @get:Input
     internal val enableExperimentalRules: Property<Boolean> = objectFactory.property()
+    @get:Input
+    internal val disabledRules: SetProperty<String> = objectFactory.setProperty()
 
     @get:Internal
     internal val enabledReports
@@ -101,6 +103,7 @@ abstract class BaseKtlintCheckTask(
         checkMinimalSupportedKtlintVersion()
         checkCWEKtlintVersion()
         checkExperimentalRulesSupportedKtlintVersion()
+        checkDisabledRulesSupportedKtlintVersion()
 
         project.javaexec(generateJavaExecSpec(additionalConfig()))
     }
@@ -147,6 +150,12 @@ abstract class BaseKtlintCheckTask(
             enabledReports
                 .map { it.asArgument() }
                 .forEach { argsWriter.println(it) }
+            disabledRules
+                .get()
+                .joinToString(separator = ",")
+                .run {
+                    if (isNotEmpty()) argsWriter.println("--disabled_rules=$this")
+                }
             getSource()
                 .toRelativeFilesList()
                 .forEach { argsWriter.println(it) }
@@ -177,6 +186,13 @@ abstract class BaseKtlintCheckTask(
         if (enableExperimentalRules.get() &&
             ktlintVersionLessThan(0, 31, 0)) {
             throw GradleException("Experimental rules are supported since 0.31.0 ktlint version.")
+        }
+    }
+
+    private fun checkDisabledRulesSupportedKtlintVersion() {
+        if (disabledRules.get().isNotEmpty() &&
+            SemVer.parse(ktlintVersion.get()) < SemVer(0, 34, 2)) {
+            throw GradleException("Rules disabling is supported since 0.34.2 ktlint version.")
         }
     }
 
