@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   - Update Kotlin to `1.3.50` version
   - Set default ktlint version to `0.34.2`
   - Update Android Gradle plugin to `3.5.0` version
+  - Minimal supported Gradle version updated to `4.5.1`
 ### Removed
   - Support for "konan" plugin
   - Support for "kotlin-native-gradle-plugin" plugin

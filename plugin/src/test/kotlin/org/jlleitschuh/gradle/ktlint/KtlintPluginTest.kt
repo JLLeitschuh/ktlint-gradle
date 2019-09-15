@@ -13,10 +13,10 @@ import org.junit.jupiter.api.Test
 class GradleCurrentKtlintPluginTest : BaseKtlintPluginTest()
 
 @Suppress("ClassName")
-class Gradle4_10KtlintPluginTest : BaseKtlintPluginTest() {
+class GradleLowestSupportedKtlintPluginTest : BaseKtlintPluginTest() {
 
     override fun gradleRunnerFor(vararg arguments: String): GradleRunner =
-            super.gradleRunnerFor(*arguments).withGradleVersion("4.10")
+            super.gradleRunnerFor(*arguments).withGradleVersion(LOWEST_SUPPORTED_GRADLE_VERSION)
 }
 
 abstract class BaseKtlintPluginTest : AbstractPluginTest() {
