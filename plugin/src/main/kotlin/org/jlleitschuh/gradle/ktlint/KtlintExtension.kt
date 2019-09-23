@@ -2,7 +2,6 @@ package org.jlleitschuh.gradle.ktlint
 
 import org.gradle.api.Action
 import org.gradle.api.file.ConfigurableFileTree
-import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
@@ -17,7 +16,6 @@ import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 open class KtlintExtension
 internal constructor(
     objectFactory: ObjectFactory,
-    projectLayout: ProjectLayout,
     private val filterTargetApplier: FilterApplier,
     private val kotlinScriptAdditionalPathApplier: KotlinScriptAdditionalPathApplier
 ) {
@@ -82,7 +80,7 @@ internal constructor(
     /**
      * Provide additional `.editorconfig` file, that are not in the project or project parent folders.
      */
-    val additionalEditorconfigFile: RegularFileProperty = newFileProperty(objectFactory, projectLayout)
+    val additionalEditorconfigFile: RegularFileProperty = objectFactory.fileProperty()
 
     /**
      * Disable particular rules, by default enabled in ktlint, using rule id.

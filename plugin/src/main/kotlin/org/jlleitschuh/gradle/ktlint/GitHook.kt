@@ -2,7 +2,6 @@ package org.jlleitschuh.gradle.ktlint
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
-import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
@@ -88,14 +87,13 @@ private fun KtlintPlugin.PluginHolder.addInstallGitHookCheckTask() {
 }
 
 open class KtlintInstallGitHookTask @Inject constructor(
-    objectFactory: ObjectFactory,
-    projectLayout: ProjectLayout
+    objectFactory: ObjectFactory
 ) : DefaultTask() {
     @get:Input
     internal val taskName: Property<String> = objectFactory.property(String::class.java)
 
     @get:OutputFile
-    internal val gitHook: RegularFileProperty = newFileProperty(objectFactory, projectLayout)
+    internal val gitHook: RegularFileProperty = objectFactory.fileProperty()
 
     @TaskAction
     fun installHook() {

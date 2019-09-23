@@ -38,7 +38,6 @@ open class KtlintBasePlugin : Plugin<Project> {
             "ktlint",
             KtlintExtension::class.java,
             target.objects,
-            target.layout,
             filterTargetApplier,
             kotlinScriptAdditionalPathApplier
         )
