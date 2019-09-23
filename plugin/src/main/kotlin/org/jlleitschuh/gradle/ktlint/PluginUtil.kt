@@ -29,10 +29,10 @@ import java.nio.file.Path
  * The latest commit on ktlint's master branch is automatically uploaded to Sonatype's snapshots repository
  * https://github.com/pinterest/ktlint#access-to-the-latest-master-snapshot
  */
-private const val ktlintMasterSnapshotVersion = "0.0.0-SNAPSHOT"
+private const val KTLINT_SNAPSHOT_VERSION = "0.0.0-SNAPSHOT"
 
 internal fun ktlintVersionLessThan(expectedVersion: SemVer, ktlintVersion: String) =
-    ktlintVersion != ktlintMasterSnapshotVersion &&
+    ktlintVersion != KTLINT_SNAPSHOT_VERSION &&
         SemVer.parse(ktlintVersion) < expectedVersion
 
 internal fun resolveMainClassName(ktlintVersion: String) = when {
