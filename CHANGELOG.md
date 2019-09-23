@@ -8,15 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 ### Added
   - Add support for 3rd party reporters (#125)
+  - `disabledRules` extension property to disable rules usage by id (#267)
 ### Changed
   - Update Gradle to `5.6` version
   - Update Kotlin to `1.3.50` version
+  - Set default ktlint version to `0.34.2`
 ### Removed
   - Support for "konan" plugin
   - Support for "kotlin-native-gradle-plugin" plugin
   - Deprecated `ruleset` extension property, please use `ruleset` configuration instead
 ### Fixed
-  - ?
+  - Task failing when command line arguments limit was reached (#233)
 
 ## [8.2.0] - 2019-07-18
 ### Added

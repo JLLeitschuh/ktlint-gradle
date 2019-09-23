@@ -159,6 +159,7 @@ ktlint {
     ignoreFailures = true
     enableExperimentalRules = true
     additionalEditorconfigFile = file("/some/additional/.editorconfig")
+    disabledRules = ["final-newline"]
     kotlinScriptAdditionalPaths {
         include fileTree("scripts/")
     }
@@ -192,6 +193,7 @@ ktlint {
     ignoreFailures.set(true)
     enableExperimentalRules.set(true)
     additionalEditorconfigFile.set(file("/some/additional/.editorconfig"))
+    disabledRules.set(setOf("final-newline"))
     kotlinScriptAdditionalPaths {
         include(fileTree("scripts/"))
     }
