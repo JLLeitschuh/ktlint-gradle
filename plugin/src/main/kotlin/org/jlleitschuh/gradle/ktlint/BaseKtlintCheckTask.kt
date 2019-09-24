@@ -5,7 +5,6 @@ import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTree
-import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
@@ -29,15 +28,14 @@ import java.io.PrintWriter
 
 @Suppress("UnstableApiUsage")
 abstract class BaseKtlintCheckTask(
-    private val objectFactory: ObjectFactory,
-    private val projectLayout: ProjectLayout
+    private val objectFactory: ObjectFactory
 ) : SourceTask() {
 
     @get:Classpath
     internal val classpath: ConfigurableFileCollection = project.files()
 
     @get:Internal
-    internal val additionalEditorconfigFile: RegularFileProperty = newFileProperty(objectFactory, projectLayout)
+    internal val additionalEditorconfigFile: RegularFileProperty = objectFactory.fileProperty()
 
     @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:InputFiles
@@ -76,7 +74,7 @@ abstract class BaseKtlintCheckTask(
                 KtlintReport(
                     objectFactory.property { set(it.isAvailable()) },
                     it,
-                    newFileProperty(objectFactory, projectLayout).apply {
+                    objectFactory.fileProperty().apply {
                         set(it.getOutputFile())
                     }
                 )
@@ -109,7 +107,7 @@ abstract class BaseKtlintCheckTask(
     }
 
     @OutputFiles
-    private val ktlintArgsFile = newFileProperty(objectFactory, projectLayout).apply {
+    private val ktlintArgsFile = objectFactory.fileProperty().apply {
         set(
             project.layout.buildDirectory.file(
                 project.provider {

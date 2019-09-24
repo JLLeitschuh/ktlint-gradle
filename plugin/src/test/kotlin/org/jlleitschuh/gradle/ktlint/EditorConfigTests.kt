@@ -16,10 +16,10 @@ class GradleCurrentEditorConfigTest : EditorConfigTests()
  * Runs [EditorConfigTests] with lowest supported Gradle version.
  */
 @Suppress("ClassName")
-class Gradle4_10EditorConfigTest : EditorConfigTests() {
+class GradleLowestSupportedEditorConfigTest : EditorConfigTests() {
 
     override fun gradleRunnerFor(vararg arguments: String): GradleRunner =
-        super.gradleRunnerFor(*arguments).withGradleVersion("4.10")
+        super.gradleRunnerFor(*arguments).withGradleVersion(LOWEST_SUPPORTED_GRADLE_VERSION)
 }
 
 /**
