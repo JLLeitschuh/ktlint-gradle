@@ -12,5 +12,9 @@ dependencies {
 ktlint {
     verbose.set(true)
     outputToConsole.set(true)
-    reporters.set(setOf(ReporterType.CHECKSTYLE, ReporterType.JSON))
+
+    reporters {
+        reporter(ReporterType.CHECKSTYLE)
+        reporter(ReporterType.JSON)
+    }
 }

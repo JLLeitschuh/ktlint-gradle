@@ -46,9 +46,11 @@ internal fun createKtlintReporterConfiguration(
         description = KTLINT_REPORTER_CONFIGURATION_DESCRIPTION
 
         withDependencies {
-            extension.customReportersSet.get()
-                .forEach {
-                    dependencies.addLater(target.provider { it.dependency })
+            extension
+                .reporterExtension
+                .customReporters
+                .all {
+                    dependencies.addLater(target.provider { it.dependencyArtifact })
                 }
         }
     }

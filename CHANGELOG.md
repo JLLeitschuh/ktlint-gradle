@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 ### Added
-  - Add support for 3rd party reporters (#125)
+  - Breaking: Add support for 3rd party reporters:
+    - new reporters configuration DSL (#125)
+    - tasks `reportOutputFiles` property was replaced with `allReportsOutputFiles`
   - `disabledRules` extension property to disable rules usage by id (#267)
 ### Changed
   - Update Gradle to `5.6` version

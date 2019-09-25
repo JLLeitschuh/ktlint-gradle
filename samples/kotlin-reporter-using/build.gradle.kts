@@ -16,14 +16,22 @@ dependencies {
 
 ktlint {
     verbose.set(true)
+    debug.set(true)
     outputToConsole.set(true)
-    reporters.set(setOf(
-        ReporterType.CHECKSTYLE,
-        ReporterType.JSON
-    ))
+    reporters {
+        reporter(ReporterType.CHECKSTYLE)
+        reporter(ReporterType.JSON)
 
-    customReporters {
-        reporter("csv", "csv", project(":samples:kotlin-reporter-creating"))
-        reporter("html", "html", "me.cassiano:ktlint-html-reporter:0.2.3")
+        customReporters {
+            register("csv") {
+                reporterFileExtension = "csv"
+                dependency = project(":samples:kotlin-reporter-creating")
+            }
+
+            register("html") {
+                reporterFileExtension = "html"
+                dependency = "me.cassiano:ktlint-html-reporter:0.2.3"
+            }
+        }
     }
 }

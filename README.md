@@ -155,11 +155,25 @@ ktlint {
     verbose = true
     android = false
     outputToConsole = true
-    reporters = [ReporterType.PLAIN, ReporterType.CHECKSTYLE]
     ignoreFailures = true
     enableExperimentalRules = true
     additionalEditorconfigFile = file("/some/additional/.editorconfig")
     disabledRules = ["final-newline"]
+    reporters {
+        reporter "plain"
+        reporter "checkstyle"
+        
+        customReporters {
+            "csv" {
+                reporterFileExtension = "csv"
+                dependency = project(":project-reporters:csv-reporter")
+            }
+            "yaml" {
+                reporterFileExtension = "yml"
+                dependency = "com.example:ktlint-yaml-reporter:1.0.0"
+            }
+        }
+    }
     kotlinScriptAdditionalPaths {
         include fileTree("scripts/")
     }
@@ -189,11 +203,25 @@ ktlint {
     verbose.set(true)
     android.set(false)
     outputToConsole.set(true)
-    reporters.set(setOf(ReporterType.PLAIN, ReporterType.CHECKSTYLE))
     ignoreFailures.set(true)
     enableExperimentalRules.set(true)
     additionalEditorconfigFile.set(file("/some/additional/.editorconfig"))
     disabledRules.set(setOf("final-newline"))
+    reporters {
+        reporter(ReporterType.PLAIN)
+        reporter(ReporterType.CHECKSTYLE)
+        
+        customReporters {
+            register("csv") {
+                reporterFileExtension = "csv"
+                dependency = project(":project-reporters:csv-reporter")
+            }
+            register("yaml") {
+                reporterFileExtension = "yml"
+                dependency = "com.example:ktlint-yaml-reporter:1.0.0"
+            }
+        }
+    }
     kotlinScriptAdditionalPaths {
         include(fileTree("scripts/"))
     }

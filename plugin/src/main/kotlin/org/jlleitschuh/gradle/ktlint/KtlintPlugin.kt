@@ -227,9 +227,9 @@ open class KtlintPlugin : Plugin<Project> {
             }
         })
         ruleSetsClasspath.setFrom(pluginHolder.ktlintRulesetConfiguration)
-        reporters.set(pluginHolder.extension.reporters)
+        reporters.set(pluginHolder.extension.reporterExtension.reporters)
         customReportersClasspath.setFrom(pluginHolder.ktlintReporterConfiguration)
-        customReporters.set(pluginHolder.extension.customReportersSet)
+        customReporters.set(pluginHolder.extension.reporterExtension.customReporters)
         android.set(pluginHolder.extension.android)
         enableExperimentalRules.set(pluginHolder.extension.enableExperimentalRules)
         disabledRules.set(pluginHolder.extension.disabledRules)

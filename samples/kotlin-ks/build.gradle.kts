@@ -1,5 +1,3 @@
-import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
-
 plugins {
     application
     kotlin("jvm")
@@ -18,7 +16,7 @@ ktlint {
     verbose.set(true)
     outputToConsole.set(true)
     coloredOutput.set(true)
-    reporters.set(setOf(ReporterType.CHECKSTYLE, ReporterType.JSON))
+    // reporters.set(setOf(ReporterType.CHECKSTYLE, ReporterType.JSON))
     filter {
         exclude("**/style-violations.kt")
     }

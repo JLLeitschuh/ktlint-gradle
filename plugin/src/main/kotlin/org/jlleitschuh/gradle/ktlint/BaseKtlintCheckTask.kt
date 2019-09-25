@@ -101,9 +101,9 @@ abstract class BaseKtlintCheckTask(
                                 .resolvedConfiguration
                                 .resolvedArtifacts
                                 .find { artifact ->
-                                    artifact.name == it.dependency.name
+                                    artifact.name == it.dependencyArtifact.name
                                 }
-                                ?.file ?: throw GradleException("Failed to resolve ${it.dependency} artifact")
+                                ?.file ?: throw GradleException("Failed to resolve ${it.dependencyArtifact} artifact")
                         )
                     },
                     newFileProperty(objectFactory, projectLayout).apply {
@@ -180,7 +180,7 @@ abstract class BaseKtlintCheckTask(
                 .files
                 .map { "--ruleset=${it.absolutePath}" }
                 .forEach { argsWriter.println(it) }
-            enabledReports
+            allReports
                 .map { it.asArgument() }
                 .forEach { argsWriter.println(it) }
             disabledRules
@@ -247,18 +247,10 @@ abstract class BaseKtlintCheckTask(
         return files.map { it.relativeTo(baseDir) }
     }
 
-    @Deprecated(
-        "Please use allREportOutputFiles",
-        ReplaceWith("allReportOutputFiles")
-    )
-    @get:OutputFiles
-    val reportOutputFiles: Map<ReporterType, RegularFileProperty>
-        get() = enabledReports.associateTo(mutableMapOf()) { it.reporterType to it.outputFile }
-
     /**
      * Provides all reports outputs map: reporter id to reporter output file.
      */
     @get:OutputFiles
-    val allReportOutputFiles: Map<String, RegularFileProperty>
+    val allReportsOutputFiles: Map<String, RegularFileProperty>
         get() = allReports.associateTo(mutableMapOf()) { it.reporterId to it.outputFile }
 }
