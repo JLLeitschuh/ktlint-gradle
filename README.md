@@ -165,11 +165,11 @@ ktlint {
         
         customReporters {
             "csv" {
-                reporterFileExtension = "csv"
+                fileExtension = "csv"
                 dependency = project(":project-reporters:csv-reporter")
             }
             "yaml" {
-                reporterFileExtension = "yml"
+                fileExtension = "yml"
                 dependency = "com.example:ktlint-yaml-reporter:1.0.0"
             }
         }
@@ -180,9 +180,6 @@ ktlint {
     filter {
         exclude("**/generated/**")
         include("**/kotlin/**")
-    }
-    customReporters {
-        reporter "csv", "csv", project(":csv-reporter")
     }
 }
 
@@ -213,11 +210,11 @@ ktlint {
         
         customReporters {
             register("csv") {
-                reporterFileExtension = "csv"
+                fileExtension = "csv"
                 dependency = project(":project-reporters:csv-reporter")
             }
             register("yaml") {
-                reporterFileExtension = "yml"
+                fileExtension = "yml"
                 dependency = "com.example:ktlint-yaml-reporter:1.0.0"
             }
         }

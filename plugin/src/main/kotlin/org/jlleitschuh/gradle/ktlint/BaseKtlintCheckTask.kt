@@ -237,7 +237,7 @@ abstract class BaseKtlintCheckTask(
 
     private fun CustomReporter.getOutputFile() =
         project.layout.buildDirectory.file(project.provider {
-            "reports/ktlint/${this@BaseKtlintCheckTask.name}.$reporterFileExtension"
+            "reports/ktlint/${this@BaseKtlintCheckTask.name}.$fileExtension"
         })
 
     private fun FileTree.toRelativeFilesList(): List<File> {

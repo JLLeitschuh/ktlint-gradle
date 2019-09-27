@@ -24,12 +24,12 @@ ktlint {
 
         customReporters {
             register("csv") {
-                reporterFileExtension = "csv"
+                fileExtension = "csv"
                 dependency = project(":samples:kotlin-reporter-creating")
             }
 
             register("html") {
-                reporterFileExtension = "html"
+                fileExtension = "html"
                 dependency = "me.cassiano:ktlint-html-reporter:0.2.3"
             }
         }

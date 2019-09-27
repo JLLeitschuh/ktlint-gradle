@@ -15,7 +15,7 @@ class CustomReporter(
     /**
      * Generated report file extension.
      */
-    var reporterFileExtension: String = reporterId
+    var fileExtension: String = reporterId
 
     /**
      * Reporter [dependency notation](https://docs.gradle.org/current/dsl/org.gradle.api.artifacts.dsl.DependencyHandler.html#N17198).

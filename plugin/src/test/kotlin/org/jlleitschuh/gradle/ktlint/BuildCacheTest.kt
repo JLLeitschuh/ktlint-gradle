@@ -51,7 +51,7 @@ abstract class BuildCacheTest : AbstractPluginTest() {
                 reporter "checkstyle"
                 customReporters {
                     "html" {
-                        reporterFileExtension = "html"
+                        fileExtension = "html"
                         dependency = "me.cassiano:ktlint-html-reporter:0.2.3"
                     }
                 }
