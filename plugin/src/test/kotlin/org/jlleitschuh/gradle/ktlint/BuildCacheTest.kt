@@ -15,9 +15,9 @@ class GradleCurrentBuildCacheTest : BuildCacheTest()
  * Runs [BuildCacheTest] with lowest supported Gradle version.
  */
 @Suppress("ClassName")
-class Gradle4_10BuildCacheTest : BuildCacheTest() {
+class GradleLowestSupportedBuildCacheTest : BuildCacheTest() {
     override fun gradleRunnerFor(vararg arguments: String): GradleRunner =
-        super.gradleRunnerFor(*arguments).withGradleVersion("4.10")
+        super.gradleRunnerFor(*arguments).withGradleVersion(LOWEST_SUPPORTED_GRADLE_VERSION)
 }
 
 abstract class BuildCacheTest : AbstractPluginTest() {
@@ -45,11 +45,16 @@ abstract class BuildCacheTest : AbstractPluginTest() {
     internal fun `Check task with reporters is relocatable`() {
         configureBuildCache()
         configureDefaultProjects("""
-            import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
-            ktlint.reporters = [ReporterType.PLAIN, ReporterType.CHECKSTYLE]
-            ktlint.customReporters {
-                reporter "html", "html", "me.cassiano:ktlint-html-reporter:0.2.3"
+            ktlint.reporters {
+                reporter "plain"
+                reporter "checkstyle"
+                customReporters {
+                    "html" {
+                        reporterFileExtension = "html"
+                        dependency = "me.cassiano:ktlint-html-reporter:0.2.3"
+                    }
+                }
             }
         """.trimIndent())
 

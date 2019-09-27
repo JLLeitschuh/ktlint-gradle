@@ -16,9 +16,9 @@ class GradleCurrentReportersTests : ReportersTest()
  * Runs [ReportersTest] with lowest supported Gradle version.
  */
 @Suppress("ClassName")
-class Gradle4_10ReportersTest : ReportersTest() {
+class GradleLowestSupportedReportersTest : ReportersTest() {
     override fun gradleRunnerFor(vararg arguments: String): GradleRunner =
-        super.gradleRunnerFor(*arguments).withGradleVersion("4.10")
+        super.gradleRunnerFor(*arguments).withGradleVersion(LOWEST_SUPPORTED_GRADLE_VERSION)
 }
 
 abstract class ReportersTest : AbstractPluginTest() {
@@ -33,7 +33,11 @@ abstract class ReportersTest : AbstractPluginTest() {
 
         projectRoot.buildFile().appendText("""
 
-            ktlint.reporters = [ReporterType.PLAIN_GROUP_BY_FILE, ReporterType.CHECKSTYLE, ReporterType.JSON]
+            ktlint.reporters {
+                reporter "plain_group_by_file"
+                reporter "checkstyle"
+                reporter "json"
+            }
         """.trimIndent())
 
         buildAndFail("ktlintCheck").apply {
@@ -52,8 +56,14 @@ abstract class ReportersTest : AbstractPluginTest() {
         // https://github.com/mcassiano/ktlint-html-reporter/releases
         projectRoot.buildFile().appendText("""
             
-            ktlint.customReporters {
-                reporter "html", "html", "me.cassiano:ktlint-html-reporter:0.2.3"
+            ktlint.reporters {
+                reporter "checkstyle"
+                customReporters {
+                    "html" {
+                        reporterFileExtension = "html"
+                        dependency = "me.cassiano:ktlint-html-reporter:0.2.3"
+                    }
+                }
             }
         """.trimIndent())
 
@@ -73,7 +83,10 @@ abstract class ReportersTest : AbstractPluginTest() {
 
         projectRoot.buildFile().appendText("""
 
-            ktlint.reporters = [ReporterType.JSON, ReporterType.PLAIN]
+            ktlint.reporters {
+                reporter "json"
+                reporter "plain"
+            }
         """.trimIndent())
 
         build("ktlintCheck").apply {
@@ -91,7 +104,10 @@ abstract class ReportersTest : AbstractPluginTest() {
 
         projectRoot.buildFile().appendText("""
 
-            ktlint.reporters = [ReporterType.JSON, ReporterType.PLAIN_GROUP_BY_FILE]
+            ktlint.reporters {
+                reporter "json"
+                reporter "plain_group_by_file"
+            }
         """.trimIndent())
 
         build("ktlintCheck").apply {
@@ -102,7 +118,10 @@ abstract class ReportersTest : AbstractPluginTest() {
 
         projectRoot.buildFile().appendText("""
 
-            ktlint.reporters = [ReporterType.JSON, ReporterType.CHECKSTYLE]
+            ktlint.reporters {
+                reporter "json"
+                reporter "checkstyle"
+            }
         """.trimIndent())
 
         build("ktlintCheck").apply {

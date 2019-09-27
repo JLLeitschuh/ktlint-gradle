@@ -33,10 +33,6 @@ fun File.kotlinPluginProjectSetup(
             repositories {
                 gradlePluginPortal()
             }
-
-            import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
-
-            ktlint.reporters = [ReporterType.CHECKSTYLE, ReporterType.PLAIN]
         """.trimIndent()
     )
 }
