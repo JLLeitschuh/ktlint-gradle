@@ -34,16 +34,15 @@ abstract class ReportersTest : AbstractPluginTest() {
         projectRoot.buildFile().appendText("""
 
             ktlint.reporters {
-                reporter "plain_group_by_file"
                 reporter "checkstyle"
                 reporter "json"
             }
         """.trimIndent())
 
         buildAndFail("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.FAILED)
             assertThat(output).contains("Unnecessary space(s)")
-            assertReportCreated(ReporterType.PLAIN_GROUP_BY_FILE.fileExtension)
+            assertReportNotCreated(ReporterType.PLAIN.fileExtension)
             assertReportCreated(ReporterType.CHECKSTYLE.fileExtension)
             assertReportCreated(ReporterType.JSON.fileExtension)
         }
@@ -68,10 +67,10 @@ abstract class ReportersTest : AbstractPluginTest() {
         """.trimIndent())
 
         buildAndFail("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.FAILED)
             assertThat(output).contains("Unnecessary space(s)")
-            assertReportCreated(ReporterType.PLAIN.fileExtension)
             assertReportCreated(ReporterType.CHECKSTYLE.fileExtension)
+            assertReportNotCreated(ReporterType.PLAIN.fileExtension)
             assertReportNotCreated(ReporterType.JSON.fileExtension)
             assertReportCreated("html")
         }
@@ -90,13 +89,13 @@ abstract class ReportersTest : AbstractPluginTest() {
         """.trimIndent())
 
         build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertReportCreated(ReporterType.PLAIN.fileExtension)
             assertReportCreated(ReporterType.JSON.fileExtension)
         }
 
         build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
             assertReportCreated(ReporterType.PLAIN.fileExtension)
             assertReportCreated(ReporterType.JSON.fileExtension)
             assertReportNotCreated(ReporterType.CHECKSTYLE.fileExtension)
@@ -111,7 +110,7 @@ abstract class ReportersTest : AbstractPluginTest() {
         """.trimIndent())
 
         build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertReportCreated(ReporterType.PLAIN_GROUP_BY_FILE.fileExtension)
             assertReportCreated(ReporterType.JSON.fileExtension)
         }
@@ -130,6 +129,18 @@ abstract class ReportersTest : AbstractPluginTest() {
             assertReportCreated(ReporterType.CHECKSTYLE.fileExtension)
             // TODO: Stale reports are not cleaned up
             assertReportCreated(ReporterType.PLAIN.fileExtension)
+        }
+    }
+
+    @Test
+    internal fun `Should use plain reporter if no reporters were defined`() {
+        projectRoot.withFailingSources()
+
+        buildAndFail("ktlintCheck").apply {
+            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertReportCreated(ReporterType.PLAIN.fileExtension)
+            assertReportNotCreated(ReporterType.CHECKSTYLE.fileExtension)
+            assertReportNotCreated(ReporterType.JSON.fileExtension)
         }
     }
 

@@ -75,6 +75,7 @@ abstract class BaseKtlintCheckTask(
     @get:Internal
     internal val enabledReports: List<KtlintReport.BuiltIn>
         get() = reporters.get()
+            .ifEmpty { setOf(ReporterType.PLAIN) }
             .map {
                 KtlintReport.BuiltIn(
                     it.reporterName,

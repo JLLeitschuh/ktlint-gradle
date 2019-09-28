@@ -134,7 +134,7 @@ internal constructor(
         objectFactory: ObjectFactory
     ) {
         internal val reporters: SetProperty<ReporterType> = objectFactory.setProperty {
-            set(setOf(ReporterType.PLAIN))
+            set(emptySet())
         }
 
         /**
