@@ -28,6 +28,7 @@ The assumption being that you would not want to lint code you weren't compiling.
     - [Simple setup](#idea-plugin-simple-setup)
     - [Using new plugin API](#idea-plugin-setup-using-new-plugin-api)
   - [Plugin configuration](#configuration)
+    - [Customer reporters](#custom-reporters)
   - [Samples](#samples)
 - [Task details](#task-added)
   - [Main tasks](#main-tasks)
@@ -237,6 +238,23 @@ dependencies {
     ktlintRuleset(project(":chore:project-ruleset")) 
 }
 ```
+
+#### Custom reporters
+
+**Note**: If Ktlint custom reporter creates report output file internally, for example:
+```kotlin
+class CsvReporter(
+    private val out: PrintStream
+) : Reporter {
+    override fun onLintError(file: String, err: LintError, corrected: Boolean) {
+        val line = "$file;${err.line};${err.col};${err.ruleId};${err.detail};$corrected"
+        out.println(line)
+        File("some_other_file.txt").write(line) // <-- Here!!!
+    }
+}
+```
+"some_other_file.txt" won't be captured as task output. This may lead to the problem,
+that task will always be not "UP_TO_DATE" and caching will not work.
 
 ### Samples
 
