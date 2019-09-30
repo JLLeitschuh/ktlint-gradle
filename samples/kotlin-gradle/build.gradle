@@ -1,5 +1,3 @@
-import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
-
 plugins {
     id 'kotlin'
     id 'application'
@@ -15,5 +13,15 @@ dependencies {
 ktlint {
     debug = true
     verbose = true
-    reporters = [ReporterType.CHECKSTYLE, ReporterType.PLAIN]
+    reporters {
+        reporter "checkstyle"
+        reporter "plain"
+
+        customReporters {
+            "html" {
+                fileExtension = "html"
+                dependency = "me.cassiano:ktlint-html-reporter:0.2.3"
+            }
+        }
+    }
 }

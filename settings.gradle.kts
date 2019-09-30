@@ -44,6 +44,8 @@ include("samples:kotlin-multiplatform-jvm")
 include("samples:kotlin-multiplatform-js")
 include("samples:kotlin-rulesets-creating")
 include("samples:kotlin-rulesets-using")
+include("samples:kotlin-reporter-creating")
+include("samples:kotlin-reporter-using")
 include("samples:kotlin-mpp")
 if (isAndroidSdkAvailable()) {
     include("samples:kotlin-mpp-android")

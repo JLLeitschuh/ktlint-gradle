@@ -6,6 +6,7 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.tasks.util.PatternFilterable
+import org.jlleitschuh.gradle.ktlint.reporter.CustomReporter
 
 internal typealias FilterApplier = (Action<PatternFilterable>) -> Unit
 internal typealias KotlinScriptAdditionalPathApplier = (ConfigurableFileTree) -> Unit
@@ -38,6 +39,7 @@ open class KtlintBasePlugin : Plugin<Project> {
             "ktlint",
             KtlintExtension::class.java,
             target.objects,
+            target.container(CustomReporter::class.java) { name -> CustomReporter(name, target.dependencies) },
             filterTargetApplier,
             kotlinScriptAdditionalPathApplier
         )

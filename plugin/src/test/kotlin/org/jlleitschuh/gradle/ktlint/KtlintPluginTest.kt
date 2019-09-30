@@ -3,7 +3,6 @@ package org.jlleitschuh.gradle.ktlint
 import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
-import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -49,135 +48,8 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         buildAndFail("ktlintCheck").apply {
             assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.FAILED)
             assertThat(output).contains("Unnecessary space(s)")
-            assertReportCreated(ReporterType.PLAIN)
-            assertReportCreated(ReporterType.CHECKSTYLE)
-            assertReportNotCreated(ReporterType.JSON)
         }
     }
-
-    @Test
-    fun `creates multiple reports`() {
-        projectRoot.withFailingSources()
-
-        projectRoot.buildFile().appendText("""
-
-            ktlint.reporters = [ReporterType.PLAIN_GROUP_BY_FILE, ReporterType.CHECKSTYLE, ReporterType.JSON]
-        """.trimIndent())
-
-        buildAndFail("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.FAILED)
-            assertThat(output).contains("Unnecessary space(s)")
-            assertReportCreated(ReporterType.PLAIN_GROUP_BY_FILE)
-            assertReportCreated(ReporterType.CHECKSTYLE)
-            assertReportCreated(ReporterType.JSON)
-        }
-    }
-
-    @Test
-    fun `is out of date when different report is enabled`() {
-        projectRoot.withCleanSources()
-
-        projectRoot.buildFile().appendText("""
-
-            ktlint.reporters = [ReporterType.JSON, ReporterType.PLAIN]
-        """.trimIndent())
-
-        build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertReportCreated(ReporterType.PLAIN)
-            assertReportCreated(ReporterType.JSON)
-        }
-
-        build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
-            assertReportCreated(ReporterType.PLAIN)
-            assertReportCreated(ReporterType.JSON)
-            assertReportNotCreated(ReporterType.CHECKSTYLE)
-        }
-
-        projectRoot.buildFile().appendText("""
-
-            ktlint.reporters = [ReporterType.JSON, ReporterType.PLAIN_GROUP_BY_FILE]
-        """.trimIndent())
-
-        build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertReportCreated(ReporterType.PLAIN_GROUP_BY_FILE)
-            assertReportCreated(ReporterType.JSON)
-        }
-
-        projectRoot.buildFile().appendText("""
-
-            ktlint.reporters = [ReporterType.JSON, ReporterType.CHECKSTYLE]
-        """.trimIndent())
-
-        build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertReportCreated(ReporterType.JSON)
-            assertReportCreated(ReporterType.CHECKSTYLE)
-            // TODO: Stale reports are not cleaned up
-            assertReportCreated(ReporterType.PLAIN)
-        }
-    }
-
-    @Test
-    fun `check task is relocatable`() {
-        val originalLocation = temporaryFolder.resolve("original")
-        val relocatedLocation = temporaryFolder.resolve("relocated")
-        val localBuildCacheDirectory = temporaryFolder.resolve("build-cache")
-        listOf(originalLocation, relocatedLocation).forEach {
-            it.apply {
-                withCleanSources()
-                buildFile().writeText("""
-                    ${pluginsBlockWithMainPluginAndKotlinJvm()}
-
-                    repositories {
-                        gradlePluginPortal()
-                    }
-
-                    import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
-
-                    ktlint.reporters = [ReporterType.PLAIN, ReporterType.CHECKSTYLE]
-                """.trimIndent())
-                settingsFile().writeText("""
-                    buildCache {
-                        local {
-                            directory = '${localBuildCacheDirectory.toURI()}'
-                        }
-                    }
-                """.trimIndent())
-            }
-        }
-
-        GradleRunner.create()
-            .withProjectDir(originalLocation)
-            .withPluginClasspath()
-            .withArguments("ktlintCheck", "--build-cache")
-            .forwardOutput()
-            .build().apply {
-                assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            }
-
-        GradleRunner.create()
-            .withProjectDir(relocatedLocation)
-            .withPluginClasspath()
-            .withArguments("ktlintCheck", "--build-cache")
-            .forwardOutput()
-            .build().apply {
-                assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.FROM_CACHE)
-            }
-    }
-
-    private fun assertReportCreated(reportType: ReporterType) {
-        assertThat(reportLocation(reportType).isFile).isTrue()
-    }
-
-    private fun assertReportNotCreated(reportType: ReporterType) {
-        assertThat(reportLocation(reportType).isFile).isFalse()
-    }
-
-    private fun reportLocation(reportType: ReporterType) =
-            projectRoot.resolve("build/reports/ktlint/ktlintMainSourceSetCheck.${reportType.fileExtension}")
 
     @Test
     fun `should succeed check on clean sources`() {

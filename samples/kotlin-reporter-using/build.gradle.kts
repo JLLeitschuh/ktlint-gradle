@@ -12,14 +12,26 @@ application {
 
 dependencies {
     compile(kotlin("stdlib"))
-    ktlintRuleset(project(":samples:kotlin-rulesets-creating"))
 }
 
 ktlint {
     verbose.set(true)
+    debug.set(true)
     outputToConsole.set(true)
     reporters {
         reporter(ReporterType.CHECKSTYLE)
         reporter(ReporterType.JSON)
+
+        customReporters {
+            register("csv") {
+                fileExtension = "csv"
+                dependency = project(":samples:kotlin-reporter-creating")
+            }
+
+            register("html") {
+                fileExtension = "html"
+                dependency = "me.cassiano:ktlint-html-reporter:0.2.3"
+            }
+        }
     }
 }

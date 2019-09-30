@@ -21,6 +21,7 @@ import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.SourceTask
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.JavaExecSpec
+import org.jlleitschuh.gradle.ktlint.reporter.CustomReporter
 import org.jlleitschuh.gradle.ktlint.reporter.KtlintReport
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import java.io.File
@@ -58,6 +59,10 @@ abstract class BaseKtlintCheckTask(
     internal val ignoreFailures: Property<Boolean> = objectFactory.property()
     @get:Internal
     internal val reporters: SetProperty<ReporterType> = objectFactory.setProperty()
+    @get:Classpath
+    internal val customReportersClasspath: ConfigurableFileCollection = project.files()
+    @get:Internal
+    internal val customReporters: SetProperty<CustomReporter> = objectFactory.setProperty()
     @get:Console
     internal val outputToConsole: Property<Boolean> = objectFactory.property()
     @get:Console
@@ -68,10 +73,12 @@ abstract class BaseKtlintCheckTask(
     internal val disabledRules: SetProperty<String> = objectFactory.setProperty()
 
     @get:Internal
-    internal val enabledReports
+    internal val enabledReports: List<KtlintReport.BuiltIn>
         get() = reporters.get()
+            .ifEmpty { setOf(ReporterType.PLAIN) }
             .map {
-                KtlintReport(
+                KtlintReport.BuiltIn(
+                    it.reporterName,
                     objectFactory.property { set(it.isAvailable()) },
                     it,
                     objectFactory.fileProperty().apply {
@@ -80,6 +87,33 @@ abstract class BaseKtlintCheckTask(
                 )
             }
             .filter { it.enabled.get() }
+
+    @get:Internal
+    internal val customReports: List<KtlintReport.CustomReport>
+        get() = customReporters.get()
+            .map {
+                KtlintReport.CustomReport(
+                    it.reporterId,
+                    objectFactory.fileProperty().apply {
+                        set(
+                            project.configurations.getByName(KTLINT_REPORTER_CONFIGURATION_NAME)
+                                .resolvedConfiguration
+                                .resolvedArtifacts
+                                .find { artifact ->
+                                    artifact.name == it.dependencyArtifact.name
+                                }
+                                ?.file ?: throw GradleException("Failed to resolve ${it.dependencyArtifact} artifact")
+                        )
+                    },
+                    objectFactory.fileProperty().apply {
+                        set(it.getOutputFile())
+                    }
+                )
+            }
+
+    @get:Internal
+    internal val allReports
+        get() = enabledReports.plus(customReports)
 
     init {
         if (project.hasProperty(FILTER_INCLUDE_PROPERTY_NAME)) {
@@ -145,7 +179,7 @@ abstract class BaseKtlintCheckTask(
                 .files
                 .map { "--ruleset=${it.absolutePath}" }
                 .forEach { argsWriter.println(it) }
-            enabledReports
+            allReports
                 .map { it.asArgument() }
                 .forEach { argsWriter.println(it) }
             disabledRules
@@ -202,12 +236,20 @@ abstract class BaseKtlintCheckTask(
             "reports/ktlint/${this@BaseKtlintCheckTask.name}.$fileExtension"
         })
 
+    private fun CustomReporter.getOutputFile() =
+        project.layout.buildDirectory.file(project.provider {
+            "reports/ktlint/${this@BaseKtlintCheckTask.name}.$fileExtension"
+        })
+
     private fun FileTree.toRelativeFilesList(): List<File> {
         val baseDir = project.projectDir
         return files.map { it.relativeTo(baseDir) }
     }
 
+    /**
+     * Provides all reports outputs map: reporter id to reporter output file.
+     */
     @get:OutputFiles
-    val reportOutputFiles: Map<ReporterType, RegularFileProperty>
-        get() = enabledReports.associateTo(mutableMapOf()) { it.reporterType to it.outputFile }
+    val allReportsOutputFiles: Map<String, RegularFileProperty>
+        get() = allReports.associateTo(mutableMapOf()) { it.reporterId to it.outputFile }
 }

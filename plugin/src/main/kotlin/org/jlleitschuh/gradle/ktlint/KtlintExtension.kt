@@ -1,24 +1,35 @@
 package org.jlleitschuh.gradle.ktlint
 
+import groovy.lang.Closure
 import org.gradle.api.Action
+import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.util.PatternFilterable
+import org.gradle.util.ConfigureUtil
+import org.jlleitschuh.gradle.ktlint.reporter.CustomReporter
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 /**
  * Extension class for configuring the [KtlintPlugin].
  * @param filterTargetApplier When [KtlintExtension.filter] is called, this function is executed.
  */
+@Suppress("UnstableApiUsage")
 open class KtlintExtension
 internal constructor(
     objectFactory: ObjectFactory,
+    customReportersContainer: NamedDomainObjectContainer<CustomReporter>,
     private val filterTargetApplier: FilterApplier,
-    private val kotlinScriptAdditionalPathApplier: KotlinScriptAdditionalPathApplier
+    kotlinScriptAdditionalPathApplier: KotlinScriptAdditionalPathApplier
 ) {
+    internal val reporterExtension = ReporterExtension(
+        customReportersContainer,
+        objectFactory
+    )
+
     /**
      * The version of ktlint to use.
      */
@@ -53,16 +64,13 @@ internal constructor(
     val ignoreFailures: Property<Boolean> = objectFactory.property { set(false) }
 
     /**
-     * Report output formats.
+     * Configure Ktlint output reporters.
      *
-     * Available values: plain, plain_group_by_file, checkstyle, json.
-     *
-     * **Note** for Gradle scripts: for now all values should be uppercase due to bug in Gradle.
-     *
-     * Default is plain.
+     * _By default_ `plain` reporter is enabled, if no other reporter is configured, otherwise you need to specify
+     * it explicitly.
      */
-    val reporters: SetProperty<ReporterType> = objectFactory.setProperty {
-        set(setOf(ReporterType.PLAIN))
+    fun reporters(action: Action<ReporterExtension>) {
+        action.execute(reporterExtension)
     }
 
     /**
@@ -118,6 +126,35 @@ internal constructor(
          */
         fun include(fileTree: ConfigurableFileTree) {
             ksApplier(fileTree)
+        }
+    }
+
+    class ReporterExtension(
+        val customReporters: NamedDomainObjectContainer<CustomReporter>,
+        objectFactory: ObjectFactory
+    ) {
+        internal val reporters: SetProperty<ReporterType> = objectFactory.setProperty {
+            set(emptySet())
+        }
+
+        /**
+         * Use one of default Ktlint output reporter
+         *
+         * _By default_ `plain` type is enabled if no reporter is explicitly specified.
+         *
+         * @param reporterType one of `plain`, `plain_group_by_file`, `checkstyle`, `json`.
+         */
+        fun reporter(reporterType: ReporterType) {
+            reporters.add(reporterType)
+        }
+
+        /**
+         * Add 3rd party reporters.
+         */
+        fun customReporters(configuration: Closure<NamedDomainObjectContainer<CustomReporter>>) {
+            // This method is needed for Groovy interop
+            // See https://discuss.gradle.org/t/multi-level-dsl-for-plugin-extension/19029/16
+            ConfigureUtil.configure(configuration, customReporters)
         }
     }
 }

@@ -28,6 +28,7 @@ The assumption being that you would not want to lint code you weren't compiling.
     - [Simple setup](#idea-plugin-simple-setup)
     - [Using new plugin API](#idea-plugin-setup-using-new-plugin-api)
   - [Plugin configuration](#configuration)
+    - [Customer reporters](#custom-reporters)
   - [Samples](#samples)
 - [Task details](#task-added)
   - [Main tasks](#main-tasks)
@@ -155,11 +156,25 @@ ktlint {
     verbose = true
     android = false
     outputToConsole = true
-    reporters = [ReporterType.PLAIN, ReporterType.CHECKSTYLE]
     ignoreFailures = true
     enableExperimentalRules = true
     additionalEditorconfigFile = file("/some/additional/.editorconfig")
     disabledRules = ["final-newline"]
+    reporters {
+        reporter "plain"
+        reporter "checkstyle"
+        
+        customReporters {
+            "csv" {
+                fileExtension = "csv"
+                dependency = project(":project-reporters:csv-reporter")
+            }
+            "yaml" {
+                fileExtension = "yml"
+                dependency = "com.example:ktlint-yaml-reporter:1.0.0"
+            }
+        }
+    }
     kotlinScriptAdditionalPaths {
         include fileTree("scripts/")
     }
@@ -186,11 +201,25 @@ ktlint {
     verbose.set(true)
     android.set(false)
     outputToConsole.set(true)
-    reporters.set(setOf(ReporterType.PLAIN, ReporterType.CHECKSTYLE))
     ignoreFailures.set(true)
     enableExperimentalRules.set(true)
     additionalEditorconfigFile.set(file("/some/additional/.editorconfig"))
     disabledRules.set(setOf("final-newline"))
+    reporters {
+        reporter(ReporterType.PLAIN)
+        reporter(ReporterType.CHECKSTYLE)
+        
+        customReporters {
+            register("csv") {
+                fileExtension = "csv"
+                dependency = project(":project-reporters:csv-reporter")
+            }
+            register("yaml") {
+                fileExtension = "yml"
+                dependency = "com.example:ktlint-yaml-reporter:1.0.0"
+            }
+        }
+    }
     kotlinScriptAdditionalPaths {
         include(fileTree("scripts/"))
     }
@@ -207,6 +236,23 @@ dependencies {
 }
 ```
 
+#### Custom reporters
+
+**Note**: If Ktlint custom reporter creates report output file internally, for example:
+```kotlin
+class CsvReporter(
+    private val out: PrintStream
+) : Reporter {
+    override fun onLintError(file: String, err: LintError, corrected: Boolean) {
+        val line = "$file;${err.line};${err.col};${err.ruleId};${err.detail};$corrected"
+        out.println(line)
+        File("some_other_file.txt").write(line) // <-- Here!!!
+    }
+}
+```
+"some_other_file.txt" won't be captured as task output. This may lead to the problem,
+that task will always be not "UP_TO_DATE" and caching will not work.
+
 ### Samples
 
 This repository provides following examples how to setup this plugin:
@@ -217,8 +263,8 @@ This repository provides following examples how to setup this plugin:
 - [kotlin-multiplatform-common](/samples/kotlin-multiplatform-common) - applies plugin to Kotlin common multiplatform module
 - [kotlin-multiplatform-js](/samples/kotlin-multiplatform-js) - applies plugin to Kotlin Javascript multiplatform module
 - [kotlin-multiplatform-jvm](/samples/kotlin-multiplatform-jvm) - applies plugin to Kotlin JVM multiplatform module
-- [kotlin-native](/samples/kotlin-native) - applies plugin to Kotlin native project
 - [kotlin-rulesets-using](/samples/kotlin-rulesets-using) - adds custom [example](/samples/kotlin-ruleset-creating) ruleset
+- [kotlin-reporter-using](/samples/kotlin-reporter-using) - adds custom [example](/samples/kotlin-reporter-creating) reporter 
 
 ## Tasks Added
 
