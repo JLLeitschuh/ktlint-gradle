@@ -227,9 +227,6 @@ ktlint {
         exclude("**/generated/**")
         include("**/kotlin/**")
     }
-    customReporters {
-        reporter("csv", "csv", project(":samples:kotlin-reporter-creating"))
-    }
 }
 
 dependencies {
@@ -266,8 +263,8 @@ This repository provides following examples how to setup this plugin:
 - [kotlin-multiplatform-common](/samples/kotlin-multiplatform-common) - applies plugin to Kotlin common multiplatform module
 - [kotlin-multiplatform-js](/samples/kotlin-multiplatform-js) - applies plugin to Kotlin Javascript multiplatform module
 - [kotlin-multiplatform-jvm](/samples/kotlin-multiplatform-jvm) - applies plugin to Kotlin JVM multiplatform module
-- [kotlin-native](/samples/kotlin-native) - applies plugin to Kotlin native project
 - [kotlin-rulesets-using](/samples/kotlin-rulesets-using) - adds custom [example](/samples/kotlin-ruleset-creating) ruleset
+- [kotlin-reporter-using](/samples/kotlin-reporter-using) - adds custom [example](/samples/kotlin-reporter-creating) reporter 
 
 ## Tasks Added
 
