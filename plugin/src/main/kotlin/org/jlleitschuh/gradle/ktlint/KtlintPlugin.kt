@@ -1,6 +1,8 @@
 package org.jlleitschuh.gradle.ktlint
 
 import com.android.build.gradle.BaseExtension
+import java.util.concurrent.Callable
+import kotlin.reflect.KClass
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -12,8 +14,6 @@ import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
-import java.util.concurrent.Callable
-import kotlin.reflect.KClass
 
 /**
  * Plugin that provides a wrapper over the `ktlint` project.

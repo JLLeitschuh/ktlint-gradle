@@ -1,10 +1,10 @@
 package org.jlleitschuh.gradle.ktlint
 
+import java.io.File
 import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.io.File
 
 class KtlintPluginVersionTest : AbstractPluginTest() {
 

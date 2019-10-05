@@ -1,9 +1,9 @@
 package org.jlleitschuh.gradle.ktlint
 
-import org.gradle.api.model.ObjectFactory
-import org.gradle.api.tasks.CacheableTask
 import java.io.PrintWriter
 import javax.inject.Inject
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.tasks.CacheableTask
 
 @Suppress("UnstableApiUsage")
 @CacheableTask

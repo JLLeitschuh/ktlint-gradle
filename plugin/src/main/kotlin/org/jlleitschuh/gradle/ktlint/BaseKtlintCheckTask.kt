@@ -1,5 +1,7 @@
 package org.jlleitschuh.gradle.ktlint
 
+import java.io.File
+import java.io.PrintWriter
 import net.swiftzer.semver.SemVer
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
@@ -24,8 +26,6 @@ import org.gradle.process.JavaExecSpec
 import org.jlleitschuh.gradle.ktlint.reporter.CustomReporter
 import org.jlleitschuh.gradle.ktlint.reporter.KtlintReport
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
-import java.io.File
-import java.io.PrintWriter
 
 @Suppress("UnstableApiUsage")
 abstract class BaseKtlintCheckTask(
