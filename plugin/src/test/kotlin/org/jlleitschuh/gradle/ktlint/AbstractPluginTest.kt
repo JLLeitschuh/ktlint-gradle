@@ -1,9 +1,9 @@
 package org.jlleitschuh.gradle.ktlint
 
+import java.io.File
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.io.TempDir
-import java.io.File
 
 abstract class AbstractPluginTest {
 

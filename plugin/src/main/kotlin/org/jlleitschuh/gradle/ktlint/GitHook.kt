@@ -1,5 +1,7 @@
 package org.jlleitschuh.gradle.ktlint
 
+import java.io.File
+import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFileProperty
@@ -9,8 +11,6 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.intellij.lang.annotations.Language
-import java.io.File
-import javax.inject.Inject
 
 internal const val FILTER_INCLUDE_PROPERTY_NAME = "internalKtlintGitFilter"
 
