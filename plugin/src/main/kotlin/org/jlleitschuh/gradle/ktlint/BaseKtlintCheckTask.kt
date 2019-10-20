@@ -194,7 +194,7 @@ abstract class BaseKtlintCheckTask(
                 .get()
                 .run {
                     if (isNotEmpty()) argsWriter.println("--color-name=$this")
-                } 
+                }
             getSource()
                 .toRelativeFilesList()
                 .forEach { argsWriter.println(it) }
