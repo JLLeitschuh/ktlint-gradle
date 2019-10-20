@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Added
   - ?
 ### Changed
-  - ?
+  - Set default ktlint version to `0.35.0`
 ### Removed
   - ?
 ### Fixed
