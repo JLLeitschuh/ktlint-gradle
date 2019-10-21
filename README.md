@@ -156,6 +156,7 @@ ktlint {
     verbose = true
     android = false
     outputToConsole = true
+    outputColorName = "RED"
     ignoreFailures = true
     enableExperimentalRules = true
     additionalEditorconfigFile = file("/some/additional/.editorconfig")
@@ -201,6 +202,7 @@ ktlint {
     verbose.set(true)
     android.set(false)
     outputToConsole.set(true)
+    outputColorName.set("RED")
     ignoreFailures.set(true)
     enableExperimentalRules.set(true)
     additionalEditorconfigFile.set(file("/some/additional/.editorconfig"))
