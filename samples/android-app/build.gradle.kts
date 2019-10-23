@@ -55,4 +55,5 @@ dependencies {
 
 ktlint {
     android.set(true)
+    outputColorName.set("RED")
 }

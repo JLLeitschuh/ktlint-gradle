@@ -68,6 +68,8 @@ abstract class BaseKtlintCheckTask(
     @get:Console
     internal val coloredOutput: Property<Boolean> = objectFactory.property()
     @get:Input
+    internal val outputColorName: Property<String> = objectFactory.property()
+    @get:Input
     internal val enableExperimentalRules: Property<Boolean> = objectFactory.property()
     @get:Input
     internal val disabledRules: SetProperty<String> = objectFactory.setProperty()
@@ -187,6 +189,11 @@ abstract class BaseKtlintCheckTask(
                 .joinToString(separator = ",")
                 .run {
                     if (isNotEmpty()) argsWriter.println("--disabled_rules=$this")
+                }
+            outputColorName
+                .get()
+                .run {
+                    if (isNotEmpty()) argsWriter.println("--color-name=$this")
                 }
             getSource()
                 .toRelativeFilesList()

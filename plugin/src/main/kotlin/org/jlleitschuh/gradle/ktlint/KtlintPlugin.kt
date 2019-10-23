@@ -226,6 +226,7 @@ open class KtlintPlugin : Plugin<Project> {
                 it
             }
         })
+        outputColorName.set(pluginHolder.extension.outputColorName)
         ruleSetsClasspath.setFrom(pluginHolder.ktlintRulesetConfiguration)
         reporters.set(pluginHolder.extension.reporterExtension.reporters)
         customReportersClasspath.setFrom(pluginHolder.ktlintReporterConfiguration)
