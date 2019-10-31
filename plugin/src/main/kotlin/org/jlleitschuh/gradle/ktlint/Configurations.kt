@@ -2,6 +2,7 @@ package org.jlleitschuh.gradle.ktlint
 
 import net.swiftzer.semver.SemVer
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
 
 internal const val KTLINT_CONFIGURATION_NAME = "ktlint"
@@ -13,6 +14,9 @@ internal const val KTLINT_REPORTER_CONFIGURATION_DESCRIPTION = "All ktlint custo
 
 internal fun createKtlintConfiguration(target: Project, extension: KtlintExtension) =
     target.configurations.maybeCreate(KTLINT_CONFIGURATION_NAME).apply {
+        // Configurations in resolved state are not allowed to modify dependencies
+        if (state != Configuration.State.UNRESOLVED) return@apply
+
         description = KTLINT_CONFIGURATION_DESCRIPTION
         val dependencyProvider = target.provider<Dependency> {
             val ktlintVersion = extension.version.get()
