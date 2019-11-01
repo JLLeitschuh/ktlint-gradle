@@ -344,4 +344,34 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             assertThat(output).contains("Experimental rules are supported since 0.31.0 ktlint version.")
         }
     }
+
+    @Test
+    internal fun `Should run incrementally`() {
+        val initialSourceFile = "src/main/kotlin/initial.kt"
+        projectRoot.createSourceFile(
+            initialSourceFile,
+            """
+            val foo = "bar"
+            
+            """.trimIndent()
+        )
+
+        build(":ktlintCheck")
+
+        val additionalSourceFile = "src/main/kotlin/another-file.kt"
+        projectRoot.createSourceFile(
+            additionalSourceFile,
+            """
+            val bar = "foo"
+            
+            """.trimIndent()
+        )
+
+        build(":ktlintCheck").apply {
+            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            val args = projectRoot.ktlintBuildDir().resolve("ktlintMainSourceSetCheck.args").readText()
+            assertThat(args).contains(additionalSourceFile)
+            assertThat(args).doesNotContain(initialSourceFile)
+        }
+    }
 }

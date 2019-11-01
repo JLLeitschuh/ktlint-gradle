@@ -2,13 +2,16 @@ package org.jlleitschuh.gradle.ktlint
 
 import java.io.File
 import java.io.PrintWriter
+import java.util.concurrent.Callable
 import net.swiftzer.semver.SemVer
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTree
+import org.gradle.api.file.FileType
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.model.ReplacedBy
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Classpath
@@ -23,6 +26,8 @@ import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.SourceTask
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.JavaExecSpec
+import org.gradle.work.ChangeType
+import org.gradle.work.InputChanges
 import org.jlleitschuh.gradle.ktlint.reporter.CustomReporter
 import org.jlleitschuh.gradle.ktlint.reporter.KtlintReport
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
@@ -127,19 +132,25 @@ abstract class BaseKtlintCheckTask(
         }
     }
 
-    @InputFiles
-    @SkipWhenEmpty
-    @PathSensitive(PathSensitivity.RELATIVE)
+    @ReplacedBy("stableSources")
     override fun getSource(): FileTree { return super.getSource() }
 
+    @get:SkipWhenEmpty
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    @get:InputFiles
+    internal val stableSources: FileCollection = project.files(Callable<FileTree> {
+        return@Callable getSource()
+    })
+
     @TaskAction
-    fun lint() {
+    fun lint(inputChanges: InputChanges) {
         checkMinimalSupportedKtlintVersion()
         checkCWEKtlintVersion()
         checkExperimentalRulesSupportedKtlintVersion()
         checkDisabledRulesSupportedKtlintVersion()
 
-        project.javaexec(generateJavaExecSpec(additionalConfig()))
+        project.logger.info("Executing ${if (inputChanges.isIncremental) "incrementally" else "non-incrementally"}")
+        project.javaexec(generateJavaExecSpec(inputChanges, additionalConfig()))
     }
 
     @OutputFiles
@@ -156,6 +167,7 @@ abstract class BaseKtlintCheckTask(
     abstract fun additionalConfig(): (PrintWriter) -> Unit
 
     private fun generateJavaExecSpec(
+        inputChanges: InputChanges,
         additionalConfig: (PrintWriter) -> Unit
     ): (JavaExecSpec) -> Unit = { javaExecSpec ->
         javaExecSpec.classpath = classpath
@@ -195,9 +207,15 @@ abstract class BaseKtlintCheckTask(
                 .run {
                     if (isNotEmpty()) argsWriter.println("--color-name=$this")
                 }
-            getSource()
-                .toRelativeFilesList()
-                .forEach { argsWriter.println(it) }
+            inputChanges.getFileChanges(stableSources).forEach {
+                logger.debug("File changed: $it")
+                with(it) {
+                    if (fileType != FileType.DIRECTORY &&
+                        changeType != ChangeType.REMOVED) {
+                        argsWriter.println(file.toRelativeFile())
+                    }
+                }
+            }
             additionalConfig(argsWriter)
         }
         javaExecSpec.args("@$argsConfigFile")
@@ -248,10 +266,7 @@ abstract class BaseKtlintCheckTask(
             "reports/ktlint/${this@BaseKtlintCheckTask.name}.$fileExtension"
         })
 
-    private fun FileTree.toRelativeFilesList(): List<File> {
-        val baseDir = project.projectDir
-        return files.map { it.relativeTo(baseDir) }
-    }
+    private fun File.toRelativeFile(): File = relativeTo(project.projectDir)
 
     /**
      * Provides all reports outputs map: reporter id to reporter output file.

@@ -313,6 +313,11 @@ No. This approaches are not equivalent how they work. The problem that
 plugin may not find some of kotlin plugins if both approaches are used
 in the project configuration. Especially it is related to Android plugin.
 
+- Does plugin check changed files incrementally?
+
+Yes. On first run plugin will check all files in the module, on
+subsequent runs it will check only added/modified files.
+
 ## Developers
 
 ### Importing

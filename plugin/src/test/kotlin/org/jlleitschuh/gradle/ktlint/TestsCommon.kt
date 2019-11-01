@@ -7,6 +7,8 @@ const val LOWEST_SUPPORTED_GRADLE_VERSION = "5.4.1"
 
 fun File.buildFile() = resolve("build.gradle")
 
+fun File.ktlintBuildDir() = resolve("build/ktlint")
+
 @Language("Groovy")
 private fun pluginsBlockWithMainPluginAndKotlinPlugin(
     kotlinPluginId: String
