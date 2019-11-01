@@ -5,14 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [9.1.0] - 2019-11-01
 ### Added
   - Support for outputColorName property (#297)
   - Support for incremental checks (#231)
 ### Changed
   - Set default ktlint version to `0.35.0`
-### Removed
-  - ?
 ### Fixed
   - Ktlint configuration could be tried to configured after been resolved (#283)
 
