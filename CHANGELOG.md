@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 ### Added
   - Support for outputColorName property (#297)
+  - Support for incremental checks (#231)
 ### Changed
   - Set default ktlint version to `0.35.0`
 ### Removed
