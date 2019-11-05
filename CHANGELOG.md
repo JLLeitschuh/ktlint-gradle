@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [9.1.1] - Unreleased
+### Fixed
+  - Running format task may delete source files (#302): disable incremental
+  support for format tasks. Lint tasks are still incremental.
+
 ## [9.1.0] - 2019-11-01
 ### Added
   - Support for outputColorName property (#297)
