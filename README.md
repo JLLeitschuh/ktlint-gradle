@@ -315,8 +315,10 @@ in the project configuration. Especially it is related to Android plugin.
 
 - Does plugin check changed files incrementally?
 
-Yes. On first run plugin will check all files in the module, on
+Yes, check tasks support it. On first run task will check all files in the source set, on
 subsequent runs it will check only added/modified files.
+
+Format tasks does not check file incrementally.
 
 ## Developers
 

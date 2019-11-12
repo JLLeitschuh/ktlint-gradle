@@ -157,14 +157,15 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
     fun `Should always format again restored to pre-format state sources`() {
         projectRoot.withFailingSources()
         build(":ktlintFormat").apply {
-            assertThat(task(":ktlintMainSourceSetFormat")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":ktlintMainSourceSetFormat")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
 
         projectRoot.restoreFailingSources()
 
         build(":ktlintFormat").apply {
-            assertThat(task(":ktlintMainSourceSetFormat")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":ktlintMainSourceSetFormat")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
+        assertThat(projectRoot.resolve(FAIL_SOURCE_FILE)).exists()
     }
 
     @Test

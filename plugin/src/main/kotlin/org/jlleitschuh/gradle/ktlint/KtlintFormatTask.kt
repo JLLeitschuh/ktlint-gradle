@@ -9,6 +9,7 @@ import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
+import org.gradle.api.tasks.TaskAction
 
 @CacheableTask
 open class KtlintFormatTask @Inject constructor(
@@ -16,6 +17,11 @@ open class KtlintFormatTask @Inject constructor(
 ) : BaseKtlintCheckTask(objectFactory) {
     override fun additionalConfig(): (PrintWriter) -> Unit = {
         it.println("-F")
+    }
+
+    @TaskAction
+    fun format() {
+        runLint(stableSources.files)
     }
 
     /**

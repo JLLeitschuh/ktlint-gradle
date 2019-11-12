@@ -53,7 +53,7 @@ abstract class AbstractPluginTest {
 
     protected
     fun File.withFailingSources() = createSourceFile(
-        "src/main/kotlin/fail-source.kt",
+        FAIL_SOURCE_FILE,
         """
             val  foo    =     "bar"
             
@@ -77,7 +77,7 @@ abstract class AbstractPluginTest {
     )
 
     protected fun File.restoreFailingSources() {
-        val sourceFile = resolve("src/main/kotlin/fail-source.kt")
+        val sourceFile = resolve(FAIL_SOURCE_FILE)
         sourceFile.delete()
         withFailingSources()
     }
@@ -94,4 +94,8 @@ abstract class AbstractPluginTest {
     }
 
     fun File.settingsFile() = resolve("settings.gradle")
+
+    companion object {
+        const val FAIL_SOURCE_FILE = "src/main/kotlin/fail-source.kt"
+    }
 }
