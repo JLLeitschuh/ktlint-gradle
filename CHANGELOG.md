@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [9.1.1] - Unreleased
+## [9.1.1] - 2019-11-12
 ### Fixed
   - Running format task may delete source files (#302): disable incremental
   support for format tasks. Lint tasks are still incremental.
