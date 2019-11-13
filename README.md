@@ -106,7 +106,7 @@ subprojects {
     
     // Optionally configure plugin
     ktlint {
-       debug = true
+       debug.set(true)
     }
 }
 ```
