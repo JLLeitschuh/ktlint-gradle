@@ -5,6 +5,6 @@ object PluginVersions {
     val androidPlugin = "3.5.0"
     val semver = "1.1.1"
     val gradleWrapper = "6.0.1"
-    val junit5 = "5.4.0"
+    val junit5 = "5.5.2"
     val assertJ = "3.11.1"
 }
