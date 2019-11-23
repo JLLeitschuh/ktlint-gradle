@@ -11,7 +11,7 @@ application {
 }
 
 dependencies {
-    compile(kotlin("stdlib"))
+    implementation(kotlin("stdlib"))
     ktlintRuleset(project(":samples:kotlin-rulesets-creating"))
 }
 

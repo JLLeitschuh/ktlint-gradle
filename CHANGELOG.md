@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+### Added
+  - ?
+### Changed
+  - Update Gradle to `6.0.1` version
+  - Update Kotlin to `1.3.60` version
+### Fixed
+  - ?
+### Removed
+  - ?
+
 ## [9.1.1] - 2019-11-12
 ### Fixed
   - Running format task may delete source files (#302): disable incremental

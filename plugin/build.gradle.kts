@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "org.jlleitschuh.gradle"
-version = "9.1.1"
+version = "9.2.0-SNAPSHOT"
 
 repositories {
     google()
