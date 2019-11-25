@@ -150,7 +150,7 @@ abstract class BaseKtlintCheckTask(
     }
 
     @OutputFiles
-    private val ktlintArgsFile = objectFactory.fileProperty().apply {
+    val ktlintArgsFile = objectFactory.fileProperty().apply {
         set(
             project.layout.buildDirectory.file(
                 project.provider {
