@@ -17,3 +17,12 @@ jobs:
       run: ./plugin/gradlew -p ./plugin build --no-daemon
     - name: Check plugin codestyle
       run: ./plugin/gradlew -p ./plugin ktlintCheck --no-daemon
+    - name: Install checkbashisms
+      run: sudo apt-get install -qq devscripts
+    - name: Check git bashisms
+      run: ./gradlew addKtlintCheckGitPreCommitHook --no-daemon && checkbashisms .git/hooks/pre-commit
+    - name: Check ktlint-plugin on samples
+      uses: msfjarvis/setup-android@1.0
+      with:
+        entrypoint: ./gradlew
+        args: ktlintCheck --no-daemon
