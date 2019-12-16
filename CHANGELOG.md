@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Changed
   - Update Gradle to `6.0.1` version
   - Update Kotlin to `1.3.60` version
+  - Set default ktlint version to `0.36.0`
 ### Fixed
   - ?
 ### Removed
