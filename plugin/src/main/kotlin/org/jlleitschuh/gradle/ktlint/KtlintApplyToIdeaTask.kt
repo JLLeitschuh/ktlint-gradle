@@ -1,6 +1,7 @@
 package org.jlleitschuh.gradle.ktlint
 
 import javax.inject.Inject
+import net.swiftzer.semver.SemVer
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.model.ObjectFactory
@@ -31,16 +32,36 @@ open class KtlintApplyToIdeaTask @Inject constructor(
         project.javaexec {
             it.classpath = classpath
             it.main = resolveMainClassName(ktlintVersion.get())
-            if (globally.get()) {
-                it.args("--apply-to-idea")
-            } else {
-                it.args("--apply-to-idea-project")
-            }
-            // -y here to auto-overwrite existing IDEA code style
-            it.args("-y")
+
+            // Global flags
             if (android.get()) {
                 it.args("--android")
             }
+
+            // Subcommand
+            if (globally.get()) {
+                it.args(getApplyToIdeaCommand())
+            } else {
+                it.args(getApplyToProjectCommand())
+            }
+
+            // Subcommand parameters
+            // -y here to auto-overwrite existing IDEA code style
+            it.args("-y")
         }
     }
+
+    private fun getApplyToIdeaCommand() =
+        if (SemVer.parse(ktlintVersion.get()) >= SemVer(0, 35, 0)) {
+            "applyToIDEA"
+        } else {
+            "--apply-to-idea"
+        }
+
+    private fun getApplyToProjectCommand() =
+        if (SemVer.parse(ktlintVersion.get()) >= SemVer(0, 35, 0)) {
+            "applyToIDEAProject"
+        } else {
+            "--apply-to-idea-project"
+        }
 }
