@@ -7,12 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 ### Added
-  - ?
+  - Html reporter to provided reporters [#312](https://github.com/JLLeitschuh/ktlint-gradle/issues/312)
 ### Changed
   - Update Gradle to `6.0.1` version
   - Update Kotlin to `1.3.60` version
+  - Set default ktlint version to `0.36.0`
 ### Fixed
-  - ?
+  - Fix `ktlintApplyToIdea` task fails when `android = true` is set [#311](https://github.com/JLLeitschuh/ktlint-gradle/issues/311)
 ### Removed
   - ?
 
