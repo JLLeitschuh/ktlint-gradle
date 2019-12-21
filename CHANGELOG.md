@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   - Update Gradle to `6.0.1` version
   - Update Kotlin to `1.3.60` version
 ### Fixed
-  - ?
+  - Fix `ktlintApplyToIdea` task fails when `android = true` is set [#311](https://github.com/JLLeitschuh/ktlint-gradle/issues/311)
 ### Removed
   - ?
 
