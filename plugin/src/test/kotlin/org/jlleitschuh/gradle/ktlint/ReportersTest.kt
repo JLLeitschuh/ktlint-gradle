@@ -144,6 +144,41 @@ abstract class ReportersTest : AbstractPluginTest() {
         }
     }
 
+    @Test
+    internal fun `Should generate html report`() {
+        projectRoot.withCleanSources()
+
+        projectRoot.buildFile().appendText("""
+
+            ktlint.reporters {
+                reporter "html"
+            }
+        """.trimIndent())
+
+        build("ktlintCheck").apply {
+            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertReportCreated(ReporterType.HTML.fileExtension)
+        }
+    }
+
+    @Test
+    internal fun `Should ignore html reporter on ktlint version less then 0_36_0`() {
+        projectRoot.withCleanSources()
+
+        projectRoot.buildFile().appendText("""
+
+            ktlint.version = "0.35.0"
+            ktlint.reporters {
+                reporter "html"
+            }
+        """.trimIndent())
+
+        build("ktlintCheck").apply {
+            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertReportNotCreated(ReporterType.HTML.fileExtension)
+        }
+    }
+
     private fun assertReportCreated(reportFileExtension: String) {
         assertThat(reportLocation(reportFileExtension).isFile).isTrue()
     }
