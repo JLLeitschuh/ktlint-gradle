@@ -71,6 +71,9 @@ Minimal supported [ktlint](https://github.com/pinterest/ktlint) version: `0.22.0
 #### Simple setup
 
 Build script snippet for use in all Gradle versions:
+<details>
+<summary>Groovy</summary>
+
 ```groovy
 buildscript {
   repositories {
@@ -85,7 +88,22 @@ buildscript {
 
 apply plugin: "org.jlleitschuh.gradle.ktlint"
 ```
+</details>
+<details open>
+<summary>Kotlin</summary>
 
+```groovy
+buildscript {
+  repositories {
+    maven("https://plugins.gradle.org/m2/")
+  }
+}
+
+plugins {
+  id "org.jlleitschuh.gradle.ktlint" version "<current_version>"
+}
+```
+</details>
 
 #### Using new plugin API
 
@@ -100,9 +118,26 @@ plugins {
 #### Applying to subprojects
 
 Optionally apply plugin to all project modules:
+<details>
+<summary>Groovy</summary>
+
 ```groovy
 subprojects {
     apply plugin: "org.jlleitschuh.gradle.ktlint" // Version should be inherited from parent
+    
+    // Optionally configure plugin
+    ktlint {
+       debug = true
+    }
+}
+```
+</details>
+<details open>
+<summary>Kotlin</summary>
+
+```gradle
+subprojects {
+    apply(plugin = "org.jlleitschuh.gradle.ktlint") // Version should be inherited from parent
     
     // Optionally configure plugin
     ktlint {
@@ -110,6 +145,7 @@ subprojects {
     }
 }
 ```
+</details>
 
 ### IntelliJ Idea Only Plugin
 
@@ -146,6 +182,8 @@ object will be used.
 
 The version of ktlint used by default _may change_ between patch versions of this plugin.
 If you don't want to inherit these changes then make sure you lock your version here.
+<details>
+<summary>Groovy</summary>
 
 ```groovy
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
@@ -191,8 +229,12 @@ dependencies {
     ktlintRuleset project(":chore:project-ruleset") 
 }
 ```
+</details>
 
 or in kotlin script:
+<details open>
+<summary>Kotlin</summary>
+
 ```kotlin
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
@@ -237,6 +279,7 @@ dependencies {
     ktlintRuleset(project(":chore:project-ruleset")) 
 }
 ```
+</details>
 
 #### Custom reporters
 
