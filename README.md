@@ -30,7 +30,7 @@ The assumption being that you would not want to lint code you weren't compiling.
   - [Plugin configuration](#configuration)
     - [Customer reporters](#custom-reporters)
   - [Samples](#samples)
-- [Task details](#task-added)
+- [Task details](#tasks-added)
   - [Main tasks](#main-tasks)
   - [Additional tasks](#additional-helper-tasks)
 - [FAQ](#faq)
