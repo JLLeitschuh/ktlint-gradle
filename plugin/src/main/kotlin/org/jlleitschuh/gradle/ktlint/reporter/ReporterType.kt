@@ -10,5 +10,6 @@ enum class ReporterType(
     PLAIN("plain", SemVer(0, 9, 0), "txt"),
     PLAIN_GROUP_BY_FILE("plain?group_by_file", SemVer(0, 9, 0), "txt"),
     CHECKSTYLE("checkstyle", SemVer(0, 9, 0), "xml"),
-    JSON("json", SemVer(0, 9, 0), "json");
+    JSON("json", SemVer(0, 9, 0), "json"),
+    HTML("html", SemVer(0, 36, 0), "html");
 }

@@ -11,6 +11,20 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
+      - name: Restore Gradle caches
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-cache-${{ hashFiles('**/*.gradle.kts') }}-${{ hashFiles('**/gradle.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-cache-
+      - name: Restore Gradle wrapper
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradlew') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-wrapper-
       - name: Build plugin
         run: ./plugin/gradlew -p ./plugin build --no-daemon
       - name: Check plugin codestyle
@@ -27,6 +41,20 @@ jobs:
           java-version: 1.8
       - name: Install checkbashisms
         run: sudo apt-get install -qq devscripts
+      - name: Restore Gradle caches
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-cache-${{ hashFiles('**/*.gradle.kts') }}-${{ hashFiles('**/gradle.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-cache-
+      - name: Restore Gradle wrapper
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradlew') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-wrapper-
       - name: Check git bashisms
         run: ./gradlew addKtlintCheckGitPreCommitHook --no-daemon && checkbashisms .git/hooks/pre-commit
 
@@ -39,5 +67,19 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
+      - name: Restore Gradle caches
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-cache-${{ hashFiles('**/*.gradle.kts') }}-${{ hashFiles('**/gradle.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-cache-
+      - name: Restore Gradle wrapper
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradlew') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-wrapper-
       - name: Check ktlint-plugin on samples
         run: ./gradlew ktlintCheck --no-daemon
