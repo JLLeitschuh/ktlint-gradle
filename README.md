@@ -92,16 +92,17 @@ apply plugin: "org.jlleitschuh.gradle.ktlint"
 <details open>
 <summary>Kotlin</summary>
 
-```groovy
+```kotlin
 buildscript {
   repositories {
     maven("https://plugins.gradle.org/m2/")
   }
+  dependencies {
+    classpath("org.jlleitschuh.gradle:ktlint-gradle:<current_version>")
+  }
 }
 
-plugins {
-  id "org.jlleitschuh.gradle.ktlint" version "<current_version>"
-}
+apply(plugin = "org.jlleitschuh.gradle.ktlint")
 ```
 </details>
 
@@ -135,7 +136,7 @@ subprojects {
 <details open>
 <summary>Kotlin</summary>
 
-```gradle
+```kotlin
 subprojects {
     apply(plugin = "org.jlleitschuh.gradle.ktlint") // Version should be inherited from parent
     
@@ -167,9 +168,9 @@ apply plugin: "org.jlleitschuh.gradle.ktlint-idea"
 #### Idea plugin setup using new plugin API
 
 Build script snippet for new, incubating, plugin mechanism introduced in Gradle 2.1:
-```groovy
+```kotlin
 plugins {
-  id "org.jlleitschuh.gradle.ktlint-idea" version "<current_version>"
+  id("org.jlleitschuh.gradle.ktlint-idea") version "<current_version>"
 }
 ```
 
