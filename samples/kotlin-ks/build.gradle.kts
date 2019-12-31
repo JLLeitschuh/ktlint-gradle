@@ -21,6 +21,7 @@ ktlint {
     reporters {
         reporter(ReporterType.CHECKSTYLE)
         reporter(ReporterType.JSON)
+        reporter(ReporterType.HTML)
     }
     filter {
         exclude("**/style-violations.kt")
