@@ -23,6 +23,7 @@ dependencies {
     compileOnly(kotlin("gradle-plugin", PluginVersions.kotlin))
     compileOnly("com.android.tools.build:gradle:${PluginVersions.androidPlugin}")
     implementation("net.swiftzer.semver:semver:${PluginVersions.semver}")
+    implementation("org.eclipse.jgit:org.eclipse.jgit:${PluginVersions.jgit}")
 
     /*
      * Do not depend upon the gradle script kotlin plugin API. IE: gradleScriptKotlinApi()

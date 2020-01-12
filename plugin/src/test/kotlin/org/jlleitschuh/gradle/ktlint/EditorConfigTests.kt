@@ -18,8 +18,12 @@ class GradleCurrentEditorConfigTest : EditorConfigTests()
 @Suppress("ClassName")
 class GradleLowestSupportedEditorConfigTest : EditorConfigTests() {
 
-    override fun gradleRunnerFor(vararg arguments: String): GradleRunner =
-        super.gradleRunnerFor(*arguments).withGradleVersion(LOWEST_SUPPORTED_GRADLE_VERSION)
+    override fun gradleRunnerFor(
+        vararg arguments: String,
+        projectRoot: File
+    ): GradleRunner =
+        super.gradleRunnerFor(*arguments, projectRoot = projectRoot)
+            .withGradleVersion(LOWEST_SUPPORTED_GRADLE_VERSION)
 }
 
 /**

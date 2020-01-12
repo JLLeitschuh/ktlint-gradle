@@ -1,14 +1,11 @@
 package org.jlleitschuh.gradle.ktlint
 
-import java.io.File
 import javax.inject.Inject
+import org.eclipse.jgit.lib.RepositoryBuilder
 import org.gradle.api.DefaultTask
-import org.gradle.api.Project
-import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.intellij.lang.annotations.Language
 
@@ -24,10 +21,33 @@ set -e
 internal const val startHookSection = "######## KTLINT-GRADLE HOOK START ########\n"
 internal const val endHookSection = "######## KTLINT-GRADLE HOOK END ########\n"
 
-@Language("Sh")
-internal fun generateGitHook(taskName: String) = """
+private fun generateGradleCommand(
+    taskName: String,
+    gradleRootDirPrefix: String
+): String {
+    val gradleCommand = if (gradleRootDirPrefix.isNotEmpty()) {
+        "./$gradleRootDirPrefix/gradlew -p ./$gradleRootDirPrefix"
+    } else {
+        "./gradlew"
+    }
+    return "$gradleCommand --quiet $taskName -P$FILTER_INCLUDE_PROPERTY_NAME=${'$'}CHANGED_FILES"
+}
 
-CHANGED_FILES="${'$'}(git --no-pager diff --name-status --no-color --cached | awk '$1 != "D" && $2 ~ /\.kts|\.kt/ { print $2}')"
+private fun generateGitCommand(
+    gradleRootDirPrefix: String
+): String = if (gradleRootDirPrefix.isEmpty()) {
+    "git --no-pager diff --name-status --no-color --cached"
+} else {
+    "git --no-pager diff --name-status --no-color --cached -- $gradleRootDirPrefix/"
+}
+
+@Language("Sh")
+internal fun generateGitHook(
+    taskName: String,
+    gradleRootDirPrefix: String
+) = """
+
+CHANGED_FILES="${'$'}(${generateGitCommand(gradleRootDirPrefix)} | awk '$1 != "D" && $2 ~ /\.kts|\.kt/ { print $2}')"
 
 if [ -z "${'$'}CHANGED_FILES" ]; then
     echo "No Kotlin staged files."
@@ -37,7 +57,7 @@ fi;
 echo "Running ktlint over these files:"
 echo "${'$'}CHANGED_FILES"
 
-./gradlew --quiet $taskName -P$FILTER_INCLUDE_PROPERTY_NAME="${'$'}CHANGED_FILES"
+${generateGradleCommand(taskName, gradleRootDirPrefix)}
 
 echo "Completed ktlint run."
 
@@ -52,15 +72,11 @@ echo "Completed ktlint hook."
 """.trimIndent()
 
 internal fun KtlintPlugin.PluginHolder.addGitHookTasks() {
-    if (target.rootProject == target &&
-        target.checkGitIsPresent()) {
+    if (target.rootProject == target) {
         addInstallGitHookFormatTask()
         addInstallGitHookCheckTask()
     }
 }
-
-private val Project.gitFolder: File get() = rootProject.file(".git")
-private fun Project.checkGitIsPresent(): Boolean = gitFolder.exists()
 
 private fun KtlintPlugin.PluginHolder.addInstallGitHookFormatTask() {
     target.tasks.register(
@@ -70,7 +86,7 @@ private fun KtlintPlugin.PluginHolder.addInstallGitHookFormatTask() {
         it.description = "Adds git hook to run ktlintFormat on changed files"
         it.group = HELP_GROUP
         it.taskName.set(FORMAT_PARENT_TASK_NAME)
-        it.gitHook.set(target.file(".git/hooks/pre-commit"))
+        it.hookName.set("pre-commit")
     }
 }
 
@@ -82,7 +98,7 @@ private fun KtlintPlugin.PluginHolder.addInstallGitHookCheckTask() {
         it.description = "Adds git hook to run ktlintCheck on changed files"
         it.group = HELP_GROUP
         it.taskName.set(CHECK_PARENT_TASK_NAME)
-        it.gitHook.set(target.file(".git/hooks/pre-commit"))
+        it.hookName.set("pre-commit")
     }
 }
 
@@ -92,21 +108,29 @@ open class KtlintInstallGitHookTask @Inject constructor(
     @get:Input
     internal val taskName: Property<String> = objectFactory.property(String::class.java)
 
-    @get:OutputFile
-    internal val gitHook: RegularFileProperty = objectFactory.fileProperty()
+    @get:Input
+    internal val hookName: Property<String> = objectFactory.property(String::class.java)
 
     @TaskAction
     fun installHook() {
-        val gitHookFile = gitHook.get().asFile
+        val repo = RepositoryBuilder().findGitDir(project.projectDir).setMustExist(false).build()
+        if (!repo.objectDatabase.exists()) {
+            logger.warn("No git folder was found!")
+            return
+        }
+
+        logger.info(".git directory path: ${repo.directory}")
+        val gitHookFile = repo.directory.resolve("hooks/${hookName.get()}")
         logger.info("Hook file: $gitHookFile")
         if (!gitHookFile.exists()) {
             gitHookFile.createNewFile()
             gitHookFile.setExecutable(true)
         }
+        val gradleRootDirPrefix = project.rootDir.relativeTo(repo.workTree).path
 
         if (gitHookFile.length() == 0L) {
             gitHookFile.writeText(
-                "$shShebang$startHookSection${generateGitHook(taskName.get())}$endHookSection"
+                "$shShebang$startHookSection${generateGitHook(taskName.get(), gradleRootDirPrefix)}$endHookSection"
             )
             return
         }
@@ -118,12 +142,12 @@ open class KtlintInstallGitHookTask @Inject constructor(
             hookContent = hookContent.replaceRange(
                 startTagIndex,
                 endTagIndex,
-                "$startHookSection${generateGitHook(taskName.get())}"
+                "$startHookSection${generateGitHook(taskName.get(), gradleRootDirPrefix)}"
             )
             gitHookFile.writeText(hookContent)
         } else {
             gitHookFile.appendText(
-                "$startHookSection${generateGitHook(taskName.get())}$endHookSection"
+                "$startHookSection${generateGitHook(taskName.get(), gradleRootDirPrefix)}$endHookSection"
             )
         }
     }

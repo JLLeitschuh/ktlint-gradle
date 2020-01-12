@@ -28,16 +28,19 @@ abstract class AbstractPluginTest {
             }
         """.trimIndent()
 
-    protected
-    fun build(vararg arguments: String): BuildResult =
-        gradleRunnerFor(*arguments).forwardOutput().build()
+    protected fun build(
+        vararg arguments: String,
+        projectRoot: File = this.projectRoot
+    ): BuildResult = gradleRunnerFor(*arguments, projectRoot = projectRoot).forwardOutput().build()
 
     protected
     fun buildAndFail(vararg arguments: String): BuildResult =
-        gradleRunnerFor(*arguments).forwardOutput().buildAndFail()
+        gradleRunnerFor(arguments = *arguments).forwardOutput().buildAndFail()
 
-    protected open
-    fun gradleRunnerFor(vararg arguments: String): GradleRunner =
+    protected open fun gradleRunnerFor(
+        vararg arguments: String,
+        projectRoot: File = this.projectRoot
+    ): GradleRunner =
         GradleRunner.create()
             .withProjectDir(projectRoot)
             .withPluginClasspath()
