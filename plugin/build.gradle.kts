@@ -1,12 +1,17 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     kotlin("jvm") version PluginVersions.kotlin
     id("com.gradle.plugin-publish") version PluginVersions.gradlePublishPlugin
     `java-gradle-plugin`
     `maven-publish`
     id("org.jlleitschuh.gradle.ktlint") version PluginVersions.ktlintPlugin
+    id("com.github.johnrengelman.shadow") version PluginVersions.shadow
 }
 
-group = "org.jlleitschuh.gradle"
+val pluginGroup = "org.jlleitschuh.gradle"
+group = pluginGroup
 version = "9.2.0-SNAPSHOT"
 
 repositories {
@@ -18,12 +23,20 @@ tasks.withType<PluginUnderTestMetadata>().configureEach {
     pluginClasspath.from(configurations.compileOnly)
 }
 
+/**
+ * Special configuration to be included in resulting shadowed jar, but not added to the generated pom and gradle
+ * metadata files.
+ */
+val shadowImplementation by configurations.creating
+configurations["compileOnly"].extendsFrom(shadowImplementation)
+configurations["testImplementation"].extendsFrom(shadowImplementation)
+
 dependencies {
     compileOnly(gradleApi())
     compileOnly(kotlin("gradle-plugin", PluginVersions.kotlin))
     compileOnly("com.android.tools.build:gradle:${PluginVersions.androidPlugin}")
-    implementation("net.swiftzer.semver:semver:${PluginVersions.semver}")
-    implementation("org.eclipse.jgit:org.eclipse.jgit:${PluginVersions.jgit}")
+    shadowImplementation("net.swiftzer.semver:semver:${PluginVersions.semver}")
+    shadowImplementation("org.eclipse.jgit:org.eclipse.jgit:${PluginVersions.jgit}")
 
     /*
      * Do not depend upon the gradle script kotlin plugin API. IE: gradleScriptKotlinApi()
@@ -39,6 +52,41 @@ dependencies {
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
+}
+
+val shadowJarTask = tasks.named("shadowJar", ShadowJar::class.java)
+// Enable package relocation in resulting shadow jar
+val relocateShadowJar = tasks.register("relocateShadowJar", ConfigureShadowRelocation::class.java) {
+    prefix = "$pluginGroup.shadow"
+    target = shadowJarTask.get()
+}
+
+// Removing gradleApi() added by 'java-gradle-plugin` plugin from resulting shadowed jar
+configurations.named(JavaPlugin.API_CONFIGURATION_NAME) {
+    dependencies.remove(project.dependencies.gradleApi())
+}
+
+shadowJarTask.configure {
+    dependsOn(relocateShadowJar)
+    minimize()
+    archiveClassifier.set("")
+    configurations = listOf(shadowImplementation)
+}
+
+// Required for plugin substitution to work in samples project
+artifacts {
+    add("runtime", shadowJarTask)
+}
+
+tasks.whenTaskAdded {
+    if (name == "publishPluginJar" || name == "generateMetadataFileForPluginMavenPublication") {
+        dependsOn(tasks.named("shadowJar"))
+    }
+}
+
+// Disabling default jar task as it is overridden by shadowJar
+tasks.named("jar").configure {
+    enabled = false
 }
 
 /**
@@ -79,6 +127,27 @@ gradlePlugin {
         register("ktlintIdeaPlugin") {
             id = "org.jlleitschuh.gradle.ktlint-idea"
             implementationClass = "org.jlleitschuh.gradle.ktlint.KtlintIdeaPlugin"
+        }
+    }
+}
+
+// Need to move publishing configuration into afterEvaluate {}
+// to override changes done by "com.gradle.plugin-publish" plugin in afterEvaluate {} block
+// See PublishPlugin class for details
+afterEvaluate {
+    publishing {
+        publications {
+            withType(MavenPublication::class.java) {
+                // Special workaround to publish shadow jar instead of normal one. Name to override peeked here:
+                // https://github.com/gradle/gradle/blob/master/subprojects/plugin-development/src/main/java/org/gradle/plugin/devel/plugins/MavenPluginPublishPlugin.java#L73
+                if (name == "pluginMaven") {
+                    setArtifacts(
+                        listOf(
+                            shadowJarTask.get()
+                        )
+                    )
+                }
+            }
         }
     }
 }

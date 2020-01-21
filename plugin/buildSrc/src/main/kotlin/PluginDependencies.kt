@@ -8,4 +8,5 @@ object PluginVersions {
     val gradleWrapper = "6.0.1"
     val junit5 = "5.5.2"
     val assertJ = "3.11.1"
+    val shadow = "5.2.0"
 }
