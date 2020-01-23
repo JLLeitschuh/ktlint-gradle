@@ -167,7 +167,7 @@ abstract class ReportersTest : AbstractPluginTest() {
 
         projectRoot.buildFile().appendText("""
 
-            ktlint.version = "0.35.0"
+            ktlint.version = "0.36.0"
             ktlint.reporters {
                 reporter "html"
             }
