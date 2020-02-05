@@ -89,6 +89,32 @@ tasks.named("jar").configure {
     enabled = false
 }
 
+val ensureDependenciesAreInlined by tasks.registering {
+    description = "Ensures all declared dependencies are inlined into shadowed jar"
+    group = HelpTasksPlugin.HELP_GROUP
+    dependsOn(tasks.shadowJar)
+
+    doLast {
+        val nonInlinedDependencies = mutableListOf<String>()
+        zipTree(tasks.shadowJar.flatMap { it.archiveFile }).visit {
+            if (!isDirectory) {
+                val path = relativePath
+                if (!path.startsWith("META-INF") &&
+                    path.lastName.endsWith(".class") &&
+                    !path.pathString.startsWith(pluginGroup.replace(".", "/"))) {
+                    nonInlinedDependencies.add(path.pathString)
+                }
+            }
+        }
+        if (nonInlinedDependencies.isNotEmpty()) {
+            throw GradleException("Found non inlined dependencies: $nonInlinedDependencies")
+        }
+    }
+}
+tasks.named("check") {
+    dependsOn(ensureDependenciesAreInlined)
+}
+
 /**
  * Configures the publishing environment for publishing with Travis CI.
  * All you need to do is push a tagged commit to github and Travis CI will automatically publish a
