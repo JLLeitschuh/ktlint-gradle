@@ -1,5 +1,6 @@
 package org.jlleitschuh.gradle.ktlint
 
+import java.io.File
 import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
@@ -17,8 +18,12 @@ class GradleCurrentReportersTests : ReportersTest()
  */
 @Suppress("ClassName")
 class GradleLowestSupportedReportersTest : ReportersTest() {
-    override fun gradleRunnerFor(vararg arguments: String): GradleRunner =
-        super.gradleRunnerFor(*arguments).withGradleVersion(LOWEST_SUPPORTED_GRADLE_VERSION)
+    override fun gradleRunnerFor(
+        vararg arguments: String,
+        projectRoot: File
+    ): GradleRunner =
+        super.gradleRunnerFor(*arguments, projectRoot = projectRoot)
+            .withGradleVersion(LOWEST_SUPPORTED_GRADLE_VERSION)
 }
 
 abstract class ReportersTest : AbstractPluginTest() {
