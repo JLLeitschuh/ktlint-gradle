@@ -16,7 +16,11 @@ script:
   - ./plugin/gradlew -p ./plugin ktlintCheck --no-daemon
   - ./gradlew ktlintCheck --no-daemon
   - ./gradlew addKtlintCheckGitPreCommitHook --no-daemon && checkbashisms .git/hooks/pre-commit
-  - if [ -n "$TRAVIS_TAG" ]; then ./plugin/gradlew -p ./plugin publishPlugins --no-daemon; fi
+  - |
+      if [ -n "$TRAVIS_TAG" ]; then 
+        ./plugin/gradlew -p ./plugin publishPlugins --no-daemon
+        ./plugin/gradlew -p ./plugin githubRelease --no-daemon
+      fi
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock

@@ -1,5 +1,6 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.jetbrains.kotlin.util.prefixIfNot
 
 plugins {
     kotlin("jvm") version PluginVersions.kotlin
@@ -8,6 +9,7 @@ plugins {
     `maven-publish`
     id("org.jlleitschuh.gradle.ktlint") version PluginVersions.ktlintPlugin
     id("com.github.johnrengelman.shadow") version PluginVersions.shadow
+    id("com.github.breadmoirai.github-release") version PluginVersions.githubRelease
 }
 
 val pluginGroup = "org.jlleitschuh.gradle"
@@ -123,9 +125,11 @@ tasks.named("check") {
 fun setupPublishingEnvironment() {
     val keyEnvironmentVariable = "GRADLE_PUBLISH_KEY"
     val secretEnvironmentVariable = "GRADLE_PUBLISH_SECRET"
+    val githubEnvironmentVariable = "GITHUB_KEY"
 
     val keyProperty = "gradle.publish.key"
     val secretProperty = "gradle.publish.secret"
+    val githubProperty = "github.secret"
 
     if (System.getProperty(keyProperty) == null || System.getProperty(secretProperty) == null) {
         logger
@@ -137,7 +141,20 @@ fun setupPublishingEnvironment() {
             System.setProperty(keyProperty, key)
             System.setProperty(secretProperty, secret)
         } else {
-            logger.warn("key or secret was null")
+            logger.warn("Publishing key or secret was null")
+        }
+    }
+
+    if (System.getProperty(githubProperty) == null) {
+        logger.info(
+            "`$githubProperty` was not set. Attempting to configure it from environment variable"
+        )
+
+        val key: String? = System.getenv(githubEnvironmentVariable)
+        if (key != null) {
+            System.setProperty(githubProperty, key)
+        } else {
+            logger.warn("Github key was null")
         }
     }
 }
@@ -191,6 +208,20 @@ pluginBundle {
         "ktlintIdeaPlugin" {
             displayName = "Ktlint Gradle IntelliJ Configuration Plugin"
         }
+    }
+}
+
+githubRelease {
+    setToken(System.getProperty("github.secret"))
+    setOwner("JLLeitschuh")
+    setRepo("ktlint-gradle")
+    setOverwrite(true)
+    body {
+        projectDir.resolve("../CHANGELOG.md")
+            .readText()
+            .substringAfter("## ")
+            .substringBefore("## [")
+            .prefixIfNot("## ")
     }
 }
 

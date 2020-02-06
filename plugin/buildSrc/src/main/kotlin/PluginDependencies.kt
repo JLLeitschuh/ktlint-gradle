@@ -9,4 +9,5 @@ object PluginVersions {
     val junit5 = "5.5.2"
     val assertJ = "3.11.1"
     val shadow = "5.2.0"
+    val githubRelease = "2.2.10"
 }
