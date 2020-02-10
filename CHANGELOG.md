@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [9.2.0] - 2020-02-10
 ### Added
   - Html reporter to provided reporters [#312](https://github.com/JLLeitschuh/ktlint-gradle/issues/312)
   - Plugin will search for project `.git` folder

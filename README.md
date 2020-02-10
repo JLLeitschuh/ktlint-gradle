@@ -2,7 +2,7 @@
 
 **Provides a convenient wrapper plugin over the [ktlint](https://github.com/pinterest/ktlint) project.**
 
-Latest plugin version: [9.1.1](/CHANGELOG.md#911---2019-11-12)
+Latest plugin version: [9.2.0](/CHANGELOG.md#920---2020-02-10)
 
 [![Join the chat at https://kotlinlang.slack.com](https://img.shields.io/badge/slack-@kotlinlang/ktlint-yellow.svg?logo=slack)](https://kotlinlang.slack.com/messages/CKS3XG0LS)
 [![Build Status](https://travis-ci.org/JLLeitschuh/ktlint-gradle.svg?branch=master)](https://travis-ci.org/JLLeitschuh/ktlint-gradle)
