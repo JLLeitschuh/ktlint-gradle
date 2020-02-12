@@ -30,7 +30,7 @@ private fun generateGradleCommand(
     } else {
         "./gradlew"
     }
-    return "$gradleCommand --quiet $taskName -P$FILTER_INCLUDE_PROPERTY_NAME=${'$'}CHANGED_FILES"
+    return "$gradleCommand --quiet $taskName -P$FILTER_INCLUDE_PROPERTY_NAME=\"${'$'}CHANGED_FILES\""
 }
 
 private fun generateGitCommand(

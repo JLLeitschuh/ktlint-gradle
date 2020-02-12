@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Changed
   - ?
 ### Fixed
-  - ?
+  - Git hook fails to check multiple files [#336](https://github.com/JLLeitschuh/ktlint-gradle/issues/336)
 ### Removed
   - ?
 
