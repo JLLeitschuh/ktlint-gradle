@@ -5,15 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
-### Added
-  - ?
-### Changed
-  - ?
+## [9.2.1] - 2020-02-12
 ### Fixed
   - Git hook fails to check multiple files [#336](https://github.com/JLLeitschuh/ktlint-gradle/issues/336)
-### Removed
-  - ?
 
 ## [9.2.0] - 2020-02-10
 ### Added
