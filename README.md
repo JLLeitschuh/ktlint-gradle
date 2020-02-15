@@ -364,6 +364,14 @@ subsequent runs it will check only added/modified files.
 
 Format tasks does not check file incrementally.
 
+- I could not filter dynamically attached sources that are located outside of the project dir.
+
+Gradle based filtering are only working for files located inside project (subproject) folder, see https://github.com/gradle/gradle/issues/3417
+To filter files outside project dir, use:
+```kotlin
+exclude { element -> element.file.path.contains("generated/") }
+```
+
 ## Developers
 
 ### Importing
