@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Added
   - ?
 ### Changed
-  - ?
+  - Check pre-commit hook will not add partially committed files to git commit [#330](https://github.com/JLLeitschuh/ktlint-gradle/issues/330)
 ### Fixed
   - ?
 ### Deleted
