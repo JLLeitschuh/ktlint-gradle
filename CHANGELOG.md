@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   - ?
 ### Changed
   - Update Gradle to `6.2.1` version
+  - Update Android Gradle plugin to `3.6.0` version
 ### Fixed
   - ?
 ### Deleted
