@@ -77,7 +77,7 @@ shadowJarTask.configure {
 
 // Required for plugin substitution to work in samples project
 artifacts {
-    add("runtime", shadowJarTask)
+    add("runtimeOnly", shadowJarTask)
 }
 
 tasks.whenTaskAdded {
