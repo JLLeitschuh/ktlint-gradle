@@ -41,9 +41,24 @@ private fun generateGitCommand(
     "git --no-pager diff --name-status --no-color --cached -- $gradleRootDirPrefix/"
 }
 
+private fun postCheck(
+    shouldUpdateCommit: Boolean
+): String = if (shouldUpdateCommit) {
+    """
+    echo "${'$'}CHANGED_FILES" | while read -r file; do
+        if [ -f ${'$'}file ]; then
+            git add ${'$'}file
+        fi
+    done
+    """.trimIndent()
+} else {
+    ""
+}
+
 @Language("Sh")
 internal fun generateGitHook(
     taskName: String,
+    shouldUpdateCommit: Boolean,
     gradleRootDirPrefix: String
 ) = """
 
@@ -60,13 +75,7 @@ echo "${'$'}CHANGED_FILES"
 ${generateGradleCommand(taskName, gradleRootDirPrefix)}
 
 echo "Completed ktlint run."
-
-echo "${'$'}CHANGED_FILES" | while read -r file; do
-    if [ -f ${'$'}file ]; then
-        git add ${'$'}file
-    fi
-done
-
+${postCheck(shouldUpdateCommit)}
 echo "Completed ktlint hook."
 
 """.trimIndent()
@@ -86,6 +95,8 @@ private fun KtlintPlugin.PluginHolder.addInstallGitHookFormatTask() {
         it.description = "Adds git hook to run ktlintFormat on changed files"
         it.group = HELP_GROUP
         it.taskName.set(FORMAT_PARENT_TASK_NAME)
+        // Format git hook will automatically add back updated files to git commit
+        it.shouldUpdateCommit.set(true)
         it.hookName.set("pre-commit")
     }
 }
@@ -98,6 +109,7 @@ private fun KtlintPlugin.PluginHolder.addInstallGitHookCheckTask() {
         it.description = "Adds git hook to run ktlintCheck on changed files"
         it.group = HELP_GROUP
         it.taskName.set(CHECK_PARENT_TASK_NAME)
+        it.shouldUpdateCommit.set(false)
         it.hookName.set("pre-commit")
     }
 }
@@ -107,6 +119,9 @@ open class KtlintInstallGitHookTask @Inject constructor(
 ) : DefaultTask() {
     @get:Input
     internal val taskName: Property<String> = objectFactory.property(String::class.java)
+
+    @get:Input
+    internal val shouldUpdateCommit: Property<Boolean> = objectFactory.property(Boolean::class.java).convention(false)
 
     @get:Input
     internal val hookName: Property<String> = objectFactory.property(String::class.java)
@@ -130,7 +145,11 @@ open class KtlintInstallGitHookTask @Inject constructor(
 
         if (gitHookFile.length() == 0L) {
             gitHookFile.writeText(
-                "$shShebang$startHookSection${generateGitHook(taskName.get(), gradleRootDirPrefix)}$endHookSection"
+                "$shShebang$startHookSection${generateGitHook(
+                    taskName.get(),
+                    shouldUpdateCommit.get(),
+                    gradleRootDirPrefix
+                )}$endHookSection"
             )
             return
         }
@@ -142,12 +161,20 @@ open class KtlintInstallGitHookTask @Inject constructor(
             hookContent = hookContent.replaceRange(
                 startTagIndex,
                 endTagIndex,
-                "$startHookSection${generateGitHook(taskName.get(), gradleRootDirPrefix)}"
+                "$startHookSection${generateGitHook(
+                    taskName.get(),
+                    shouldUpdateCommit.get(),
+                    gradleRootDirPrefix
+                )}"
             )
             gitHookFile.writeText(hookContent)
         } else {
             gitHookFile.appendText(
-                "$startHookSection${generateGitHook(taskName.get(), gradleRootDirPrefix)}$endHookSection"
+                "$startHookSection${generateGitHook(
+                    taskName.get(),
+                    shouldUpdateCommit.get(),
+                    gradleRootDirPrefix
+                )}$endHookSection"
             )
         }
     }

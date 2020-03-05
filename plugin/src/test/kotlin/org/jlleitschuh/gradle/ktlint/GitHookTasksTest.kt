@@ -108,6 +108,28 @@ class GitHookTasksTest : AbstractPluginTest() {
         }
     }
 
+    @Test
+    internal fun `Check hook should not include files into git commit`() {
+        projectRoot.setupGradleProject()
+        val gitDir = projectRoot.initGit()
+
+        build(":$INSTALL_GIT_HOOK_CHECK_TASK").run {
+            assertThat(task(":$INSTALL_GIT_HOOK_CHECK_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(gitDir.preCommitGitHook().readText()).doesNotContain("git add")
+        }
+    }
+
+    @Test
+    internal fun `Format hook should include updated files into git commit`() {
+        projectRoot.setupGradleProject()
+        val gitDir = projectRoot.initGit()
+
+        build(":$INSTALL_GIT_HOOK_FORMAT_TASK").run {
+            assertThat(task(":$INSTALL_GIT_HOOK_FORMAT_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(gitDir.preCommitGitHook().readText()).contains("git add")
+        }
+    }
+
     private fun File.initGit(): File {
         val repo = RepositoryBuilder().setWorkTree(this).setMustExist(false).build()
         repo.create()
