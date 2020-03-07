@@ -184,14 +184,50 @@ abstract class ReportersTest : AbstractPluginTest() {
         }
     }
 
-    private fun assertReportCreated(reportFileExtension: String) {
-        assertThat(reportLocation(reportFileExtension).isFile).isTrue()
+    @Test
+    internal fun `Should create reports in modified reports output dir`() {
+        projectRoot.withFailingSources()
+        val newLocation = "other/location"
+
+        projectRoot.buildFile().appendText("""
+            
+            ktlint.reporters {
+                reporter "checkstyle"
+                reporter "json"
+            }
+
+            tasks.withType(org.jlleitschuh.gradle.ktlint.KtlintCheckTask.class) {
+                reporterOutputDir = project.layout.buildDirectory.dir("$newLocation")
+            }
+        """.trimIndent())
+
+        buildAndFail("ktlintCheck").apply {
+            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.FAILED)
+
+            assertReportNotCreated(ReporterType.CHECKSTYLE.fileExtension)
+            assertReportCreated(ReporterType.CHECKSTYLE.fileExtension, "build/$newLocation")
+
+            assertReportNotCreated(ReporterType.JSON.fileExtension)
+            assertReportCreated(ReporterType.JSON.fileExtension, "build/$newLocation")
+        }
     }
 
-    private fun assertReportNotCreated(reportFileExtension: String) {
-        assertThat(reportLocation(reportFileExtension).isFile).isFalse()
+    private fun assertReportCreated(
+        reportFileExtension: String,
+        reportsLocation: String = "build/reports/ktlint"
+    ) {
+        assertThat(reportLocation(reportsLocation, reportFileExtension).isFile).isTrue()
     }
 
-    private fun reportLocation(reportFileExtension: String) =
-        projectRoot.resolve("build/reports/ktlint/ktlintMainSourceSetCheck.$reportFileExtension")
+    private fun assertReportNotCreated(
+        reportFileExtension: String,
+        reportsLocation: String = "build/reports/ktlint"
+    ) {
+        assertThat(reportLocation(reportsLocation, reportFileExtension).isFile).isFalse()
+    }
+
+    private fun reportLocation(
+        reportsLocation: String,
+        reportFileExtension: String
+    ) = projectRoot.resolve("$reportsLocation/ktlintMainSourceSetCheck.$reportFileExtension")
 }
