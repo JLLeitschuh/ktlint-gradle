@@ -18,7 +18,7 @@ open class KtlintCheckTask @Inject constructor(
 
     @TaskAction
     fun lint(inputChanges: InputChanges) {
-        project.logger.info("Executing ${if (inputChanges.isIncremental) "incrementally" else "non-incrementally"}")
+        logger.info("Executing ${if (inputChanges.isIncremental) "incrementally" else "non-incrementally"}")
 
         val filesToLint = inputChanges
             .getFileChanges(stableSources)
@@ -29,7 +29,7 @@ open class KtlintCheckTask @Inject constructor(
             }
             .map { it.file }
             .toSet()
-        project.logger.debug("Files changed: $filesToLint")
+        logger.debug("Files changed: $filesToLint")
 
         runLint(filesToLint)
     }
