@@ -19,7 +19,6 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.language.base.plugins.LifecycleBasePlugin
 
 internal fun resolveMainClassName(ktlintVersion: String) = when {
     SemVer.parse(ktlintVersion) < SemVer(0, 32, 0) -> "com.github.shyiko.ktlint.Main"
