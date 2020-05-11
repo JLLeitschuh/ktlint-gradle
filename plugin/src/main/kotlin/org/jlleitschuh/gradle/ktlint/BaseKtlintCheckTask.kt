@@ -32,6 +32,10 @@ import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 abstract class BaseKtlintCheckTask(
     private val objectFactory: ObjectFactory
 ) : SourceTask() {
+    
+    init {
+      group = "ktlint"
+    }
 
     @get:Classpath
     internal val classpath: ConfigurableFileCollection = project.files()
