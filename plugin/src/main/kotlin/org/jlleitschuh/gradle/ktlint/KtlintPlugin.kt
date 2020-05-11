@@ -306,7 +306,7 @@ open class KtlintPlugin : Plugin<Project> {
 
         val metaKtlintCheckTask: TaskProvider<Task> by lazy {
             target.registerTask<Task>(CHECK_PARENT_TASK_NAME) {
-                group = VERIFICATION_GROUP
+                group = KTLINT_GROUP
                 description = "Runs ktlint on all kotlin sources in this project."
             }
         }
@@ -356,7 +356,7 @@ private fun Project.createAndroidVariantMetaKtlintCheckTask(
     variantName: String,
     multiplatformTargetName: String? = null
 ): TaskProvider<Task> = registerTask(variantName.androidVariantMetaCheckTaskName(multiplatformTargetName)) {
-    group = VERIFICATION_GROUP
+    group = KTLINT_GROUP
     description = "Runs ktlint on all kotlin sources for android $variantName variant in this project."
 }
 

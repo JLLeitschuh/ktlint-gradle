@@ -95,7 +95,7 @@ private fun Path.isRootEditorConfig(): Boolean {
     return false
 }
 
-internal const val VERIFICATION_GROUP = LifecycleBasePlugin.VERIFICATION_GROUP
+internal const val KTLINT_GROUP = "ktlint"
 internal const val FORMATTING_GROUP = "Formatting"
 internal const val HELP_GROUP = HelpTasksPlugin.HELP_GROUP
 internal const val CHECK_PARENT_TASK_NAME = "ktlintCheck"
