@@ -34,7 +34,7 @@ abstract class BaseKtlintCheckTask(
 ) : SourceTask() {
     
     init {
-      group = "ktlint"
+        group = "ktlint"
     }
 
     @get:Classpath
