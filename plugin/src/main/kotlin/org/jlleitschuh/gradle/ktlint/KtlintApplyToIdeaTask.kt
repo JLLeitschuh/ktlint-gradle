@@ -14,6 +14,10 @@ import org.gradle.api.tasks.TaskAction
 open class KtlintApplyToIdeaTask @Inject constructor(
     objectFactory: ObjectFactory
 ) : DefaultTask() {
+    
+    init {
+        group = "ktlint"
+    }
 
     @get:Classpath
     val classpath: ConfigurableFileCollection = project.files()
