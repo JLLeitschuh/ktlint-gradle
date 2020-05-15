@@ -195,7 +195,9 @@ internal fun BaseKtlintCheckTask.applyGitFilter() {
                 true
             } else {
                 filesToInclude.any {
-                    fileTreeElement.file.absolutePath.endsWith(it)
+                    fileTreeElement.file.absolutePath
+                            .replace("\\", "/")
+                            .endsWith(it)
                 }
             }
         }
