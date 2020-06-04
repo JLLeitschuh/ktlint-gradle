@@ -11,7 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Changed
   - Check pre-commit hook will not add partially committed files to git commit [#330](https://github.com/JLLeitschuh/ktlint-gradle/issues/330)
   - Update Gradle to `6.2.1` version
-  - Update Android Gradle plugin to `3.6.0` version
+  - Update Android Gradle plugin to `3.6.3` version
+  - Set default ktlint version to `0.37.1`
 ### Fixed
   - ?
 ### Deleted
