@@ -43,7 +43,7 @@ class ItemListActivity : AppCompatActivity() {
 
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
+                .setAction("Action", null).show()
         }
 
         if (item_detail_container != null) {
@@ -78,9 +78,9 @@ class ItemListActivity : AppCompatActivity() {
                         arguments?.putString(ItemDetailFragment.ARG_ITEM_ID, item.id)
                     }
                     mParentActivity.supportFragmentManager
-                            .beginTransaction()
-                            .replace(R.id.item_detail_container, fragment)
-                            .commit()
+                        .beginTransaction()
+                        .replace(R.id.item_detail_container, fragment)
+                        .commit()
                 } else {
                     val intent = Intent(v.context, ItemDetailActivity::class.java).apply {
                         putExtra(ItemDetailFragment.ARG_ITEM_ID, item.id)
@@ -92,7 +92,7 @@ class ItemListActivity : AppCompatActivity() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.item_list_content, parent, false)
+                .inflate(R.layout.item_list_content, parent, false)
             return ViewHolder(view)
         }
 

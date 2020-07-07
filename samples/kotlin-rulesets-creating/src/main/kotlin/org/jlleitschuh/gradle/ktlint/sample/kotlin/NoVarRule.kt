@@ -13,7 +13,8 @@ class NoVarRule : Rule("no-var") {
         emit: (offset: Int, errorMessage: String, canBeAutoCorrected: Boolean) -> Unit
     ) {
         if (node is LeafPsiElement && node.textMatches("var") &&
-                getNonStrictParentOfType(node, KtStringTemplateEntry::class.java) == null) {
+            getNonStrictParentOfType(node, KtStringTemplateEntry::class.java) == null
+        ) {
             emit(node.startOffset, "Unexpected var, use val instead", false)
         }
     }

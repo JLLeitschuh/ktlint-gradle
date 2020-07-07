@@ -307,7 +307,7 @@ This repository provides following examples how to setup this plugin:
 - [kotlin-js](/samples/kotlin-js) - applies plugin to kotlin js project
 - [kotlin-ks](/samples/kotlin-ks) - applies plugin to plain Kotlin project that uses Kotlin DSL in `build.gradle.kts` files
 - [kotlin-multiplatform-common](/samples/kotlin-multiplatform-common) - applies plugin to Kotlin common multiplatform module
-- [kotlin-multiplatform-js](/samples/kotlin-multiplatform-js) - applies plugin to Kotlin Javascript multiplatform module
+- [kotlin-multiplatform-js](/samples/kotlin-multiplatform-js) - applies plugin to Kotlin JavaScript multiplatform module
 - [kotlin-multiplatform-jvm](/samples/kotlin-multiplatform-jvm) - applies plugin to Kotlin JVM multiplatform module
 - [kotlin-rulesets-using](/samples/kotlin-rulesets-using) - adds custom [example](/samples/kotlin-ruleset-creating) ruleset
 - [kotlin-reporter-using](/samples/kotlin-reporter-using) - adds custom [example](/samples/kotlin-reporter-creating) reporter 

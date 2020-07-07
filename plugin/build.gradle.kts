@@ -154,7 +154,7 @@ fun setupPublishingEnvironment() {
         if (key != null) {
             System.setProperty(githubProperty, key)
         } else {
-            logger.warn("Github key was null")
+            logger.warn("GitHub key was null")
         }
     }
 }
