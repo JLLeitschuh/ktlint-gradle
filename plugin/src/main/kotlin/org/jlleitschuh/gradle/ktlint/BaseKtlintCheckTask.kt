@@ -138,6 +138,9 @@ abstract class BaseKtlintCheckTask(
         return@Callable getSource()
     })
 
+    @Internal
+    lateinit var runner: KtLintRunner
+
     protected fun runLint(
         filesToCheck: Set<File>
     ) {
@@ -146,31 +149,13 @@ abstract class BaseKtlintCheckTask(
         checkExperimentalRulesSupportedKtlintVersion()
         checkDisabledRulesSupportedKtlintVersion()
 
-        project.javaexec(generateJavaExecSpec(filesToCheck, additionalConfig()))
+        val argsFile = writeArgsFile(filesToCheck, additionalConfig())
+        runner.lint(classpath, ktlintVersion.get(), ignoreFailures.get(), argsFile)
     }
 
-    @OutputFiles
-    val ktlintArgsFile = objectFactory.fileProperty().apply {
-        set(
-            project.layout.buildDirectory.file(
-                project.provider {
-                    "ktlint/${this@BaseKtlintCheckTask.name}.args"
-                }
-            )
-        )
-    }
-
-    abstract fun additionalConfig(): (PrintWriter) -> Unit
-
-    private fun generateJavaExecSpec(
-        filesToCheck: Set<File>,
-        additionalConfig: (PrintWriter) -> Unit
-    ): (JavaExecSpec) -> Unit = { javaExecSpec ->
-        javaExecSpec.classpath = classpath
-        javaExecSpec.main = resolveMainClassName(ktlintVersion.get())
-        javaExecSpec.isIgnoreExitValue = ignoreFailures.get()
-
+    private fun writeArgsFile(filesToCheck: Set<File>, additionalConfig: (PrintWriter) -> Unit): File {
         val argsConfigFile = ktlintArgsFile.get().asFile
+
         if (!argsConfigFile.exists()) {
             argsConfigFile.parentFile.mkdirs()
             argsConfigFile.createNewFile()
@@ -186,30 +171,43 @@ abstract class BaseKtlintCheckTask(
                 argsWriter.println("--editorconfig=${additionalEditorconfigFile.get().asFile.absolutePath}")
             }
             ruleSetsClasspath
-                .files
-                .map { "--ruleset=${it.absolutePath}" }
-                .forEach { argsWriter.println(it) }
+                    .files
+                    .map { "--ruleset=${it.absolutePath}" }
+                    .forEach { argsWriter.println(it) }
             allReports
-                .map { it.asArgument() }
-                .forEach { argsWriter.println(it) }
+                    .map { it.asArgument() }
+                    .forEach { argsWriter.println(it) }
             disabledRules
-                .get()
-                .joinToString(separator = ",")
-                .run {
-                    if (isNotEmpty()) argsWriter.println("--disabled_rules=$this")
-                }
+                    .get()
+                    .joinToString(separator = ",")
+                    .run {
+                        if (isNotEmpty()) argsWriter.println("--disabled_rules=$this")
+                    }
             outputColorName
-                .get()
-                .run {
-                    if (isNotEmpty()) argsWriter.println("--color-name=$this")
-                }
+                    .get()
+                    .run {
+                        if (isNotEmpty()) argsWriter.println("--color-name=$this")
+                    }
             additionalConfig(argsWriter)
             filesToCheck.forEach {
                 argsWriter.println(it.toRelativeFile())
             }
         }
-        javaExecSpec.args("@$argsConfigFile")
+        return argsConfigFile
     }
+
+    @OutputFiles
+    val ktlintArgsFile = objectFactory.fileProperty().apply {
+        set(
+            project.layout.buildDirectory.file(
+                project.provider {
+                    "ktlint/${this@BaseKtlintCheckTask.name}.args"
+                }
+            )
+        )
+    }
+
+    abstract fun additionalConfig(): (PrintWriter) -> Unit
 
     private fun checkMinimalSupportedKtlintVersion() {
         if (SemVer.parse(ktlintVersion.get()) < SemVer(0, 22, 0)) {

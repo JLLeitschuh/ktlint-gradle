@@ -5,7 +5,9 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.ConfigurableFileTree
+import org.gradle.api.internal.ProcessOperations
 import org.gradle.api.tasks.util.PatternFilterable
+import org.gradle.util.GradleVersion
 import org.jlleitschuh.gradle.ktlint.reporter.CustomReporter
 
 internal typealias FilterApplier = (Action<PatternFilterable>) -> Unit
@@ -20,6 +22,16 @@ open class KtlintBasePlugin : Plugin<Project> {
     override fun apply(target: Project) {
         val filterTargetApplier: FilterApplier = {
             target.tasks.withType(BaseKtlintCheckTask::class.java).configureEach(it)
+        }
+
+        target.tasks.withType(BaseKtlintCheckTask::class.java).configureEach {
+            val objects = target.objects
+            val gradleVersion = GradleVersion.version(target.gradle.gradleVersion)
+            if (gradleVersion < GradleVersion.version("6.0")) {
+                it.runner = objects.newInstance(JavaExecKtLintRunner::class.java, target as ProcessOperations)
+            } else {
+                it.runner = objects.newInstance(WorkerApiKtLintRunner::class.java)
+            }
         }
 
         val kotlinScriptAdditionalPathApplier: KotlinScriptAdditionalPathApplier = { additionalFileTree ->
