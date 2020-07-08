@@ -282,6 +282,19 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
     }
 
     @Test
+    internal fun `Should internal git filter work with Windows`() {
+        projectRoot.withCleanSources()
+        projectRoot.withFailingSources()
+
+        build(
+                ":$CHECK_PARENT_TASK_NAME",
+                "-P$FILTER_INCLUDE_PROPERTY_NAME=src\\main\\kotlin\\clean-source.kt"
+        ).run {
+            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        }
+    }
+
+    @Test
     internal fun `Git filter should respect already applied filters`() {
         projectRoot.withFailingSources()
         projectRoot.buildFile().appendText("""
