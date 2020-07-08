@@ -23,7 +23,6 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.SourceTask
-import org.gradle.process.JavaExecSpec
 import org.jlleitschuh.gradle.ktlint.reporter.CustomReporter
 import org.jlleitschuh.gradle.ktlint.reporter.KtlintReport
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
@@ -138,7 +137,7 @@ abstract class BaseKtlintCheckTask(
         return@Callable getSource()
     })
 
-    @Internal
+    @get:Internal
     lateinit var runner: KtLintRunner
 
     protected fun runLint(
