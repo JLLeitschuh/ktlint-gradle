@@ -4,6 +4,7 @@ import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
+import org.gradle.process.ExecOperations
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
 import org.gradle.workers.WorkerExecutor
@@ -15,7 +16,15 @@ abstract class WorkerApiKtLintRunner : KtLintRunner {
     abstract val workerExecutor: WorkerExecutor
 
     override fun lint(ktlintClasspath: FileCollection, ktlintVersion: String, ignoreFailures: Boolean, ktlintArgsFile: File) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        // TODO: Possibly this could use processIsolation and programmatically execute ktlint
+        val queue = workerExecutor.noIsolation()
+
+        queue.submit(KtLintWorkAction::class.java) { params ->
+            params.ktlintClasspath.from(ktlintClasspath)
+            params.ktlintVersion.set(ktlintVersion)
+            params.ignoreFailures.set(ignoreFailures)
+            params.ktlintArgsFile.set(ktlintArgsFile)
+        }
     }
 }
 
@@ -27,7 +36,14 @@ interface KtLintParameters : WorkParameters {
 }
 
 abstract class KtLintWorkAction : WorkAction<KtLintParameters> {
+    @get:Inject abstract val execOperations: ExecOperations
+    
     override fun execute() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        execOperations.javaexec {
+            it.classpath = parameters.ktlintClasspath
+            it.main = resolveMainClassName(parameters.ktlintVersion.get())
+            it.isIgnoreExitValue = parameters.ignoreFailures.get()
+            it.args("@${parameters.ktlintArgsFile.asFile.get()}")
+        }
     }
 }
