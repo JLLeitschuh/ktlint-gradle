@@ -170,23 +170,23 @@ abstract class BaseKtlintCheckTask(
                 argsWriter.println("--editorconfig=${additionalEditorconfigFile.get().asFile.absolutePath}")
             }
             ruleSetsClasspath
-                    .files
-                    .map { "--ruleset=${it.absolutePath}" }
-                    .forEach { argsWriter.println(it) }
+                .files
+                .map { "--ruleset=${it.absolutePath}" }
+                .forEach { argsWriter.println(it) }
             allReports
-                    .map { it.asArgument() }
-                    .forEach { argsWriter.println(it) }
+                .map { it.asArgument() }
+                .forEach { argsWriter.println(it) }
             disabledRules
-                    .get()
-                    .joinToString(separator = ",")
-                    .run {
-                        if (isNotEmpty()) argsWriter.println("--disabled_rules=$this")
-                    }
+                .get()
+                .joinToString(separator = ",")
+                .run {
+                    if (isNotEmpty()) argsWriter.println("--disabled_rules=$this")
+                }
             outputColorName
-                    .get()
-                    .run {
-                        if (isNotEmpty()) argsWriter.println("--color-name=$this")
-                    }
+                .get()
+                .run {
+                    if (isNotEmpty()) argsWriter.println("--color-name=$this")
+                }
             additionalConfig(argsWriter)
             filesToCheck.forEach {
                 argsWriter.println(it.toRelativeFile())
