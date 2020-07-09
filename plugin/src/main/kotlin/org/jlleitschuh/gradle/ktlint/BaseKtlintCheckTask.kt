@@ -8,6 +8,7 @@ import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTree
+import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.model.ReplacedBy
@@ -18,6 +19,7 @@ import org.gradle.api.tasks.Console
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -29,7 +31,8 @@ import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 @Suppress("UnstableApiUsage")
 abstract class BaseKtlintCheckTask(
-    private val objectFactory: ObjectFactory
+    private val objectFactory: ObjectFactory,
+    private val projectLayout: ProjectLayout
 ) : SourceTask() {
 
     @get:Classpath
@@ -74,9 +77,12 @@ abstract class BaseKtlintCheckTask(
     @get:Input
     internal val disabledRules: SetProperty<String> = objectFactory.setProperty()
 
-    @get:Internal
-    internal val enabledReports: List<KtlintReport.BuiltIn>
-        get() = reporters.get()
+    /**
+     * Should only be invoked at configuration time.
+     */
+    private fun getEnabledReports(): List<KtlintReport.BuiltIn> =
+        reporters
+            .get()
             .ifEmpty { setOf(ReporterType.PLAIN) }
             .map {
                 KtlintReport.BuiltIn(
@@ -90,9 +96,12 @@ abstract class BaseKtlintCheckTask(
             }
             .filter { it.enabled.get() }
 
-    @get:Internal
-    internal val customReports: List<KtlintReport.CustomReport>
-        get() = customReporters.get()
+    /**
+     * Should only be invoked at configuration time.
+     */
+    private fun getCustomReports(): List<KtlintReport.CustomReport> =
+        customReporters
+            .get()
             .map {
                 KtlintReport.CustomReport(
                     it.reporterId,
@@ -113,9 +122,11 @@ abstract class BaseKtlintCheckTask(
                 )
             }
 
-    @get:Internal
-    internal val allReports
-        get() = enabledReports.plus(customReports)
+    @get:Nested
+    internal val allReports by lazy {
+        // This is called at configuration time and stored for use at execution time.
+        getEnabledReports().plus(getCustomReports())
+    }
 
     init {
         if (project.hasProperty(FILTER_INCLUDE_PROPERTY_NAME)) {
@@ -128,7 +139,9 @@ abstract class BaseKtlintCheckTask(
     }
 
     @ReplacedBy("stableSources")
-    override fun getSource(): FileTree { return super.getSource() }
+    override fun getSource(): FileTree {
+        return super.getSource()
+    }
 
     @get:SkipWhenEmpty
     @get:PathSensitive(PathSensitivity.RELATIVE)
@@ -198,7 +211,7 @@ abstract class BaseKtlintCheckTask(
     @OutputFiles
     val ktlintArgsFile = objectFactory.fileProperty().apply {
         set(
-            project.layout.buildDirectory.file(
+            projectLayout.buildDirectory.file(
                 project.provider {
                     "ktlint/${this@BaseKtlintCheckTask.name}.args"
                 }
@@ -244,16 +257,16 @@ abstract class BaseKtlintCheckTask(
         SemVer.parse(ktlintVersion.get()) >= availableSinceVersion
 
     private fun ReporterType.getOutputFile() =
-        project.layout.buildDirectory.file(project.provider {
+        projectLayout.buildDirectory.file(project.provider {
             "reports/ktlint/${this@BaseKtlintCheckTask.name}.$fileExtension"
         })
 
     private fun CustomReporter.getOutputFile() =
-        project.layout.buildDirectory.file(project.provider {
+        projectLayout.buildDirectory.file(project.provider {
             "reports/ktlint/${this@BaseKtlintCheckTask.name}.$fileExtension"
         })
 
-    private fun File.toRelativeFile(): File = relativeTo(project.projectDir)
+    private fun File.toRelativeFile(): File = relativeTo(projectLayout.projectDirectory.asFile)
 
     /**
      * Provides all reports outputs map: reporter id to reporter output file.
