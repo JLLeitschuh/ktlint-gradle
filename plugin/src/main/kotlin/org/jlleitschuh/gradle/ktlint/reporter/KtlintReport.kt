@@ -7,7 +7,9 @@ import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputFile
 
 internal sealed class KtlintReport {
+    @get:Input
     abstract val reporterId: String
+    @get:OutputFile
     abstract val outputFile: RegularFileProperty
     abstract fun asArgument(): String
 
