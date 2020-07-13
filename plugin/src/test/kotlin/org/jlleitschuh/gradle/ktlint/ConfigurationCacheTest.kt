@@ -1,13 +1,13 @@
 package org.jlleitschuh.gradle.ktlint
 
+import java.io.File
 import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.io.File
 
-class FutureGradleConfigurationCacheTest: ConfigurationCacheTest() {
+class FutureGradleConfigurationCacheTest : ConfigurationCacheTest() {
     override fun gradleRunnerFor(
         vararg arguments: String,
         projectRoot: File
@@ -16,7 +16,7 @@ class FutureGradleConfigurationCacheTest: ConfigurationCacheTest() {
             .withGradleVersion("6.6-milestone-3")
 }
 
-abstract class ConfigurationCacheTest: AbstractPluginTest() {
+abstract class ConfigurationCacheTest : AbstractPluginTest() {
     private val configurationCacheFlag = "--configuration-cache"
     private val configurationCacheWarnFlag = "--configuration-cache-problems=warn"
     /**
