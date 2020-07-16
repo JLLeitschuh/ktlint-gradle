@@ -9,6 +9,7 @@ import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTree
+import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.model.ReplacedBy
@@ -19,20 +20,21 @@ import org.gradle.api.tasks.Console
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.SourceTask
-import org.gradle.process.JavaExecSpec
 import org.jlleitschuh.gradle.ktlint.reporter.CustomReporter
 import org.jlleitschuh.gradle.ktlint.reporter.KtlintReport
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 @Suppress("UnstableApiUsage")
 abstract class BaseKtlintCheckTask(
-    private val objectFactory: ObjectFactory
+    private val objectFactory: ObjectFactory,
+    private val projectLayout: ProjectLayout
 ) : SourceTask() {
 
     @get:Classpath
@@ -78,9 +80,12 @@ abstract class BaseKtlintCheckTask(
     @get:Input
     internal val disabledRules: SetProperty<String> = objectFactory.setProperty()
 
-    @get:Internal
-    internal val enabledReports: List<KtlintReport.BuiltIn>
-        get() = reporters.get()
+    /**
+     * Should only be invoked at configuration time.
+     */
+    private fun getEnabledReports(): List<KtlintReport.BuiltIn> =
+        reporters
+            .get()
             .ifEmpty { setOf(ReporterType.PLAIN) }
             .map {
                 KtlintReport.BuiltIn(
@@ -94,9 +99,12 @@ abstract class BaseKtlintCheckTask(
             }
             .filter { it.enabled.get() }
 
-    @get:Internal
-    internal val customReports: List<KtlintReport.CustomReport>
-        get() = customReporters.get()
+    /**
+     * Should only be invoked at configuration time.
+     */
+    private fun getCustomReports(): List<KtlintReport.CustomReport> =
+        customReporters
+            .get()
             .map {
                 KtlintReport.CustomReport(
                     it.reporterId,
@@ -117,9 +125,11 @@ abstract class BaseKtlintCheckTask(
                 )
             }
 
-    @get:Internal
-    internal val allReports
-        get() = enabledReports.plus(customReports)
+    @get:Nested
+    internal val allReports by lazy {
+        // This is called at configuration time and stored for use at execution time.
+        getEnabledReports().plus(getCustomReports())
+    }
 
     init {
         if (project.hasProperty(FILTER_INCLUDE_PROPERTY_NAME)) {
@@ -132,7 +142,9 @@ abstract class BaseKtlintCheckTask(
     }
 
     @ReplacedBy("stableSources")
-    override fun getSource(): FileTree { return super.getSource() }
+    override fun getSource(): FileTree {
+        return super.getSource()
+    }
 
     @get:SkipWhenEmpty
     @get:PathSensitive(PathSensitivity.RELATIVE)
@@ -140,6 +152,9 @@ abstract class BaseKtlintCheckTask(
     internal val stableSources: FileCollection = project.files(Callable<FileTree> {
         return@Callable getSource()
     })
+
+    @get:Internal
+    lateinit var runner: KtLintRunner
 
     protected fun runLint(
         filesToCheck: Set<File>
@@ -149,31 +164,13 @@ abstract class BaseKtlintCheckTask(
         checkExperimentalRulesSupportedKtlintVersion()
         checkDisabledRulesSupportedKtlintVersion()
 
-        project.javaexec(generateJavaExecSpec(filesToCheck, additionalConfig()))
+        val argsFile = writeArgsFile(filesToCheck, additionalConfig())
+        runner.lint(classpath, ktlintVersion.get(), ignoreFailures.get(), argsFile)
     }
 
-    @OutputFiles
-    val ktlintArgsFile = objectFactory.fileProperty().apply {
-        set(
-            project.layout.buildDirectory.file(
-                project.provider {
-                    "ktlint/${this@BaseKtlintCheckTask.name}.args"
-                }
-            )
-        )
-    }
-
-    abstract fun additionalConfig(): (PrintWriter) -> Unit
-
-    private fun generateJavaExecSpec(
-        filesToCheck: Set<File>,
-        additionalConfig: (PrintWriter) -> Unit
-    ): (JavaExecSpec) -> Unit = { javaExecSpec ->
-        javaExecSpec.classpath = classpath
-        javaExecSpec.main = resolveMainClassName(ktlintVersion.get())
-        javaExecSpec.isIgnoreExitValue = ignoreFailures.get()
-
+    private fun writeArgsFile(filesToCheck: Set<File>, additionalConfig: (PrintWriter) -> Unit): File {
         val argsConfigFile = ktlintArgsFile.get().asFile
+
         if (!argsConfigFile.exists()) {
             argsConfigFile.parentFile.mkdirs()
             argsConfigFile.createNewFile()
@@ -211,8 +208,21 @@ abstract class BaseKtlintCheckTask(
                 argsWriter.println(it.toRelativeFile())
             }
         }
-        javaExecSpec.args("@$argsConfigFile")
+        return argsConfigFile
     }
+
+    @OutputFiles
+    val ktlintArgsFile = objectFactory.fileProperty().apply {
+        set(
+            projectLayout.buildDirectory.file(
+                project.provider {
+                    "ktlint/${this@BaseKtlintCheckTask.name}.args"
+                }
+            )
+        )
+    }
+
+    abstract fun additionalConfig(): (PrintWriter) -> Unit
 
     private fun checkMinimalSupportedKtlintVersion() {
         if (SemVer.parse(ktlintVersion.get()) < SemVer(0, 22, 0)) {
@@ -257,7 +267,7 @@ abstract class BaseKtlintCheckTask(
         it.file("${this@BaseKtlintCheckTask.name}.$fileExtension")
     }
 
-    private fun File.toRelativeFile(): File = relativeTo(project.projectDir)
+    private fun File.toRelativeFile(): File = relativeTo(projectLayout.projectDirectory.asFile)
 
     /**
      * Base location of ktlint generated reports.

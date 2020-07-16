@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   - Update Gradle to `6.2.1` version
   - Update Android Gradle plugin to `3.6.3` version
   - Set default ktlint version to `0.37.1`
+  - Executing ktlint uses now uses the [Gradle worker API](https://guides.gradle.org/using-the-worker-api/) when supported.
+  - `ktlintFormat` and `ktlintCheck` tasks now support the [configuration cache](https://docs.gradle.org/nightly/userguide/configuration_cache.html)
 ### Fixed
   - ?
 ### Deleted
