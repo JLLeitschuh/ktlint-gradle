@@ -28,6 +28,7 @@ The assumption being that you would not want to lint code you weren't compiling.
     - [Simple setup](#idea-plugin-simple-setup)
     - [Using new plugin API](#idea-plugin-setup-using-new-plugin-api)
   - [Plugin configuration](#configuration)
+    - [Setting reports output directory](#setting-reports-output-directory)
     - [Customer reporters](#custom-reporters)
   - [Samples](#samples)
 - [Task details](#tasks-added)
@@ -278,6 +279,32 @@ dependencies {
     ktlintRuleset("com.github.username:rulseset:master-SNAPSHOT")
     ktlintRuleset(files("/path/to/custom/rulseset.jar"))
     ktlintRuleset(project(":chore:project-ruleset")) 
+}
+```
+</details>
+
+#### Setting reports output directory
+
+It is possible also to define different from default output directory for generated reports
+ (by default it is "build/reports/ktlint"):
+<details>
+<summary>Groovy</summary>
+
+```groovy
+tasks.withType(org.jlleitschuh.gradle.ktlint.KtlintCheckTask) {
+    reporterOutputDir = project.layout.buildDirectory.dir("other/location")
+}
+```
+</details>
+
+<details open>
+<summary>Kotlin script</summary>
+
+```kotlin
+tasks.withType<org.jlleitschuh.gradle.ktlint.KtlintCheckTask>() {
+    reporterOutputDir.set(
+        project.layout.buildDirectory.dir("other/location")
+    )
 }
 ```
 </details>

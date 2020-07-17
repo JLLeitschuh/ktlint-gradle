@@ -6,6 +6,7 @@ import java.util.concurrent.Callable
 import net.swiftzer.semver.SemVer
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTree
 import org.gradle.api.file.ProjectLayout
@@ -20,6 +21,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -41,6 +43,7 @@ abstract class BaseKtlintCheckTask(
     @get:Internal
     internal val additionalEditorconfigFile: RegularFileProperty = objectFactory.fileProperty()
 
+    @Suppress("unused")
     @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:InputFiles
     internal val editorConfigFiles: FileCollection by lazy(LazyThreadSafetyMode.NONE) {
@@ -256,21 +259,30 @@ abstract class BaseKtlintCheckTask(
     private fun ReporterType.isAvailable() =
         SemVer.parse(ktlintVersion.get()) >= availableSinceVersion
 
-    private fun ReporterType.getOutputFile() =
-        projectLayout.buildDirectory.file(project.provider {
-            "reports/ktlint/${this@BaseKtlintCheckTask.name}.$fileExtension"
-        })
+    private fun ReporterType.getOutputFile() = reporterOutputDir.map {
+        it.file("${this@BaseKtlintCheckTask.name}.$fileExtension")
+    }
 
-    private fun CustomReporter.getOutputFile() =
-        projectLayout.buildDirectory.file(project.provider {
-            "reports/ktlint/${this@BaseKtlintCheckTask.name}.$fileExtension"
-        })
+    private fun CustomReporter.getOutputFile() = reporterOutputDir.map {
+        it.file("${this@BaseKtlintCheckTask.name}.$fileExtension")
+    }
 
     private fun File.toRelativeFile(): File = relativeTo(projectLayout.projectDirectory.asFile)
 
     /**
+     * Base location of ktlint generated reports.
+     *
+     * Default is "${project.buildDir}/reports/ktlint".
+     */
+    @get:OutputDirectory
+    val reporterOutputDir: DirectoryProperty = objectFactory.directoryProperty().convention(
+        project.layout.buildDirectory.dir("reports/ktlint")
+    )
+
+    /**
      * Provides all reports outputs map: reporter id to reporter output file.
      */
+    @Suppress("unused")
     @get:OutputFiles
     val allReportsOutputFiles: Map<String, RegularFileProperty>
         get() = allReports.associateTo(mutableMapOf()) { it.reporterId to it.outputFile }
