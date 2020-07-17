@@ -291,7 +291,7 @@ It is possible also to define different from default output directory for genera
 <summary>Groovy</summary>
 
 ```groovy
-tasks.withType(org.jlleitschuh.gradle.ktlint.KtlintCheckTask.class) {
+tasks.withType(org.jlleitschuh.gradle.ktlint.KtlintCheckTask) {
     reporterOutputDir = project.layout.buildDirectory.dir("other/location")
 }
 ```
