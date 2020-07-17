@@ -5,20 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [9.3.0] - 2020.07.17
 ### Added
   - Allow to specify reporters output dir [#321](https://github.com/JLLeitschuh/ktlint-gradle/issues/321)
 ### Changed
   - Check pre-commit hook will not add partially committed files to git commit [#330](https://github.com/JLLeitschuh/ktlint-gradle/issues/330)
-  - Update Gradle to `6.2.1` version
+  - Update Gradle to `6.5.1` version
   - Update Android Gradle plugin to `3.6.3` version
-  - Set default ktlint version to `0.37.1`
+  - Set default ktlint version to `0.37.2`
   - Executing ktlint uses now uses the [Gradle worker API](https://guides.gradle.org/using-the-worker-api/) when supported.
-  - `ktlintFormat` and `ktlintCheck` tasks now support the [configuration cache](https://docs.gradle.org/nightly/userguide/configuration_cache.html)
-### Fixed
-  - ?
-### Deleted
-  - ?
+  - `ktlintFormat` and `ktlintCheck` tasks now support the [configuration cache](https://docs.gradle.org/nightly/userguide/configuration_cache.html) [#364](https://github.com/JLLeitschuh/ktlint-gradle/issues/364)
+  -  Make pre-commit hook working with Windows path separator [#359] (https://github.com/JLLeitschuh/ktlint-gradle/pull/359) 
 
 ## [9.2.1] - 2020-02-12
 ### Fixed
