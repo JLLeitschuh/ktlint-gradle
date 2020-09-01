@@ -1,10 +1,10 @@
 package org.jlleitschuh.gradle.ktlint
 
-import java.io.File
 import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Test
+import java.io.File
 
 /**
  * Runs [BuildCacheTest] with the current version of Gradle.
@@ -48,7 +48,8 @@ abstract class BuildCacheTest : AbstractPluginTest() {
     @Test
     internal fun `Check task with reporters is relocatable`() {
         configureBuildCache()
-        configureDefaultProjects("""
+        configureDefaultProjects(
+            """
 
             ktlint.reporters {
                 reporter "plain"
@@ -60,7 +61,8 @@ abstract class BuildCacheTest : AbstractPluginTest() {
                     }
                 }
             }
-        """.trimIndent())
+            """.trimIndent()
+        )
 
         createRunner(originalRoot)
             .build().apply {
@@ -84,13 +86,15 @@ abstract class BuildCacheTest : AbstractPluginTest() {
         .forwardOutput()
 
     private fun File.addBuildCacheSettings() = settingsFile()
-        .writeText("""
+        .writeText(
+            """
             buildCache {
                 local {
                     directory = '${localBuildCache.toURI()}'
                 }
             }
-        """.trimIndent())
+            """.trimIndent()
+        )
 
     private fun configureBuildCache() {
         originalRoot.addBuildCacheSettings()
@@ -102,7 +106,8 @@ abstract class BuildCacheTest : AbstractPluginTest() {
     ) {
         listOf(originalRoot, relocatedRoot).forEach {
             it.withCleanSources()
-            it.buildFile().writeText("""
+            it.buildFile().writeText(
+                """
                     ${pluginsBlockWithMainPluginAndKotlinJvm()}
 
                     repositories {
@@ -111,7 +116,8 @@ abstract class BuildCacheTest : AbstractPluginTest() {
                     
                     $additionalConfig
 
-                """.trimIndent())
+                """.trimIndent()
+            )
         }
     }
 }

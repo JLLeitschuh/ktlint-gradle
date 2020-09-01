@@ -1,12 +1,12 @@
 package org.jlleitschuh.gradle.ktlint
 
-import java.io.File
 import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.io.File
 
 /**
  * Runs [ReportersTest] with the current version of Gradle.
@@ -36,13 +36,15 @@ abstract class ReportersTest : AbstractPluginTest() {
     fun `Should create multiple reports`() {
         projectRoot.withFailingSources()
 
-        projectRoot.buildFile().appendText("""
+        projectRoot.buildFile().appendText(
+            """
 
             ktlint.reporters {
                 reporter "checkstyle"
                 reporter "json"
             }
-        """.trimIndent())
+            """.trimIndent()
+        )
 
         buildAndFail("ktlintCheck").apply {
             assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.FAILED)
@@ -58,7 +60,8 @@ abstract class ReportersTest : AbstractPluginTest() {
         projectRoot.withFailingSources()
 
         // https://github.com/mcassiano/ktlint-html-reporter/releases
-        projectRoot.buildFile().appendText("""
+        projectRoot.buildFile().appendText(
+            """
             
             ktlint.reporters {
                 reporter "checkstyle"
@@ -69,7 +72,8 @@ abstract class ReportersTest : AbstractPluginTest() {
                     }
                 }
             }
-        """.trimIndent())
+            """.trimIndent()
+        )
 
         buildAndFail("ktlintCheck").apply {
             assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.FAILED)
@@ -85,13 +89,15 @@ abstract class ReportersTest : AbstractPluginTest() {
     fun `Is out of date when different report is enabled`() {
         projectRoot.withCleanSources()
 
-        projectRoot.buildFile().appendText("""
+        projectRoot.buildFile().appendText(
+            """
 
             ktlint.reporters {
                 reporter "json"
                 reporter "plain"
             }
-        """.trimIndent())
+            """.trimIndent()
+        )
 
         build("ktlintCheck").apply {
             assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
@@ -106,13 +112,15 @@ abstract class ReportersTest : AbstractPluginTest() {
             assertReportNotCreated(ReporterType.CHECKSTYLE.fileExtension)
         }
 
-        projectRoot.buildFile().appendText("""
+        projectRoot.buildFile().appendText(
+            """
 
             ktlint.reporters {
                 reporter "json"
                 reporter "plain_group_by_file"
             }
-        """.trimIndent())
+            """.trimIndent()
+        )
 
         build("ktlintCheck").apply {
             assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
@@ -120,13 +128,15 @@ abstract class ReportersTest : AbstractPluginTest() {
             assertReportCreated(ReporterType.JSON.fileExtension)
         }
 
-        projectRoot.buildFile().appendText("""
+        projectRoot.buildFile().appendText(
+            """
 
             ktlint.reporters {
                 reporter "json"
                 reporter "checkstyle"
             }
-        """.trimIndent())
+            """.trimIndent()
+        )
 
         build("ktlintCheck").apply {
             assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
@@ -153,12 +163,14 @@ abstract class ReportersTest : AbstractPluginTest() {
     internal fun `Should generate html report`() {
         projectRoot.withCleanSources()
 
-        projectRoot.buildFile().appendText("""
+        projectRoot.buildFile().appendText(
+            """
 
             ktlint.reporters {
                 reporter "html"
             }
-        """.trimIndent())
+            """.trimIndent()
+        )
 
         build("ktlintCheck").apply {
             assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
@@ -170,13 +182,15 @@ abstract class ReportersTest : AbstractPluginTest() {
     internal fun `Should ignore html reporter on ktlint version less then 0_36_0`() {
         projectRoot.withCleanSources()
 
-        projectRoot.buildFile().appendText("""
+        projectRoot.buildFile().appendText(
+            """
 
             ktlint.version = "0.35.0"
             ktlint.reporters {
                 reporter "html"
             }
-        """.trimIndent())
+            """.trimIndent()
+        )
 
         build("ktlintCheck").apply {
             assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
@@ -189,7 +203,8 @@ abstract class ReportersTest : AbstractPluginTest() {
         projectRoot.withFailingSources()
         val newLocation = "other/location"
 
-        projectRoot.buildFile().appendText("""
+        projectRoot.buildFile().appendText(
+            """
             
             ktlint.reporters {
                 reporter "checkstyle"
@@ -199,7 +214,8 @@ abstract class ReportersTest : AbstractPluginTest() {
             tasks.withType(org.jlleitschuh.gradle.ktlint.KtlintCheckTask.class) {
                 reporterOutputDir = project.layout.buildDirectory.dir("$newLocation")
             }
-        """.trimIndent())
+            """.trimIndent()
+        )
 
         buildAndFail("ktlintCheck").apply {
             assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.FAILED)

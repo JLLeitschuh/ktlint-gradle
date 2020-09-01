@@ -1,7 +1,5 @@
 package org.jlleitschuh.gradle.ktlint
 
-import java.io.PrintWriter
-import javax.inject.Inject
 import org.gradle.api.file.FileType
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
@@ -9,6 +7,8 @@ import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.TaskAction
 import org.gradle.work.ChangeType
 import org.gradle.work.InputChanges
+import java.io.PrintWriter
+import javax.inject.Inject
 
 @Suppress("UnstableApiUsage")
 @CacheableTask

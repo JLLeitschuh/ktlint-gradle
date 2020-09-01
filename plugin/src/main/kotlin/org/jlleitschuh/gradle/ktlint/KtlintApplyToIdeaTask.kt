@@ -1,6 +1,5 @@
 package org.jlleitschuh.gradle.ktlint
 
-import javax.inject.Inject
 import net.swiftzer.semver.SemVer
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
@@ -9,6 +8,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
+import javax.inject.Inject
 
 @Suppress("UnstableApiUsage")
 open class KtlintApplyToIdeaTask @Inject constructor(
@@ -35,7 +35,9 @@ open class KtlintApplyToIdeaTask @Inject constructor(
 
             // Global flags
             if (android.get()) {
-                it.args("--android")
+                it.args(
+                    "--android"
+                )
             }
 
             // Subcommand

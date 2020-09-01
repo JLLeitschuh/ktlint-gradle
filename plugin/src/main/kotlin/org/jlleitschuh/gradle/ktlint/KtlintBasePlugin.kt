@@ -36,9 +36,11 @@ open class KtlintBasePlugin : Plugin<Project> {
         val kotlinScriptAdditionalPathApplier: KotlinScriptAdditionalPathApplier = { additionalFileTree ->
             val configureAction = Action<Task> { task ->
                 with(task as BaseKtlintCheckTask) {
-                    source = source.plus(additionalFileTree.also {
-                        it.include("*.kts")
-                    })
+                    source = source.plus(
+                        additionalFileTree.also {
+                            it.include("*.kts")
+                        }
+                    )
                 }
             }
 

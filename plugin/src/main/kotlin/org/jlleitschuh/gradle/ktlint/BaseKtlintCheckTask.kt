@@ -1,8 +1,5 @@
 package org.jlleitschuh.gradle.ktlint
 
-import java.io.File
-import java.io.PrintWriter
-import java.util.concurrent.Callable
 import net.swiftzer.semver.SemVer
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
@@ -30,6 +27,9 @@ import org.gradle.api.tasks.SourceTask
 import org.jlleitschuh.gradle.ktlint.reporter.CustomReporter
 import org.jlleitschuh.gradle.ktlint.reporter.KtlintReport
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+import java.io.File
+import java.io.PrintWriter
+import java.util.concurrent.Callable
 
 @Suppress("UnstableApiUsage")
 abstract class BaseKtlintCheckTask(
@@ -149,9 +149,11 @@ abstract class BaseKtlintCheckTask(
     @get:SkipWhenEmpty
     @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:InputFiles
-    internal val stableSources: FileCollection = project.files(Callable<FileTree> {
-        return@Callable getSource()
-    })
+    internal val stableSources: FileCollection = project.files(
+        Callable<FileTree> {
+            return@Callable getSource()
+        }
+    )
 
     @get:Internal
     lateinit var runner: KtLintRunner
@@ -226,14 +228,17 @@ abstract class BaseKtlintCheckTask(
 
     private fun checkMinimalSupportedKtlintVersion() {
         if (SemVer.parse(ktlintVersion.get()) < SemVer(0, 22, 0)) {
-            throw GradleException("Ktlint versions less than 0.22.0 are not supported. " +
-                "Detected Ktlint version: ${ktlintVersion.get()}.")
+            throw GradleException(
+                "Ktlint versions less than 0.22.0 are not supported. " +
+                    "Detected Ktlint version: ${ktlintVersion.get()}."
+            )
         }
     }
 
     private fun checkCWEKtlintVersion() {
         if (!ruleSetsClasspath.isEmpty &&
-            SemVer.parse(ktlintVersion.get()) < SemVer(0, 30, 0)) {
+            SemVer.parse(ktlintVersion.get()) < SemVer(0, 30, 0)
+        ) {
             logger.warn(
                 "You are using ktlint version ${ktlintVersion.get()} that has the security vulnerability " +
                     "'CWE-494: Download of Code Without Integrity Check'.\n" +
@@ -244,14 +249,16 @@ abstract class BaseKtlintCheckTask(
 
     private fun checkExperimentalRulesSupportedKtlintVersion() {
         if (enableExperimentalRules.get() &&
-            SemVer.parse(ktlintVersion.get()) < SemVer(0, 31, 0)) {
+            SemVer.parse(ktlintVersion.get()) < SemVer(0, 31, 0)
+        ) {
             throw GradleException("Experimental rules are supported since 0.31.0 ktlint version.")
         }
     }
 
     private fun checkDisabledRulesSupportedKtlintVersion() {
         if (disabledRules.get().isNotEmpty() &&
-            SemVer.parse(ktlintVersion.get()) < SemVer(0, 34, 2)) {
+            SemVer.parse(ktlintVersion.get()) < SemVer(0, 34, 2)
+        ) {
             throw GradleException("Rules disabling is supported since 0.34.2 ktlint version.")
         }
     }
