@@ -1,11 +1,11 @@
 package org.jlleitschuh.gradle.ktlint
 
-import java.io.File
 import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.io.File
 
 /**
  * Runs [EditorConfigTests] with the current version of Gradle.
@@ -103,10 +103,13 @@ abstract class EditorConfigTests : AbstractPluginTest() {
         val moduleLocation = projectWithModulesLocation.resolve("test/module1")
         moduleLocation.mkdirs()
 
-        projectWithModulesLocation.settingsFile().writeText("""
+        projectWithModulesLocation.settingsFile().writeText(
+            """
             include ":test:module1"
-        """.trimIndent())
-        projectWithModulesLocation.buildFile().writeText("""
+            """.trimIndent()
+        )
+        projectWithModulesLocation.buildFile().writeText(
+            """
             ${pluginsBlockWithMainPluginAndKotlinJvm()}
 
             repositories {
@@ -118,12 +121,15 @@ abstract class EditorConfigTests : AbstractPluginTest() {
                     jcenter()
                 }
             }
-        """.trimIndent())
+            """.trimIndent()
+        )
         projectWithModulesLocation.createEditorconfigFile()
-        moduleLocation.buildFile().writeText("""
+        moduleLocation.buildFile().writeText(
+            """
             apply plugin: "kotlin"
             apply plugin: "org.jlleitschuh.gradle.ktlint"
-        """.trimIndent())
+            """.trimIndent()
+        )
         moduleLocation.withCleanSources()
 
         val gradleRunner = GradleRunner.create()

@@ -1,7 +1,5 @@
 package org.jlleitschuh.gradle.ktlint
 
-import java.io.File
-import javax.inject.Inject
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.RegularFileProperty
@@ -10,6 +8,8 @@ import org.gradle.process.ExecOperations
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
 import org.gradle.workers.WorkerExecutor
+import java.io.File
+import javax.inject.Inject
 
 abstract class WorkerApiKtLintRunner : KtLintRunner {
     @get:Inject

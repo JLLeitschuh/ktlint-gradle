@@ -1,6 +1,5 @@
 package org.jlleitschuh.gradle.ktlint
 
-import javax.inject.Inject
 import org.eclipse.jgit.lib.RepositoryBuilder
 import org.gradle.api.DefaultTask
 import org.gradle.api.model.ObjectFactory
@@ -8,15 +7,17 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import org.intellij.lang.annotations.Language
+import javax.inject.Inject
 
 internal const val FILTER_INCLUDE_PROPERTY_NAME = "internalKtlintGitFilter"
 
 @Language("Bash")
-internal val shShebang = """
-#!/bin/sh
-set -e
+internal val shShebang =
+    """
+    #!/bin/sh
+    set -e
 
-""".trimIndent()
+    """.trimIndent()
 
 internal const val startHookSection = "######## KTLINT-GRADLE HOOK START ########\n"
 internal const val endHookSection = "######## KTLINT-GRADLE HOOK END ########\n"
@@ -60,25 +61,26 @@ internal fun generateGitHook(
     taskName: String,
     shouldUpdateCommit: Boolean,
     gradleRootDirPrefix: String
-) = """
+) =
+    """
 
-CHANGED_FILES="${'$'}(${generateGitCommand(gradleRootDirPrefix)} | awk '$1 != "D" && $2 ~ /\.kts|\.kt/ { print $2}')"
+    CHANGED_FILES="${'$'}(${generateGitCommand(gradleRootDirPrefix)} | awk '$1 != "D" && $2 ~ /\.kts|\.kt/ { print $2}')"
 
-if [ -z "${'$'}CHANGED_FILES" ]; then
-    echo "No Kotlin staged files."
-    exit 0
-fi;
+    if [ -z "${'$'}CHANGED_FILES" ]; then
+        echo "No Kotlin staged files."
+        exit 0
+    fi;
 
-echo "Running ktlint over these files:"
-echo "${'$'}CHANGED_FILES"
+    echo "Running ktlint over these files:"
+    echo "${'$'}CHANGED_FILES"
 
-${generateGradleCommand(taskName, gradleRootDirPrefix)}
+    ${generateGradleCommand(taskName, gradleRootDirPrefix)}
 
-echo "Completed ktlint run."
-${postCheck(shouldUpdateCommit)}
-echo "Completed ktlint hook."
+    echo "Completed ktlint run."
+    ${postCheck(shouldUpdateCommit)}
+    echo "Completed ktlint hook."
 
-""".trimIndent()
+    """.trimIndent()
 
 internal fun KtlintPlugin.PluginHolder.addGitHookTasks() {
     if (target.rootProject == target) {
@@ -195,9 +197,11 @@ internal fun BaseKtlintCheckTask.applyGitFilter() {
                 true
             } else {
                 filesToInclude.any {
-                    fileTreeElement.file.absolutePath
-                            .replace("\\", "/")
-                            .endsWith(it)
+                    fileTreeElement
+                        .file
+                        .absolutePath
+                        .replace("\\", "/")
+                        .endsWith(it)
                 }
             }
         }
