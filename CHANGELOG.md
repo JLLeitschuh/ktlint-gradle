@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## Unreleased
+### Added
+  - ?
+### Changed
+  - ?
+### Fixed
+  - ?
+### Deleted
+  - ?
+
 ## [9.3.0] - 2020.07.17
 ### Added
   - Allow to specify reporters output dir [#321](https://github.com/JLLeitschuh/ktlint-gradle/issues/321)
