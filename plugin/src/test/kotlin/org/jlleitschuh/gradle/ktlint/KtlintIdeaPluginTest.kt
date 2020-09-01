@@ -15,7 +15,7 @@ class KtlintIdeaPluginTest : AbstractPluginTest() {
                 repositories {
                     gradlePluginPortal()
                 }
-            """.trimIndent()
+                """.trimIndent()
             )
         }
     }
