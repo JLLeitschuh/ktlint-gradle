@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Added
   - ?
 ### Changed
-  - ?
+  - Updated Gradle to `6.6.1` version
 ### Fixed
   - ?
 ### Deleted
