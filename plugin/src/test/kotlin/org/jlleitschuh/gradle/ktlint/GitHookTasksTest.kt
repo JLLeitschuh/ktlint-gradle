@@ -1,10 +1,10 @@
 package org.jlleitschuh.gradle.ktlint
 
-import java.io.File
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.jgit.lib.RepositoryBuilder
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Test
+import java.io.File
 
 class GitHookTasksTest : AbstractPluginTest() {
     @Test
@@ -12,14 +12,18 @@ class GitHookTasksTest : AbstractPluginTest() {
         projectRoot.setupGradleProject()
         val submoduleDir = projectRoot.resolve("some-module").also { it.mkdir() }
         projectRoot.initGit()
-        projectRoot.settingsFile().writeText("""
+        projectRoot.settingsFile().writeText(
+            """
             include ":some-module"
-        """.trimIndent())
+            """.trimIndent()
+        )
         //language=Groovy
-        submoduleDir.buildFile().writeText("""
+        submoduleDir.buildFile().writeText(
+            """
             apply plugin: "kotlin"
             apply plugin: "org.jlleitschuh.gradle.ktlint"
-        """.trimIndent())
+            """.trimIndent()
+        )
 
         buildAndFail(":some-module:$INSTALL_GIT_HOOK_CHECK_TASK").run {
             assertThat(output).contains("Task '$INSTALL_GIT_HOOK_CHECK_TASK' not found in project")
@@ -70,7 +74,8 @@ class GitHookTasksTest : AbstractPluginTest() {
     internal fun `Should not touch already existing hooks`() {
         projectRoot.setupGradleProject()
         val gitDir = projectRoot.initGit()
-        gitDir.preCommitGitHook().writeText("""
+        gitDir.preCommitGitHook().writeText(
+            """
             $shShebang
 
             echo "test1"
@@ -79,17 +84,20 @@ class GitHookTasksTest : AbstractPluginTest() {
 
             $endHookSection
             echo "test2"
-        """.trimIndent())
+            """.trimIndent()
+        )
 
         build(":$INSTALL_GIT_HOOK_FORMAT_TASK")
 
         val hookContent = gitDir.preCommitGitHook().readText()
 
-        assertThat(hookContent).startsWith("""
+        assertThat(hookContent).startsWith(
+            """
             $shShebang
 
             echo "test1"
-        """.trimIndent())
+            """.trimIndent()
+        )
         assertThat(hookContent).endsWith("echo \"test2\"")
     }
 
@@ -142,12 +150,14 @@ class GitHookTasksTest : AbstractPluginTest() {
 
     private fun File.setupGradleProject() {
         //language=Groovy
-        buildFile().writeText("""
+        buildFile().writeText(
+            """
             ${pluginsBlockWithMainPluginAndKotlinJvm()}
 
             repositories {
                 gradlePluginPortal()
             }
-        """.trimIndent())
+            """.trimIndent()
+        )
     }
 }

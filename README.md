@@ -13,7 +13,7 @@ This plugin creates convenient tasks in your Gradle project
 that run [ktlint](https://github.com/pinterest/ktlint) checks or do code
 auto format.
 
-Plugin can be applied to any project, but only activates if that project has the kotlin plugin applied.
+The plugin can be applied to any project, but only activates if that project has the kotlin plugin applied.
 The assumption being that you would not want to lint code you weren't compiling.
 
 ## Table of content
@@ -42,7 +42,7 @@ The assumption being that you would not want to lint code you weren't compiling.
 
 ## Supported Kotlin plugins
 
-This plugin supports following kotlin plugins:
+This plugin supports the following kotlin plugins:
 - "kotlin"
 - "kotlin-android"
 - "kotlin2js"
@@ -53,15 +53,15 @@ This plugin supports following kotlin plugins:
 - project kotlin script files
 - "org.jetbrains.kotlin.js"
 
-If you know any new Kotlin plugin that are not in this list - please,
+If you know any new Kotlin plugin that is not in this list - please,
 open a [new issue](https://github.com/JLLeitschuh/ktlint-gradle/issues/new).
 
 ## How to use
 
 ### Minimal supported versions
 
-This plugin was written using the new API available for gradle script kotlin builds.
-This API is available in new versions of gradle.
+This plugin was written using the new API available for the Gradle script Kotlin builds.
+This API is available in new versions of Gradle.
 
 Minimal supported [Gradle](www.gradle.org) version: `5.4.1`
 
@@ -158,7 +158,7 @@ rules using ktlint.
 
 #### Idea plugin simple setup
 
-For all gradle versions:
+For all Gradle versions:
 
 Use the same `buildscript` logic as [above](#simple-setup), but with this instead of the above suggested `apply` line.
 
@@ -328,7 +328,7 @@ that task will always be not "UP_TO_DATE" and caching will not work.
 
 ### Samples
 
-This repository provides following examples how to setup this plugin:
+This repository provides the following examples of how to set up this plugin:
 - [android-app](/samples/android-app) - applies plugin to android application project
 - [kotlin-gradle](/samples/kotlin-gradle) - applies plugin to plain Kotlin project that uses groovy in `build.gradle` files
 - [kotlin-js](/samples/kotlin-js) - applies plugin to kotlin js project
@@ -347,7 +347,7 @@ This plugin adds two maintasks to every source set: `ktlint[source set name]Sour
 Additionally, a simple `ktlintCheck` task has also been added that checks all of the source sets for that project.
 Similarly, a `ktlintFormat` task has been added that formats all of the source sets.
 
-Android projects, additionally, will have meta tasks for Android variants, that will process all source sets in variant.
+Android projects, additionally, will have meta tasks for Android variants, that will process all source sets in a variant.
 For example, if app has `foo` flavor, following meta tasks will be added:
 `ktlintFooDebugCheck`, `ktlintFooReleaseCheck`, `ktlintFooDebugFormat`, `ktlintFooReleaseFormat`.
 
@@ -357,7 +357,7 @@ Additionally plugin adds two task for project kotlin script files: `ktlintKotlin
 
 Following additional  tasks are added:
 - `ktlintApplyToIdea` - The task generates IntelliJ IDEA (or Android Studio) Kotlin
-                        style files in the project `.idea/` folder. **Note** that this tasks will overwrite the existing style file.
+                        style files in the project `.idea/` folder. **Note** that this task will overwrite the existing style file.
 - `ktlintApplyToIdeaGlobally` - The task generates IntelliJ IDEA (or Android Studio) Kotlin
                                 style files in the user home IDEA
                                 (or Android Studio) settings folder. **Note** that this task will overwrite the existing style file.
@@ -366,11 +366,11 @@ that runs ktlint check over staged files.
 - `addKtlintFormatGitPreCommitHook` - adds [Git](https://www.git-scm.com/) `pre-commit` hook, 
 that runs ktlint format over staged files and adds fixed files back to commit.
 
-All this additional tasks are always added **only** to the root project.
+All these additional tasks are always added **only** to the root project.
 
 ## FAQ
 
-- Is it possible to not stop tasks execution if some of subprojects tasks failed?
+- Is it possible to not stop task execution if some of the subprojects tasks failed?
 
 Yes. Just use gradle `--continue` option:
 ```shell
@@ -380,16 +380,16 @@ $ ./gradlew --continue ktlintCheck
 - Can I mix old plugin and new plugin API setup in my project
 (see [simple-setup](#simple-setup) and [using new plugin API setup](#using-new-plugin-api))?
 
-No. This approaches are not equivalent how they work. The problem that
-plugin may not find some of kotlin plugins if both approaches are used
-in the project configuration. Especially it is related to Android plugin.
+No. These approaches are not equivalent to how they work. The problem that
+the plugin may not find some of the kotlin plugins if both approaches are used
+in the project configuration. Especially it is related to the Android plugin.
 
-- Does plugin check changed files incrementally?
+- Does plugin check change files incrementally?
 
-Yes, check tasks support it. On first run task will check all files in the source set, on
+Yes, check tasks support it. On the first run, the task will check all files in the source set, on
 subsequent runs it will check only added/modified files.
 
-Format tasks does not check file incrementally.
+Format tasks do not check files incrementally.
 
 - I could not filter dynamically attached sources that are located outside of the project dir.
 
