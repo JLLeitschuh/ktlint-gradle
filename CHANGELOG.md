@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Changed
   - Updated Gradle to `6.6.1` version
 ### Fixed
-  - ?
+  - KtLint was not checking files that contains whitespace in path or name [#362](https://github.com/JLLeitschuh/ktlint-gradle/issues/362)
 ### Deleted
   - ?
 
