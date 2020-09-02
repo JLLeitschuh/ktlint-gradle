@@ -31,8 +31,14 @@ open class KtlintCheckTask @Inject constructor(
             }
             .map { it.file }
             .toSet()
-        logger.debug("Files changed: $filesToLint")
 
-        runLint(filesToLint)
+        if (filesToLint.isEmpty()) {
+            didWork = false
+            logger.info("No ${ChangeType.ADDED} or ${ChangeType.MODIFIED} files that need to be linted")
+        } else {
+            logger.debug("Files changed: $filesToLint")
+
+            runLint(filesToLint)
+        }
     }
 }
