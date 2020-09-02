@@ -212,7 +212,7 @@ abstract class ReportersTest : AbstractPluginTest() {
             }
 
             tasks.withType(org.jlleitschuh.gradle.ktlint.KtlintCheckTask.class) {
-                reporterOutputDir = project.layout.buildDirectory.dir("$newLocation")
+                reporterOutputDir = project.layout.buildDirectory.dir("$newLocation/${'$'}name")
             }
             """.trimIndent()
         )
@@ -245,5 +245,7 @@ abstract class ReportersTest : AbstractPluginTest() {
     private fun reportLocation(
         reportsLocation: String,
         reportFileExtension: String
-    ) = projectRoot.resolve("$reportsLocation/ktlintMainSourceSetCheck.$reportFileExtension")
+    ) = projectRoot.resolve(
+        "$reportsLocation/ktlintMainSourceSetCheck/ktlintMainSourceSetCheck.$reportFileExtension"
+    )
 }
