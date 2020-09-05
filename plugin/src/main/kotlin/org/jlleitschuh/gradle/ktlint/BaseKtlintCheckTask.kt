@@ -207,7 +207,7 @@ abstract class BaseKtlintCheckTask(
                 }
             additionalConfig(argsWriter)
             filesToCheck.forEach {
-                argsWriter.println(it.toRelativeFile())
+                argsWriter.println("\"${it.toRelativeFile()}\"")
             }
         }
         return argsConfigFile

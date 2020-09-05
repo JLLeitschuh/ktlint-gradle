@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   - Updated Gradle to `6.6.1` version
   - Each task will output reports into subdirectory inside `build/reports/ktlint` directory to fix non-working caching [#379](https://github.com/JLLeitschuh/ktlint-gradle/issues/379)
 ### Fixed
-  - ?
+  - KtLint was not checking files that contains whitespace in path or name [#362](https://github.com/JLLeitschuh/ktlint-gradle/issues/362)
 ### Deleted
   - ?
 

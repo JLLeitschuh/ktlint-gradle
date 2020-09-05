@@ -413,6 +413,23 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
     }
 
     @Test
+    internal fun `Should check files which path contains whitespace`() {
+        projectRoot.createSourceFile(
+            "src/main/kotlin/some path with whitespace/some file.kt",
+            """
+                class Test
+            """.trimIndent()
+        )
+
+        buildAndFail(":ktlintCheck").apply {
+            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertThat(output).contains(
+                "class Test should be declared in a file named Test.kt (cannot be auto-corrected)"
+            )
+        }
+    }
+
+    @Test
     internal fun `Should do nothing when there are no eligible incremental updates`() {
         val passingContents =
             """
