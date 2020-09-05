@@ -97,6 +97,12 @@ abstract class AbstractPluginTest {
         sourceFile.writeText(contents)
     }
 
+    protected
+    fun File.removeSourceFile(sourceFilePath: String) {
+        val sourceFile = resolve(sourceFilePath)
+        sourceFile.delete()
+    }
+
     fun File.settingsFile() = resolve("settings.gradle")
 
     companion object {

@@ -37,11 +37,13 @@ abstract class BuildCacheTest : AbstractPluginTest() {
         createRunner(originalRoot)
             .build().apply {
                 assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(task(":ktlintTestSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
             }
 
         createRunner(relocatedRoot)
             .build().apply {
                 assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.FROM_CACHE)
+                assertThat(task(":ktlintTestSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.FROM_CACHE)
             }
     }
 
@@ -106,6 +108,13 @@ abstract class BuildCacheTest : AbstractPluginTest() {
     ) {
         listOf(originalRoot, relocatedRoot).forEach {
             it.withCleanSources()
+            it.createSourceFile(
+                "src/test/kotlin/Test.kt",
+                """
+                class Test
+            
+                """.trimIndent()
+            )
             it.buildFile().writeText(
                 """
                     ${pluginsBlockWithMainPluginAndKotlinJvm()}

@@ -428,4 +428,39 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             )
         }
     }
+
+    @Test
+    internal fun `Should do nothing when there are no eligible incremental updates`() {
+        val passingContents =
+            """
+            val foo = "bar"
+
+            """.trimIndent()
+
+        val failingContents =
+            """
+            val foo="bar"
+
+            """.trimIndent()
+
+        val initialSourceFile = "src/main/kotlin/initial.kt"
+        projectRoot.createSourceFile(initialSourceFile, passingContents)
+
+        val additionalSourceFile = "src/main/kotlin/another-file.kt"
+        projectRoot.createSourceFile(additionalSourceFile, passingContents)
+
+        val testSourceFile = "src/test/kotlin/another-file.kt"
+        projectRoot.createSourceFile(testSourceFile, failingContents)
+
+        build(":ktlintMainSourceSetCheck").apply {
+            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        }
+
+        // Removing a source file will cause the task to run, but the only incremental change will
+        // be REMOVED, which does need to call ktlint
+        projectRoot.removeSourceFile(initialSourceFile)
+        build(":ktlintMainSourceSetCheck").apply {
+            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+        }
+    }
 }

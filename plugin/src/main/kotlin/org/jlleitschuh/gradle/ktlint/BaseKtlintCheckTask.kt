@@ -279,11 +279,13 @@ abstract class BaseKtlintCheckTask(
     /**
      * Base location of ktlint generated reports.
      *
-     * Default is "${project.buildDir}/reports/ktlint".
+     * Default is "${project.buildDir}/reports/ktlint/$name".
+     *
+     * **Note**: should be unique per task, otherwise task caching will not work.
      */
     @get:OutputDirectory
     val reporterOutputDir: DirectoryProperty = objectFactory.directoryProperty().convention(
-        project.layout.buildDirectory.dir("reports/ktlint")
+        project.layout.buildDirectory.dir("reports/ktlint/$name")
     )
 
     /**
