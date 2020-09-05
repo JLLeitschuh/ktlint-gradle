@@ -399,6 +399,28 @@ To filter files outside project dir, use:
 exclude { element -> element.file.path.contains("generated/") }
 ```
 
+- Running KtLint fails with strange exception (for example, check [#383](https://github.com/JLLeitschuh/ktlint-gradle/issues/383))
+
+Ensure you are not pinning Kotlin version for "ktlint*" configurations added by plugin.
+
+KtLint relies on Kotlin compiler to parse source files. Each version of KtLint are build using specific Kotlin version.
+
+To exclude "ktlint*" Gradle configurations from Kotlin version pinning - use following approach:
+```kotlin
+configurations.all {
+    if (!name.startsWith("ktlint")) {
+        resolutionStrategy {
+            eachDependency {
+                // Force Kotlin to our version
+                if (requested.group == "org.jetbrains.kotlin") {
+                    useVersion("1.3.72")
+                }
+            }
+        }
+    }
+}
+```
+
 ## Developers
 
 ### Importing
