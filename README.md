@@ -292,7 +292,7 @@ It is possible also to define different from default output directory for genera
 
 ```groovy
 tasks.withType(org.jlleitschuh.gradle.ktlint.KtlintCheckTask) {
-    reporterOutputDir = project.layout.buildDirectory.dir("other/location")
+    reporterOutputDir = project.layout.buildDirectory.dir("other/location/$name")
 }
 ```
 </details>
@@ -303,7 +303,7 @@ tasks.withType(org.jlleitschuh.gradle.ktlint.KtlintCheckTask) {
 ```kotlin
 tasks.withType<org.jlleitschuh.gradle.ktlint.KtlintCheckTask>() {
     reporterOutputDir.set(
-        project.layout.buildDirectory.dir("other/location")
+        project.layout.buildDirectory.dir("other/location/$name")
     )
 }
 ```
