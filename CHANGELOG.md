@@ -5,16 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## Unreleased
-### Added
-  - ?
+## [9.4.0] - 2020.09.06
 ### Changed
   - Updated Gradle to `6.6.1` version
   - Each task will output reports into subdirectory inside `build/reports/ktlint` directory to fix non-working caching [#379](https://github.com/JLLeitschuh/ktlint-gradle/issues/379)
+  - Set default ktlint version to `0.38.1`
 ### Fixed
   - KtLint was not checking files that contains whitespace in path or name [#362](https://github.com/JLLeitschuh/ktlint-gradle/issues/362)
-### Deleted
-  - ?
+  - Skip check if incremental changes contains only removed files [#385](https://github.com/JLLeitschuh/ktlint-gradle/issues/385)
 
 ## [9.3.0] - 2020.07.17
 ### Added
