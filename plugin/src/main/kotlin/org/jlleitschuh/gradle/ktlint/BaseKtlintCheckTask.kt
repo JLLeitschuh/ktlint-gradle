@@ -207,7 +207,8 @@ abstract class BaseKtlintCheckTask(
                 }
             additionalConfig(argsWriter)
             filesToCheck.forEach {
-                argsWriter.println("\"${it.toRelativeFile()}\"")
+                val filePath = it.toRelativeFile().path.replace("\\", "\\\\")
+                argsWriter.println("\"$filePath\"")
             }
         }
         return argsConfigFile
