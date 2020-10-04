@@ -242,7 +242,7 @@ abstract class BaseKtlintCheckTask(
         ) {
             logger.warn(
                 "You are using ktlint version ${ktlintVersion.get()} that has the security vulnerability " +
-                    "'CWE-494: Download of Code Without Integrity Check'.\n" +
+                    "'CWE-494: Download of Code Without Integrity Check'.${System.lineSeparator()}" +
                     "Consider upgrading to versions consider upgrading to versions >= 0.30.0"
             )
         }

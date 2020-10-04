@@ -207,8 +207,8 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
 
         build(":dependencies").apply {
             assertThat(output).contains(
-                "$KTLINT_CONFIGURATION_NAME - $KTLINT_CONFIGURATION_DESCRIPTION\n" +
-                    "\\--- com.github.shyiko:ktlint:0.26.0\n"
+                "$KTLINT_CONFIGURATION_NAME - $KTLINT_CONFIGURATION_DESCRIPTION${System.lineSeparator()}" +
+                    "\\--- com.github.shyiko:ktlint:0.26.0${System.lineSeparator()}"
             )
         }
     }
@@ -226,8 +226,8 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
 
         build(":dependencies").apply {
             assertThat(output).contains(
-                "$KTLINT_CONFIGURATION_NAME - $KTLINT_CONFIGURATION_DESCRIPTION\n" +
-                    "\\--- com.pinterest:ktlint:0.32.0\n"
+                "$KTLINT_CONFIGURATION_NAME - $KTLINT_CONFIGURATION_DESCRIPTION${System.lineSeparator()}" +
+                    "\\--- com.pinterest:ktlint:0.32.0${System.lineSeparator()}"
             )
         }
     }

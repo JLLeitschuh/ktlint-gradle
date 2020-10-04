@@ -77,7 +77,7 @@ private tailrec fun searchEditorConfigFiles(
     }
 }
 
-private val editorConfigRootRegex = "^root\\s?=\\s?true\\n".toRegex()
+private val editorConfigRootRegex = "^root\\s?=\\s?true\\R".toRegex()
 
 private fun Path.isRootEditorConfig(): Boolean {
     val asFile = toFile()
