@@ -404,11 +404,18 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             """.trimIndent()
         )
 
+        // TODO: Add better approach to different file paths on different OS
+        fun String.updatePathForWindows() = if (System.getProperty("os.name").contains("Windows")) {
+            replace("/", "\\\\")
+        } else {
+            this
+        }
+
         build(":ktlintCheck").apply {
             assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             val args = projectRoot.ktlintBuildDir().resolve("ktlintMainSourceSetCheck.args").readText()
-            assertThat(args).contains(additionalSourceFile)
-            assertThat(args).doesNotContain(initialSourceFile)
+            assertThat(args).contains(additionalSourceFile.updatePathForWindows())
+            assertThat(args).doesNotContain(initialSourceFile.updatePathForWindows())
         }
     }
 
