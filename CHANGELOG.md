@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [9.4.1] - 2020.10.05
+### Fixed
+  - Plugin now correctly validates files on Windows OS [#399](https://github.com/JLLeitschuh/ktlint-gradle/issues/399)
+
 ## [9.4.0] - 2020.09.06
 ### Changed
   - Updated Gradle to `6.6.1` version

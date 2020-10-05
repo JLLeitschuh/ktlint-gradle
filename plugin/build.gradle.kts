@@ -14,7 +14,7 @@ plugins {
 
 val pluginGroup = "org.jlleitschuh.gradle"
 group = pluginGroup
-version = "9.4.0"
+version = "9.4.1"
 
 repositories {
     google()

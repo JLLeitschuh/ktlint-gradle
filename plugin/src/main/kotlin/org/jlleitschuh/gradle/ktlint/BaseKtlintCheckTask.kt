@@ -207,7 +207,8 @@ abstract class BaseKtlintCheckTask(
                 }
             additionalConfig(argsWriter)
             filesToCheck.forEach {
-                argsWriter.println("\"${it.toRelativeFile()}\"")
+                val filePath = it.toRelativeFile().path.replace("\\", "\\\\")
+                argsWriter.println("\"$filePath\"")
             }
         }
         return argsConfigFile
@@ -241,7 +242,7 @@ abstract class BaseKtlintCheckTask(
         ) {
             logger.warn(
                 "You are using ktlint version ${ktlintVersion.get()} that has the security vulnerability " +
-                    "'CWE-494: Download of Code Without Integrity Check'.\n" +
+                    "'CWE-494: Download of Code Without Integrity Check'.${System.lineSeparator()}" +
                     "Consider upgrading to versions consider upgrading to versions >= 0.30.0"
             )
         }
