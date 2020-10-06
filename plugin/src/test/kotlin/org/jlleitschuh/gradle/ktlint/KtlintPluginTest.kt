@@ -207,8 +207,8 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
 
         build(":dependencies").apply {
             assertThat(output).contains(
-                "$KTLINT_CONFIGURATION_NAME - $KTLINT_CONFIGURATION_DESCRIPTION\n" +
-                    "\\--- com.github.shyiko:ktlint:0.26.0\n"
+                "$KTLINT_CONFIGURATION_NAME - $KTLINT_CONFIGURATION_DESCRIPTION${System.lineSeparator()}" +
+                    "\\--- com.github.shyiko:ktlint:0.26.0${System.lineSeparator()}"
             )
         }
     }
@@ -226,8 +226,8 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
 
         build(":dependencies").apply {
             assertThat(output).contains(
-                "$KTLINT_CONFIGURATION_NAME - $KTLINT_CONFIGURATION_DESCRIPTION\n" +
-                    "\\--- com.pinterest:ktlint:0.32.0\n"
+                "$KTLINT_CONFIGURATION_NAME - $KTLINT_CONFIGURATION_DESCRIPTION${System.lineSeparator()}" +
+                    "\\--- com.pinterest:ktlint:0.32.0${System.lineSeparator()}"
             )
         }
     }
@@ -404,11 +404,18 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             """.trimIndent()
         )
 
+        // TODO: Add better approach to different file paths on different OS
+        fun String.updatePathForWindows() = if (System.getProperty("os.name").contains("Windows")) {
+            replace("/", "\\\\")
+        } else {
+            this
+        }
+
         build(":ktlintCheck").apply {
             assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             val args = projectRoot.ktlintBuildDir().resolve("ktlintMainSourceSetCheck.args").readText()
-            assertThat(args).contains(additionalSourceFile)
-            assertThat(args).doesNotContain(initialSourceFile)
+            assertThat(args).contains(additionalSourceFile.updatePathForWindows())
+            assertThat(args).doesNotContain(initialSourceFile.updatePathForWindows())
         }
     }
 
