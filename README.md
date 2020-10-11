@@ -45,10 +45,6 @@ The assumption being that you would not want to lint code you weren't compiling.
 This plugin supports the following kotlin plugins:
 - "kotlin"
 - "kotlin-android"
-- "kotlin2js"
-- "kotlin-platform-common"
-- "kotlin-platform-js"
-- "kotlin-platform-jvm"
 - "kotlin-multiplatform"
 - project kotlin script files
 - "org.jetbrains.kotlin.js"

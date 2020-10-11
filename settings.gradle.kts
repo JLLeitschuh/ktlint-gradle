@@ -50,11 +50,7 @@ include("samples:kotlin-gradle")
 if (isAndroidSdkAvailable()) {
     include("samples:android-app")
 }
-include("samples:kotlin-kotlin2js")
 include("samples:kotlin-js")
-include("samples:kotlin-multiplatform-common")
-include("samples:kotlin-multiplatform-jvm")
-include("samples:kotlin-multiplatform-js")
 include("samples:kotlin-rulesets-creating")
 include("samples:kotlin-rulesets-using")
 include("samples:kotlin-reporter-creating")

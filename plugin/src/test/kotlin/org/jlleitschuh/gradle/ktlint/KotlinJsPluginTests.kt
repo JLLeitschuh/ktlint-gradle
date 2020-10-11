@@ -33,6 +33,17 @@ abstract class KotlinJsPluginTests : AbstractPluginTest() {
     @BeforeEach
     internal fun setUp() {
         projectRoot.kotlinPluginProjectSetup("org.jetbrains.kotlin.js")
+
+        projectRoot.buildFile().appendText(
+            """
+                
+                kotlin {
+                    js {
+                        nodejs()
+                    }
+                }
+            """.trimMargin()
+        )
     }
 
     @Test
