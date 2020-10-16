@@ -1,5 +1,6 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.util.prefixIfNot
 
 plugins {
@@ -19,6 +20,12 @@ version = "10.0.0-SNAPSHOT"
 repositories {
     google()
     jcenter()
+}
+
+tasks.withType<KotlinCompile>() {
+    kotlinOptions {
+        apiVersion = "1.3"
+    }
 }
 
 tasks.withType<PluginUnderTestMetadata>().configureEach {

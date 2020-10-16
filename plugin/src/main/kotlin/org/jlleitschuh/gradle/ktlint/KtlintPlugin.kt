@@ -13,7 +13,6 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import java.util.concurrent.Callable
-import kotlin.reflect.KClass
 
 /**
  * Plugin that provides a wrapper over the `ktlint` project.
@@ -33,9 +32,7 @@ open class KtlintPlugin : Plugin<Project> {
 
     private fun PluginHolder.addKtLintTasksToKotlinPlugin() {
         target.plugins.withId("kotlin", applyKtLint())
-        target.plugins.withId("kotlin2js", applyKtLint())
         target.plugins.withId("org.jetbrains.kotlin.js", applyKtLint())
-        target.plugins.withId("kotlin-platform-common", applyKtLint())
         target.plugins.withId("kotlin-android", applyKtLintToAndroid())
         target.plugins.withId(
             "org.jetbrains.kotlin.multiplatform",
@@ -85,11 +82,9 @@ open class KtlintPlugin : Plugin<Project> {
         }
     }
 
-    private fun PluginHolder.applyKtLint(): (Plugin<in Any>) -> Unit {
-        return {
-            val sourceSets = target.theHelper<KotlinProjectExtension>().sourceSets
-
-            sourceSets.all { sourceSet ->
+    private fun PluginHolder.applyKtLint(): (Plugin<in Any>) -> Unit = {
+        target.extensions.configure<KotlinProjectExtension>("kotlin") { extension ->
+            extension.sourceSets.all { sourceSet ->
                 val kotlinSourceDirectories = sourceSet.kotlin.sourceDirectories
                 val checkTask = createCheckTask(
                     this,
@@ -288,16 +283,6 @@ open class KtlintPlugin : Plugin<Project> {
             }
         }
     }
-
-    /*
-     * Helper functions used until Gradle Script Kotlin solidifies it's plugin API.
-     */
-
-    private inline fun <reified T : Any> Project.theHelper() =
-        theHelper(T::class)
-
-    private fun <T : Any> Project.theHelper(extensionType: KClass<T>) =
-        convention.findPlugin(extensionType.java) ?: convention.getByType(extensionType.java)
 
     private fun Project.isConsolePlain() = gradle.startParameter.consoleOutput == ConsoleOutput.Plain
 

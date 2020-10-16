@@ -9,7 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Added
   - ?
 ### Changed
-  - ?
+  - Updated Kotlin to `1.4.10` version.
+
+    **Breaking** - removed support for following deprecated Kotlin plugins:
+    1. "kotlin2js"
+    2. "kotlin-platform-*"
+
 ### Removed
   - ?
 ### Fixed

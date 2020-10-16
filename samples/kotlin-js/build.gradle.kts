@@ -9,6 +9,12 @@ dependencies {
     "implementation"(kotlin("stdlib-js"))
 }
 
+kotlin {
+    js {
+        nodejs()
+    }
+}
+
 ktlint {
     verbose.set(true)
     outputToConsole.set(true)
