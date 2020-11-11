@@ -10,4 +10,9 @@ object SamplesVersions {
     val androidSupport = "27.0.2"
     val espressoRunner = "1.0.1"
     val espresso = "3.0.1"
+    val androidXFragment = "1.2.5"
+    val androidXRecyclerView = "1.1.0"
+    val androidMaterial = "1.2.1"
+    val androidXTestRunner = "1.3.0"
+    val androidXEspresso = "3.3.0"
 }

@@ -2,11 +2,11 @@ package org.jlleitschuh.gradle.ktlint.android
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.v7.app.AppCompatActivity
+import android.view.LayoutInflater
 import android.view.MenuItem
-import kotlinx.android.synthetic.main.activity_item_detail.detail_toolbar
-import kotlinx.android.synthetic.main.activity_item_detail.fab
+import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.snackbar.Snackbar
+import org.jlleitschuh.gradle.ktlint.android.databinding.ActivityItemDetailBinding
 
 /**
  * An activity representing a single Item detail screen. This
@@ -15,13 +15,15 @@ import kotlinx.android.synthetic.main.activity_item_detail.fab
  * in a [ItemListActivity].
  */
 class ItemDetailActivity : AppCompatActivity() {
+    internal var viewBinding: ActivityItemDetailBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_item_detail)
-        setSupportActionBar(detail_toolbar)
+        viewBinding = ActivityItemDetailBinding.inflate(LayoutInflater.from(this))
+        setContentView(viewBinding?.root)
+        setSupportActionBar(viewBinding?.detailToolbar)
 
-        fab.setOnClickListener { view ->
+        viewBinding?.fab?.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own detail action", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
         }
