@@ -8,17 +8,8 @@ kotlin {
     android()
 
     sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation(kotlin("stdlib-common"))
-            }
-        }
-
-        val androidMain by getting {
-            dependencies {
-                implementation(kotlin("stdlib"))
-            }
-        }
+        val commonMain by getting
+        val androidMain by getting
     }
 }
 
@@ -28,14 +19,14 @@ ktlint {
 }
 
 android {
-    compileSdkVersion(27)
+    compileSdkVersion(30)
 
     defaultConfig {
         minSdkVersion(23)
-        targetSdkVersion(27)
+        targetSdkVersion(30)
         versionCode = 1
         versionName = "1.0"
-        testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -52,7 +43,7 @@ android {
     }
 
     compileOptions {
-        setSourceCompatibility(JavaVersion.VERSION_1_8)
-        setTargetCompatibility(JavaVersion.VERSION_1_8)
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 }
