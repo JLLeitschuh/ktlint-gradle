@@ -1,17 +1,11 @@
 package org.jlleitschuh.gradle.ktlint
 
-import com.android.build.gradle.AppExtension
-import com.android.build.gradle.BaseExtension
-import com.android.build.gradle.FeatureExtension
-import com.android.build.gradle.LibraryExtension
-import com.android.build.gradle.TestExtension
-import com.android.build.gradle.api.BaseVariant
 import net.swiftzer.semver.SemVer
-import org.gradle.api.DomainObjectSet
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.logging.configuration.ConsoleOutput
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.HelpTasksPlugin
 import org.gradle.api.provider.ListProperty
@@ -130,28 +124,4 @@ internal fun String.sourceSetCheckTaskName() = "ktlint${capitalize()}SourceSetCh
  */
 internal fun String.sourceSetFormatTaskName() = "ktlint${capitalize()}SourceSetFormat"
 
-/**
- * Create check task name for android variant name with optional android multiplatform target name addition.
- */
-internal fun String.androidVariantMetaCheckTaskName(
-    multiplatformTargetName: String? = null
-) = "ktlint${capitalize()}${multiplatformTargetName?.capitalize() ?: ""}Check"
-
-/**
- * Create format task name for android variant name with optional android multiplatform target name addition.
- */
-internal fun String.androidVariantMetaFormatTaskName(
-    multiplatformTargetName: String? = null
-) = "ktlint${capitalize()}${multiplatformTargetName?.capitalize() ?: ""}Format"
-
-/**
- * Get specific android variants from [BaseExtension].
- */
-internal val BaseExtension.variants: DomainObjectSet<out BaseVariant>?
-    get() = when (this) {
-        is AppExtension -> applicationVariants
-        is LibraryExtension -> libraryVariants
-        is FeatureExtension -> featureVariants
-        is TestExtension -> applicationVariants
-        else -> null // Instant app extension doesn't provide variants access
-    }
+internal fun Project.isConsolePlain() = gradle.startParameter.consoleOutput == ConsoleOutput.Plain

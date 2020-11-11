@@ -343,10 +343,6 @@ This plugin adds two maintasks to every source set: `ktlint[source set name]Sour
 Additionally, a simple `ktlintCheck` task has also been added that checks all of the source sets for that project.
 Similarly, a `ktlintFormat` task has been added that formats all of the source sets.
 
-Android projects, additionally, will have meta tasks for Android variants, that will process all source sets in a variant.
-For example, if app has `foo` flavor, following meta tasks will be added:
-`ktlintFooDebugCheck`, `ktlintFooReleaseCheck`, `ktlintFooDebugFormat`, `ktlintFooReleaseFormat`.
-
 Additionally plugin adds two task for project kotlin script files: `ktlintKotlinScriptCheck` and `ktlintKotlinScriptFormat`.
 
 ### Additional helper tasks
