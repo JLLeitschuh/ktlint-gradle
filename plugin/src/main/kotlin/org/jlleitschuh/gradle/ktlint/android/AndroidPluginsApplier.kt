@@ -1,4 +1,3 @@
-@file:Suppress("UnstableApiUsage")
 package org.jlleitschuh.gradle.ktlint.android
 
 import com.android.build.api.dsl.AndroidSourceSet
@@ -45,6 +44,7 @@ internal fun KtlintPlugin.PluginHolder.applyKtLintToAndroid(): (Plugin<in Any>) 
     }
 }
 
+@Suppress("UnstableApiUsage")
 private typealias AndroidCommonExtension = CommonExtension<
     AndroidSourceSet,
     BuildFeatures,
@@ -61,7 +61,7 @@ private typealias AndroidCommonExtension = CommonExtension<
  * so most probably main source set maybe checked several times.
  * This approach creates one check tasks per one source set.
  */
-@Suppress("UNCHECKED_CAST")
+@Suppress("UNCHECKED_CAST", "UnstableApiUsage")
 private fun androidPluginConfigureAction(
     pluginHolder: KtlintPlugin.PluginHolder
 ): (Plugin<Any>) -> Unit = {
