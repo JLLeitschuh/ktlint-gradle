@@ -6,11 +6,6 @@ plugins {
 
 kotlin {
     android()
-
-    sourceSets {
-        val commonMain by getting
-        val androidMain by getting
-    }
 }
 
 ktlint {
