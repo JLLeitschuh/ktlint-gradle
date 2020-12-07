@@ -1,19 +1,20 @@
 plugins {
     id("com.android.application")
     kotlin("android")
-    kotlin("android.extensions")
     id("org.jlleitschuh.gradle.ktlint")
 }
 
 android {
-    compileSdkVersion(27)
+    compileSdkVersion(30)
+
+    buildFeatures.viewBinding = true
 
     defaultConfig {
         minSdkVersion(23)
-        targetSdkVersion(27)
+        targetSdkVersion(30)
         versionCode = 1
         versionName = "1.0"
-        testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -30,26 +31,26 @@ android {
     }
 
     compileOptions {
-        setSourceCompatibility(JavaVersion.VERSION_1_8)
-        setTargetCompatibility(JavaVersion.VERSION_1_8)
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 
     sourceSets {
-        val kotlinAddintionalSourceSets = project.file("src/main/kotlin")
-        findByName("main")?.java?.srcDirs(kotlinAddintionalSourceSets)
+        val kotlinAdditionalSourceSets = project.file("src/main/kotlin")
+        findByName("main")?.java?.srcDirs(kotlinAdditionalSourceSets)
     }
 }
 
 dependencies {
-    "implementation"("org.jetbrains.kotlin:kotlin-stdlib-jdk7:${SamplesVersions.kotlin}")
-    "implementation"("com.android.support:appcompat-v7:${SamplesVersions.androidSupport}")
-    "implementation"("com.android.support:support-v4:${SamplesVersions.androidSupport}")
-    "implementation"("com.android.support:recyclerview-v7:${SamplesVersions.androidSupport}")
-    "implementation"("com.android.support:design:${SamplesVersions.androidSupport}")
-    "testImplementation"("junit:junit:${SamplesVersions.junit}")
-    "androidTestImplementation"("com.android.support.test:runner:${SamplesVersions.espressoRunner}")
-    "androidTestImplementation"(
-        "com.android.support.test.espresso:espresso-core:${SamplesVersions.espresso}"
+    implementation("androidx.fragment:fragment-ktx:${SamplesVersions.androidXFragment}")
+    implementation("androidx.recyclerview:recyclerview:${SamplesVersions.androidXRecyclerView}")
+    implementation("com.google.android.material:material:${SamplesVersions.androidMaterial}")
+
+    testImplementation("junit:junit:${SamplesVersions.junit}")
+
+    androidTestImplementation("androidx.test:runner:${SamplesVersions.androidXTestRunner}")
+    androidTestImplementation(
+        "androidx.test.espresso:espresso-core:${SamplesVersions.androidXEspresso}"
     )
 }
 

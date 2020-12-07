@@ -1,12 +1,11 @@
 package org.jlleitschuh.gradle.ktlint.android
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import kotlinx.android.synthetic.main.activity_item_detail.toolbar_layout
-import kotlinx.android.synthetic.main.item_detail.view.item_detail
+import androidx.fragment.app.Fragment
+import org.jlleitschuh.gradle.ktlint.android.databinding.ItemDetailBinding
 import org.jlleitschuh.gradle.ktlint.android.dummy.DummyContent
 
 /**
@@ -22,6 +21,8 @@ class ItemDetailFragment : Fragment() {
      */
     private var mItem: DummyContent.DummyItem? = null
 
+    private var viewBinding: ItemDetailBinding? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -29,9 +30,9 @@ class ItemDetailFragment : Fragment() {
             // Load the dummy content specified by the fragment
             // arguments. In a real-world scenario, use a Loader
             // to load content from a content provider.
-            mItem = DummyContent.ITEM_MAP[arguments!!.getString(ARG_ITEM_ID)]
+            mItem = DummyContent.ITEM_MAP[arguments?.getString(ARG_ITEM_ID)]
             mItem?.let {
-                activity?.toolbar_layout?.title = it.content
+                (activity as? ItemDetailActivity)?.viewBinding?.detailToolbar?.title = it.content
             }
         }
     }
@@ -41,14 +42,19 @@ class ItemDetailFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val rootView = inflater.inflate(R.layout.item_detail, container, false)
+        viewBinding = ItemDetailBinding.inflate(inflater, container, false)
 
         // Show the dummy content as text in a TextView.
         mItem?.let {
-            rootView.item_detail.text = it.details
+            viewBinding?.itemDetail?.text = it.details
         }
 
-        return rootView
+        return viewBinding?.root
+    }
+
+    override fun onDestroyView() {
+        viewBinding = null
+        super.onDestroyView()
     }
 
     companion object {

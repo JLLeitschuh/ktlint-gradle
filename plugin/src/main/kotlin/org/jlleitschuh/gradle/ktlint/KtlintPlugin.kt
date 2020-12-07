@@ -1,18 +1,13 @@
 package org.jlleitschuh.gradle.ktlint
 
-import com.android.build.gradle.BaseExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.gradle.api.file.FileCollection
-import org.gradle.api.file.FileTree
-import org.gradle.api.logging.configuration.ConsoleOutput
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
-import java.util.concurrent.Callable
+import org.jlleitschuh.gradle.ktlint.android.applyKtLintToAndroid
 
 /**
  * Plugin that provides a wrapper over the `ktlint` project.
@@ -63,21 +58,8 @@ open class KtlintPlugin : Plugin<Project> {
         }
 
         multiplatformExtension.targets.all { kotlinTarget ->
-            when (kotlinTarget.platformType) {
-                KotlinPlatformType.androidJvm -> {
-                    val androidConfigureAction: (Plugin<Any>) -> Unit = {
-                        target.extensions.configure(BaseExtension::class.java) { ext ->
-                            ext.addVariantsMetaTasks(target, kotlinTarget.targetName)
-                        }
-                    }
-                    target.plugins.withId("com.android.application", androidConfigureAction)
-                    target.plugins.withId("com.android.library", androidConfigureAction)
-                    target.plugins.withId("com.android.instantapp", androidConfigureAction)
-                    target.plugins.withId("com.android.feature", androidConfigureAction)
-                    target.plugins.withId("com.android.test", androidConfigureAction)
-                    target.plugins.withId("com.android.dynamic-feature", androidConfigureAction)
-                }
-                else -> Unit
+            if (kotlinTarget.platformType == KotlinPlatformType.androidJvm) {
+                applyKtLintToAndroid()
             }
         }
     }
@@ -106,146 +88,6 @@ open class KtlintPlugin : Plugin<Project> {
         }
     }
 
-    private fun PluginHolder.applyKtLintToAndroid(): (Plugin<in Any>) -> Unit {
-        return {
-            fun createTasks(
-                sourceSetName: String,
-                sources: FileCollection
-            ) {
-                val checkTask = createCheckTask(
-                    this,
-                    sourceSetName,
-                    sources
-                )
-
-                addKtlintCheckTaskToProjectMetaCheckTask(checkTask)
-                setCheckTaskDependsOnKtlintCheckTask(target, checkTask)
-
-                val ktlintSourceSetFormatTask = createFormatTask(
-                    this,
-                    sourceSetName,
-                    sources
-                )
-
-                addKtlintFormatTaskToProjectMetaFormatTask(ktlintSourceSetFormatTask)
-            }
-
-            /*
-             * Variant manager returns all sources for variant,
-             * so most probably main source set maybe checked several times.
-             * This approach creates one check tasks per one source set.
-             */
-            val pluginConfigureAction: (Plugin<Any>) -> Unit = {
-                target.extensions.configure(BaseExtension::class.java) { ext ->
-                    ext.sourceSets { sourceSet ->
-                        sourceSet.all { androidSourceSet ->
-                            // Passing Callable, so returned FileCollection, will lazy evaluate it
-                            // only when task will need it.
-                            // Solves the problem of having additional source dirs in
-                            // current AndroidSourceSet, that are not available on eager
-                            // evaluation.
-                            createTasks(
-                                androidSourceSet.name,
-                                target.files(Callable { androidSourceSet.java.srcDirs })
-                            )
-                        }
-                    }
-
-                    ext.addVariantsMetaTasks(target)
-                }
-            }
-
-            target.plugins.withId("com.android.application", pluginConfigureAction)
-            target.plugins.withId("com.android.library", pluginConfigureAction)
-            target.plugins.withId("com.android.instantapp", pluginConfigureAction)
-            target.plugins.withId("com.android.feature", pluginConfigureAction)
-            target.plugins.withId("com.android.test", pluginConfigureAction)
-            target.plugins.withId("com.android.dynamic-feature", pluginConfigureAction)
-        }
-    }
-
-    private fun PluginHolder.addKtlintCheckTaskToProjectMetaCheckTask(
-        checkTask: TaskProvider<KtlintCheckTask>
-    ) {
-        metaKtlintCheckTask.configure { it.dependsOn(checkTask) }
-    }
-
-    private fun PluginHolder.addKtlintFormatTaskToProjectMetaFormatTask(
-        formatTask: TaskProvider<KtlintFormatTask>
-    ) {
-        metaKtlintFormatTask.configure { it.dependsOn(formatTask) }
-    }
-
-    private fun createFormatTask(
-        pluginHolder: PluginHolder,
-        sourceSetName: String,
-        kotlinSourceDirectories: Iterable<*>
-    ): TaskProvider<KtlintFormatTask> {
-        return pluginHolder.target.registerTask(sourceSetName.sourceSetFormatTaskName()) {
-            description = "Runs a check against all .kt files to ensure that they are formatted according to ktlint."
-            configurePluginTask(pluginHolder) {
-                setSource(kotlinSourceDirectories)
-            }
-        }
-    }
-
-    private fun createCheckTask(
-        pluginHolder: PluginHolder,
-        sourceSetName: String,
-        kotlinSourceDirectories: Iterable<*>
-    ): TaskProvider<KtlintCheckTask> {
-        return pluginHolder.target.registerTask(sourceSetName.sourceSetCheckTaskName()) {
-            description = "Runs a check against all .kt files to ensure that they are formatted according to ktlint."
-            configurePluginTask(pluginHolder) {
-                setSource(kotlinSourceDirectories)
-            }
-        }
-    }
-
-    private fun BaseKtlintCheckTask.configurePluginTask(
-        pluginHolder: PluginHolder,
-        additionalTaskConfig: BaseKtlintCheckTask.() -> Unit
-    ) {
-        classpath.setFrom(pluginHolder.ktlintConfiguration)
-        ktlintVersion.set(pluginHolder.extension.version)
-        verbose.set(pluginHolder.extension.verbose)
-        additionalEditorconfigFile.set(pluginHolder.extension.additionalEditorconfigFile)
-        debug.set(pluginHolder.extension.debug)
-        ignoreFailures.set(pluginHolder.extension.ignoreFailures)
-        outputToConsole.set(pluginHolder.extension.outputToConsole)
-        coloredOutput.set(
-            pluginHolder.extension.coloredOutput.map {
-                if (pluginHolder.target.isConsolePlain()) {
-                    pluginHolder.target.logger.info("Console type is plain: disabling colored output")
-                    false
-                } else {
-                    it
-                }
-            }
-        )
-        outputColorName.set(pluginHolder.extension.outputColorName)
-        ruleSetsClasspath.setFrom(pluginHolder.ktlintRulesetConfiguration)
-        reporters.set(pluginHolder.extension.reporterExtension.reporters)
-        customReportersClasspath.setFrom(pluginHolder.ktlintReporterConfiguration)
-        customReporters.set(pluginHolder.extension.reporterExtension.customReporters)
-        android.set(pluginHolder.extension.android)
-        enableExperimentalRules.set(pluginHolder.extension.enableExperimentalRules)
-        disabledRules.set(pluginHolder.extension.disabledRules)
-
-        additionalTaskConfig()
-    }
-
-    private fun setCheckTaskDependsOnKtlintCheckTask(
-        project: Project,
-        ktlintCheck: TaskProvider<KtlintCheckTask>
-    ) {
-        project.plugins.withType(LifecycleBasePlugin::class.java) {
-            project.tasks.named(LifecycleBasePlugin.CHECK_TASK_NAME).configure { task ->
-                task.dependsOn(ktlintCheck)
-            }
-        }
-    }
-
     private fun PluginHolder.addKotlinScriptTasks() {
         val projectDirectoryScriptFiles = target.fileTree(target.projectDir)
         projectDirectoryScriptFiles.include("*.kts")
@@ -257,34 +99,6 @@ open class KtlintPlugin : Plugin<Project> {
         val formatTask = createKotlinScriptFormatTask(this, projectDirectoryScriptFiles)
         addKtlintFormatTaskToProjectMetaFormatTask(formatTask)
     }
-
-    private fun createKotlinScriptCheckTask(
-        pluginHolder: PluginHolder,
-        projectScriptFiles: FileTree
-    ): TaskProvider<KtlintCheckTask> {
-        return pluginHolder.target.registerTask(KOTLIN_SCRIPT_CHECK_TASK) {
-            description = "Runs a check against all .kts files in project directory " +
-                "to ensure that they are formatted according to ktlint."
-            configurePluginTask(pluginHolder) {
-                source = projectScriptFiles
-            }
-        }
-    }
-
-    private fun createKotlinScriptFormatTask(
-        pluginHolder: PluginHolder,
-        projectScriptFiles: FileTree
-    ): TaskProvider<KtlintFormatTask> {
-        return pluginHolder.target.registerTask(KOTLIN_SCRIPT_FORMAT_TASK) {
-            description = "Format all .kts files in project directory " +
-                "to ensure that they are formatted according to ktlint."
-            configurePluginTask(pluginHolder) {
-                source = projectScriptFiles
-            }
-        }
-    }
-
-    private fun Project.isConsolePlain() = gradle.startParameter.consoleOutput == ConsoleOutput.Plain
 
     internal class PluginHolder(
         val target: Project
@@ -311,47 +125,4 @@ open class KtlintPlugin : Plugin<Project> {
             createKtlintReporterConfiguration(target, extension)
         }
     }
-}
-
-/**
- * This is not scoped inside of [KtlintPlugin] because of these issues:
- *  - https://github.com/JLLeitschuh/ktlint-gradle/issues/201
- *  - https://github.com/gradle/gradle/issues/8411
- */
-private fun BaseExtension.addVariantsMetaTasks(
-    target: Project,
-    multiplatformTargetName: String? = null
-) {
-    variants?.all { variant ->
-        val variantCheckTask = target.createAndroidVariantMetaKtlintCheckTask(
-            variant.name,
-            multiplatformTargetName
-        )
-        val variantFormatTask = target.createAndroidVariantMetaKtlintFormatTask(
-            variant.name,
-            multiplatformTargetName
-        )
-        variant.sourceSets.forEach { sourceSet ->
-            val sourceSetName = "${multiplatformTargetName?.capitalize() ?: ""}${sourceSet.name.capitalize()}"
-            variantCheckTask.configure { it.dependsOn(sourceSetName.sourceSetCheckTaskName()) }
-            variantFormatTask.configure { it.dependsOn(sourceSetName.sourceSetFormatTaskName()) }
-        }
-    }
-}
-
-private fun Project.createAndroidVariantMetaKtlintCheckTask(
-    variantName: String,
-    multiplatformTargetName: String? = null
-): TaskProvider<Task> = registerTask(variantName.androidVariantMetaCheckTaskName(multiplatformTargetName)) {
-    group = VERIFICATION_GROUP
-    description = "Runs ktlint on all kotlin sources for android $variantName variant in this project."
-}
-
-private fun Project.createAndroidVariantMetaKtlintFormatTask(
-    variantName: String,
-    multiplatformTargetName: String? = null
-): TaskProvider<Task> = registerTask(variantName.androidVariantMetaFormatTaskName(multiplatformTargetName)) {
-    group = FORMATTING_GROUP
-    description = "Runs ktlint formatter on all kotlin sources for android $variantName" +
-        " variant in this project."
 }

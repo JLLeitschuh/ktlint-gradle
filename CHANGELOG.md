@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
     **Breaking** - removed support for following deprecated Kotlin plugins:
     1. "kotlin2js"
     2. "kotlin-platform-*"
+  - Updated Android Gradle Plugin to 4.1.0 version.
+
+    **Breaking** - removed build variants meta tasks. Minimum supported AGP version is 4.0.0.
 
 ### Removed
   - ?
