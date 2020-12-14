@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   - Updated Android Gradle Plugin to 4.1.0 version.
 
     **Breaking** - removed build variants meta tasks. Minimum supported AGP version is 4.0.0.
+  - Updated shadow plugin to 6.1.0 version.
 
 ### Removed
   - ?

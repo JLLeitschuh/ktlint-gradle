@@ -70,11 +70,6 @@ val relocateShadowJar = tasks.register("relocateShadowJar", ConfigureShadowReloc
     target = shadowJarTask.get()
 }
 
-// Removing gradleApi() added by 'java-gradle-plugin` plugin from resulting shadowed jar
-configurations.named(JavaPlugin.API_CONFIGURATION_NAME) {
-    dependencies.remove(project.dependencies.gradleApi())
-}
-
 shadowJarTask.configure {
     dependsOn(relocateShadowJar)
     minimize()
