@@ -46,6 +46,8 @@ dependencies {
     compileOnly("com.android.tools.build:gradle:${PluginVersions.androidPlugin}")
     shadowImplementation("net.swiftzer.semver:semver:${PluginVersions.semver}")
     shadowImplementation("org.eclipse.jgit:org.eclipse.jgit:${PluginVersions.jgit}")
+    // Explicitly added for shadow plugin to relocate implementation as well
+    shadowImplementation("org.slf4j:slf4j-nop:${PluginVersions.sl4f}")
 
     /*
      * Do not depend upon the gradle script kotlin plugin API. IE: gradleScriptKotlinApi()
