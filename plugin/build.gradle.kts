@@ -46,6 +46,8 @@ dependencies {
     compileOnly("com.android.tools.build:gradle:${PluginVersions.androidPlugin}")
     shadowImplementation("net.swiftzer.semver:semver:${PluginVersions.semver}")
     shadowImplementation("org.eclipse.jgit:org.eclipse.jgit:${PluginVersions.jgit}")
+    // Explicitly added for shadow plugin to relocate implementation as well
+    shadowImplementation("org.slf4j:slf4j-nop:${PluginVersions.sl4f}")
 
     /*
      * Do not depend upon the gradle script kotlin plugin API. IE: gradleScriptKotlinApi()
@@ -68,11 +70,6 @@ val shadowJarTask = tasks.named("shadowJar", ShadowJar::class.java)
 val relocateShadowJar = tasks.register("relocateShadowJar", ConfigureShadowRelocation::class.java) {
     prefix = "$pluginGroup.shadow"
     target = shadowJarTask.get()
-}
-
-// Removing gradleApi() added by 'java-gradle-plugin` plugin from resulting shadowed jar
-configurations.named(JavaPlugin.API_CONFIGURATION_NAME) {
-    dependencies.remove(project.dependencies.gradleApi())
 }
 
 shadowJarTask.configure {
