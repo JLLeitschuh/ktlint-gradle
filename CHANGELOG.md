@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
     **Breaking** - removed build variants meta tasks. Minimum supported AGP version is 4.0.0.
   - Updated shadow plugin to 6.1.0 version.
+  - Set default ktlint version to `0.40.0` 
 
 ### Removed
   - ?
