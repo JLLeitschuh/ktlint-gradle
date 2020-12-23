@@ -1,11 +1,13 @@
 package org.jlleitschuh.gradle.ktlint
 
 import org.gradle.api.Action
+import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.tasks.util.PatternFilterable
+import org.gradle.util.GradleVersion
 import org.jlleitschuh.gradle.ktlint.reporter.CustomReporter
 
 internal typealias FilterApplier = (Action<PatternFilterable>) -> Unit
@@ -18,6 +20,8 @@ open class KtlintBasePlugin : Plugin<Project> {
     internal lateinit var extension: KtlintExtension
 
     override fun apply(target: Project) {
+        target.checkMinimalSupportedGradleVersion()
+
         val filterTargetApplier: FilterApplier = {
             target.tasks.withType(BaseKtlintCheckTask::class.java).configureEach(it)
         }
@@ -45,5 +49,17 @@ open class KtlintBasePlugin : Plugin<Project> {
             filterTargetApplier,
             kotlinScriptAdditionalPathApplier
         )
+    }
+
+    private fun Project.checkMinimalSupportedGradleVersion() {
+        if (GradleVersion.version(gradle.gradleVersion) < GradleVersion.version(LOWEST_SUPPORTED_GRADLE_VERSION)) {
+            throw GradleException(
+                "Current version of plugin supports minimal Gradle version: $LOWEST_SUPPORTED_GRADLE_VERSION"
+            )
+        }
+    }
+
+    companion object {
+        const val LOWEST_SUPPORTED_GRADLE_VERSION = "6.0"
     }
 }

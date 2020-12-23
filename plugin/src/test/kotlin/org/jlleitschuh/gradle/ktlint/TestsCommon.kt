@@ -3,8 +3,6 @@ package org.jlleitschuh.gradle.ktlint
 import org.intellij.lang.annotations.Language
 import java.io.File
 
-const val LOWEST_SUPPORTED_GRADLE_VERSION = "6.0"
-
 fun File.buildFile() = resolve("build.gradle")
 
 fun File.ktlintBuildDir() = resolve("build/ktlint")
