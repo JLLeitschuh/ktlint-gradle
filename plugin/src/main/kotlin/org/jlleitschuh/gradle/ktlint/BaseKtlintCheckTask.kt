@@ -156,7 +156,7 @@ abstract class BaseKtlintCheckTask(
     )
 
     @get:Internal
-    lateinit var runner: KtLintRunner
+    internal val runner: KtLintRunner = objectFactory.newInstance(WorkerApiKtLintRunner::class.java)
 
     protected fun runLint(
         filesToCheck: Set<File>

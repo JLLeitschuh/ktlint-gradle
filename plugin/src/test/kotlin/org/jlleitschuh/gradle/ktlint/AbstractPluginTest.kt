@@ -35,7 +35,7 @@ abstract class AbstractPluginTest {
 
     protected
     fun buildAndFail(vararg arguments: String): BuildResult =
-        gradleRunnerFor(arguments = *arguments).forwardOutput().buildAndFail()
+        gradleRunnerFor(arguments = arguments).forwardOutput().buildAndFail()
 
     protected open fun gradleRunnerFor(
         vararg arguments: String,

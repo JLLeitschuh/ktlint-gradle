@@ -1,6 +1,7 @@
 package org.jlleitschuh.gradle.ktlint
 
 import org.gradle.api.Action
+import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -19,18 +20,10 @@ open class KtlintBasePlugin : Plugin<Project> {
     internal lateinit var extension: KtlintExtension
 
     override fun apply(target: Project) {
+        target.checkMinimalSupportedGradleVersion()
+
         val filterTargetApplier: FilterApplier = {
             target.tasks.withType(BaseKtlintCheckTask::class.java).configureEach(it)
-        }
-
-        target.tasks.withType(BaseKtlintCheckTask::class.java).configureEach {
-            val objects = target.objects
-            val gradleVersion = GradleVersion.version(target.gradle.gradleVersion)
-            if (gradleVersion < GradleVersion.version("6.0")) {
-                it.runner = objects.newInstance(JavaExecKtLintRunner::class.java, target)
-            } else {
-                it.runner = objects.newInstance(WorkerApiKtLintRunner::class.java)
-            }
         }
 
         val kotlinScriptAdditionalPathApplier: KotlinScriptAdditionalPathApplier = { additionalFileTree ->
@@ -56,5 +49,17 @@ open class KtlintBasePlugin : Plugin<Project> {
             filterTargetApplier,
             kotlinScriptAdditionalPathApplier
         )
+    }
+
+    private fun Project.checkMinimalSupportedGradleVersion() {
+        if (GradleVersion.version(gradle.gradleVersion) < GradleVersion.version(LOWEST_SUPPORTED_GRADLE_VERSION)) {
+            throw GradleException(
+                "Current version of plugin supports minimal Gradle version: $LOWEST_SUPPORTED_GRADLE_VERSION"
+            )
+        }
+    }
+
+    companion object {
+        const val LOWEST_SUPPORTED_GRADLE_VERSION = "6.0"
     }
 }

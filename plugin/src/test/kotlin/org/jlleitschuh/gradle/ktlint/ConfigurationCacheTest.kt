@@ -1,20 +1,11 @@
 package org.jlleitschuh.gradle.ktlint
 
 import org.assertj.core.api.Assertions.assertThat
-import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.io.File
 
-class FutureGradleConfigurationCacheTest : ConfigurationCacheTest() {
-    override fun gradleRunnerFor(
-        vararg arguments: String,
-        projectRoot: File
-    ): GradleRunner =
-        super.gradleRunnerFor(*arguments, projectRoot = projectRoot)
-            .withGradleVersion("6.6-milestone-3")
-}
+class GradleCurrentConfigurationTest : ConfigurationCacheTest()
 
 abstract class ConfigurationCacheTest : AbstractPluginTest() {
     private val configurationCacheFlag = "--configuration-cache"
@@ -31,8 +22,8 @@ abstract class ConfigurationCacheTest : AbstractPluginTest() {
     private val maxProblemsFlag = "-Dorg.gradle.unsafe.configuration-cache.max-problems=2"
 
     @BeforeEach
-    internal fun setUp() {
-        projectRoot.defaultProjectSetup(kotlinVersion = "1.4-M3")
+    fun setupBuild() {
+        projectRoot.defaultProjectSetup()
     }
 
     @Test
