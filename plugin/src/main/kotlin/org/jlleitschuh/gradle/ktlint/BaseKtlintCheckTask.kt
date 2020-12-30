@@ -27,6 +27,7 @@ import org.gradle.api.tasks.SourceTask
 import org.jlleitschuh.gradle.ktlint.reporter.CustomReporter
 import org.jlleitschuh.gradle.ktlint.reporter.KtlintReport
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+import org.jlleitschuh.gradle.ktlint.worker.WorkerApiKtLintRunner
 import java.io.File
 import java.io.PrintWriter
 import java.util.concurrent.Callable

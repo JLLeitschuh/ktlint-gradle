@@ -1,11 +1,12 @@
-package org.jlleitschuh.gradle.ktlint
+package org.jlleitschuh.gradle.ktlint.worker
 
 import org.gradle.api.file.FileCollection
 import org.gradle.workers.WorkerExecutor
-import org.jlleitschuh.gradle.ktlint.worker.KtLintWorkAction
+import org.jlleitschuh.gradle.ktlint.KtLintRunner
 import java.io.File
 import javax.inject.Inject
 
+@Suppress("UnstableApiUsage")
 abstract class WorkerApiKtLintRunner : KtLintRunner {
     @get:Inject
     abstract val workerExecutor: WorkerExecutor
