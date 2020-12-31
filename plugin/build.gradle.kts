@@ -42,6 +42,7 @@ configurations["testImplementation"].extendsFrom(shadowImplementation)
 
 dependencies {
     compileOnly(gradleApi())
+    compileOnly("com.pinterest.ktlint:ktlint-core:${PluginVersions.ktlint}")
     compileOnly(kotlin("gradle-plugin", PluginVersions.kotlin))
     compileOnly("com.android.tools.build:gradle:${PluginVersions.androidPlugin}")
     shadowImplementation("net.swiftzer.semver:semver:${PluginVersions.semver}")
@@ -59,6 +60,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:${PluginVersions.junit5}")
     testImplementation("org.assertj:assertj-core:${PluginVersions.assertJ}")
     testImplementation(kotlin("reflect"))
+    testImplementation("com.pinterest.ktlint:ktlint-core:${PluginVersions.ktlint}")
 }
 
 tasks.withType<Test>().configureEach {
