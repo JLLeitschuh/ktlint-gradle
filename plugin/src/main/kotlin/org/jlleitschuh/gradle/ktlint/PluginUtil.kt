@@ -4,15 +4,19 @@ import net.swiftzer.semver.SemVer
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.FileCollection
+import org.gradle.api.file.ProjectLayout
+import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.configuration.ConsoleOutput
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.HelpTasksPlugin
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.language.base.plugins.LifecycleBasePlugin
+import java.io.File
 import java.nio.file.Path
 
 internal fun resolveMainClassName(ktlintVersion: String) = when {
@@ -101,6 +105,7 @@ internal const val KOTLIN_SCRIPT_FORMAT_TASK = "ktlintKotlinScriptFormat"
 internal const val INSTALL_GIT_HOOK_CHECK_TASK = "addKtlintCheckGitPreCommitHook"
 internal const val INSTALL_GIT_HOOK_FORMAT_TASK = "addKtlintFormatGitPreCommitHook"
 internal val KOTLIN_EXTENSIONS = listOf("kt", "kts")
+internal val INTERMEDIATE_RESULTS_PATH = "intermediates${File.separator}ktlint${File.separator}"
 
 internal inline fun <reified T> ObjectFactory.property(
     configuration: Property<T>.() -> Unit = {}
@@ -125,3 +130,10 @@ internal fun String.sourceSetCheckTaskName() = "ktlint${capitalize()}SourceSetCh
 internal fun String.sourceSetFormatTaskName() = "ktlint${capitalize()}SourceSetFormat"
 
 internal fun Project.isConsolePlain() = gradle.startParameter.consoleOutput == ConsoleOutput.Plain
+
+/**
+ * Get file path where tasks could put their intermediate results, that could be consumed by other plugin tasks.
+ */
+internal fun ProjectLayout.intermediateResultsBuildDir(
+    resultsFile: String
+): Provider<RegularFile> = buildDirectory.file("$INTERMEDIATE_RESULTS_PATH$resultsFile")
