@@ -13,14 +13,14 @@ import com.android.build.gradle.internal.api.DefaultAndroidSourceDirectorySet
 import org.gradle.api.Plugin
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.TaskProvider
-import org.jlleitschuh.gradle.ktlint.KtlintCheckTask
-import org.jlleitschuh.gradle.ktlint.KtlintFormatTask
 import org.jlleitschuh.gradle.ktlint.KtlintPlugin
 import org.jlleitschuh.gradle.ktlint.addKtlintCheckTaskToProjectMetaCheckTask
 import org.jlleitschuh.gradle.ktlint.addKtlintFormatTaskToProjectMetaFormatTask
 import org.jlleitschuh.gradle.ktlint.createCheckTask
 import org.jlleitschuh.gradle.ktlint.createFormatTask
 import org.jlleitschuh.gradle.ktlint.setCheckTaskDependsOnKtlintCheckTask
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 import java.util.concurrent.Callable
 
 internal fun KtlintPlugin.PluginHolder.applyKtLintToAndroid(): (Plugin<in Any>) -> Unit {
@@ -87,7 +87,7 @@ private fun androidPluginConfigureAction(
 private fun KtlintPlugin.PluginHolder.createAndroidTasks(
     sourceSetName: String,
     sources: FileCollection
-): Pair<TaskProvider<KtlintCheckTask>, TaskProvider<KtlintFormatTask>> {
+): Pair<TaskProvider<KtLintCheckTask>, TaskProvider<KtLintFormatTask>> {
     val checkTask = createCheckTask(
         this,
         sourceSetName,

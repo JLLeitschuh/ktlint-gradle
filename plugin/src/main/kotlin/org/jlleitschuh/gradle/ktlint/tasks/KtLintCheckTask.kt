@@ -1,4 +1,4 @@
-package org.jlleitschuh.gradle.ktlint
+package org.jlleitschuh.gradle.ktlint.tasks
 
 import org.gradle.api.file.FileType
 import org.gradle.api.file.ProjectLayout
@@ -7,16 +7,20 @@ import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.TaskAction
 import org.gradle.work.ChangeType
 import org.gradle.work.InputChanges
-import java.io.PrintWriter
+import org.gradle.workers.WorkerExecutor
 import javax.inject.Inject
 
 @Suppress("UnstableApiUsage")
 @CacheableTask
-open class KtlintCheckTask @Inject constructor(
+abstract class KtLintCheckTask @Inject constructor(
     objectFactory: ObjectFactory,
-    projectLayout: ProjectLayout
-) : BaseKtlintCheckTask(objectFactory, projectLayout) {
-    override fun additionalConfig(): (PrintWriter) -> Unit = {}
+    projectLayout: ProjectLayout,
+    workerExecutor: WorkerExecutor,
+) : BaseKtLintCheckTask(
+    objectFactory,
+    projectLayout,
+    workerExecutor,
+) {
 
     @TaskAction
     fun lint(inputChanges: InputChanges) {
@@ -38,7 +42,19 @@ open class KtlintCheckTask @Inject constructor(
         } else {
             logger.debug("Files changed: $filesToLint")
 
-            runLint(filesToLint)
+            runLint(filesToLint, false)
         }
+    }
+
+    companion object {
+        fun buildTaskNameForSourceSet(
+            sourceSetName: String
+        ): String = "runKtLintCheckOver${sourceSetName.capitalize()}SourceSet"
+
+        const val KOTLIN_SCRIPT_TASK_NAME = "runKtLintCheckOverKotlinScripts"
+
+        fun buildDescription(
+            fileType: String
+        ): String = "Lints all $fileType files to ensure that they are formatted according to codestyle."
     }
 }

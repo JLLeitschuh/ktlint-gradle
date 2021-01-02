@@ -4,15 +4,20 @@ import org.gradle.api.Project
 import org.gradle.api.file.FileTree
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.language.base.plugins.LifecycleBasePlugin
+import org.jlleitschuh.gradle.ktlint.tasks.BaseKtLintCheckTask
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
+import org.jlleitschuh.gradle.ktlint.tasks.LoadReportersTask
+import org.jlleitschuh.gradle.ktlint.tasks.LoadRuleSetsTask
 
 internal fun KtlintPlugin.PluginHolder.addKtlintCheckTaskToProjectMetaCheckTask(
-    checkTask: TaskProvider<KtlintCheckTask>
+    checkTask: TaskProvider<KtLintCheckTask>
 ) {
     metaKtlintCheckTask.configure { it.dependsOn(checkTask) }
 }
 
 internal fun KtlintPlugin.PluginHolder.addKtlintFormatTaskToProjectMetaFormatTask(
-    formatTask: TaskProvider<KtlintFormatTask>
+    formatTask: TaskProvider<KtLintFormatTask>
 ) {
     metaKtlintFormatTask.configure { it.dependsOn(formatTask) }
 }
@@ -21,57 +26,59 @@ internal fun createFormatTask(
     pluginHolder: KtlintPlugin.PluginHolder,
     sourceSetName: String,
     kotlinSourceDirectories: Iterable<*>
-): TaskProvider<KtlintFormatTask> {
-    return pluginHolder.target.registerTask(sourceSetName.sourceSetFormatTaskName()) {
-        description = "Runs a check against all .kt files to ensure that they are formatted according to ktlint."
-        configurePluginTask(pluginHolder) {
+): TaskProvider<KtLintFormatTask> = pluginHolder
+    .target
+    .registerTask(
+        KtLintFormatTask.buildTaskNameForSourceSet(sourceSetName)
+    ) {
+        description = KtLintFormatTask.buildDescription(".kt")
+        configureBaseCheckTask(pluginHolder) {
             setSource(kotlinSourceDirectories)
         }
     }
-}
 
 internal fun createCheckTask(
     pluginHolder: KtlintPlugin.PluginHolder,
     sourceSetName: String,
     kotlinSourceDirectories: Iterable<*>
-): TaskProvider<KtlintCheckTask> {
-    return pluginHolder.target.registerTask(sourceSetName.sourceSetCheckTaskName()) {
-        description = "Runs a check against all .kt files to ensure that they are formatted according to ktlint."
-        configurePluginTask(pluginHolder) {
+): TaskProvider<KtLintCheckTask> = pluginHolder
+    .target
+    .registerTask(
+        KtLintCheckTask.buildTaskNameForSourceSet(sourceSetName)
+    ) {
+        description = KtLintCheckTask.buildDescription(".kt")
+        configureBaseCheckTask(pluginHolder) {
             setSource(kotlinSourceDirectories)
         }
     }
-}
 
 internal fun createKotlinScriptCheckTask(
     pluginHolder: KtlintPlugin.PluginHolder,
     projectScriptFiles: FileTree
-): TaskProvider<KtlintCheckTask> {
-    return pluginHolder.target.registerTask(KOTLIN_SCRIPT_CHECK_TASK) {
-        description = "Runs a check against all .kts files in project directory " +
-            "to ensure that they are formatted according to ktlint."
-        configurePluginTask(pluginHolder) {
+): TaskProvider<KtLintCheckTask> = pluginHolder
+    .target
+    .registerTask(KtLintCheckTask.KOTLIN_SCRIPT_TASK_NAME) {
+        description = KtLintCheckTask.buildDescription(".kts")
+        configureBaseCheckTask(pluginHolder) {
             source = projectScriptFiles
         }
     }
-}
 
 internal fun createKotlinScriptFormatTask(
     pluginHolder: KtlintPlugin.PluginHolder,
     projectScriptFiles: FileTree
-): TaskProvider<KtlintFormatTask> {
-    return pluginHolder.target.registerTask(KOTLIN_SCRIPT_FORMAT_TASK) {
-        description = "Format all .kts files in project directory " +
-            "to ensure that they are formatted according to ktlint."
-        configurePluginTask(pluginHolder) {
+): TaskProvider<KtLintFormatTask> = pluginHolder
+    .target
+    .registerTask(KtLintFormatTask.KOTLIN_SCRIPT_TASK_NAME) {
+        description = KtLintFormatTask.buildDescription(".kts")
+        configureBaseCheckTask(pluginHolder) {
             source = projectScriptFiles
         }
     }
-}
 
 internal fun setCheckTaskDependsOnKtlintCheckTask(
     project: Project,
-    ktlintCheck: TaskProvider<KtlintCheckTask>
+    ktlintCheck: TaskProvider<KtLintCheckTask>
 ) {
     project.plugins.withType(LifecycleBasePlugin::class.java) {
         project.tasks.named(LifecycleBasePlugin.CHECK_TASK_NAME).configure { task ->
@@ -80,35 +87,47 @@ internal fun setCheckTaskDependsOnKtlintCheckTask(
     }
 }
 
-private fun BaseKtlintCheckTask.configurePluginTask(
-    pluginHolder: KtlintPlugin.PluginHolder,
-    additionalTaskConfig: BaseKtlintCheckTask.() -> Unit
+internal fun createLoadRuleSetsTask(
+    pluginHolder: KtlintPlugin.PluginHolder
+): TaskProvider<LoadRuleSetsTask> = pluginHolder.target.registerTask(
+    LoadRuleSetsTask.LOAD_RULE_SETS_TASK
 ) {
-    classpath.setFrom(pluginHolder.ktlintConfiguration)
+    description = LoadRuleSetsTask.DESCRIPTION
+
+    ktLintClasspath.setFrom(pluginHolder.ktlintConfiguration)
+    ruleSetsClasspath.setFrom(pluginHolder.ktlintReporterConfiguration)
+    disabledRules.set(pluginHolder.extension.disabledRules)
+    enableExperimentalRules.set(pluginHolder.extension.enableExperimentalRules)
+    ktLintVersion.set(pluginHolder.extension.version)
+}
+
+internal fun createLoadReportersTask(
+    pluginHolder: KtlintPlugin.PluginHolder
+): TaskProvider<LoadReportersTask> = pluginHolder.target.registerTask(
+    LoadReportersTask.TASK_NAME
+) {
+    description = LoadReportersTask.DESCRIPTION
+
+    ktLintClasspath.setFrom(pluginHolder.ktlintConfiguration)
+    reportersClasspath.setFrom(pluginHolder.ktlintReporterConfiguration)
+    debug.set(pluginHolder.extension.debug)
+    ktLintVersion.set(pluginHolder.extension.version)
+    enabledReporters.set(pluginHolder.extension.reporterExtension.reporters)
+}
+
+private fun BaseKtLintCheckTask.configureBaseCheckTask(
+    pluginHolder: KtlintPlugin.PluginHolder,
+    additionalTaskConfig: BaseKtLintCheckTask.() -> Unit
+) {
+    ktLintClasspath.setFrom(pluginHolder.ktlintConfiguration)
     ktlintVersion.set(pluginHolder.extension.version)
-    verbose.set(pluginHolder.extension.verbose)
     additionalEditorconfigFile.set(pluginHolder.extension.additionalEditorconfigFile)
     debug.set(pluginHolder.extension.debug)
-    ignoreFailures.set(pluginHolder.extension.ignoreFailures)
-    outputToConsole.set(pluginHolder.extension.outputToConsole)
-    coloredOutput.set(
-        pluginHolder.extension.coloredOutput.map {
-            if (pluginHolder.target.isConsolePlain()) {
-                pluginHolder.target.logger.info("Console type is plain: disabling colored output")
-                false
-            } else {
-                it
-            }
-        }
-    )
-    outputColorName.set(pluginHolder.extension.outputColorName)
     ruleSetsClasspath.setFrom(pluginHolder.ktlintRulesetConfiguration)
-    reporters.set(pluginHolder.extension.reporterExtension.reporters)
-    customReportersClasspath.setFrom(pluginHolder.ktlintReporterConfiguration)
-    customReporters.set(pluginHolder.extension.reporterExtension.customReporters)
     android.set(pluginHolder.extension.android)
-    enableExperimentalRules.set(pluginHolder.extension.enableExperimentalRules)
     disabledRules.set(pluginHolder.extension.disabledRules)
+    loadedRuleSets.set(pluginHolder.loadRuleSetsTask.get().loadedRuleSets)
+    loadedReporters.set(pluginHolder.loadReportersTask.get().loadedReporters)
 
     additionalTaskConfig()
 }
