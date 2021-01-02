@@ -1,6 +1,8 @@
 package org.jlleitschuh.gradle.ktlint.tasks
 
+import net.swiftzer.semver.SemVer
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
@@ -32,6 +34,9 @@ internal abstract class LoadRuleSetsTask @Inject constructor(
     internal abstract val ruleSetsClasspath: ConfigurableFileCollection
 
     @get:Input
+    internal abstract val ktLintVersion: Property<String>
+
+    @get:Input
     internal abstract val enableExperimentalRules: Property<Boolean>
 
     @get:Input
@@ -44,6 +49,9 @@ internal abstract class LoadRuleSetsTask @Inject constructor(
 
     @TaskAction
     fun loadRuleSets() {
+        checkExperimentalRulesSupportedKtLintVersion()
+        checkDisabledRulesSupportedKtLintVersion()
+
         val queue = workerExecutor.classLoaderIsolation { workerExecutor ->
             workerExecutor.classpath.from(ktLintClasspath, ruleSetsClasspath)
         }
@@ -52,6 +60,22 @@ internal abstract class LoadRuleSetsTask @Inject constructor(
             params.disabledRules.set(disabledRules)
             params.enableExperimentalRules.set(enableExperimentalRules)
             params.serializeResultIntoFile.set(loadedRuleSets)
+        }
+    }
+
+    private fun checkExperimentalRulesSupportedKtLintVersion() {
+        if (enableExperimentalRules.get() &&
+            SemVer.parse(ktLintVersion.get()) < SemVer(0, 31, 0)
+        ) {
+            throw GradleException("Experimental rules are supported since 0.31.0 ktlint version.")
+        }
+    }
+
+    private fun checkDisabledRulesSupportedKtLintVersion() {
+        if (disabledRules.get().isNotEmpty() &&
+            SemVer.parse(ktLintVersion.get()) < SemVer(0, 34, 2)
+        ) {
+            throw GradleException("Rules disabling is supported since 0.34.2 ktlint version.")
         }
     }
 
