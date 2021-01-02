@@ -14,6 +14,7 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.workers.WorkerExecutor
 import org.jlleitschuh.gradle.ktlint.intermediateResultsBuildDir
+import org.jlleitschuh.gradle.ktlint.reporter.CustomReporter
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import org.jlleitschuh.gradle.ktlint.worker.LoadReportersWorkAction
 import javax.inject.Inject
@@ -40,6 +41,9 @@ internal abstract class LoadReportersTask @Inject constructor(
     @get:Input
     internal abstract val enabledReporters: SetProperty<ReporterType>
 
+    @get:Input
+    internal abstract val customReporters: SetProperty<CustomReporter>
+
     @get:OutputFile
     internal val loadedReporters: RegularFileProperty = objectFactory.fileProperty().convention(
         projectLayout.intermediateResultsBuildDir("reporters.bin")
@@ -59,6 +63,7 @@ internal abstract class LoadReportersTask @Inject constructor(
                         reporters.filter { it.isAvailable() }
                     }
             )
+            param.customReporters.set(customReporters)
             param.loadedReporters.set(loadedReporters)
         }
     }

@@ -113,6 +113,7 @@ internal fun createLoadReportersTask(
     debug.set(pluginHolder.extension.debug)
     ktLintVersion.set(pluginHolder.extension.version)
     enabledReporters.set(pluginHolder.extension.reporterExtension.reporters)
+    customReporters.set(pluginHolder.extension.reporterExtension.customReporters)
 }
 
 private fun BaseKtLintCheckTask.configureBaseCheckTask(

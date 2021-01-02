@@ -122,7 +122,7 @@ open class KtlintPlugin : Plugin<Project> {
         val ktlintConfiguration by lazy(LazyThreadSafetyMode.NONE) { createKtlintConfiguration(target, extension) }
         val ktlintRulesetConfiguration = createKtlintRulesetConfiguration(target)
         val ktlintReporterConfiguration by lazy(LazyThreadSafetyMode.NONE) {
-            createKtlintReporterConfiguration(target, extension)
+            createKtLintReporterConfiguration(target, extension)
         }
         val loadRuleSetsTask = createLoadRuleSetsTask(this)
         val loadReportersTask = createLoadReportersTask(this)

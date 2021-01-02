@@ -42,11 +42,13 @@ internal fun createKtlintRulesetConfiguration(target: Project) =
         description = KTLINT_RULESET_CONFIGURATION_DESCRIPTION
     }
 
-internal fun createKtlintReporterConfiguration(
+internal fun createKtLintReporterConfiguration(
     target: Project,
     extension: KtlintExtension
-) =
-    target.configurations.maybeCreate(KTLINT_REPORTER_CONFIGURATION_NAME).apply {
+) = target
+    .configurations
+    .maybeCreate(KTLINT_REPORTER_CONFIGURATION_NAME)
+    .apply {
         description = KTLINT_REPORTER_CONFIGURATION_DESCRIPTION
 
         withDependencies {
@@ -54,7 +56,15 @@ internal fun createKtlintReporterConfiguration(
                 .reporterExtension
                 .customReporters
                 .all {
-                    dependencies.addLater(target.provider { it.dependencyArtifact })
+                    dependencies.addLater(
+                        target.provider {
+                            val reporterDependency = it.dependency
+                            requireNotNull(reporterDependency) {
+                                "Reporter ${it.reporterId} dependency is not set!"
+                            }
+                            target.dependencies.create(reporterDependency)
+                        }
+                    )
                 }
         }
     }

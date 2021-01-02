@@ -48,7 +48,7 @@ open class KtlintBasePlugin : Plugin<Project> {
             "ktlint",
             KtlintExtension::class.java,
             target.objects,
-            target.container(CustomReporter::class.java) { name -> CustomReporter(name, target.dependencies) },
+            target.container(CustomReporter::class.java) { CustomReporter(it) },
             filterTargetApplier,
             kotlinScriptAdditionalPathApplier
         )
