@@ -32,9 +32,10 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
         val debug = parameters.debug.get()
         val formatSource = parameters.formatSource.getOrElse(false)
 
-        val errors = mutableMapOf<SerializableLintError, Boolean>()
+        val result = mutableListOf<LintErrorResult>()
 
         parameters.filesToLint.files.forEach {
+            val errors = mutableListOf<Pair<SerializableLintError, Boolean>>()
             val ktlintParameters = KtLint.Params(
                 fileName = it.absolutePath,
                 text = it.readText(),
@@ -44,7 +45,7 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
                 editorConfigPath = additionalEditorConfig,
                 script = !it.name.endsWith(".kt", ignoreCase = true),
                 cb = { lintError, isCorrected ->
-                    errors[SerializableLintError(lintError)] = isCorrected
+                    errors.add(SerializableLintError(lintError) to isCorrected)
                 }
             )
 
@@ -53,6 +54,12 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
             } else {
                 KtLint.lint(ktlintParameters)
             }
+            result.add(
+                LintErrorResult(
+                    lintedFile = it,
+                    lintErrors = errors
+                )
+            )
         }
 
         ObjectOutputStream(
@@ -60,7 +67,7 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
                 parameters.discoveredErrorsFile.asFile.get()
             )
         ).use {
-            it.writeObject(errors)
+            it.writeObject(result)
         }
     }
 
