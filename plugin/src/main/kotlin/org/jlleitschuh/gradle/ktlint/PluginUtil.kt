@@ -7,6 +7,7 @@ import org.gradle.api.file.FileCollection
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.logging.Logger
 import org.gradle.api.logging.configuration.ConsoleOutput
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.HelpTasksPlugin
@@ -137,3 +138,17 @@ internal fun Project.isConsolePlain() = gradle.startParameter.consoleOutput == C
 internal fun ProjectLayout.intermediateResultsBuildDir(
     resultsFile: String
 ): Provider<RegularFile> = buildDirectory.file("$INTERMEDIATE_RESULTS_PATH$resultsFile")
+
+/**
+ * Logs into Gradle console KtLint debug message.
+ */
+internal fun Logger.logKtLintDebugMessage(
+    debugIsEnabled: Boolean,
+    logProducer: () -> List<String>
+) {
+    if (debugIsEnabled) {
+        logProducer().forEach {
+            warn("[KtLint DEBUG] $it")
+        }
+    }
+}
