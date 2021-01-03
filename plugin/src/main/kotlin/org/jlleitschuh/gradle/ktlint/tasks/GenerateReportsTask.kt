@@ -3,6 +3,7 @@ package org.jlleitschuh.gradle.ktlint.tasks
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.FileCollection
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
@@ -11,7 +12,12 @@ import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
+import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.TaskAction
 import org.gradle.workers.WorkerExecutor
 import org.jetbrains.kotlin.konan.file.File
@@ -21,6 +27,7 @@ import org.jlleitschuh.gradle.ktlint.worker.GenerateReportsWorkAction
 import org.jlleitschuh.gradle.ktlint.worker.LoadReportersWorkAction
 import java.io.FileInputStream
 import java.io.ObjectInputStream
+import java.util.concurrent.Callable
 import javax.inject.Inject
 
 /**
@@ -45,8 +52,26 @@ abstract class GenerateReportsTask @Inject constructor(
     @get:InputFile
     internal abstract val loadedReporters: RegularFileProperty
 
-    @get:InputFile
+    @get:Internal
     internal abstract val discoveredErrors: RegularFileProperty
+
+    /**
+     * Workaround for https://github.com/gradle/gradle/issues/2919
+     */
+    @Suppress("UnstableApiUsage", "Unused")
+    @get:SkipWhenEmpty
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    @get:InputFiles
+    internal val discoveredErrorsWorkaround: FileCollection = projectLayout.files(
+        Callable {
+            val discoveredErrorsFile = discoveredErrors.asFile.orNull
+            if (discoveredErrorsFile?.exists() == true) {
+                discoveredErrorsFile
+            } else {
+                null
+            }
+        }
+    )
 
     @get:Input
     internal abstract val reportsName: Property<String>
@@ -127,5 +152,28 @@ abstract class GenerateReportsTask @Inject constructor(
         }
         options.putAll(loadedReporter.reporterOptions)
         return options.toMap()
+    }
+
+    internal enum class LintType(
+        val suffix: String
+    ) {
+        CHECK("Check"), FORMAT("Format")
+    }
+
+    companion object {
+        internal fun generateNameForSourceSets(
+            sourceSetName: String,
+            lintType: LintType
+        ): String {
+            return "ktLint${sourceSetName.capitalize()}SourceSet${lintType.suffix}"
+        }
+
+        internal fun generateNameForKotlinScripts(
+            lintType: LintType
+        ): String {
+            return "ktLintKotlinScript${lintType.suffix}"
+        }
+
+        const val DESCRIPTION = "Generates reports and prints errors into Gradle console."
     }
 }
