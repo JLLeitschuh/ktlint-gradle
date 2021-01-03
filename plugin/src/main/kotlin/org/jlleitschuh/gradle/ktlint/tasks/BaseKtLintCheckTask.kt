@@ -92,9 +92,11 @@ abstract class BaseKtLintCheckTask @Inject constructor(
         }
     )
 
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:InputFile
     internal abstract val loadedRuleSets: RegularFileProperty
 
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:InputFile
     internal abstract val loadedReporters: RegularFileProperty
 

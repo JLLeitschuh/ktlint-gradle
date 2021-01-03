@@ -46,9 +46,11 @@ abstract class GenerateReportsTask @Inject constructor(
     @get:Classpath
     internal abstract val reportersClasspath: ConfigurableFileCollection
 
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:InputFile
     internal abstract val loadedReporterProviders: RegularFileProperty
 
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:InputFile
     internal abstract val loadedReporters: RegularFileProperty
 
