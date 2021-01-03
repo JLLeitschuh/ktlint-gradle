@@ -50,7 +50,12 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
             )
 
             if (formatSource) {
-                KtLint.format(ktlintParameters)
+                val currentFileContent = it.readText()
+                val updatedFileContent = KtLint.format(ktlintParameters)
+
+                if (updatedFileContent != currentFileContent) {
+                    it.writeText(updatedFileContent)
+                }
             } else {
                 KtLint.lint(ktlintParameters)
             }
