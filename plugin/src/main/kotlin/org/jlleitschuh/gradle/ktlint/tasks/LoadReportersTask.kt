@@ -49,6 +49,11 @@ internal abstract class LoadReportersTask @Inject constructor(
         projectLayout.intermediateResultsBuildDir("reporters.bin")
     )
 
+    @get:OutputFile
+    internal val loadedReporterProviders: RegularFileProperty = objectFactory.fileProperty().convention(
+        projectLayout.intermediateResultsBuildDir("reporterProviders.bin")
+    )
+
     @TaskAction
     fun loadReporters() {
         val queue = workerExecutor.classLoaderIsolation { spec ->
@@ -65,6 +70,7 @@ internal abstract class LoadReportersTask @Inject constructor(
             )
             param.customReporters.set(customReporters)
             param.loadedReporters.set(loadedReporters)
+            param.loadedReporterProviders.set(loadedReporterProviders)
         }
     }
 

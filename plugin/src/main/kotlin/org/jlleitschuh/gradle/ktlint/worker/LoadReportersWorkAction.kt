@@ -1,6 +1,7 @@
 package org.jlleitschuh.gradle.ktlint.worker
 
 import com.pinterest.ktlint.core.ReporterProvider
+import org.gradle.api.GradleException
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.Logging
 import org.gradle.api.provider.Property
@@ -12,6 +13,7 @@ import org.jlleitschuh.gradle.ktlint.reporter.CustomReporter
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import java.io.FileOutputStream
 import java.io.ObjectOutputStream
+import java.io.Serializable
 import java.util.ServiceLoader
 
 @Suppress("UnstableApiUsage")
@@ -20,32 +22,27 @@ internal abstract class LoadReportersWorkAction : WorkAction<LoadReportersWorkAc
     private val logger = Logging.getLogger("ktlint-load-reporters-worker")
 
     override fun execute() {
-        val allReporters = loadAllReporterProviders()
-        val enabledReporters = getEnabledReporters()
-        val disabledReporters = ReporterType.values().subtract(enabledReporters)
-        val customReporters = parameters.customReporters.get()
+        val allProviders = loadAllReporterProviders()
+        val loadedReporters = filterEnabledBuiltInProviders(allProviders) + filterCustomProviders(allProviders)
 
-        val loadedReporters = allReporters
-            .filterNot { reporterProvider ->
-                disabledReporters.any {
-                    reporterProvider.id == it.reporterName
-                }
-            }
-            .associateWith { reporterProvider ->
-                val fileExtension = enabledReporters.find { it.reporterName == reporterProvider.id }?.fileExtension
-                    ?: customReporters.find { it.reporterId == reporterProvider.id }?.fileExtension
-                requireNotNull(fileExtension) { "Unknown ReporterProvider: \"${reporterProvider.id}\"!" }
-
-                fileExtension
-            }
-            .mapKeys { SerializableReporterProvider(it.key) }
+        ObjectOutputStream(
+            FileOutputStream(
+                parameters.loadedReporterProviders.asFile.get()
+            )
+        ).use { oos ->
+            oos.writeObject(
+                loadedReporters.map { SerializableReporterProvider(it.second) }
+            )
+        }
 
         ObjectOutputStream(
             FileOutputStream(
                 parameters.loadedReporters.asFile.get()
             )
-        ).use {
-            it.writeObject(loadedReporters)
+        ).use { oos ->
+            oos.writeObject(
+                loadedReporters.map { it.first }
+            )
         }
     }
 
@@ -67,10 +64,64 @@ internal abstract class LoadReportersWorkAction : WorkAction<LoadReportersWorkAc
             }
         }
 
+    private fun filterEnabledBuiltInProviders(
+        allProviders: List<ReporterProvider>
+    ): List<Pair<LoadedReporter, ReporterProvider>> {
+        val enabledReporters = getEnabledReporters()
+
+        val enabledProviders = allProviders
+            .filter { reporterProvider ->
+                enabledReporters.any {
+                    reporterProvider.id == it.reporterName
+                }
+            }
+        return enabledReporters
+            .map { reporterType ->
+                val provider = enabledProviders.find { reporterType.reporterName == it.id }
+                    ?: throw GradleException("KtLint plugin failed to load reporters. Please open a new issue.")
+
+                val options = if (reporterType == ReporterType.PLAIN_GROUP_BY_FILE) {
+                    reporterType.options.associateWith { "true" }
+                } else {
+                    emptyMap()
+                }
+
+                LoadedReporter(provider.id, reporterType.fileExtension, options) to provider
+            }
+    }
+
+    private fun filterCustomProviders(
+        allProviders: List<ReporterProvider>
+    ): List<Pair<LoadedReporter, ReporterProvider>> {
+        val customReporters = parameters.customReporters.get()
+        val customProviders = allProviders
+            .filter { reporterProvider ->
+                customReporters.any { reporterProvider.id == it.reporterId }
+            }
+
+        return customReporters
+            .map { customReporter ->
+                val provider = customProviders.find { customReporter.reporterId == it.id }
+                    ?: throw GradleException("KtLint plugin failed to load custom reporters. Please open a new issue.")
+                LoadedReporter(customReporter.reporterId, customReporter.fileExtension, emptyMap()) to provider
+            }
+    }
+
     internal interface LoadReportersParameters : WorkParameters {
         val enabledReporters: SetProperty<ReporterType>
         val customReporters: SetProperty<CustomReporter>
         val debug: Property<Boolean>
+        val loadedReporterProviders: RegularFileProperty
         val loadedReporters: RegularFileProperty
+    }
+
+    internal data class LoadedReporter(
+        val reporterId: String,
+        val fileExtension: String,
+        val reporterOptions: Map<String, String>
+    ) : Serializable {
+        companion object {
+            private const val serialVersionUID: Long = 201201233L
+        }
     }
 }
