@@ -33,7 +33,7 @@ abstract class DisabledRulesTest : AbstractPluginTest() {
     }
 
     @Test
-    internal fun `Should lint without errors when "final-newline" is disabled`() {
+    internal fun `Should lint without errors when 'final-newline' is disabled`() {
         projectRoot.buildFile().appendText(
             """
 
@@ -48,13 +48,13 @@ abstract class DisabledRulesTest : AbstractPluginTest() {
             """.trimIndent()
         )
 
-        build(":ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
     @Test
-    internal fun `Should lint without errors when "final-newline" and "no-consecutive-blank-lines" are disabled`() {
+    internal fun `Should lint without errors when 'final-newline' and 'no-consecutive-blank-lines' are disabled`() {
         projectRoot.buildFile().appendText(
             """
 
@@ -75,13 +75,13 @@ abstract class DisabledRulesTest : AbstractPluginTest() {
             """.trimIndent()
         )
 
-        build(":ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
     @Test
-    internal fun `Should fail if ktlint version is lower then 0_34_2 and disabled rules configuration is set`() {
+    internal fun `Should fail if ktLint version is lower then 0_34_2 and disabled rules configuration is set`() {
         projectRoot.buildFile().appendText(
             """
 
@@ -92,8 +92,8 @@ abstract class DisabledRulesTest : AbstractPluginTest() {
 
         projectRoot.withCleanSources()
 
-        buildAndFail(":ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.FAILED)
+        buildAndFail(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
             assertThat(output).contains("Rules disabling is supported since 0.34.2 ktlint version.")
         }
     }

@@ -49,12 +49,12 @@ abstract class KtLintCheckTask @Inject constructor(
     companion object {
         fun buildTaskNameForSourceSet(
             sourceSetName: String
-        ): String = "runKtLintCheckOver${sourceSetName.capitalize()}SourceSet"
+        ): String = "runKtlintCheckOver${sourceSetName.capitalize()}SourceSet"
 
-        const val KOTLIN_SCRIPT_TASK_NAME = "runKtLintCheckOverKotlinScripts"
+        const val KOTLIN_SCRIPT_TASK_NAME = "runKtlintCheckOverKotlinScripts"
 
         fun buildDescription(
             fileType: String
-        ): String = "Lints all $fileType files to ensure that they are formatted according to codestyle."
+        ): String = "Lints all $fileType files to ensure that they are formatted according to the code style."
     }
 }

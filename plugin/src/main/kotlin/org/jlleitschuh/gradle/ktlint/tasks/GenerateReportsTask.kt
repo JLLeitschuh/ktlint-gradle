@@ -166,15 +166,11 @@ abstract class GenerateReportsTask @Inject constructor(
         internal fun generateNameForSourceSets(
             sourceSetName: String,
             lintType: LintType
-        ): String {
-            return "ktLint${sourceSetName.capitalize()}SourceSet${lintType.suffix}"
-        }
+        ): String = "ktLint${sourceSetName.capitalize()}SourceSet${lintType.suffix}"
 
         internal fun generateNameForKotlinScripts(
             lintType: LintType
-        ): String {
-            return "ktLintKotlinScript${lintType.suffix}"
-        }
+        ): String = "ktlintKotlinScript${lintType.suffix}"
 
         const val DESCRIPTION = "Generates reports and prints errors into Gradle console."
     }

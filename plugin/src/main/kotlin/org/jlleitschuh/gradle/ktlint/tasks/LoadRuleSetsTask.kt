@@ -80,7 +80,7 @@ internal abstract class LoadRuleSetsTask @Inject constructor(
     }
 
     companion object {
-        internal const val LOAD_RULE_SETS_TASK = "loadKtLintRuleSets"
-        internal const val DESCRIPTION = "Preloads required KtLint RuleSets."
+        internal const val LOAD_RULE_SETS_TASK = "loadKtlintRuleSets"
+        internal const val DESCRIPTION = "Preloads required Ktlint RuleSets."
     }
 }

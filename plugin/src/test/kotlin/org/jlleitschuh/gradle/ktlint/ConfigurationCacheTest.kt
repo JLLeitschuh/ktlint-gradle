@@ -35,27 +35,49 @@ abstract class ConfigurationCacheTest : AbstractPluginTest() {
             
             """.trimIndent()
         )
-        build(configurationCacheFlag, configurationCacheWarnFlag, maxProblemsFlag, ":ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        build(
+            configurationCacheFlag,
+            configurationCacheWarnFlag,
+            maxProblemsFlag,
+            CHECK_PARENT_TASK_NAME
+        ).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
-        build(configurationCacheFlag, configurationCacheWarnFlag, maxProblemsFlag, ":ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+
+        build(
+            configurationCacheFlag,
+            configurationCacheWarnFlag,
+            maxProblemsFlag,
+            CHECK_PARENT_TASK_NAME
+        ).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
             assertThat(output).contains("Reusing configuration cache.")
         }
     }
     @Test
-    internal fun `Should support configuration cache without errors when reformating`() {
+    internal fun `Should support configuration cache without errors when reformatting`() {
         projectRoot.createSourceFile(
             "src/main/kotlin/clean-source.kt",
             """
             val foo = "bar"
             """.trimIndent()
         )
-        build(configurationCacheFlag, configurationCacheWarnFlag, maxProblemsFlag, ":ktlintFormat").apply {
-            assertThat(task(":ktlintMainSourceSetFormat")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        build(
+            configurationCacheFlag,
+            configurationCacheWarnFlag,
+            maxProblemsFlag,
+            CHECK_PARENT_TASK_NAME
+        ).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
-        build(configurationCacheFlag, configurationCacheWarnFlag, maxProblemsFlag, ":ktlintFormat").apply {
-            assertThat(task(":ktlintMainSourceSetFormat")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+
+        build(
+            configurationCacheFlag,
+            configurationCacheWarnFlag,
+            maxProblemsFlag,
+            CHECK_PARENT_TASK_NAME
+        ).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertThat(output).contains("Reusing configuration cache.")
         }
     }

@@ -41,11 +41,11 @@ abstract class EditorConfigTests : AbstractPluginTest() {
         projectRoot.withCleanSources()
         projectRoot.createEditorconfigFile()
 
-        build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
-        build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
         }
     }
 
@@ -55,11 +55,11 @@ abstract class EditorConfigTests : AbstractPluginTest() {
         projectRoot.withCleanSources()
         projectRoot.createEditorconfigFile(filePath = additionalConfigPath)
 
-        build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
-        build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
         }
     }
 
@@ -68,13 +68,13 @@ abstract class EditorConfigTests : AbstractPluginTest() {
         projectRoot.withCleanSources()
         projectRoot.createEditorconfigFile()
 
-        build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
 
         projectRoot.modifyEditorconfigFile(100)
-        build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -84,16 +84,16 @@ abstract class EditorConfigTests : AbstractPluginTest() {
         projectRoot.withCleanSources()
         projectRoot.createEditorconfigFile(filePath = additionalConfigPath)
 
-        build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
 
         projectRoot.modifyEditorconfigFile(
             maxLineLength = 100,
             filePath = additionalConfigPath
         )
-        build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -138,19 +138,19 @@ abstract class EditorConfigTests : AbstractPluginTest() {
             .withPluginClasspath()
 
         gradleRunner
-            .withArguments(":test:module1:ktlintCheck")
+            .withArguments(":test:module1:$CHECK_PARENT_TASK_NAME")
             .forwardOutput()
             .build().apply {
-                assertThat(task(":test:module1:ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(task(":test:module1:$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             }
 
         projectWithModulesLocation.modifyEditorconfigFile(100)
 
         gradleRunner
-            .withArguments(":test:module1:ktlintCheck")
+            .withArguments(":test:module1:$CHECK_PARENT_TASK_NAME")
             .forwardOutput()
             .build().apply {
-                assertThat(task(":test:module1:ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(task(":test:module1:$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             }
     }
 

@@ -34,16 +34,16 @@ class KtlintPluginVersionTest : AbstractPluginTest() {
     @Test
     fun `with ktlint version equal to 0_22`() {
         projectRoot.buildScriptUsingKtlintVersion("0.22.0")
-        build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetFormatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
     @Test
     fun `with ktlint version less than 0_22`() {
         projectRoot.buildScriptUsingKtlintVersion("0.21.0")
-        buildAndFail("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.FAILED)
+        buildAndFail(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetFormatTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
         }
     }
 }

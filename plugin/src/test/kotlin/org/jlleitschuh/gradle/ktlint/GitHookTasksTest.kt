@@ -41,7 +41,7 @@ class GitHookTasksTest : AbstractPluginTest() {
         build(":$INSTALL_GIT_HOOK_CHECK_TASK").run {
             assertThat(task(":$INSTALL_GIT_HOOK_CHECK_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertThat(gitDir.preCommitGitHook()).exists()
-            assertThat(gitDir.preCommitGitHook().canExecute()).isTrue()
+            assertThat(gitDir.preCommitGitHook().canExecute()).isTrue
             assertThat(gitDir.preCommitGitHook().readText()).contains(CHECK_PARENT_TASK_NAME)
         }
     }

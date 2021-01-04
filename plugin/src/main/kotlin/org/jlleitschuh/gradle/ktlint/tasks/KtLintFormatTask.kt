@@ -40,13 +40,13 @@ abstract class KtLintFormatTask @Inject constructor(
     companion object {
         fun buildTaskNameForSourceSet(
             sourceSetName: String
-        ): String = "runKtLintFormatOver${sourceSetName.capitalize()}SourceSet"
+        ): String = "runKtlintFormatOver${sourceSetName.capitalize()}SourceSet"
 
-        const val KOTLIN_SCRIPT_TASK_NAME = "runKtLintFormatOverKotlinScripts"
+        const val KOTLIN_SCRIPT_TASK_NAME = "runKtlintFormatOverKotlinScripts"
 
         fun buildDescription(
             fileType: String
-        ): String = "Lints all $fileType files to ensure that they are formatted according to codestyle " +
-            " and, on error, tries to format code to conform codestyle."
+        ): String = "Lints all $fileType files to ensure that they are formatted according to the code style " +
+            " and, on error, tries to format code to conform code style."
     }
 }

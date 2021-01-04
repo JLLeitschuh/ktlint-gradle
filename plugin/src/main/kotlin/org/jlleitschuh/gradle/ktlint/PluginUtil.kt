@@ -11,7 +11,6 @@ import org.gradle.api.logging.Logger
 import org.gradle.api.logging.configuration.ConsoleOutput
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.HelpTasksPlugin
-import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
@@ -98,15 +97,13 @@ internal const val VERIFICATION_GROUP = LifecycleBasePlugin.VERIFICATION_GROUP
 internal const val FORMATTING_GROUP = "Formatting"
 internal const val HELP_GROUP = HelpTasksPlugin.HELP_GROUP
 internal const val CHECK_PARENT_TASK_NAME = "ktlintCheck"
-internal const val FORMAT_PARENT_TASK_NAME = "ktlintFormat"
+internal const val FORMAT_PARENT_TASK_NAME = "kllintFormat"
 internal const val APPLY_TO_IDEA_TASK_NAME = "ktlintApplyToIdea"
 internal const val APPLY_TO_IDEA_GLOBALLY_TASK_NAME = "ktlintApplyToIdeaGlobally"
-internal const val KOTLIN_SCRIPT_CHECK_TASK = "ktlintKotlinScriptCheck"
-internal const val KOTLIN_SCRIPT_FORMAT_TASK = "ktlintKotlinScriptFormat"
 internal const val INSTALL_GIT_HOOK_CHECK_TASK = "addKtlintCheckGitPreCommitHook"
 internal const val INSTALL_GIT_HOOK_FORMAT_TASK = "addKtlintFormatGitPreCommitHook"
 internal val KOTLIN_EXTENSIONS = listOf("kt", "kts")
-internal val INTERMEDIATE_RESULTS_PATH = "intermediates${File.separator}ktlint${File.separator}"
+internal val INTERMEDIATE_RESULTS_PATH = "intermediates${File.separator}ktLint${File.separator}"
 
 internal inline fun <reified T> ObjectFactory.property(
     configuration: Property<T>.() -> Unit = {}
@@ -115,10 +112,6 @@ internal inline fun <reified T> ObjectFactory.property(
 internal inline fun <reified T> ObjectFactory.setProperty(
     configuration: SetProperty<T>.() -> Unit = {}
 ) = setProperty(T::class.java).apply(configuration)
-
-internal inline fun <reified T> ObjectFactory.listProperty(
-    configuration: ListProperty<T>.() -> Unit = {}
-) = listProperty(T::class.java).apply(configuration)
 
 internal fun Project.isConsolePlain() = gradle.startParameter.consoleOutput == ConsoleOutput.Plain
 
