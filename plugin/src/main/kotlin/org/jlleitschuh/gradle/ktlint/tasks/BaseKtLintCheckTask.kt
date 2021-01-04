@@ -1,7 +1,5 @@
 package org.jlleitschuh.gradle.ktlint.tasks
 
-import net.swiftzer.semver.SemVer
-import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTree
@@ -111,9 +109,6 @@ abstract class BaseKtLintCheckTask @Inject constructor(
         filesToCheck: Set<File>,
         formatSources: Boolean,
     ) {
-        checkMinimalSupportedKtLintVersion()
-        checkCWEKtLintVersion()
-
         val queue = workerExecutor.classLoaderIsolation { workerExecutor ->
             workerExecutor.classpath.from(ktLintClasspath, ruleSetsClasspath)
         }
@@ -127,27 +122,6 @@ abstract class BaseKtLintCheckTask @Inject constructor(
             params.additionalEditorconfigFile.set(additionalEditorconfigFile)
             params.formatSource.set(formatSources)
             params.discoveredErrorsFile.set(discoveredErrors)
-        }
-    }
-
-    private fun checkMinimalSupportedKtLintVersion() {
-        if (SemVer.parse(ktlintVersion.get()) < SemVer(0, 22, 0)) {
-            throw GradleException(
-                "Ktlint versions less than 0.22.0 are not supported. " +
-                    "Detected Ktlint version: ${ktlintVersion.get()}."
-            )
-        }
-    }
-
-    private fun checkCWEKtLintVersion() {
-        if (!ruleSetsClasspath.isEmpty &&
-            SemVer.parse(ktlintVersion.get()) < SemVer(0, 30, 0)
-        ) {
-            logger.warn(
-                "You are using ktlint version ${ktlintVersion.get()} that has the security vulnerability " +
-                    "'CWE-494: Download of Code Without Integrity Check'.${System.lineSeparator()}" +
-                    "Consider upgrading to versions consider upgrading to versions >= 0.30.0"
-            )
         }
     }
 }

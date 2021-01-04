@@ -61,7 +61,7 @@ This API is available in new versions of Gradle.
 
 Minimal supported [Gradle](www.gradle.org) version: `6.0`
 
-Minimal supported [ktlint](https://github.com/pinterest/ktlint) version: `0.22.0`
+Minimal supported [ktlint](https://github.com/pinterest/ktlint) version: `0.34.0`
 
 ### Ktlint plugin
 

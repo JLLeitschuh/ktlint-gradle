@@ -15,6 +15,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.workers.WorkerExecutor
+import org.jlleitschuh.gradle.ktlint.checkMinimalSupportedKtLintVersion
 import org.jlleitschuh.gradle.ktlint.intermediateResultsBuildDir
 import org.jlleitschuh.gradle.ktlint.worker.RuleSetLoaderWorkAction
 import javax.inject.Inject
@@ -51,7 +52,7 @@ internal abstract class LoadRuleSetsTask @Inject constructor(
 
     @TaskAction
     fun loadRuleSets() {
-        checkExperimentalRulesSupportedKtLintVersion()
+        checkMinimalSupportedKtLintVersion(ktLintVersion.get())
         checkDisabledRulesSupportedKtLintVersion()
 
         val queue = workerExecutor.classLoaderIsolation { workerExecutor ->
@@ -65,14 +66,6 @@ internal abstract class LoadRuleSetsTask @Inject constructor(
         }
     }
 
-    private fun checkExperimentalRulesSupportedKtLintVersion() {
-        if (enableExperimentalRules.get() &&
-            SemVer.parse(ktLintVersion.get()) < SemVer(0, 31, 0)
-        ) {
-            throw GradleException("Experimental rules are supported since 0.31.0 ktlint version.")
-        }
-    }
-
     private fun checkDisabledRulesSupportedKtLintVersion() {
         if (disabledRules.get().isNotEmpty() &&
             SemVer.parse(ktLintVersion.get()) < SemVer(0, 34, 2)
@@ -82,7 +75,7 @@ internal abstract class LoadRuleSetsTask @Inject constructor(
     }
 
     companion object {
-        internal const val LOAD_RULE_SETS_TASK = "loadKtlintRuleSets"
+        internal const val TASK_NAME = "loadKtlintRuleSets"
         internal const val DESCRIPTION = "Preloads required Ktlint RuleSets."
     }
 }

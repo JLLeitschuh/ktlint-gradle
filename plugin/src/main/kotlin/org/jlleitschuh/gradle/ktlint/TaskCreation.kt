@@ -89,7 +89,7 @@ internal fun KtlintPlugin.PluginHolder.setCheckTaskDependsOnGenerateReportsTask(
 internal fun createLoadRuleSetsTask(
     pluginHolder: KtlintPlugin.PluginHolder
 ): TaskProvider<LoadRuleSetsTask> = pluginHolder.target.registerTask(
-    LoadRuleSetsTask.LOAD_RULE_SETS_TASK
+    LoadRuleSetsTask.TASK_NAME
 ) {
     description = LoadRuleSetsTask.DESCRIPTION
 

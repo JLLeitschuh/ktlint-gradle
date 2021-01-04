@@ -14,6 +14,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.workers.WorkerExecutor
+import org.jlleitschuh.gradle.ktlint.checkMinimalSupportedKtLintVersion
 import org.jlleitschuh.gradle.ktlint.intermediateResultsBuildDir
 import org.jlleitschuh.gradle.ktlint.reporter.CustomReporter
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
@@ -58,6 +59,8 @@ internal abstract class LoadReportersTask @Inject constructor(
 
     @TaskAction
     fun loadReporters() {
+        checkMinimalSupportedKtLintVersion(ktLintVersion.get())
+
         val queue = workerExecutor.classLoaderIsolation { spec ->
             spec.classpath.setFrom(ktLintClasspath, reportersClasspath)
         }

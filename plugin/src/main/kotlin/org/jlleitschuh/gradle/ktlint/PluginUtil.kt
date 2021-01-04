@@ -1,6 +1,7 @@
 package org.jlleitschuh.gradle.ktlint
 
 import net.swiftzer.semver.SemVer
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.FileCollection
@@ -18,11 +19,6 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import java.io.File
 import java.nio.file.Path
-
-internal fun resolveMainClassName(ktlintVersion: String) = when {
-    SemVer.parse(ktlintVersion) < SemVer(0, 32, 0) -> "com.github.shyiko.ktlint.Main"
-    else -> "com.pinterest.ktlint.Main"
-}
 
 internal inline fun <reified T : Task> Project.registerTask(
     name: String,
@@ -133,5 +129,14 @@ internal fun Logger.logKtLintDebugMessage(
         logProducer().forEach {
             warn("[KtLint DEBUG] $it")
         }
+    }
+}
+
+internal fun checkMinimalSupportedKtLintVersion(ktLintVersion: String) {
+    if (SemVer.parse(ktLintVersion) < SemVer(0, 34, 0)) {
+        throw GradleException(
+            "KtLint versions less than 0.34.0 are not supported. " +
+                "Detected KtLint version: $ktLintVersion."
+        )
     }
 }

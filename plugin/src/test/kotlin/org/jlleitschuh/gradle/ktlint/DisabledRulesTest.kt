@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.jlleitschuh.gradle.ktlint.KtlintBasePlugin.Companion.LOWEST_SUPPORTED_GRADLE_VERSION
+import org.jlleitschuh.gradle.ktlint.tasks.LoadRuleSetsTask
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -85,7 +86,7 @@ abstract class DisabledRulesTest : AbstractPluginTest() {
         projectRoot.buildFile().appendText(
             """
 
-            ktlint.version = "0.33.0"
+            ktlint.version = "0.34.0"
             ktlint.disabledRules = ["final-newline"]
             """.trimIndent()
         )
@@ -93,7 +94,7 @@ abstract class DisabledRulesTest : AbstractPluginTest() {
         projectRoot.withCleanSources()
 
         buildAndFail(CHECK_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertThat(task(":${LoadRuleSetsTask.TASK_NAME}")?.outcome).isEqualTo(TaskOutcome.FAILED)
             assertThat(output).contains("Rules disabling is supported since 0.34.2 ktlint version.")
         }
     }

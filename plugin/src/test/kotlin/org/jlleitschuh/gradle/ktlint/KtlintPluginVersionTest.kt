@@ -2,6 +2,7 @@ package org.jlleitschuh.gradle.ktlint
 
 import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testkit.runner.TaskOutcome
+import org.jlleitschuh.gradle.ktlint.tasks.LoadReportersTask
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -32,18 +33,18 @@ class KtlintPluginVersionTest : AbstractPluginTest() {
     }
 
     @Test
-    fun `with ktlint version equal to 0_22`() {
-        projectRoot.buildScriptUsingKtlintVersion("0.22.0")
+    fun `with ktLint version equal to 0_34`() {
+        projectRoot.buildScriptUsingKtlintVersion("0.34.0")
         build(CHECK_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetFormatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
     @Test
-    fun `with ktlint version less than 0_22`() {
-        projectRoot.buildScriptUsingKtlintVersion("0.21.0")
+    fun `with ktLint version less than 0_34`() {
+        projectRoot.buildScriptUsingKtlintVersion("0.33.0")
         buildAndFail(CHECK_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetFormatTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertThat(task(":${LoadReportersTask.TASK_NAME}")?.outcome).isEqualTo(TaskOutcome.FAILED)
         }
     }
 }

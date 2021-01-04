@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   - Updated shadow plugin to 6.1.0 version.
   - Updated Gradle to `6.7.1` version
   - Set minimal supported Gradle version to `6.0`
+  - Set minimal supported KtLint version to `0.34.0`
 
 ### Removed
   - ?

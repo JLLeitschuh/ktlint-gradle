@@ -78,7 +78,9 @@ internal abstract class LoadReportersWorkAction : WorkAction<LoadReportersWorkAc
         return enabledReporters
             .map { reporterType ->
                 val provider = enabledProviders.find { reporterType.reporterName == it.id }
-                    ?: throw GradleException("KtLint plugin failed to load reporters. Please open a new issue.")
+                    ?: throw GradleException(
+                        "KtLint plugin failed to load reporter ${reporterType.reporterName}."
+                    )
 
                 val options = if (reporterType == ReporterType.PLAIN_GROUP_BY_FILE) {
                     reporterType.options.associateWith { "true" }
@@ -102,7 +104,9 @@ internal abstract class LoadReportersWorkAction : WorkAction<LoadReportersWorkAc
         return customReporters
             .map { customReporter ->
                 val provider = customProviders.find { customReporter.reporterId == it.id }
-                    ?: throw GradleException("KtLint plugin failed to load custom reporters. Please open a new issue.")
+                    ?: throw GradleException(
+                        "KtLint plugin failed to load ${customReporter.reporterId} custom reporter."
+                    )
                 LoadedReporter(customReporter.reporterId, customReporter.fileExtension, emptyMap()) to provider
             }
     }

@@ -33,24 +33,6 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
     }
 
     @Test
-    fun `fails on versions older than 0_22_0`() {
-        projectRoot.buildFile().appendText(
-            """
-
-            ktlint.version = "0.21.0"
-            """.trimIndent()
-        )
-
-        projectRoot.withCleanSources()
-
-        buildAndFail(CHECK_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
-            assertThat(output)
-                .contains("Ktlint versions less than 0.22.0 are not supported. Detected Ktlint version: 0.21.0.")
-        }
-    }
-
-    @Test
     fun `should fail check on failing sources`() {
         projectRoot.withFailingSources()
 
@@ -207,33 +189,14 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         projectRoot.buildFile().appendText(
             """
 
-            ktlint.version = "0.26.0"
+            ktlint.version = "0.35.0"
             """.trimIndent()
         )
 
         build(":dependencies").apply {
             assertThat(output).contains(
                 "$KTLINT_CONFIGURATION_NAME - $KTLINT_CONFIGURATION_DESCRIPTION${System.lineSeparator()}" +
-                    "\\--- com.github.shyiko:ktlint:0.26.0${System.lineSeparator()}"
-            )
-        }
-    }
-
-    @Test
-    fun `Should apply pinterest ktlint version from extension when the requested version is 0_32_0`() {
-        projectRoot.withCleanSources()
-
-        projectRoot.buildFile().appendText(
-            """
-
-            ktlint.version = "0.32.0"
-            """.trimIndent()
-        )
-
-        build(":dependencies").apply {
-            assertThat(output).contains(
-                "$KTLINT_CONFIGURATION_NAME - $KTLINT_CONFIGURATION_DESCRIPTION${System.lineSeparator()}" +
-                    "\\--- com.pinterest:ktlint:0.32.0${System.lineSeparator()}"
+                    "\\--- com.pinterest:ktlint:0.35.0${System.lineSeparator()}"
             )
         }
     }
@@ -362,29 +325,12 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             """
 
             ktlint.enableExperimentalRules = true
-            ktlint.version = "0.32.0"
+            ktlint.version = "0.34.0"
             """.trimIndent()
         )
 
         buildAndFail(":$CHECK_PARENT_TASK_NAME", "-s").apply {
             assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
-        }
-    }
-
-    @Test
-    internal fun `Should fail the build if ktlint version is less then 0_31_0 and experimental rules are enabled`() {
-        projectRoot.withCleanSources()
-        projectRoot.buildFile().appendText(
-            """
-
-            ktlint.version = "0.30.0"
-            ktlint.enableExperimentalRules = true
-            """.trimIndent()
-        )
-
-        buildAndFail(":$CHECK_PARENT_TASK_NAME").apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
-            assertThat(output).contains("Experimental rules are supported since 0.31.0 ktlint version.")
         }
     }
 
