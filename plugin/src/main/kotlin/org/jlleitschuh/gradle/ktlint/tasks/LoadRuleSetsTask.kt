@@ -9,6 +9,7 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
@@ -22,6 +23,7 @@ import javax.inject.Inject
  * Task to load KtLint `RuleSet` [Set] and serialize it into [loadedRuleSets] file.
  */
 @Suppress("UnstableApiUsage")
+@CacheableTask
 internal abstract class LoadRuleSetsTask @Inject constructor(
     private val workerExecutor: WorkerExecutor,
     objectFactory: ObjectFactory,

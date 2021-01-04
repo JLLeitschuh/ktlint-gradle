@@ -8,6 +8,7 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
@@ -20,6 +21,7 @@ import org.jlleitschuh.gradle.ktlint.worker.LoadReportersWorkAction
 import javax.inject.Inject
 
 @Suppress("UnstableApiUsage")
+@CacheableTask
 internal abstract class LoadReportersTask @Inject constructor(
     private val workerExecutor: WorkerExecutor,
     objectFactory: ObjectFactory,

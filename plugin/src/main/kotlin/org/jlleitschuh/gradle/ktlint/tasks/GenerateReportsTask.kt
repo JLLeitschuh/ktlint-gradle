@@ -9,6 +9,7 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
@@ -35,6 +36,7 @@ import javax.inject.Inject
  *
  * This will actually fail the build in case some non-corrected lint issues.
  */
+@CacheableTask
 abstract class GenerateReportsTask @Inject constructor(
     private val workerExecutor: WorkerExecutor,
     projectLayout: ProjectLayout,
@@ -96,12 +98,21 @@ abstract class GenerateReportsTask @Inject constructor(
     @get:Input
     internal abstract val verbose: Property<Boolean>
 
+    /**
+     * Reports output directory.
+     *
+     * Default is "build/reports/ktlint/${taskName}/".
+     */
     @Suppress("UnstableApiUsage")
     @get:OutputDirectory
     val reportsOutputDirectory: DirectoryProperty = objectFactory
         .directoryProperty()
         .convention(
-            projectLayout.buildDirectory.dir("reports${File.separator}ktlint")
+            reportsName.flatMap {
+                projectLayout
+                    .buildDirectory
+                    .dir("reports${File.separator}ktlint${File.separator}$it")
+            }
         )
 
     @Suppress("UnstableApiUsage")

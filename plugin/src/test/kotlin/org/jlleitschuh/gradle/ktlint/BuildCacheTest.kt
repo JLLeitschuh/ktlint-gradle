@@ -85,12 +85,12 @@ abstract class BuildCacheTest : AbstractPluginTest() {
 
     private fun createRunner(
         projectDir: File,
-        taskToExecute: String = "ktlintCheck"
+        taskToExecute: String = CHECK_PARENT_TASK_NAME
     ) = GradleRunner
         .create()
         .withProjectDir(projectDir)
         .withPluginClasspath()
-        .withArguments(taskToExecute, "--build-cache")
+        .withArguments(taskToExecute, "--build-cache", "-Dorg.gradle.caching.debug=true")
         .forwardOutput()
 
     private fun File.addBuildCacheSettings() = settingsFile()
