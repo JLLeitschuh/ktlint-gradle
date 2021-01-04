@@ -177,7 +177,7 @@ abstract class GenerateReportsTask @Inject constructor(
         internal fun generateNameForSourceSets(
             sourceSetName: String,
             lintType: LintType
-        ): String = "ktLint${sourceSetName.capitalize()}SourceSet${lintType.suffix}"
+        ): String = "ktlint${sourceSetName.capitalize()}SourceSet${lintType.suffix}"
 
         internal fun generateNameForKotlinScripts(
             lintType: LintType
