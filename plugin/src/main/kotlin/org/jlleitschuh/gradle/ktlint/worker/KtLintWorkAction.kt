@@ -1,6 +1,7 @@
 package org.jlleitschuh.gradle.ktlint.worker
 
 import com.pinterest.ktlint.core.KtLint
+import com.pinterest.ktlint.core.RuleSet
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
@@ -28,7 +29,7 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
             .orNull
             ?.asFile
             ?.absolutePath
-        val userData = generateUserData()
+        val userData = generateUserData(ruleSets)
         val debug = parameters.debug.get()
         val formatSource = parameters.formatSource.getOrElse(false)
 
@@ -76,15 +77,25 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
         }
     }
 
-    private fun generateUserData(): Map<String, String> {
+    private fun generateUserData(loadedRuleSets: List<RuleSet>): Map<String, String> {
         val userData = mutableMapOf(
             "android" to parameters.android.get().toString()
         )
         val disabledRules = parameters.disabledRules.get()
         if (disabledRules.isNotEmpty()) {
+            val standardRuleSet = loadedRuleSets.find { it.id == "standard" }
             userData["disabled_rules"] = disabledRules.joinToString(
                 separator = ","
-            )
+            ) { disabledRuleId ->
+                // Workaround for '===' usage on this line:
+                // https://github.com/pinterest/ktlint/blob/fc64c4ff2d7179ae4fcf7cac2691fafbec55a552/ktlint-core/src/main/kotlin/com/pinterest/ktlint/core/KtLint.kt#L219
+                // Loaded standard ruleset id is not "===" to "standard" string from ktlint jar.
+                if (standardRuleSet != null && standardRuleSet.rules.any { it.id == disabledRuleId }) {
+                    "standard:$disabledRuleId"
+                } else {
+                    disabledRuleId
+                }
+            }
         }
 
         return userData.toMap()
