@@ -95,7 +95,7 @@ abstract class KotlinJsPluginTests : AbstractPluginTest() {
         projectRoot.withFailingSources()
 
         buildAndFail(CHECK_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetFormatTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
         }
     }
 }
