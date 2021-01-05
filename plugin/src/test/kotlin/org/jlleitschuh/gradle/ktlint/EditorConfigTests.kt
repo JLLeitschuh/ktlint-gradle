@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.jlleitschuh.gradle.ktlint.KtlintBasePlugin.Companion.LOWEST_SUPPORTED_GRADLE_VERSION
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -31,6 +32,8 @@ class GradleLowestSupportedEditorConfigTest : EditorConfigTests() {
  * Contains all tests related to `.editorconfig` files support.
  */
 abstract class EditorConfigTests : AbstractPluginTest() {
+    private val lintTaskName = KtLintCheckTask.buildTaskNameForSourceSet("main")
+
     @BeforeEach
     internal fun setUp() {
         projectRoot.defaultProjectSetup()
@@ -42,10 +45,10 @@ abstract class EditorConfigTests : AbstractPluginTest() {
         projectRoot.createEditorconfigFile()
 
         build(CHECK_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":$lintTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
         build(CHECK_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(task(":$lintTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
         }
     }
 
@@ -56,10 +59,10 @@ abstract class EditorConfigTests : AbstractPluginTest() {
         projectRoot.createEditorconfigFile(filePath = additionalConfigPath)
 
         build(CHECK_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":$lintTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
         build(CHECK_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(task(":$lintTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
         }
     }
 
@@ -69,12 +72,12 @@ abstract class EditorConfigTests : AbstractPluginTest() {
         projectRoot.createEditorconfigFile()
 
         build(CHECK_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":$lintTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
 
         projectRoot.modifyEditorconfigFile(100)
         build(CHECK_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":$lintTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -85,7 +88,7 @@ abstract class EditorConfigTests : AbstractPluginTest() {
         projectRoot.createEditorconfigFile(filePath = additionalConfigPath)
 
         build(CHECK_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":$lintTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
 
         projectRoot.modifyEditorconfigFile(
@@ -93,7 +96,7 @@ abstract class EditorConfigTests : AbstractPluginTest() {
             filePath = additionalConfigPath
         )
         build(CHECK_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":$lintTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -141,7 +144,7 @@ abstract class EditorConfigTests : AbstractPluginTest() {
             .withArguments(":test:module1:$CHECK_PARENT_TASK_NAME")
             .forwardOutput()
             .build().apply {
-                assertThat(task(":test:module1:$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(task(":test:module1:$lintTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             }
 
         projectWithModulesLocation.modifyEditorconfigFile(100)
@@ -150,7 +153,7 @@ abstract class EditorConfigTests : AbstractPluginTest() {
             .withArguments(":test:module1:$CHECK_PARENT_TASK_NAME")
             .forwardOutput()
             .build().apply {
-                assertThat(task(":test:module1:$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(task(":test:module1:$lintTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             }
     }
 
