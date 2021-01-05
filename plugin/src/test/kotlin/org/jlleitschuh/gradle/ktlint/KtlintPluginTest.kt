@@ -335,7 +335,7 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
     }
 
     @Test
-    internal fun `Should run incrementally`() {
+    internal fun `Lint check should run incrementally`() {
         val initialSourceFile = "src/main/kotlin/initial.kt"
         projectRoot.createSourceFile(
             initialSourceFile,
@@ -345,7 +345,9 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             """.trimIndent()
         )
 
-        build(":ktlintCheck")
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        }
 
         val additionalSourceFile = "src/main/kotlin/another-file.kt"
         projectRoot.createSourceFile(
@@ -356,18 +358,9 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             """.trimIndent()
         )
 
-        // TODO: Add better approach to different file paths on different OS
-        fun String.updatePathForWindows() = if (System.getProperty("os.name").contains("Windows")) {
-            replace("/", "\\\\")
-        } else {
-            this
-        }
-
-        build(CHECK_PARENT_TASK_NAME).apply {
+        build(CHECK_PARENT_TASK_NAME, "--info").apply {
             assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            val args = projectRoot.ktlintBuildDir().resolve("ktlintMainSourceSetCheck.args").readText()
-            assertThat(args).contains(additionalSourceFile.updatePathForWindows())
-            assertThat(args).doesNotContain(initialSourceFile.updatePathForWindows())
+            assertThat(output).contains("Executing incrementally")
         }
     }
 
