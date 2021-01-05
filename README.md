@@ -138,7 +138,7 @@ subprojects {
     apply(plugin = "org.jlleitschuh.gradle.ktlint") // Version should be inherited from parent
     
     // Optionally configure plugin
-    ktlint {
+    configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
        debug.set(true)
     }
 }
@@ -236,7 +236,7 @@ or in kotlin script:
 ```kotlin
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
-ktlint {
+configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
     version.set("0.22.0")
     debug.set(true)
     verbose.set(true)
