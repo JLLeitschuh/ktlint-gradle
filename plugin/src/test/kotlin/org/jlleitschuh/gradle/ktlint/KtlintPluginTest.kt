@@ -5,6 +5,7 @@ import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.jlleitschuh.gradle.ktlint.KtlintBasePlugin.Companion.LOWEST_SUPPORTED_GRADLE_VERSION
 import org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -155,14 +156,15 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
     @Test
     fun `Should always format again restored to pre-format state sources`() {
         projectRoot.withFailingSources()
+        val formatTaskName = KtLintFormatTask.buildTaskNameForSourceSet("main")
         build(FORMAT_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetFormatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
 
         projectRoot.restoreFailingSources()
 
         build(FORMAT_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetFormatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
         assertThat(projectRoot.resolve(FAIL_SOURCE_FILE)).exists()
     }
@@ -170,15 +172,16 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
     @Test
     fun `Format task should be up-to-date on 3rd run`() {
         projectRoot.withFailingSources()
+        val formatTaskName = KtLintFormatTask.buildTaskNameForSourceSet("main")
 
         build(FORMAT_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetFormatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
         build(FORMAT_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetFormatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
         build(FORMAT_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetFormatTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
         }
     }
 
