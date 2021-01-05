@@ -267,13 +267,11 @@ abstract class BaseKtlintCheckTask(
     private fun ReporterType.isAvailable() =
         SemVer.parse(ktlintVersion.get()) >= availableSinceVersion
 
-    private fun ReporterType.getOutputFile() = reporterOutputDir.map {
-        it.file("${this@BaseKtlintCheckTask.name}.$fileExtension")
-    }
+    private fun ReporterType.getOutputFile() =
+        reporterOutputDir.get().file("${this@BaseKtlintCheckTask.name}.$fileExtension")
 
-    private fun CustomReporter.getOutputFile() = reporterOutputDir.map {
-        it.file("${this@BaseKtlintCheckTask.name}.$fileExtension")
-    }
+    private fun CustomReporter.getOutputFile() =
+        reporterOutputDir.get().file("${this@BaseKtlintCheckTask.name}.$fileExtension")
 
     private fun File.toRelativeFile(): File = relativeTo(projectLayout.projectDirectory.asFile)
 
