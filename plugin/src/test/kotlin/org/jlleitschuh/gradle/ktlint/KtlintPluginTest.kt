@@ -231,7 +231,7 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         additionalFolder.withFailingKotlinScript()
 
         build(kotlinScriptCheckTaskName).apply {
-            assertThat(task(":$kotlinScriptCheckTaskName")?.outcome).isEqualTo(TaskOutcome.NO_SOURCE)
+            assertThat(task(":$kotlinScriptCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SKIPPED)
         }
     }
 
@@ -292,7 +292,7 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             ":$CHECK_PARENT_TASK_NAME",
             "-P$FILTER_INCLUDE_PROPERTY_NAME=src/main/kotlin/fail-source.kt"
         ).run {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.NO_SOURCE)
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SKIPPED)
         }
     }
 
@@ -304,7 +304,7 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             ":$CHECK_PARENT_TASK_NAME",
             "-P$FILTER_INCLUDE_PROPERTY_NAME=src/main/kotlin/failing-sources.kt"
         ).run {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.NO_SOURCE)
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SKIPPED)
         }
     }
 
