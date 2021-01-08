@@ -25,6 +25,7 @@ import org.jlleitschuh.gradle.ktlint.KOTLIN_EXTENSIONS
 import org.jlleitschuh.gradle.ktlint.applyGitFilter
 import org.jlleitschuh.gradle.ktlint.getEditorConfigFiles
 import org.jlleitschuh.gradle.ktlint.intermediateResultsBuildDir
+import org.jlleitschuh.gradle.ktlint.property
 import org.jlleitschuh.gradle.ktlint.worker.KtLintWorkAction
 import java.io.File
 import java.util.concurrent.Callable
@@ -65,6 +66,14 @@ abstract class BaseKtLintCheckTask @Inject constructor(
 
     @get:Input
     internal abstract val disabledRules: SetProperty<String>
+
+    /**
+     * Max lint worker heap size. Default is "256m".
+     */
+    @get:Internal
+    val workerMaxHeapSize: Property<String> = objectFactory.property {
+        convention("256m")
+    }
 
     init {
         if (project.hasProperty(FILTER_INCLUDE_PROPERTY_NAME)) {
@@ -109,8 +118,11 @@ abstract class BaseKtLintCheckTask @Inject constructor(
         filesToCheck: Set<File>,
         formatSources: Boolean,
     ) {
-        val queue = workerExecutor.classLoaderIsolation { workerExecutor ->
-            workerExecutor.classpath.from(ktLintClasspath, ruleSetsClasspath)
+        val queue = workerExecutor.processIsolation { spec ->
+            spec.classpath.from(ktLintClasspath, ruleSetsClasspath)
+            spec.forkOptions { options ->
+                options.maxHeapSize = workerMaxHeapSize.get()
+            }
         }
 
         queue.submit(KtLintWorkAction::class.java) { params ->
