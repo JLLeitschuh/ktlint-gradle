@@ -427,4 +427,16 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             assertThat(output).doesNotContain("com.pinterest.ktlint")
         }
     }
+
+    @Test
+    internal fun `Should print pathes to generated reports on code style violations`() {
+        projectRoot.withFailingSources()
+
+        buildAndFail(CHECK_PARENT_TASK_NAME).apply {
+            val s = File.separator
+            assertThat(output).contains(
+                "build${s}reports${s}ktlint${s}ktlintMainSourceSetCheck${s}ktlintMainSourceSetCheck.txt"
+            )
+        }
+    }
 }

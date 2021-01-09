@@ -2,11 +2,13 @@ package org.jlleitschuh.gradle.ktlint.worker
 
 import com.pinterest.ktlint.core.LintError
 import org.gradle.api.GradleException
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.Logging
 import org.gradle.api.provider.Property
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
+import org.jetbrains.kotlin.util.prefixIfNot
 
 @Suppress("UnstableApiUsage")
 internal abstract class ConsoleReportWorkAction : WorkAction<ConsoleReportWorkAction.ConsoleReportParameters> {
@@ -32,7 +34,16 @@ internal abstract class ConsoleReportWorkAction : WorkAction<ConsoleReportWorkAc
         if (errors.any { it.lintErrors.any { !it.second } } &&
             !parameters.ignoreFailures.getOrElse(false)
         ) {
-            throw GradleException("KtLint found code style violations.")
+            val reportsPaths = parameters
+                .generatedReportsPaths
+                .files.joinToString(separator = "\n") { it.absolutePath.prefixIfNot("|- ") }
+
+            throw GradleException(
+                """
+                |KtLint found code style violations. You could find them in following reports:
+                $reportsPaths
+                """.trimMargin()
+            )
         }
     }
 
@@ -54,5 +65,6 @@ internal abstract class ConsoleReportWorkAction : WorkAction<ConsoleReportWorkAc
         val outputToConsole: Property<Boolean>
         val ignoreFailures: Property<Boolean>
         val verbose: Property<Boolean>
+        val generatedReportsPaths: ConfigurableFileCollection
     }
 }

@@ -109,14 +109,16 @@ abstract class GenerateReportsTask @Inject constructor(
         }
 
         val loadedReporters = loadLoadedReporters()
-        loadedReporters.forEach { loadedReporter ->
+            .associateWith {
+                reportsOutputDirectory.file("${reportsName.get()}.${it.fileExtension}")
+            }
+
+        loadedReporters.forEach { (loadedReporter, reporterOutput) ->
             queue.submit(GenerateReportsWorkAction::class.java) { param ->
                 param.discoveredErrorsFile.set(discoveredErrors)
                 param.loadedReporterProviders.set(loadedReporterProviders)
                 param.reporterId.set(loadedReporter.reporterId)
-                param.reporterOutput.set(
-                    reportsOutputDirectory.file("${reportsName.get()}.${loadedReporter.fileExtension}")
-                )
+                param.reporterOutput.set(reporterOutput)
                 param.reporterOptions.set(generateReporterOptions(loadedReporter))
             }
         }
@@ -126,6 +128,7 @@ abstract class GenerateReportsTask @Inject constructor(
             param.outputToConsole.set(outputToConsole)
             param.ignoreFailures.set(ignoreFailures)
             param.verbose.set(verbose)
+            param.generatedReportsPaths.from(loadedReporters.values)
         }
     }
 
