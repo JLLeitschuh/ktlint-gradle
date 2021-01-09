@@ -7,8 +7,6 @@ import org.gradle.api.logging.Logging
 import org.gradle.api.provider.Property
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
-import java.io.FileInputStream
-import java.io.ObjectInputStream
 
 @Suppress("UnstableApiUsage")
 internal abstract class ConsoleReportWorkAction : WorkAction<ConsoleReportWorkAction.ConsoleReportParameters> {
@@ -16,7 +14,7 @@ internal abstract class ConsoleReportWorkAction : WorkAction<ConsoleReportWorkAc
     private val logger = Logging.getLogger("ktlint-console-report-worker")
 
     override fun execute() {
-        val errors = loadErrors()
+        val errors = loadErrors(parameters.discoveredErrors.asFile.get())
 
         if (parameters.outputToConsole.getOrElse(false)) {
             val verbose = parameters.verbose.get()
@@ -37,13 +35,6 @@ internal abstract class ConsoleReportWorkAction : WorkAction<ConsoleReportWorkAc
             throw GradleException("KtLint found code style violations.")
         }
     }
-
-    private fun loadErrors(): List<LintErrorResult> =
-        ObjectInputStream(FileInputStream(parameters.discoveredErrors.asFile.get()))
-            .use {
-                @Suppress("UNCHECKED_CAST")
-                it.readObject() as List<LintErrorResult>
-            }
 
     private fun LintError.logError(
         filePath: String,

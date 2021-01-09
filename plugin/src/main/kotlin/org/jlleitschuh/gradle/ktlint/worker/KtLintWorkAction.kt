@@ -8,21 +8,13 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
-import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 
 @Suppress("UnstableApiUsage")
 abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParameters> {
     override fun execute() {
-        val serializedRuleSets = parameters.loadedRuleSets.asFile.get()
-        val ruleSets = ObjectInputStream(FileInputStream(serializedRuleSets))
-            .use {
-                @Suppress("UNCHECKED_CAST")
-                it.readObject() as List<SerializableRuleSet>
-            }
-            .map { it.ruleSet }
+        val ruleSets = loadRuleSets(parameters.loadedRuleSets.get().asFile)
 
         val additionalEditorConfig = parameters
             .additionalEditorconfigFile

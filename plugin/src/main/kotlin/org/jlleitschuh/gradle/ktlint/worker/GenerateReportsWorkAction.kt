@@ -1,23 +1,21 @@
 package org.jlleitschuh.gradle.ktlint.worker
 
-import com.pinterest.ktlint.core.ReporterProvider
 import org.gradle.api.GradleException
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
-import java.io.FileInputStream
-import java.io.ObjectInputStream
 import java.io.PrintStream
 
 @Suppress("UnstableApiUsage")
 internal abstract class GenerateReportsWorkAction : WorkAction<GenerateReportsWorkAction.GenerateReportsParameters> {
 
     override fun execute() {
-        val discoveredErrors = loadErrors()
+        val discoveredErrors = loadErrors(parameters.discoveredErrorsFile.get().asFile)
         val currentReporterId = parameters.reporterId.get()
-        val reporterProvider = loadReporterProviders().find { it.id == currentReporterId }
+        val reporterProvider = loadReporterProviders(parameters.loadedReporterProviders.asFile.get())
+            .find { it.id == currentReporterId }
             ?: throw GradleException("Could not find ReporterProvider \"$currentReporterId\"")
 
         PrintStream(
@@ -40,21 +38,6 @@ internal abstract class GenerateReportsWorkAction : WorkAction<GenerateReportsWo
             reporter.afterAll()
         }
     }
-
-    private fun loadReporterProviders(): List<ReporterProvider> =
-        ObjectInputStream(FileInputStream(parameters.loadedReporterProviders.asFile.get()))
-            .use {
-                @Suppress("UNCHECKED_CAST")
-                it.readObject() as List<SerializableReporterProvider>
-            }
-            .map { it.reporterProvider }
-
-    private fun loadErrors(): List<LintErrorResult> =
-        ObjectInputStream(FileInputStream(parameters.discoveredErrorsFile.asFile.get()))
-            .use {
-                @Suppress("UNCHECKED_CAST")
-                it.readObject() as List<LintErrorResult>
-            }
 
     internal interface GenerateReportsParameters : WorkParameters {
         val discoveredErrorsFile: RegularFileProperty
