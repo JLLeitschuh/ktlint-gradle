@@ -3,6 +3,7 @@ package org.jlleitschuh.gradle.ktlint
 import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.condition.OS
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -75,18 +76,24 @@ class KtLintSupportedVersionsTest : AbstractPluginTest() {
     companion object {
         @Suppress("unused")
         @JvmStatic
-        fun provideSupportedKtLintVersions(): Stream<Arguments> = Stream.of(
-            Arguments.of("0.34.0"),
-            Arguments.of("0.34.2"),
-            Arguments.of("0.35.0"),
-            Arguments.of("0.36.0"),
-            Arguments.of("0.37.0"),
-            Arguments.of("0.37.1"),
-            Arguments.of("0.37.2"),
-            // "0.38.0" has been compiled with Kotlin apiLevel 1.4 and not supported by Gradle plugins
-            Arguments.of("0.38.1"),
-            Arguments.of("0.39.0"),
-            Arguments.of("0.40.0")
-        )
+        fun provideSupportedKtLintVersions(): Stream<Arguments> {
+            val versions = mutableListOf(
+                Arguments.of("0.34.0"),
+                Arguments.of("0.34.2"),
+                Arguments.of("0.35.0"),
+                Arguments.of("0.36.0"),
+                Arguments.of("0.37.1"),
+                Arguments.of("0.37.2"),
+                // "0.38.0" has been compiled with Kotlin apiLevel 1.4 and not supported by Gradle plugins
+                Arguments.of("0.38.1"),
+                Arguments.of("0.39.0"),
+                Arguments.of("0.40.0")
+            )
+
+            // "0.37.0" is failing on Windows machines that is fixed in the next version
+            if (!OS.WINDOWS.isCurrentOs) versions.add(Arguments.of("0.37.0"))
+
+            return Stream.of(*versions.toTypedArray())
+        }
     }
 }
