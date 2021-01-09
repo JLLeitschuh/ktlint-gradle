@@ -82,6 +82,29 @@ abstract class DisabledRulesTest : AbstractPluginTest() {
     }
 
     @Test
+    internal fun `Should lint without errors when 'no-consecutive-blank-lines' are disable in the code`() {
+        projectRoot.createSourceFile(
+            "src/main/kotlin/clean-source.kt",
+            """
+            /* ktlint-disable no-consecutive-blank-lines */
+            fun some() {
+
+
+                print("Woohoo!")
+            }
+            /* ktlint-enable no-consecutive-blank-lines */
+            
+            val foo = "bar"
+            
+            """.trimIndent()
+        )
+
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        }
+    }
+
+    @Test
     internal fun `Should fail if ktLint version is lower then 0_34_2 and disabled rules configuration is set`() {
         projectRoot.buildFile().appendText(
             """

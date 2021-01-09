@@ -15,13 +15,14 @@ import java.io.ObjectOutputStream
 abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParameters> {
     override fun execute() {
         val ruleSets = loadRuleSets(parameters.loadedRuleSets.get().asFile)
+            .fixStandardRuleSet()
 
         val additionalEditorConfig = parameters
             .additionalEditorconfigFile
             .orNull
             ?.asFile
             ?.absolutePath
-        val userData = generateUserData(ruleSets)
+        val userData = generateUserData()
         val debug = parameters.debug.get()
         val formatSource = parameters.formatSource.getOrElse(false)
 
@@ -69,25 +70,30 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
         }
     }
 
-    private fun generateUserData(loadedRuleSets: List<RuleSet>): Map<String, String> {
+    /**
+     * Applies workaround for '===' usage on this line:
+     * https://github.com/pinterest/ktlint/blob/fc64c4ff2d7179ae4fcf7cac2691fafbec55a552/ktlint-core/src/main/kotlin/com/pinterest/ktlint/core/KtLint.kt#L219
+     * Loaded standard ruleset id is not "===" to "standard" string from ktlint jar.
+     */
+    private fun List<RuleSet>.fixStandardRuleSet(): List<RuleSet> {
+        val standardRuleSet = find { it.id == "standard" } ?: return this
+
+        val standardRuleSetId = "standard".intern()
+        val newStandardRuleSet = RuleSet(
+            standardRuleSetId,
+            *standardRuleSet.rules
+        )
+
+        return filter { it != standardRuleSet }.plus(listOf(newStandardRuleSet))
+    }
+
+    private fun generateUserData(): Map<String, String> {
         val userData = mutableMapOf(
             "android" to parameters.android.get().toString()
         )
         val disabledRules = parameters.disabledRules.get()
         if (disabledRules.isNotEmpty()) {
-            val standardRuleSet = loadedRuleSets.find { it.id == "standard" }
-            userData["disabled_rules"] = disabledRules.joinToString(
-                separator = ","
-            ) { disabledRuleId ->
-                // Workaround for '===' usage on this line:
-                // https://github.com/pinterest/ktlint/blob/fc64c4ff2d7179ae4fcf7cac2691fafbec55a552/ktlint-core/src/main/kotlin/com/pinterest/ktlint/core/KtLint.kt#L219
-                // Loaded standard ruleset id is not "===" to "standard" string from ktlint jar.
-                if (standardRuleSet != null && standardRuleSet.rules.any { it.id == disabledRuleId }) {
-                    "standard:$disabledRuleId"
-                } else {
-                    disabledRuleId
-                }
-            }
+            userData["disabled_rules"] = disabledRules.joinToString(separator = ",")
         }
 
         return userData.toMap()
