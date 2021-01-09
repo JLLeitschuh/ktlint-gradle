@@ -21,11 +21,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   - Updated Gradle to `6.7.1` version
   - Set minimal supported Gradle version to `6.0`
   - Set minimal supported KtLint version to `0.34.0`
+  - Use KtLint directly instead of invoking it via CLI [#424](https://github.com/JLLeitschuh/ktlint-gradle/pull/424)
+
+    **Breaking**:
+     1. Tasks classes were completely changed and new one were introduced. Configuration should stay the same,
+     so, if you don't configure tasks directly, update should be done without issues.
+     2. To configure reports output directory, use `GenerateReportsTask#reportsOutputDirectory` property.
+     3. Errors in Gradle console does not use colors. If you still need it, please open a new issue.
+     4. Linting is running in workers with process isolation.
+     To configure maximum heap size, use `BaseKtLintCheckTask#workerMaxHeapSize` property.
 
 ### Removed
   - ?
 ### Fixed
-  - ?
+  - Gradle deprecations [#395](https://github.com/JLLeitschuh/ktlint-gradle/issues/395)
+  - Fail task on KtLint crash [#229](https://github.com/JLLeitschuh/ktlint-gradle/issues/229)
 
 ## [9.4.1] - 2020.10.05
 ### Fixed
