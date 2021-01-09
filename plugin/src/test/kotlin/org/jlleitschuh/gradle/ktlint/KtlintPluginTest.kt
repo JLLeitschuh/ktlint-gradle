@@ -418,4 +418,13 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
         }
     }
+
+    @Test
+    internal fun `Should not leak KtLint into buildscript classpath`() {
+        projectRoot.withCleanSources()
+
+        build("buildEnvironment").apply {
+            assertThat(output).doesNotContain("com.pinterest.ktlint")
+        }
+    }
 }
