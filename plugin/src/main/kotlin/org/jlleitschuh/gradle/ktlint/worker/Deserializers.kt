@@ -2,12 +2,17 @@ package org.jlleitschuh.gradle.ktlint.worker
 
 import com.pinterest.ktlint.core.ReporterProvider
 import org.apache.commons.io.serialization.ValidatingObjectInputStream
+import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileInputStream
 
 internal fun loadErrors(
     serializedErrors: File
-): List<LintErrorResult> = ValidatingObjectInputStream(FileInputStream(serializedErrors))
+): List<LintErrorResult> = ValidatingObjectInputStream(
+    BufferedInputStream(
+        FileInputStream(serializedErrors)
+    )
+)
     .use {
         it.accept(
             ArrayList::class.java,
@@ -24,7 +29,11 @@ internal fun loadErrors(
 
 internal fun loadReporterProviders(
     serializedReporterProviders: File
-): List<ReporterProvider> = ValidatingObjectInputStream(FileInputStream(serializedReporterProviders))
+): List<ReporterProvider> = ValidatingObjectInputStream(
+    BufferedInputStream(
+        FileInputStream(serializedReporterProviders)
+    )
+)
     .use {
         it.accept(
             ArrayList::class.java,

@@ -11,6 +11,7 @@ import org.gradle.workers.WorkParameters
 import org.jlleitschuh.gradle.ktlint.logKtLintDebugMessage
 import org.jlleitschuh.gradle.ktlint.reporter.CustomReporter
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+import java.io.BufferedOutputStream
 import java.io.FileOutputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
@@ -26,8 +27,10 @@ internal abstract class LoadReportersWorkAction : WorkAction<LoadReportersWorkAc
         val loadedReporters = filterEnabledBuiltInProviders(allProviders) + filterCustomProviders(allProviders)
 
         ObjectOutputStream(
-            FileOutputStream(
-                parameters.loadedReporterProviders.asFile.get()
+            BufferedOutputStream(
+                FileOutputStream(
+                    parameters.loadedReporterProviders.asFile.get()
+                )
             )
         ).use { oos ->
             oos.writeObject(
@@ -36,8 +39,10 @@ internal abstract class LoadReportersWorkAction : WorkAction<LoadReportersWorkAc
         }
 
         ObjectOutputStream(
-            FileOutputStream(
-                parameters.loadedReporters.asFile.get()
+            BufferedOutputStream(
+                FileOutputStream(
+                    parameters.loadedReporters.asFile.get()
+                )
             )
         ).use { oos ->
             oos.writeObject(

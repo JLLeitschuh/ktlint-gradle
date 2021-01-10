@@ -9,6 +9,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
+import java.io.BufferedOutputStream
 import java.io.FileOutputStream
 import java.io.ObjectOutputStream
 import java.util.ServiceLoader
@@ -66,8 +67,10 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
         }
 
         ObjectOutputStream(
-            FileOutputStream(
-                parameters.discoveredErrorsFile.asFile.get()
+            BufferedOutputStream(
+                FileOutputStream(
+                    parameters.discoveredErrorsFile.asFile.get()
+                )
             )
         ).use {
             it.writeObject(result)
