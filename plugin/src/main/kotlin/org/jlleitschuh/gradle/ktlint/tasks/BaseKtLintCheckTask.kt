@@ -1,5 +1,7 @@
 package org.jlleitschuh.gradle.ktlint.tasks
 
+import net.swiftzer.semver.SemVer
+import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTree
@@ -53,7 +55,7 @@ abstract class BaseKtLintCheckTask @Inject constructor(
     }
 
     @get:Input
-    internal abstract val ktlintVersion: Property<String>
+    internal abstract val ktLintVersion: Property<String>
 
     @get:Classpath
     internal abstract val ruleSetsClasspath: ConfigurableFileCollection
@@ -66,6 +68,9 @@ abstract class BaseKtLintCheckTask @Inject constructor(
 
     @get:Input
     internal abstract val disabledRules: SetProperty<String>
+
+    @get:Input
+    internal abstract val enableExperimentalRules: Property<Boolean>
 
     /**
      * Max lint worker heap size. Default is "256m".
@@ -101,10 +106,6 @@ abstract class BaseKtLintCheckTask @Inject constructor(
 
     @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:InputFile
-    internal abstract val loadedRuleSets: RegularFileProperty
-
-    @get:PathSensitive(PathSensitivity.RELATIVE)
-    @get:InputFile
     internal abstract val loadedReporters: RegularFileProperty
 
     @get:OutputFile
@@ -118,6 +119,8 @@ abstract class BaseKtLintCheckTask @Inject constructor(
         filesToCheck: Set<File>,
         formatSources: Boolean,
     ) {
+        checkDisabledRulesSupportedKtLintVersion()
+
         val queue = workerExecutor.processIsolation { spec ->
             spec.classpath.from(ktLintClasspath, ruleSetsClasspath)
             spec.forkOptions { options ->
@@ -127,13 +130,21 @@ abstract class BaseKtLintCheckTask @Inject constructor(
 
         queue.submit(KtLintWorkAction::class.java) { params ->
             params.filesToLint.from(filesToCheck)
-            params.loadedRuleSets.set(loadedRuleSets)
+            params.enableExperimental.set(enableExperimentalRules)
             params.android.set(android)
             params.disabledRules.set(disabledRules)
             params.debug.set(debug)
             params.additionalEditorconfigFile.set(additionalEditorconfigFile)
             params.formatSource.set(formatSources)
             params.discoveredErrorsFile.set(discoveredErrors)
+        }
+    }
+
+    private fun checkDisabledRulesSupportedKtLintVersion() {
+        if (disabledRules.get().isNotEmpty() &&
+            SemVer.parse(ktLintVersion.get()) < SemVer(0, 34, 2)
+        ) {
+            throw GradleException("Rules disabling is supported since 0.34.2 ktlint version.")
         }
     }
 }

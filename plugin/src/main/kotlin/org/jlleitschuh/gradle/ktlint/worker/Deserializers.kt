@@ -1,7 +1,6 @@
 package org.jlleitschuh.gradle.ktlint.worker
 
 import com.pinterest.ktlint.core.ReporterProvider
-import com.pinterest.ktlint.core.RuleSet
 import org.apache.commons.io.serialization.ValidatingObjectInputStream
 import java.io.File
 import java.io.FileInputStream
@@ -35,16 +34,3 @@ internal fun loadReporterProviders(
         it.readObject() as List<SerializableReporterProvider>
     }
     .map { it.reporterProvider }
-
-internal fun loadRuleSets(
-    serializedRuleSets: File
-): List<RuleSet> = ValidatingObjectInputStream(FileInputStream(serializedRuleSets))
-    .use {
-        it.accept(
-            ArrayList::class.java,
-            SerializableRuleSet::class.java,
-        )
-        @Suppress("UNCHECKED_CAST")
-        it.readObject() as List<SerializableRuleSet>
-    }
-    .map { it.ruleSet }

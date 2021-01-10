@@ -2,6 +2,7 @@ package org.jlleitschuh.gradle.ktlint.worker
 
 import com.pinterest.ktlint.core.KtLint
 import com.pinterest.ktlint.core.RuleSet
+import com.pinterest.ktlint.core.RuleSetProvider
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
@@ -10,12 +11,15 @@ import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
 import java.io.FileOutputStream
 import java.io.ObjectOutputStream
+import java.util.ServiceLoader
 
 @Suppress("UnstableApiUsage")
 abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParameters> {
     override fun execute() {
-        val ruleSets = loadRuleSets(parameters.loadedRuleSets.get().asFile)
-            .fixStandardRuleSet()
+        val ruleSets = loadRuleSetsAndFilterThem(
+            parameters.enableExperimental.getOrElse(false),
+            parameters.disabledRules.getOrElse(emptySet())
+        )
 
         val additionalEditorConfig = parameters
             .additionalEditorconfigFile
@@ -30,7 +34,7 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
 
         parameters.filesToLint.files.forEach {
             val errors = mutableListOf<Pair<SerializableLintError, Boolean>>()
-            val ktlintParameters = KtLint.Params(
+            val ktLintParameters = KtLint.Params(
                 fileName = it.absolutePath,
                 text = it.readText(),
                 ruleSets = ruleSets,
@@ -45,13 +49,13 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
 
             if (formatSource) {
                 val currentFileContent = it.readText()
-                val updatedFileContent = KtLint.format(ktlintParameters)
+                val updatedFileContent = KtLint.format(ktLintParameters)
 
                 if (updatedFileContent != currentFileContent) {
                     it.writeText(updatedFileContent)
                 }
             } else {
-                KtLint.lint(ktlintParameters)
+                KtLint.lint(ktLintParameters)
             }
             result.add(
                 LintErrorResult(
@@ -70,23 +74,6 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
         }
     }
 
-    /**
-     * Applies workaround for '===' usage on this line:
-     * https://github.com/pinterest/ktlint/blob/fc64c4ff2d7179ae4fcf7cac2691fafbec55a552/ktlint-core/src/main/kotlin/com/pinterest/ktlint/core/KtLint.kt#L219
-     * Loaded standard ruleset id is not "===" to "standard" string from ktlint jar.
-     */
-    private fun List<RuleSet>.fixStandardRuleSet(): List<RuleSet> {
-        val standardRuleSet = find { it.id == "standard" } ?: return this
-
-        val standardRuleSetId = "standard".intern()
-        val newStandardRuleSet = RuleSet(
-            standardRuleSetId,
-            *standardRuleSet.rules
-        )
-
-        return filter { it != standardRuleSet }.plus(listOf(newStandardRuleSet))
-    }
-
     private fun generateUserData(): Map<String, String> {
         val userData = mutableMapOf(
             "android" to parameters.android.get().toString()
@@ -99,11 +86,30 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
         return userData.toMap()
     }
 
+    private fun loadRuleSetsAndFilterThem(
+        enableExperimental: Boolean,
+        disabledRules: Set<String>
+    ): Set<RuleSet> = loadRuleSetsFromClasspath()
+        .filterKeys { enableExperimental || it != "experimental" }
+        .filterKeys { !(disabledRules.contains("standard") && it == "\u0000standard") }
+        .toSortedMap()
+        .mapValues { it.value.get() }
+        .values
+        .toSet()
+
+    private fun loadRuleSetsFromClasspath(): Map<String, RuleSetProvider> = ServiceLoader
+        .load(RuleSetProvider::class.java)
+        .associateBy {
+            val key = it.get().id
+            // Adapted from KtLint CLI module
+            if (key == "standard") "\u0000$key" else key
+        }
+
     interface KtLintWorkParameters : WorkParameters {
-        val loadedRuleSets: RegularFileProperty
         val filesToLint: ConfigurableFileCollection
         val android: Property<Boolean>
         val disabledRules: SetProperty<String>
+        val enableExperimental: Property<Boolean>
         val debug: Property<Boolean>
         val additionalEditorconfigFile: RegularFileProperty
         val formatSource: Property<Boolean>

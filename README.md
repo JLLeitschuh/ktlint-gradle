@@ -341,7 +341,6 @@ This repository provides the following examples of how to set up this plugin:
 ### Main tasks
 
 This plugin adds following tasks to every project:
-- `loadKtlintRuleSets` - preloads KtLint `RuleSet`s
 - `loadKtlintReporters` - preloads KtLint `Reporter`s
 - `runKtlintCheckOverKotlinScripts` - runs actual lint check over project Kotlin script files
 - `ktlintKotlinScriptCheck` - generates reports and prints issues into Gradle console based on lint check found errors

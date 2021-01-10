@@ -8,7 +8,6 @@ import org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 import org.jlleitschuh.gradle.ktlint.tasks.LoadReportersTask
-import org.jlleitschuh.gradle.ktlint.tasks.LoadRuleSetsTask
 
 internal fun KtlintPlugin.PluginHolder.addGenerateReportsTaskToProjectMetaCheckTask(
     generatesReportsTask: TaskProvider<GenerateReportsTask>
@@ -86,20 +85,6 @@ internal fun KtlintPlugin.PluginHolder.setCheckTaskDependsOnGenerateReportsTask(
     }
 }
 
-internal fun createLoadRuleSetsTask(
-    pluginHolder: KtlintPlugin.PluginHolder
-): TaskProvider<LoadRuleSetsTask> = pluginHolder.target.registerTask(
-    LoadRuleSetsTask.TASK_NAME
-) {
-    description = LoadRuleSetsTask.DESCRIPTION
-
-    ktLintClasspath.setFrom(pluginHolder.ktlintConfiguration)
-    ruleSetsClasspath.setFrom(pluginHolder.ktlintReporterConfiguration)
-    disabledRules.set(pluginHolder.extension.disabledRules)
-    enableExperimentalRules.set(pluginHolder.extension.enableExperimentalRules)
-    ktLintVersion.set(pluginHolder.extension.version)
-}
-
 internal fun createLoadReportersTask(
     pluginHolder: KtlintPlugin.PluginHolder
 ): TaskProvider<LoadReportersTask> = pluginHolder.target.registerTask(
@@ -120,14 +105,14 @@ private fun BaseKtLintCheckTask.configureBaseCheckTask(
     additionalTaskConfig: BaseKtLintCheckTask.() -> Unit
 ) {
     ktLintClasspath.setFrom(pluginHolder.ktlintConfiguration)
-    ktlintVersion.set(pluginHolder.extension.version)
+    ktLintVersion.set(pluginHolder.extension.version)
     additionalEditorconfigFile.set(pluginHolder.extension.additionalEditorconfigFile)
     debug.set(pluginHolder.extension.debug)
     ruleSetsClasspath.setFrom(pluginHolder.ktlintRulesetConfiguration)
     android.set(pluginHolder.extension.android)
     disabledRules.set(pluginHolder.extension.disabledRules)
-    loadedRuleSets.set(pluginHolder.loadRuleSetsTask.get().loadedRuleSets)
     loadedReporters.set(pluginHolder.loadReportersTask.get().loadedReporters)
+    enableExperimentalRules.set(pluginHolder.extension.enableExperimentalRules)
 
     additionalTaskConfig()
 }
