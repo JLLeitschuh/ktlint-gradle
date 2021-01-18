@@ -40,7 +40,7 @@ internal abstract class ConsoleReportWorkAction : WorkAction<ConsoleReportWorkAc
 
             throw GradleException(
                 """
-                |KtLint found code style violations. You could find them in following reports:
+                |KtLint found code style violations. Please see the following reports:
                 $reportsPaths
                 """.trimMargin()
             )
