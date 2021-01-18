@@ -128,15 +128,17 @@ abstract class BaseKtLintCheckTask @Inject constructor(
             }
         }
 
-        queue.submit(KtLintWorkAction::class.java) { params ->
-            params.filesToLint.from(filesToCheck)
-            params.enableExperimental.set(enableExperimentalRules)
-            params.android.set(android)
-            params.disabledRules.set(disabledRules)
-            params.debug.set(debug)
-            params.additionalEditorconfigFile.set(additionalEditorconfigFile)
-            params.formatSource.set(formatSources)
-            params.discoveredErrorsFile.set(discoveredErrors)
+        filesToCheck.chunked(100).forEach {
+            queue.submit(KtLintWorkAction::class.java) { params ->
+                params.filesToLint.from(it)
+                params.enableExperimental.set(enableExperimentalRules)
+                params.android.set(android)
+                params.disabledRules.set(disabledRules)
+                params.debug.set(debug)
+                params.additionalEditorconfigFile.set(additionalEditorconfigFile)
+                params.formatSource.set(formatSources)
+                params.discoveredErrorsFile.set(discoveredErrors)
+            }
         }
     }
 

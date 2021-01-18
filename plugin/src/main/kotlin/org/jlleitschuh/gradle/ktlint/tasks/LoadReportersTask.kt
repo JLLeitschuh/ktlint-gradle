@@ -82,7 +82,7 @@ internal abstract class LoadReportersTask @Inject constructor(
     private fun ReporterType.isAvailable() =
         SemVer.parse(ktLintVersion.get()) >= availableSinceVersion
 
-    companion object {
+    internal companion object {
         internal const val TASK_NAME = "loadKtlintReporters"
         internal const val DESCRIPTION = "Preloads required KtLint reporters."
     }

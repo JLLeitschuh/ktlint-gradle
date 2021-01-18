@@ -162,7 +162,7 @@ abstract class GenerateReportsTask @Inject constructor(
         CHECK("Check"), FORMAT("Format")
     }
 
-    companion object {
+    internal companion object {
         internal fun generateNameForSourceSets(
             sourceSetName: String,
             lintType: LintType

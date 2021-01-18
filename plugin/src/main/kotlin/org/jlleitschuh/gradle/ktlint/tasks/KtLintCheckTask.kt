@@ -46,7 +46,7 @@ abstract class KtLintCheckTask @Inject constructor(
         }
     }
 
-    companion object {
+    internal companion object {
         fun buildTaskNameForSourceSet(
             sourceSetName: String
         ): String = "runKtlintCheckOver${sourceSetName.capitalize()}SourceSet"

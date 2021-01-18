@@ -37,7 +37,7 @@ abstract class KtLintFormatTask @Inject constructor(
         return source
     }
 
-    companion object {
+    internal companion object {
         fun buildTaskNameForSourceSet(
             sourceSetName: String
         ): String = "runKtlintFormatOver${sourceSetName.capitalize()}SourceSet"
