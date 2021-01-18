@@ -343,17 +343,21 @@ This repository provides the following examples of how to set up this plugin:
 This plugin adds following tasks to every project:
 - `loadKtlintReporters` - preloads KtLint `Reporter`s
 - `runKtlintCheckOverKotlinScripts` - runs actual lint check over project Kotlin script files
-- `ktlintKotlinScriptCheck` - generates reports and prints issues into Gradle console based on lint check found errors
+- `ktlintKotlinScriptCheck` - generates reports and prints issues into Gradle console based on lint check found errors.
+  This task execution depends on `loadKtlintReporters` and `runKtlintCheckOverKotlinScripts` tasks execution outputs
 - `runKtlintFormatOverKotlinScripts` - tries to format according to the code style project Kotlin script files
-- `ktlintKotlinScriptFormat` - generate reports and prints issues into Gradle console based on found unformattable errors
+- `ktlintKotlinScriptFormat` - generate reports and prints issues into Gradle console based on found non-formattable errors.
+  This task execution depends on `loadKtlintReporters` and `runKtlintFormatOverKotlinScripts` tasks execution outputs
 - `ktlintCheck` - checks all `SourceSet`s and project Kotlin script files
 - `ktlintFormat` - tries to format according to the code style all `SourceSet`s Kotlin files and project Kotlin script files
 
 Then for each `SourceSet` plugin adds following tasks:
 - `runKtlintCheckOver[source set name]SourceSet` - runs actual lint check on every Kotlin file in given `SourceSet`
-- `ktlint[source set name]SourceSetCheck` - generates reports and prints issues into Gradle console based on lint check found errors
+- `ktlint[source set name]SourceSetCheck` - generates reports and prints issues into Gradle console based on lint check found errors.
+  This task execution depends on `loadKtlintReporters` and `runKtlintCheckOver[source set name]SourceSet` tasks execution outputs
 - `runKtlintFormatOver[source set name]SourceSet` - tries to format according to the code style every Kotlin file in given `SourceSet`
-- `ktlint[source set name]SourceSetCheck` - generates reports and prints issues into Gradle console based on found unformattable errors
+- `ktlint[source set name]SourceSetCheck` - generates reports and prints issues into Gradle console based on found non-formattable errors.
+  This task execution depends on `loadKtlintReporters` and `runKtlintFormatOver[source set name]SourceSet` tasks execution outputs
 
 ### Additional helper tasks
 
