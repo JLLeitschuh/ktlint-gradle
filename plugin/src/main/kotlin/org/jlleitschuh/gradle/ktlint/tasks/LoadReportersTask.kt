@@ -64,7 +64,7 @@ internal abstract class LoadReportersTask @Inject constructor(
         // Classloader isolation is enough here as we just want to use some classes from KtLint classpath
         // to load reporters. No KtLint main object is initialized/used in this case.
         val queue = workerExecutor.classLoaderIsolation { spec ->
-            spec.classpath.setFrom(ktLintClasspath, reportersClasspath)
+            spec.classpath.from(ktLintClasspath, reportersClasspath)
         }
 
         queue.submit(LoadReportersWorkAction::class.java) { param ->
