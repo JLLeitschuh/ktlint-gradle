@@ -104,6 +104,8 @@ abstract class GenerateReportsTask @Inject constructor(
     @Suppress("UnstableApiUsage")
     @TaskAction
     fun generateReports() {
+        // Classloader isolation is enough here as we just want to use some classes from KtLint classpath
+        // to get errors and generate files/console reports. No KtLint main object is initialized/used in this case.
         val queue = workerExecutor.classLoaderIsolation { spec ->
             spec.classpath.from(ktLintClasspath, reportersClasspath)
         }

@@ -121,6 +121,9 @@ abstract class BaseKtLintCheckTask @Inject constructor(
     ) {
         checkDisabledRulesSupportedKtLintVersion()
 
+        // Process isolation is used here to run KtLint in a separate java process.
+        // This allows to better isolate work actions from different projects tasks between each other
+        // and to not pollute Gradle daemon heap, which otherwise greatly increases GC time.
         val queue = workerExecutor.processIsolation { spec ->
             spec.classpath.from(ktLintClasspath, ruleSetsClasspath)
             spec.forkOptions { options ->
