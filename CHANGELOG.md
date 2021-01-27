@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
     **Breaking** - removed build variants meta tasks. Minimum supported AGP version is 4.0.0.
   - Updated shadow plugin to 6.1.0 version.
-  - Updated Gradle to `6.7.1` version
+  - Updated Gradle to `6.8.1` version
   - Set minimal supported Gradle version to `6.0`
   - Set minimal supported KtLint version to `0.34.0`
   - Use KtLint directly instead of invoking it via CLI [#424](https://github.com/JLLeitschuh/ktlint-gradle/pull/424)
