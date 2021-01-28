@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
      3. Errors in Gradle console does not use colors. If you still need it, please open a new issue.
      4. Linting is running in workers with process isolation.
      To configure maximum heap size, use `BaseKtLintCheckTask#workerMaxHeapSize` property.
+     5. "ktlintRuleset" and "ktlintReporter" configurations dependencies versions are constraint by main "ktlint" configuration dependencies versions.
 
 ### Removed
   - ?

@@ -439,4 +439,40 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             )
         }
     }
+
+    @Test
+    internal fun `Should force dependencies versions from KtLint configuration for ruleset configuration`() {
+        projectRoot.withCleanSources()
+
+        projectRoot.buildFile().appendText(
+            """
+
+            dependencies {
+                $KTLINT_RULESET_CONFIGURATION_NAME "com.pinterest.ktlint:ktlint-core:0.34.2"
+            }
+            """.trimIndent()
+        )
+
+        build(":dependencies", "--configuration", KTLINT_RULESET_CONFIGURATION_NAME).apply {
+            assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.39.0")
+        }
+    }
+
+    @Test
+    internal fun `Should force dependencies versions from KtLint configuration for reporters configuration`() {
+        projectRoot.withCleanSources()
+
+        projectRoot.buildFile().appendText(
+            """
+
+            dependencies {
+                $KTLINT_REPORTER_CONFIGURATION_NAME "com.pinterest.ktlint:ktlint-core:0.34.2"
+            }
+            """.trimIndent()
+        )
+
+        build(":dependencies", "--configuration", KTLINT_REPORTER_CONFIGURATION_NAME).apply {
+            assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.39.0")
+        }
+    }
 }
