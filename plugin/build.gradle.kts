@@ -63,6 +63,7 @@ dependencies {
     testImplementation("org.assertj:assertj-core:${PluginVersions.assertJ}")
     testImplementation(kotlin("reflect"))
     testImplementation("com.pinterest.ktlint:ktlint-core:${PluginVersions.ktlint}")
+    testImplementation("com.tngtech.archunit:archunit-junit5:${PluginVersions.archUnit}")
 }
 
 tasks.withType<Test>().configureEach {

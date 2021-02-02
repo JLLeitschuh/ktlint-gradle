@@ -14,4 +14,5 @@ object PluginVersions {
     val shadow = "6.1.0"
     val githubRelease = "2.2.10"
     val commonsIo = "2.8.0"
+    val archUnit = "0.16.0"
 }
