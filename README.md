@@ -156,7 +156,7 @@ rules using ktlint.
 
 For all Gradle versions:
 
-Use the same `buildscript` logic as [above](#simple-setup), but with this instead of the above suggested `apply` line.
+Use the same `buildscript` logic as [above](#simple-setup), but with this instead of the above suggested `apply` line. If you also want the GIT pre-commit gradle tasks, keep both `apply` variations.
 
 ```groovy
 apply plugin: "org.jlleitschuh.gradle.ktlint-idea"
