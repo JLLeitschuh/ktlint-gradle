@@ -3,6 +3,8 @@ package org.jlleitschuh.gradle.ktlint
 import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
+import org.jlleitschuh.gradle.ktlint.KtlintBasePlugin.Companion.LOWEST_SUPPORTED_GRADLE_VERSION
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -30,6 +32,8 @@ class GradleLowestSupportedEditorConfigTest : EditorConfigTests() {
  * Contains all tests related to `.editorconfig` files support.
  */
 abstract class EditorConfigTests : AbstractPluginTest() {
+    private val lintTaskName = KtLintCheckTask.buildTaskNameForSourceSet("main")
+
     @BeforeEach
     internal fun setUp() {
         projectRoot.defaultProjectSetup()
@@ -40,11 +44,11 @@ abstract class EditorConfigTests : AbstractPluginTest() {
         projectRoot.withCleanSources()
         projectRoot.createEditorconfigFile()
 
-        build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$lintTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
-        build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$lintTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
         }
     }
 
@@ -54,11 +58,11 @@ abstract class EditorConfigTests : AbstractPluginTest() {
         projectRoot.withCleanSources()
         projectRoot.createEditorconfigFile(filePath = additionalConfigPath)
 
-        build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$lintTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
-        build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$lintTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
         }
     }
 
@@ -67,13 +71,13 @@ abstract class EditorConfigTests : AbstractPluginTest() {
         projectRoot.withCleanSources()
         projectRoot.createEditorconfigFile()
 
-        build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$lintTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
 
         projectRoot.modifyEditorconfigFile(100)
-        build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$lintTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -83,16 +87,16 @@ abstract class EditorConfigTests : AbstractPluginTest() {
         projectRoot.withCleanSources()
         projectRoot.createEditorconfigFile(filePath = additionalConfigPath)
 
-        build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$lintTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
 
         projectRoot.modifyEditorconfigFile(
             maxLineLength = 100,
             filePath = additionalConfigPath
         )
-        build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$lintTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -137,19 +141,19 @@ abstract class EditorConfigTests : AbstractPluginTest() {
             .withPluginClasspath()
 
         gradleRunner
-            .withArguments(":test:module1:ktlintCheck")
+            .withArguments(":test:module1:$CHECK_PARENT_TASK_NAME")
             .forwardOutput()
             .build().apply {
-                assertThat(task(":test:module1:ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(task(":test:module1:$lintTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             }
 
         projectWithModulesLocation.modifyEditorconfigFile(100)
 
         gradleRunner
-            .withArguments(":test:module1:ktlintCheck")
+            .withArguments(":test:module1:$CHECK_PARENT_TASK_NAME")
             .forwardOutput()
             .build().apply {
-                assertThat(task(":test:module1:ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(task(":test:module1:$lintTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             }
     }
 

@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Added
   - ?
 ### Changed
-  - Updated Kotlin to `1.4.10` version.
+  - Updated Kotlin to `1.4.30` version.
 
     **Breaking** - removed support for following deprecated Kotlin plugins:
     1. "kotlin2js"
@@ -19,11 +19,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
     **Breaking** - removed build variants meta tasks. Minimum supported AGP version is 4.0.0.
   - Updated shadow plugin to 6.1.0 version.
   - Set default ktlint version to `0.40.0` 
+  - Updated Gradle to `6.8.1` version
+  - Set minimal supported Gradle version to `6.0`
+  - Set minimal supported KtLint version to `0.34.0`
+  - Use KtLint directly instead of invoking it via CLI [#424](https://github.com/JLLeitschuh/ktlint-gradle/pull/424)
+
+    **Breaking**:
+     1. Tasks classes were completely changed and new one were introduced. Configuration should stay the same,
+     so, if you don't configure tasks directly, update should be done without issues.
+     2. To configure reports output directory, use `GenerateReportsTask#reportsOutputDirectory` property.
+     3. Errors in Gradle console does not use colors. If you still need it, please open a new issue.
+     4. Linting is running in workers with process isolation.
+     To configure maximum heap size, use `BaseKtLintCheckTask#workerMaxHeapSize` property.
+     5. "ktlintRuleset" and "ktlintReporter" configurations dependencies versions are constraint by main "ktlint" configuration dependencies versions.
 
 ### Removed
   - ?
 ### Fixed
-  - ?
+  - Gradle deprecations [#395](https://github.com/JLLeitschuh/ktlint-gradle/issues/395)
+  - Fail task on KtLint crash [#229](https://github.com/JLLeitschuh/ktlint-gradle/issues/229)
 
 ## [9.4.1] - 2020.10.05
 ### Fixed

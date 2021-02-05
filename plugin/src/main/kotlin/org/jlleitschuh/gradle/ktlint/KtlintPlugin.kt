@@ -8,6 +8,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jlleitschuh.gradle.ktlint.android.applyKtLintToAndroid
+import org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask
 
 /**
  * Plugin that provides a wrapper over the `ktlint` project.
@@ -44,17 +45,29 @@ open class KtlintPlugin : Plugin<Project> {
                 sourceSet.name,
                 sourceSet.kotlin.sourceDirectories
             )
+            val generateReportsCheckTask = createGenerateReportsTask(
+                this,
+                checkTask,
+                GenerateReportsTask.LintType.CHECK,
+                sourceSet.name
+            )
 
-            addKtlintCheckTaskToProjectMetaCheckTask(checkTask)
-            setCheckTaskDependsOnKtlintCheckTask(target, checkTask)
+            addGenerateReportsTaskToProjectMetaCheckTask(generateReportsCheckTask)
+            setCheckTaskDependsOnGenerateReportsTask(generateReportsCheckTask)
 
-            val ktlintSourceSetFormatTask = createFormatTask(
+            val formatTask = createFormatTask(
                 this,
                 sourceSet.name,
                 sourceSet.kotlin.sourceDirectories
             )
+            val generateReportsFormatTask = createGenerateReportsTask(
+                this,
+                formatTask,
+                GenerateReportsTask.LintType.FORMAT,
+                sourceSet.name
+            )
 
-            addKtlintFormatTaskToProjectMetaFormatTask(ktlintSourceSetFormatTask)
+            addGenerateReportsTaskToProjectMetaFormatTask(generateReportsFormatTask)
         }
 
         multiplatformExtension.targets.all { kotlinTarget ->
@@ -73,17 +86,29 @@ open class KtlintPlugin : Plugin<Project> {
                     sourceSet.name,
                     kotlinSourceDirectories
                 )
+                val generateReportsCheckTask = createGenerateReportsTask(
+                    this,
+                    checkTask,
+                    GenerateReportsTask.LintType.CHECK,
+                    sourceSet.name
+                )
 
-                addKtlintCheckTaskToProjectMetaCheckTask(checkTask)
-                setCheckTaskDependsOnKtlintCheckTask(target, checkTask)
+                addGenerateReportsTaskToProjectMetaCheckTask(generateReportsCheckTask)
+                setCheckTaskDependsOnGenerateReportsTask(generateReportsCheckTask)
 
-                val ktlintSourceSetFormatTask = createFormatTask(
+                val formatTask = createFormatTask(
                     this,
                     sourceSet.name,
                     kotlinSourceDirectories
                 )
+                val generateReportsFormatTask = createGenerateReportsTask(
+                    this,
+                    formatTask,
+                    GenerateReportsTask.LintType.FORMAT,
+                    sourceSet.name
+                )
 
-                addKtlintFormatTaskToProjectMetaFormatTask(ktlintSourceSetFormatTask)
+                addGenerateReportsTaskToProjectMetaFormatTask(generateReportsFormatTask)
             }
         }
     }
@@ -93,11 +118,21 @@ open class KtlintPlugin : Plugin<Project> {
         projectDirectoryScriptFiles.include("*.kts")
 
         val checkTask = createKotlinScriptCheckTask(this, projectDirectoryScriptFiles)
-        addKtlintCheckTaskToProjectMetaCheckTask(checkTask)
-        setCheckTaskDependsOnKtlintCheckTask(target, checkTask)
+        val generateReportsCheckTask = createKotlinScriptGenerateReportsTask(
+            this,
+            checkTask,
+            GenerateReportsTask.LintType.CHECK
+        )
+        addGenerateReportsTaskToProjectMetaCheckTask(generateReportsCheckTask)
+        setCheckTaskDependsOnGenerateReportsTask(generateReportsCheckTask)
 
         val formatTask = createKotlinScriptFormatTask(this, projectDirectoryScriptFiles)
-        addKtlintFormatTaskToProjectMetaFormatTask(formatTask)
+        val generateReportsFormatTask = createKotlinScriptGenerateReportsTask(
+            this,
+            formatTask,
+            GenerateReportsTask.LintType.FORMAT
+        )
+        addGenerateReportsTaskToProjectMetaFormatTask(generateReportsFormatTask)
     }
 
     internal class PluginHolder(
@@ -119,10 +154,9 @@ open class KtlintPlugin : Plugin<Project> {
             }
         }
 
-        val ktlintConfiguration by lazy(LazyThreadSafetyMode.NONE) { createKtlintConfiguration(target, extension) }
-        val ktlintRulesetConfiguration = createKtlintRulesetConfiguration(target)
-        val ktlintReporterConfiguration by lazy(LazyThreadSafetyMode.NONE) {
-            createKtlintReporterConfiguration(target, extension)
-        }
+        val ktlintConfiguration = createKtlintConfiguration(target, extension)
+        val ktlintRulesetConfiguration = createKtlintRulesetConfiguration(target, ktlintConfiguration)
+        val ktlintReporterConfiguration = createKtLintReporterConfiguration(target, extension, ktlintConfiguration)
+        val loadReportersTask = createLoadReportersTask(this)
     }
 }

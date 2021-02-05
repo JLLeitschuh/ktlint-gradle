@@ -1,24 +1,24 @@
 package org.jlleitschuh.gradle.ktlint
 
 import net.swiftzer.semver.SemVer
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.FileCollection
+import org.gradle.api.file.ProjectLayout
+import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.logging.Logger
 import org.gradle.api.logging.configuration.ConsoleOutput
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.HelpTasksPlugin
-import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.language.base.plugins.LifecycleBasePlugin
+import java.io.File
 import java.nio.file.Path
-
-internal fun resolveMainClassName(ktlintVersion: String) = when {
-    SemVer.parse(ktlintVersion) < SemVer(0, 32, 0) -> "com.github.shyiko.ktlint.Main"
-    else -> "com.pinterest.ktlint.Main"
-}
 
 internal inline fun <reified T : Task> Project.registerTask(
     name: String,
@@ -96,11 +96,10 @@ internal const val CHECK_PARENT_TASK_NAME = "ktlintCheck"
 internal const val FORMAT_PARENT_TASK_NAME = "ktlintFormat"
 internal const val APPLY_TO_IDEA_TASK_NAME = "ktlintApplyToIdea"
 internal const val APPLY_TO_IDEA_GLOBALLY_TASK_NAME = "ktlintApplyToIdeaGlobally"
-internal const val KOTLIN_SCRIPT_CHECK_TASK = "ktlintKotlinScriptCheck"
-internal const val KOTLIN_SCRIPT_FORMAT_TASK = "ktlintKotlinScriptFormat"
 internal const val INSTALL_GIT_HOOK_CHECK_TASK = "addKtlintCheckGitPreCommitHook"
 internal const val INSTALL_GIT_HOOK_FORMAT_TASK = "addKtlintFormatGitPreCommitHook"
 internal val KOTLIN_EXTENSIONS = listOf("kt", "kts")
+internal val INTERMEDIATE_RESULTS_PATH = "intermediates${File.separator}ktLint${File.separator}"
 
 internal inline fun <reified T> ObjectFactory.property(
     configuration: Property<T>.() -> Unit = {}
@@ -110,18 +109,34 @@ internal inline fun <reified T> ObjectFactory.setProperty(
     configuration: SetProperty<T>.() -> Unit = {}
 ) = setProperty(T::class.java).apply(configuration)
 
-internal inline fun <reified T> ObjectFactory.listProperty(
-    configuration: ListProperty<T>.() -> Unit = {}
-) = listProperty(T::class.java).apply(configuration)
-
-/**
- * Create check task name from source set name.
- */
-internal fun String.sourceSetCheckTaskName() = "ktlint${capitalize()}SourceSetCheck"
-
-/**
- * Create format task name from source set name.
- */
-internal fun String.sourceSetFormatTaskName() = "ktlint${capitalize()}SourceSetFormat"
-
 internal fun Project.isConsolePlain() = gradle.startParameter.consoleOutput == ConsoleOutput.Plain
+
+/**
+ * Get file path where tasks could put their intermediate results, that could be consumed by other plugin tasks.
+ */
+internal fun ProjectLayout.intermediateResultsBuildDir(
+    resultsFile: String
+): Provider<RegularFile> = buildDirectory.file("$INTERMEDIATE_RESULTS_PATH$resultsFile")
+
+/**
+ * Logs into Gradle console KtLint debug message.
+ */
+internal fun Logger.logKtLintDebugMessage(
+    debugIsEnabled: Boolean,
+    logProducer: () -> List<String>
+) {
+    if (debugIsEnabled) {
+        logProducer().forEach {
+            warn("[KtLint DEBUG] $it")
+        }
+    }
+}
+
+internal fun checkMinimalSupportedKtLintVersion(ktLintVersion: String) {
+    if (SemVer.parse(ktLintVersion) < SemVer(0, 34, 0)) {
+        throw GradleException(
+            "KtLint versions less than 0.34.0 are not supported. " +
+                "Detected KtLint version: $ktLintVersion."
+        )
+    }
+}

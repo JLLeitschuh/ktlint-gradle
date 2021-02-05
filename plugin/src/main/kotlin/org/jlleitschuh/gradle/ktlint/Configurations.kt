@@ -4,6 +4,11 @@ import net.swiftzer.semver.SemVer
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
+import org.gradle.api.artifacts.component.ModuleComponentIdentifier
+import org.gradle.api.artifacts.component.ModuleComponentSelector
+import org.gradle.api.artifacts.component.ProjectComponentIdentifier
+import org.gradle.api.artifacts.result.ResolvedDependencyResult
+import org.gradle.util.GradleVersion
 
 internal const val KTLINT_CONFIGURATION_NAME = "ktlint"
 internal const val KTLINT_CONFIGURATION_DESCRIPTION = "Main ktlint-gradle configuration"
@@ -37,24 +42,93 @@ private fun resolveGroup(ktlintVersion: String) = when {
     else -> "com.pinterest"
 }
 
-internal fun createKtlintRulesetConfiguration(target: Project) =
+internal fun createKtlintRulesetConfiguration(
+    target: Project,
+    ktLintConfiguration: Configuration
+) =
     target.configurations.maybeCreate(KTLINT_RULESET_CONFIGURATION_NAME).apply {
         description = KTLINT_RULESET_CONFIGURATION_DESCRIPTION
+        ensureConsistencyWith(target, ktLintConfiguration)
     }
 
-internal fun createKtlintReporterConfiguration(
+internal fun createKtLintReporterConfiguration(
     target: Project,
-    extension: KtlintExtension
-) =
-    target.configurations.maybeCreate(KTLINT_REPORTER_CONFIGURATION_NAME).apply {
+    extension: KtlintExtension,
+    ktLintConfiguration: Configuration
+) = target
+    .configurations
+    .maybeCreate(KTLINT_REPORTER_CONFIGURATION_NAME)
+    .apply {
         description = KTLINT_REPORTER_CONFIGURATION_DESCRIPTION
+        ensureConsistencyWith(target, ktLintConfiguration)
 
         withDependencies {
             extension
                 .reporterExtension
                 .customReporters
                 .all {
-                    dependencies.addLater(target.provider { it.dependencyArtifact })
+                    dependencies.addLater(
+                        target.provider {
+                            val reporterDependency = it.dependency
+                            requireNotNull(reporterDependency) {
+                                "Reporter ${it.reporterId} dependency is not set!"
+                            }
+                            target.dependencies.create(reporterDependency)
+                        }
+                    )
                 }
         }
     }
+
+private fun Configuration.ensureConsistencyWith(
+    target: Project,
+    otherConfiguration: Configuration
+) {
+    if (GradleVersion.version(target.gradle.gradleVersion) >= GradleVersion.version("6.8")) {
+        shouldResolveConsistentlyWith(otherConfiguration)
+    } else {
+        // Inspired by
+        // https://android.googlesource.com/platform/tools/base/+/refs/heads/mirror-goog-studio-master-dev/build-system/gradle-core/src/main/java/com/android/build/gradle/internal/dependency/ConstraintHandler.kt
+        incoming.beforeResolve {
+            val configName = it.name
+            otherConfiguration.incoming.resolutionResult.allDependencies { dependency ->
+                if (dependency is ResolvedDependencyResult) {
+                    val id = dependency.selected.id
+                    if (id is ModuleComponentIdentifier) {
+                        // using a repository with a flatDir to stock local AARs will result in an
+                        // external module dependency with no version.
+                        if (!id.version.isNullOrEmpty()) {
+                            if (id.module != "listenablefuture" ||
+                                id.group != "com.google.guava" ||
+                                id.version != "1.0"
+                            ) {
+                                target.dependencies.constraints.add(
+                                    configName,
+                                    "${id.group}:${id.module}:${id.version}"
+                                ) { constraint ->
+                                    constraint.because("${otherConfiguration.name} uses version ${id.version}")
+                                    constraint.version { versionConstraint ->
+                                        versionConstraint.strictly(id.version)
+                                    }
+                                }
+                            }
+                        }
+                    } else if (id is ProjectComponentIdentifier &&
+                        id.build.isCurrentBuild &&
+                        dependency.requested is ModuleComponentSelector
+                    ) {
+                        // Requested external library has been replaced with the project dependency, so
+                        // add the project dependency to the target configuration, so it can be chosen
+                        // instead of the external library as well.
+                        // We should avoid doing this for composite builds, so we check if the selected
+                        // project is from the current build.
+                        target.dependencies.add(
+                            configName,
+                            target.dependencies.project(mapOf("path" to id.projectPath))
+                        )
+                    }
+                }
+            }
+        }
+    }
+}

@@ -12,15 +12,14 @@ import com.android.build.api.variant.VariantProperties
 import com.android.build.gradle.internal.api.DefaultAndroidSourceDirectorySet
 import org.gradle.api.Plugin
 import org.gradle.api.file.FileCollection
-import org.gradle.api.tasks.TaskProvider
-import org.jlleitschuh.gradle.ktlint.KtlintCheckTask
-import org.jlleitschuh.gradle.ktlint.KtlintFormatTask
 import org.jlleitschuh.gradle.ktlint.KtlintPlugin
-import org.jlleitschuh.gradle.ktlint.addKtlintCheckTaskToProjectMetaCheckTask
-import org.jlleitschuh.gradle.ktlint.addKtlintFormatTaskToProjectMetaFormatTask
+import org.jlleitschuh.gradle.ktlint.addGenerateReportsTaskToProjectMetaCheckTask
+import org.jlleitschuh.gradle.ktlint.addGenerateReportsTaskToProjectMetaFormatTask
 import org.jlleitschuh.gradle.ktlint.createCheckTask
 import org.jlleitschuh.gradle.ktlint.createFormatTask
-import org.jlleitschuh.gradle.ktlint.setCheckTaskDependsOnKtlintCheckTask
+import org.jlleitschuh.gradle.ktlint.createGenerateReportsTask
+import org.jlleitschuh.gradle.ktlint.setCheckTaskDependsOnGenerateReportsTask
+import org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask
 import java.util.concurrent.Callable
 
 internal fun KtlintPlugin.PluginHolder.applyKtLintToAndroid(): (Plugin<in Any>) -> Unit {
@@ -87,22 +86,32 @@ private fun androidPluginConfigureAction(
 private fun KtlintPlugin.PluginHolder.createAndroidTasks(
     sourceSetName: String,
     sources: FileCollection
-): Pair<TaskProvider<KtlintCheckTask>, TaskProvider<KtlintFormatTask>> {
+) {
     val checkTask = createCheckTask(
         this,
         sourceSetName,
         sources
     )
+    val generateReportsCheckTask = createGenerateReportsTask(
+        this,
+        checkTask,
+        GenerateReportsTask.LintType.CHECK,
+        sourceSetName
+    )
 
-    addKtlintCheckTaskToProjectMetaCheckTask(checkTask)
-    setCheckTaskDependsOnKtlintCheckTask(target, checkTask)
+    addGenerateReportsTaskToProjectMetaCheckTask(generateReportsCheckTask)
+    setCheckTaskDependsOnGenerateReportsTask(generateReportsCheckTask)
 
     val formatTask = createFormatTask(
         this,
         sourceSetName,
         sources
     )
-
-    addKtlintFormatTaskToProjectMetaFormatTask(formatTask)
-    return checkTask to formatTask
+    val generateReportsFormatTask = createGenerateReportsTask(
+        this,
+        formatTask,
+        GenerateReportsTask.LintType.FORMAT,
+        sourceSetName
+    )
+    addGenerateReportsTaskToProjectMetaFormatTask(generateReportsFormatTask)
 }

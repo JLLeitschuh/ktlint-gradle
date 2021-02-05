@@ -3,6 +3,8 @@ package org.jlleitschuh.gradle.ktlint
 import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
+import org.jlleitschuh.gradle.ktlint.KtlintBasePlugin.Companion.LOWEST_SUPPORTED_GRADLE_VERSION
+import org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask
 import org.junit.jupiter.api.Test
 import java.io.File
 
@@ -33,17 +35,21 @@ abstract class BuildCacheTest : AbstractPluginTest() {
     fun `check task is relocatable`() {
         configureBuildCache()
         configureDefaultProjects()
+        val testSourceCheckTaskName = GenerateReportsTask.generateNameForSourceSets(
+            "test",
+            GenerateReportsTask.LintType.CHECK
+        )
 
         createRunner(originalRoot)
             .build().apply {
-                assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
-                assertThat(task(":ktlintTestSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(task(":$testSourceCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             }
 
         createRunner(relocatedRoot)
             .build().apply {
-                assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.FROM_CACHE)
-                assertThat(task(":ktlintTestSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.FROM_CACHE)
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FROM_CACHE)
+                assertThat(task(":$testSourceCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FROM_CACHE)
             }
     }
 
@@ -68,23 +74,23 @@ abstract class BuildCacheTest : AbstractPluginTest() {
 
         createRunner(originalRoot)
             .build().apply {
-                assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             }
 
         createRunner(relocatedRoot)
             .build().apply {
-                assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.FROM_CACHE)
+                assertThat(task(":$mainSourceSetCheckTaskName")!!.outcome).isEqualTo(TaskOutcome.FROM_CACHE)
             }
     }
 
     private fun createRunner(
         projectDir: File,
-        taskToExecute: String = "ktlintCheck"
+        taskToExecute: String = CHECK_PARENT_TASK_NAME
     ) = GradleRunner
         .create()
         .withProjectDir(projectDir)
         .withPluginClasspath()
-        .withArguments(taskToExecute, "--build-cache")
+        .withArguments(taskToExecute, "--build-cache", "-Dorg.gradle.caching.debug=true")
         .forwardOutput()
 
     private fun File.addBuildCacheSettings() = settingsFile()

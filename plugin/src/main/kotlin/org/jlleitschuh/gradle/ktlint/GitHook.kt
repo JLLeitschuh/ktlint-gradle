@@ -7,6 +7,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import org.intellij.lang.annotations.Language
+import org.jlleitschuh.gradle.ktlint.tasks.BaseKtLintCheckTask
 import javax.inject.Inject
 
 internal const val FILTER_INCLUDE_PROPERTY_NAME = "internalKtlintGitFilter"
@@ -182,7 +183,7 @@ open class KtlintInstallGitHookTask @Inject constructor(
     }
 }
 
-internal fun BaseKtlintCheckTask.applyGitFilter() {
+internal fun BaseKtLintCheckTask.applyGitFilter() {
     val projectRelativePath = project.rootDir.toPath()
         .relativize(project.projectDir.toPath())
         .toString()

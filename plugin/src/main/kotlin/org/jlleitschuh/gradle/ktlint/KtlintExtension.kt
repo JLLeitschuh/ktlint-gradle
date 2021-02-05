@@ -126,7 +126,7 @@ internal constructor(
         private val ksApplier: KotlinScriptAdditionalPathApplier
     ) {
         /**
-         * Adds given [fileTree] to [KOTLIN_SCRIPT_CHECK_TASK]/[KOTLIN_SCRIPT_FORMAT_TASK] tasks search.
+         * Adds given [fileTree] to kotlin script check/format tasks search.
          */
         fun include(fileTree: ConfigurableFileTree) {
             ksApplier(fileTree)
