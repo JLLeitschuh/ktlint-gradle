@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.jlleitschuh.gradle.ktlint.KtlintBasePlugin.Companion.LOWEST_SUPPORTED_GRADLE_VERSION
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -33,7 +34,7 @@ abstract class DisabledRulesTest : AbstractPluginTest() {
     }
 
     @Test
-    internal fun `Should lint without errors when "final-newline" is disabled`() {
+    internal fun `Should lint without errors when 'final-newline' is disabled`() {
         projectRoot.buildFile().appendText(
             """
 
@@ -48,13 +49,13 @@ abstract class DisabledRulesTest : AbstractPluginTest() {
             """.trimIndent()
         )
 
-        build(":ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
     @Test
-    internal fun `Should lint without errors when "final-newline" and "no-consecutive-blank-lines" are disabled`() {
+    internal fun `Should lint without errors when 'final-newline' and 'no-consecutive-blank-lines' are disabled`() {
         projectRoot.buildFile().appendText(
             """
 
@@ -75,25 +76,50 @@ abstract class DisabledRulesTest : AbstractPluginTest() {
             """.trimIndent()
         )
 
-        build(":ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
     @Test
-    internal fun `Should fail if ktlint version is lower then 0_34_2 and disabled rules configuration is set`() {
+    internal fun `Should lint without errors when 'no-consecutive-blank-lines' are disable in the code`() {
+        projectRoot.createSourceFile(
+            "src/main/kotlin/clean-source.kt",
+            """
+            /* ktlint-disable no-consecutive-blank-lines */
+            fun some() {
+
+
+                print("Woohoo!")
+            }
+            /* ktlint-enable no-consecutive-blank-lines */
+            
+            val foo = "bar"
+            
+            """.trimIndent()
+        )
+
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        }
+    }
+
+    @Test
+    internal fun `Should fail if ktLint version is lower then 0_34_2 and disabled rules configuration is set`() {
         projectRoot.buildFile().appendText(
             """
 
-            ktlint.version = "0.33.0"
+            ktlint.version = "0.34.0"
             ktlint.disabledRules = ["final-newline"]
             """.trimIndent()
         )
 
         projectRoot.withCleanSources()
 
-        buildAndFail(":ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.FAILED)
+        buildAndFail(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(
+                task(":${KtLintCheckTask.buildTaskNameForSourceSet("main")}")?.outcome
+            ).isEqualTo(TaskOutcome.FAILED)
             assertThat(output).contains("Rules disabling is supported since 0.34.2 ktlint version.")
         }
     }

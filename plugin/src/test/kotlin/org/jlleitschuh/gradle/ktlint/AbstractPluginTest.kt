@@ -2,6 +2,7 @@ package org.jlleitschuh.gradle.ktlint
 
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
+import org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 
@@ -12,6 +13,20 @@ abstract class AbstractPluginTest {
 
     val projectRoot: File
         get() = temporaryFolder.resolve("plugin-test").apply { mkdirs() }
+
+    val mainSourceSetCheckTaskName = GenerateReportsTask.generateNameForSourceSets(
+        "main",
+        GenerateReportsTask.LintType.CHECK
+    )
+
+    val mainSourceSetFormatTaskName = GenerateReportsTask.generateNameForSourceSets(
+        "main",
+        GenerateReportsTask.LintType.FORMAT
+    )
+
+    val kotlinScriptCheckTaskName = GenerateReportsTask.generateNameForKotlinScripts(
+        GenerateReportsTask.LintType.CHECK
+    )
 
     protected fun pluginsBlockWithIdeaPlugin() =
         """

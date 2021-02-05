@@ -23,9 +23,9 @@ class KtlintIdeaPluginTest : AbstractPluginTest() {
     @Test
     fun `applying helper plugin does not add the ktlint check task`() {
         build(":tasks").apply {
-            assertThat(output).doesNotContain("ktlintCheck")
+            assertThat(output).doesNotContain(CHECK_PARENT_TASK_NAME)
             // With space to not interfere with ktlintApplyToIdeaGlobally tasks
-            assertThat(output).containsIgnoringCase("ktlintApplyToIdea")
+            assertThat(output).containsIgnoringCase(APPLY_TO_IDEA_TASK_NAME)
         }
     }
 }

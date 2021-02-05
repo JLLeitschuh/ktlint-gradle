@@ -9,6 +9,9 @@ import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.tasks.util.PatternFilterable
 import org.gradle.util.GradleVersion
 import org.jlleitschuh.gradle.ktlint.reporter.CustomReporter
+import org.jlleitschuh.gradle.ktlint.tasks.BaseKtLintCheckTask
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 
 internal typealias FilterApplier = (Action<PatternFilterable>) -> Unit
 internal typealias KotlinScriptAdditionalPathApplier = (ConfigurableFileTree) -> Unit
@@ -23,12 +26,12 @@ open class KtlintBasePlugin : Plugin<Project> {
         target.checkMinimalSupportedGradleVersion()
 
         val filterTargetApplier: FilterApplier = {
-            target.tasks.withType(BaseKtlintCheckTask::class.java).configureEach(it)
+            target.tasks.withType(BaseKtLintCheckTask::class.java).configureEach(it)
         }
 
         val kotlinScriptAdditionalPathApplier: KotlinScriptAdditionalPathApplier = { additionalFileTree ->
             val configureAction = Action<Task> { task ->
-                with(task as BaseKtlintCheckTask) {
+                with(task as BaseKtLintCheckTask) {
                     source = source.plus(
                         additionalFileTree.also {
                             it.include("*.kts")
@@ -37,15 +40,15 @@ open class KtlintBasePlugin : Plugin<Project> {
                 }
             }
 
-            target.tasks.named(KOTLIN_SCRIPT_CHECK_TASK).configure(configureAction)
-            target.tasks.named(KOTLIN_SCRIPT_FORMAT_TASK).configure(configureAction)
+            target.tasks.named(KtLintCheckTask.KOTLIN_SCRIPT_TASK_NAME).configure(configureAction)
+            target.tasks.named(KtLintFormatTask.KOTLIN_SCRIPT_TASK_NAME).configure(configureAction)
         }
 
         extension = target.extensions.create(
             "ktlint",
             KtlintExtension::class.java,
             target.objects,
-            target.container(CustomReporter::class.java) { name -> CustomReporter(name, target.dependencies) },
+            target.container(CustomReporter::class.java) { CustomReporter(it) },
             filterTargetApplier,
             kotlinScriptAdditionalPathApplier
         )

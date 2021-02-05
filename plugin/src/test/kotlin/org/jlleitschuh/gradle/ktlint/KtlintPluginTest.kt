@@ -4,6 +4,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.jlleitschuh.gradle.ktlint.KtlintBasePlugin.Companion.LOWEST_SUPPORTED_GRADLE_VERSION
+import org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -32,29 +34,11 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
     }
 
     @Test
-    fun `fails on versions older than 0_22_0`() {
-        projectRoot.buildFile().appendText(
-            """
-
-            ktlint.version = "0.21.0"
-            """.trimIndent()
-        )
-
-        projectRoot.withCleanSources()
-
-        buildAndFail("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.FAILED)
-            assertThat(output)
-                .contains("Ktlint versions less than 0.22.0 are not supported. Detected Ktlint version: 0.21.0.")
-        }
-    }
-
-    @Test
     fun `should fail check on failing sources`() {
         projectRoot.withFailingSources()
 
-        buildAndFail("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.FAILED)
+        buildAndFail(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
             assertThat(output).contains("Unnecessary space(s)")
         }
     }
@@ -64,8 +48,8 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
 
         projectRoot.withCleanSources()
 
-        build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -74,9 +58,9 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         projectRoot.withCleanSources()
         val ideaRootDir = projectRoot.resolve(".idea").apply { mkdir() }
 
-        build("ktlintApplyToIdea").apply {
-            assertThat(task(":ktlintApplyToIdea")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(ideaRootDir.listFiles().isNotEmpty()).isTrue()
+        build(APPLY_TO_IDEA_TASK_NAME).apply {
+            assertThat(task(":$APPLY_TO_IDEA_TASK_NAME")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(ideaRootDir.listFiles()?.isNullOrEmpty()).isFalse()
         }
     }
 
@@ -84,9 +68,9 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
     fun `should generate code style file globally`() {
         val ideaRootDir = projectRoot.resolve(".idea").apply { mkdir() }
 
-        build(":ktlintApplyToIdeaGlobally").apply {
-            assertThat(task(":ktlintApplyToIdeaGlobally")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(ideaRootDir.listFiles().isNotEmpty()).isTrue()
+        build(APPLY_TO_IDEA_GLOBALLY_TASK_NAME).apply {
+            assertThat(task(":$APPLY_TO_IDEA_GLOBALLY_TASK_NAME")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(ideaRootDir.listFiles()?.isNullOrEmpty()).isFalse()
         }
     }
 
@@ -97,7 +81,7 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         build("tasks").apply {
             val ktlintTasks = output
                 .lineSequence()
-                .filter { it.startsWith("ktlint") }
+                .filter { it.startsWith("ktlint", ignoreCase = true) }
                 .toList()
 
             assertThat(ktlintTasks).hasSize(4)
@@ -113,7 +97,7 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         build("tasks", "--all").apply {
             val ktlintTasks = output
                 .lineSequence()
-                .filter { it.startsWith("ktlint") }
+                .filter { it.startsWith("ktlint", ignoreCase = true) }
                 .toList()
 
             // Plus for main and test sources format and check tasks
@@ -123,8 +107,12 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             assertThat(ktlintTasks).anyMatch { it.startsWith(FORMAT_PARENT_TASK_NAME) }
             assertThat(ktlintTasks).anyMatch { it.startsWith(APPLY_TO_IDEA_TASK_NAME) }
             assertThat(ktlintTasks).anyMatch { it.startsWith(APPLY_TO_IDEA_GLOBALLY_TASK_NAME) }
-            assertThat(ktlintTasks).anyMatch { it.startsWith(KOTLIN_SCRIPT_CHECK_TASK) }
-            assertThat(ktlintTasks).anyMatch { it.startsWith(KOTLIN_SCRIPT_FORMAT_TASK) }
+            assertThat(ktlintTasks).anyMatch { it.startsWith(kotlinScriptCheckTaskName) }
+            assertThat(ktlintTasks).anyMatch {
+                it.startsWith(
+                    GenerateReportsTask.generateNameForKotlinScripts(GenerateReportsTask.LintType.FORMAT)
+                )
+            }
         }
     }
 
@@ -140,8 +128,8 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             """.trimIndent()
         )
 
-        build(":ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -160,22 +148,23 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             """.trimIndent()
         )
 
-        buildAndFail(":ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.FAILED)
+        buildAndFail(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
         }
     }
 
     @Test
     fun `Should always format again restored to pre-format state sources`() {
         projectRoot.withFailingSources()
-        build(":ktlintFormat").apply {
-            assertThat(task(":ktlintMainSourceSetFormat")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        val formatTaskName = KtLintFormatTask.buildTaskNameForSourceSet("main")
+        build(FORMAT_PARENT_TASK_NAME).apply {
+            assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
 
         projectRoot.restoreFailingSources()
 
-        build(":ktlintFormat").apply {
-            assertThat(task(":ktlintMainSourceSetFormat")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        build(FORMAT_PARENT_TASK_NAME).apply {
+            assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
         assertThat(projectRoot.resolve(FAIL_SOURCE_FILE)).exists()
     }
@@ -183,52 +172,34 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
     @Test
     fun `Format task should be up-to-date on 3rd run`() {
         projectRoot.withFailingSources()
+        val formatTaskName = KtLintFormatTask.buildTaskNameForSourceSet("main")
 
-        build(":ktlintFormat").apply {
-            assertThat(task(":ktlintMainSourceSetFormat")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        build(FORMAT_PARENT_TASK_NAME).apply {
+            assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
-        build(":ktlintFormat").apply {
-            assertThat(task(":ktlintMainSourceSetFormat")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        build(FORMAT_PARENT_TASK_NAME).apply {
+            assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
-        build(":ktlintFormat").apply {
-            assertThat(task(":ktlintMainSourceSetFormat")!!.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+        build(FORMAT_PARENT_TASK_NAME).apply {
+            assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
         }
     }
 
     @Test
-    fun `Should apply ktlint version from extension`() {
+    fun `Should apply ktLint version from extension`() {
         projectRoot.withCleanSources()
 
         projectRoot.buildFile().appendText(
             """
 
-            ktlint.version = "0.26.0"
+            ktlint.version = "0.35.0"
             """.trimIndent()
         )
 
         build(":dependencies").apply {
             assertThat(output).contains(
                 "$KTLINT_CONFIGURATION_NAME - $KTLINT_CONFIGURATION_DESCRIPTION${System.lineSeparator()}" +
-                    "\\--- com.github.shyiko:ktlint:0.26.0${System.lineSeparator()}"
-            )
-        }
-    }
-
-    @Test
-    fun `Should apply pinterest ktlint version from extension when the requested version is 0_32_0`() {
-        projectRoot.withCleanSources()
-
-        projectRoot.buildFile().appendText(
-            """
-
-            ktlint.version = "0.32.0"
-            """.trimIndent()
-        )
-
-        build(":dependencies").apply {
-            assertThat(output).contains(
-                "$KTLINT_CONFIGURATION_NAME - $KTLINT_CONFIGURATION_DESCRIPTION${System.lineSeparator()}" +
-                    "\\--- com.pinterest:ktlint:0.32.0${System.lineSeparator()}"
+                    "\\--- com.pinterest:ktlint:0.35.0${System.lineSeparator()}"
             )
         }
     }
@@ -238,8 +209,8 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         projectRoot.withCleanSources()
         projectRoot.withCleanKotlinScript()
 
-        build(":$KOTLIN_SCRIPT_CHECK_TASK").apply {
-            assertThat(task(":$KOTLIN_SCRIPT_CHECK_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        build(kotlinScriptCheckTaskName).apply {
+            assertThat(task(":$kotlinScriptCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -248,8 +219,8 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         projectRoot.withCleanSources()
         projectRoot.withFailingKotlinScript()
 
-        buildAndFail(":$KOTLIN_SCRIPT_CHECK_TASK").apply {
-            assertThat(task(":$KOTLIN_SCRIPT_CHECK_TASK")?.outcome).isEqualTo(TaskOutcome.FAILED)
+        buildAndFail(kotlinScriptCheckTaskName).apply {
+            assertThat(task(":$kotlinScriptCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
         }
     }
 
@@ -259,8 +230,8 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         val additionalFolder = projectRoot.resolve("scripts/")
         additionalFolder.withFailingKotlinScript()
 
-        build(":$KOTLIN_SCRIPT_CHECK_TASK").apply {
-            assertThat(task(":$KOTLIN_SCRIPT_CHECK_TASK")?.outcome).isEqualTo(TaskOutcome.NO_SOURCE)
+        build(kotlinScriptCheckTaskName).apply {
+            assertThat(task(":$kotlinScriptCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SKIPPED)
         }
     }
 
@@ -276,8 +247,8 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             """.trimIndent()
         )
 
-        build(":$KOTLIN_SCRIPT_CHECK_TASK").apply {
-            assertThat(task(":$KOTLIN_SCRIPT_CHECK_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        build(kotlinScriptCheckTaskName).apply {
+            assertThat(task(":$kotlinScriptCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -290,7 +261,7 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             ":$CHECK_PARENT_TASK_NAME",
             "-P$FILTER_INCLUDE_PROPERTY_NAME=src/main/kotlin/clean-source.kt"
         ).run {
-            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -303,7 +274,7 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             ":$CHECK_PARENT_TASK_NAME",
             "-P$FILTER_INCLUDE_PROPERTY_NAME=src\\main\\kotlin\\clean-source.kt"
         ).run {
-            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -321,7 +292,7 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             ":$CHECK_PARENT_TASK_NAME",
             "-P$FILTER_INCLUDE_PROPERTY_NAME=src/main/kotlin/fail-source.kt"
         ).run {
-            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.NO_SOURCE)
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SKIPPED)
         }
     }
 
@@ -333,7 +304,7 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             ":$CHECK_PARENT_TASK_NAME",
             "-P$FILTER_INCLUDE_PROPERTY_NAME=src/main/kotlin/failing-sources.kt"
         ).run {
-            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.NO_SOURCE)
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SKIPPED)
         }
     }
 
@@ -357,34 +328,17 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             """
 
             ktlint.enableExperimentalRules = true
-            ktlint.version = "0.32.0"
+            ktlint.version = "0.34.0"
             """.trimIndent()
         )
 
-        buildAndFail(":$CHECK_PARENT_TASK_NAME").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.FAILED)
+        buildAndFail(":$CHECK_PARENT_TASK_NAME", "-s").apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
         }
     }
 
     @Test
-    internal fun `Should fail the build if ktlint version is less then 0_31_0 and experimental rules are enabled`() {
-        projectRoot.withCleanSources()
-        projectRoot.buildFile().appendText(
-            """
-
-            ktlint.version = "0.30.0"
-            ktlint.enableExperimentalRules = true
-            """.trimIndent()
-        )
-
-        buildAndFail(":$CHECK_PARENT_TASK_NAME").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.FAILED)
-            assertThat(output).contains("Experimental rules are supported since 0.31.0 ktlint version.")
-        }
-    }
-
-    @Test
-    internal fun `Should run incrementally`() {
+    internal fun `Lint check should run incrementally`() {
         val initialSourceFile = "src/main/kotlin/initial.kt"
         projectRoot.createSourceFile(
             initialSourceFile,
@@ -394,7 +348,9 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             """.trimIndent()
         )
 
-        build(":ktlintCheck")
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        }
 
         val additionalSourceFile = "src/main/kotlin/another-file.kt"
         projectRoot.createSourceFile(
@@ -405,18 +361,9 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             """.trimIndent()
         )
 
-        // TODO: Add better approach to different file paths on different OS
-        fun String.updatePathForWindows() = if (System.getProperty("os.name").contains("Windows")) {
-            replace("/", "\\\\")
-        } else {
-            this
-        }
-
-        build(":ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            val args = projectRoot.ktlintBuildDir().resolve("ktlintMainSourceSetCheck.args").readText()
-            assertThat(args).contains(additionalSourceFile.updatePathForWindows())
-            assertThat(args).doesNotContain(initialSourceFile.updatePathForWindows())
+        build(CHECK_PARENT_TASK_NAME, "--info").apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(output).contains("Executing incrementally")
         }
     }
 
@@ -429,8 +376,8 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             """.trimIndent()
         )
 
-        buildAndFail(":ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.FAILED)
+        buildAndFail(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
             assertThat(output).contains(
                 "class Test should be declared in a file named Test.kt (cannot be auto-corrected)"
             )
@@ -460,15 +407,72 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         val testSourceFile = "src/test/kotlin/another-file.kt"
         projectRoot.createSourceFile(testSourceFile, failingContents)
 
-        build(":ktlintMainSourceSetCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        build(mainSourceSetCheckTaskName).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
 
         // Removing a source file will cause the task to run, but the only incremental change will
         // be REMOVED, which does need to call ktlint
         projectRoot.removeSourceFile(initialSourceFile)
-        build(":ktlintMainSourceSetCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+        build(mainSourceSetCheckTaskName).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+        }
+    }
+
+    @Test
+    internal fun `Should not leak KtLint into buildscript classpath`() {
+        projectRoot.withCleanSources()
+
+        build("buildEnvironment").apply {
+            assertThat(output).doesNotContain("com.pinterest.ktlint")
+        }
+    }
+
+    @Test
+    internal fun `Should print pathes to generated reports on code style violations`() {
+        projectRoot.withFailingSources()
+
+        buildAndFail(CHECK_PARENT_TASK_NAME).apply {
+            val s = File.separator
+            assertThat(output).contains(
+                "build${s}reports${s}ktlint${s}ktlintMainSourceSetCheck${s}ktlintMainSourceSetCheck.txt"
+            )
+        }
+    }
+
+    @Test
+    internal fun `Should force dependencies versions from KtLint configuration for ruleset configuration`() {
+        projectRoot.withCleanSources()
+
+        projectRoot.buildFile().appendText(
+            """
+
+            dependencies {
+                $KTLINT_RULESET_CONFIGURATION_NAME "com.pinterest.ktlint:ktlint-core:0.34.2"
+            }
+            """.trimIndent()
+        )
+
+        build(":dependencies", "--configuration", KTLINT_RULESET_CONFIGURATION_NAME).apply {
+            assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.39.0")
+        }
+    }
+
+    @Test
+    internal fun `Should force dependencies versions from KtLint configuration for reporters configuration`() {
+        projectRoot.withCleanSources()
+
+        projectRoot.buildFile().appendText(
+            """
+
+            dependencies {
+                $KTLINT_REPORTER_CONFIGURATION_NAME "com.pinterest.ktlint:ktlint-core:0.34.2"
+            }
+            """.trimIndent()
+        )
+
+        build(":dependencies", "--configuration", KTLINT_REPORTER_CONFIGURATION_NAME).apply {
+            assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.39.0")
         }
     }
 }

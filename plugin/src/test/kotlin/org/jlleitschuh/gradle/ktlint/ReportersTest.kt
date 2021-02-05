@@ -47,12 +47,12 @@ abstract class ReportersTest : AbstractPluginTest() {
             """.trimIndent()
         )
 
-        buildAndFail("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.FAILED)
+        buildAndFail(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
             assertThat(output).contains("Unnecessary space(s)")
-            assertReportNotCreated(ReporterType.PLAIN.fileExtension)
-            assertReportCreated(ReporterType.CHECKSTYLE.fileExtension)
-            assertReportCreated(ReporterType.JSON.fileExtension)
+            assertReportNotCreated(ReporterType.PLAIN.fileExtension, mainSourceSetCheckTaskName)
+            assertReportCreated(ReporterType.CHECKSTYLE.fileExtension, mainSourceSetCheckTaskName)
+            assertReportCreated(ReporterType.JSON.fileExtension, mainSourceSetCheckTaskName)
         }
     }
 
@@ -76,13 +76,13 @@ abstract class ReportersTest : AbstractPluginTest() {
             """.trimIndent()
         )
 
-        buildAndFail("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.FAILED)
+        buildAndFail(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
             assertThat(output).contains("Unnecessary space(s)")
-            assertReportCreated(ReporterType.CHECKSTYLE.fileExtension)
-            assertReportNotCreated(ReporterType.PLAIN.fileExtension)
-            assertReportNotCreated(ReporterType.JSON.fileExtension)
-            assertReportCreated("html")
+            assertReportCreated(ReporterType.CHECKSTYLE.fileExtension, mainSourceSetCheckTaskName)
+            assertReportNotCreated(ReporterType.PLAIN.fileExtension, mainSourceSetCheckTaskName)
+            assertReportNotCreated(ReporterType.JSON.fileExtension, mainSourceSetCheckTaskName)
+            assertReportCreated("html", mainSourceSetCheckTaskName)
         }
     }
 
@@ -100,17 +100,17 @@ abstract class ReportersTest : AbstractPluginTest() {
             """.trimIndent()
         )
 
-        build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertReportCreated(ReporterType.PLAIN.fileExtension)
-            assertReportCreated(ReporterType.JSON.fileExtension)
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertReportCreated(ReporterType.PLAIN.fileExtension, mainSourceSetCheckTaskName)
+            assertReportCreated(ReporterType.JSON.fileExtension, mainSourceSetCheckTaskName)
         }
 
-        build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
-            assertReportCreated(ReporterType.PLAIN.fileExtension)
-            assertReportCreated(ReporterType.JSON.fileExtension)
-            assertReportNotCreated(ReporterType.CHECKSTYLE.fileExtension)
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertReportCreated(ReporterType.PLAIN.fileExtension, mainSourceSetCheckTaskName)
+            assertReportCreated(ReporterType.JSON.fileExtension, mainSourceSetCheckTaskName)
+            assertReportNotCreated(ReporterType.CHECKSTYLE.fileExtension, mainSourceSetCheckTaskName)
         }
 
         projectRoot.buildFile().appendText(
@@ -123,10 +123,11 @@ abstract class ReportersTest : AbstractPluginTest() {
             """.trimIndent()
         )
 
-        build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertReportCreated(ReporterType.PLAIN_GROUP_BY_FILE.fileExtension)
-            assertReportCreated(ReporterType.JSON.fileExtension)
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertReportCreated(ReporterType.PLAIN_GROUP_BY_FILE.fileExtension, mainSourceSetCheckTaskName)
+            assertReportCreated(ReporterType.JSON.fileExtension, mainSourceSetCheckTaskName)
+            assertReportNotCreated(ReporterType.CHECKSTYLE.fileExtension, mainSourceSetCheckTaskName)
         }
 
         projectRoot.buildFile().appendText(
@@ -139,12 +140,12 @@ abstract class ReportersTest : AbstractPluginTest() {
             """.trimIndent()
         )
 
-        build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertReportCreated(ReporterType.JSON.fileExtension)
-            assertReportCreated(ReporterType.CHECKSTYLE.fileExtension)
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertReportCreated(ReporterType.JSON.fileExtension, mainSourceSetCheckTaskName)
+            assertReportCreated(ReporterType.CHECKSTYLE.fileExtension, mainSourceSetCheckTaskName)
             // TODO: Stale reports are not cleaned up
-            assertReportCreated(ReporterType.PLAIN.fileExtension)
+            assertReportCreated(ReporterType.PLAIN.fileExtension, mainSourceSetCheckTaskName)
         }
     }
 
@@ -152,11 +153,11 @@ abstract class ReportersTest : AbstractPluginTest() {
     internal fun `Should use plain reporter if no reporters were defined`() {
         projectRoot.withFailingSources()
 
-        buildAndFail("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.FAILED)
-            assertReportCreated(ReporterType.PLAIN.fileExtension)
-            assertReportNotCreated(ReporterType.CHECKSTYLE.fileExtension)
-            assertReportNotCreated(ReporterType.JSON.fileExtension)
+        buildAndFail(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertReportCreated(ReporterType.PLAIN.fileExtension, mainSourceSetCheckTaskName)
+            assertReportNotCreated(ReporterType.CHECKSTYLE.fileExtension, mainSourceSetCheckTaskName)
+            assertReportNotCreated(ReporterType.JSON.fileExtension, mainSourceSetCheckTaskName)
         }
     }
 
@@ -173,9 +174,9 @@ abstract class ReportersTest : AbstractPluginTest() {
             """.trimIndent()
         )
 
-        build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertReportCreated(ReporterType.HTML.fileExtension)
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertReportCreated(ReporterType.HTML.fileExtension, mainSourceSetCheckTaskName)
         }
     }
 
@@ -193,9 +194,9 @@ abstract class ReportersTest : AbstractPluginTest() {
             """.trimIndent()
         )
 
-        build("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertReportNotCreated(ReporterType.HTML.fileExtension)
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertReportNotCreated(ReporterType.HTML.fileExtension, mainSourceSetCheckTaskName)
         }
     }
 
@@ -212,41 +213,56 @@ abstract class ReportersTest : AbstractPluginTest() {
                 reporter "json"
             }
 
-            tasks.withType(org.jlleitschuh.gradle.ktlint.KtlintCheckTask.class) {
-                reporterOutputDir = project.layout.buildDirectory.dir("$newLocation/${'$'}name")
+            tasks.withType(org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask.class) {
+                reportsOutputDirectory.set(project.layout.buildDirectory.dir("$newLocation/${'$'}name"))
             }
             """.trimIndent()
         )
 
-        buildAndFail("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.FAILED)
+        buildAndFail(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
 
-            assertReportNotCreated(ReporterType.CHECKSTYLE.fileExtension)
-            assertReportCreated(ReporterType.CHECKSTYLE.fileExtension, "build/$newLocation")
+            assertReportNotCreated(ReporterType.CHECKSTYLE.fileExtension, mainSourceSetCheckTaskName)
+            assertReportCreated(
+                ReporterType.CHECKSTYLE.fileExtension,
+                mainSourceSetCheckTaskName,
+                "build/$newLocation/$mainSourceSetCheckTaskName"
+            )
 
-            assertReportNotCreated(ReporterType.JSON.fileExtension)
-            assertReportCreated(ReporterType.JSON.fileExtension, "build/$newLocation")
+            assertReportNotCreated(ReporterType.JSON.fileExtension, mainSourceSetCheckTaskName)
+            assertReportCreated(
+                ReporterType.JSON.fileExtension,
+                mainSourceSetCheckTaskName,
+                "build/$newLocation/$mainSourceSetCheckTaskName"
+            )
         }
     }
 
     private fun assertReportCreated(
         reportFileExtension: String,
-        reportsLocation: String = "build/reports/ktlint"
+        taskName: String,
+        baseLocation: String = "build/reports/ktlint/$taskName"
     ) {
-        assertThat(reportLocation(reportsLocation, reportFileExtension).isFile).isTrue()
+        assertThat(
+            reportLocation(baseLocation, taskName, reportFileExtension).isFile
+        ).isTrue
     }
 
     private fun assertReportNotCreated(
         reportFileExtension: String,
-        reportsLocation: String = "build/reports/ktlint"
+        taskName: String,
+        baseLocation: String = "build/reports/ktlint/$taskName"
     ) {
-        assertThat(reportLocation(reportsLocation, reportFileExtension).isFile).isFalse()
+        assertThat(
+            reportLocation(baseLocation, taskName, reportFileExtension).isFile
+        ).isFalse
     }
 
     private fun reportLocation(
         reportsLocation: String,
+        taskName: String,
         reportFileExtension: String
     ) = projectRoot.resolve(
-        "$reportsLocation/ktlintMainSourceSetCheck/ktlintMainSourceSetCheck.$reportFileExtension"
+        "$reportsLocation/$taskName.$reportFileExtension"
     )
 }

@@ -17,7 +17,7 @@ class UnsupportedGradleTest : AbstractPluginTest() {
     internal fun `Should raise exception on applying plugin`() {
         projectRoot.defaultProjectSetup()
 
-        buildAndFail("ktlintCheck").run {
+        buildAndFail(CHECK_PARENT_TASK_NAME).run {
             assertThat(output).contains(
                 "Current version of plugin supports minimal Gradle version: " +
                     KtlintBasePlugin.LOWEST_SUPPORTED_GRADLE_VERSION

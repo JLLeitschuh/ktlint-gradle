@@ -25,6 +25,7 @@ repositories {
 tasks.withType<KotlinCompile>() {
     kotlinOptions {
         apiVersion = "1.3"
+        jvmTarget = "1.8"
     }
 }
 
@@ -42,10 +43,12 @@ configurations["testImplementation"].extendsFrom(shadowImplementation)
 
 dependencies {
     compileOnly(gradleApi())
+    compileOnly("com.pinterest.ktlint:ktlint-core:${PluginVersions.ktlint}")
     compileOnly(kotlin("gradle-plugin", PluginVersions.kotlin))
     compileOnly("com.android.tools.build:gradle:${PluginVersions.androidPlugin}")
     shadowImplementation("net.swiftzer.semver:semver:${PluginVersions.semver}")
     shadowImplementation("org.eclipse.jgit:org.eclipse.jgit:${PluginVersions.jgit}")
+    shadowImplementation("commons-io:commons-io:${PluginVersions.commonsIo}")
     // Explicitly added for shadow plugin to relocate implementation as well
     shadowImplementation("org.slf4j:slf4j-nop:${PluginVersions.sl4f}")
 
@@ -59,6 +62,8 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:${PluginVersions.junit5}")
     testImplementation("org.assertj:assertj-core:${PluginVersions.assertJ}")
     testImplementation(kotlin("reflect"))
+    testImplementation("com.pinterest.ktlint:ktlint-core:${PluginVersions.ktlint}")
+    testImplementation("com.tngtech.archunit:archunit-junit5:${PluginVersions.archUnit}")
 }
 
 tasks.withType<Test>().configureEach {

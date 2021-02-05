@@ -31,7 +31,7 @@ open class KtlintApplyToIdeaTask @Inject constructor(
     fun generate() {
         project.javaexec {
             it.classpath = classpath
-            it.main = resolveMainClassName(ktlintVersion.get())
+            it.main = "com.pinterest.ktlint.Main"
 
             // Global flags
             if (android.get()) {

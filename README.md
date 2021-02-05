@@ -61,7 +61,8 @@ This API is available in new versions of Gradle.
 
 Minimal supported [Gradle](www.gradle.org) version: `6.0`
 
-Minimal supported [ktlint](https://github.com/pinterest/ktlint) version: `0.22.0`
+Minimal supported [ktlint](https://github.com/pinterest/ktlint) version: `0.34.0`
+(additionally excluding `0.37.0` on Windows OS and `0.38.0` on all OS types)
 
 ### Ktlint plugin
 
@@ -287,8 +288,8 @@ It is possible also to define different from default output directory for genera
 <summary>Groovy</summary>
 
 ```groovy
-tasks.withType(org.jlleitschuh.gradle.ktlint.KtlintCheckTask) {
-    reporterOutputDir = project.layout.buildDirectory.dir("other/location/$name")
+tasks.withType(org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask) {
+    reportsOutputDirectory = project.layout.buildDirectory.dir("other/location/$name")
 }
 ```
 </details>
@@ -297,8 +298,8 @@ tasks.withType(org.jlleitschuh.gradle.ktlint.KtlintCheckTask) {
 <summary>Kotlin script</summary>
 
 ```kotlin
-tasks.withType<org.jlleitschuh.gradle.ktlint.KtlintCheckTask>() {
-    reporterOutputDir.set(
+tasks.withType<org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask>() {
+    reportsOutputDirectory.set(
         project.layout.buildDirectory.dir("other/location/$name")
     )
 }
@@ -339,11 +340,24 @@ This repository provides the following examples of how to set up this plugin:
 
 ### Main tasks
 
-This plugin adds two maintasks to every source set: `ktlint[source set name]SourceSetCheck` and `ktlint[source set name]SourceSetFormat`.
-Additionally, a simple `ktlintCheck` task has also been added that checks all of the source sets for that project.
-Similarly, a `ktlintFormat` task has been added that formats all of the source sets.
+This plugin adds following tasks to every project:
+- `loadKtlintReporters` - preloads KtLint `Reporter`s
+- `runKtlintCheckOverKotlinScripts` - runs actual lint check over project Kotlin script files
+- `ktlintKotlinScriptCheck` - generates reports and prints issues into Gradle console based on lint check found errors.
+  This task execution depends on `loadKtlintReporters` and `runKtlintCheckOverKotlinScripts` tasks execution outputs
+- `runKtlintFormatOverKotlinScripts` - tries to format according to the code style project Kotlin script files
+- `ktlintKotlinScriptFormat` - generate reports and prints issues into Gradle console based on found non-formattable errors.
+  This task execution depends on `loadKtlintReporters` and `runKtlintFormatOverKotlinScripts` tasks execution outputs
+- `ktlintCheck` - checks all `SourceSet`s and project Kotlin script files
+- `ktlintFormat` - tries to format according to the code style all `SourceSet`s Kotlin files and project Kotlin script files
 
-Additionally plugin adds two task for project kotlin script files: `ktlintKotlinScriptCheck` and `ktlintKotlinScriptFormat`.
+Then for each `SourceSet` plugin adds following tasks:
+- `runKtlintCheckOver[source set name]SourceSet` - runs actual lint check on every Kotlin file in given `SourceSet`
+- `ktlint[source set name]SourceSetCheck` - generates reports and prints issues into Gradle console based on lint check found errors.
+  This task execution depends on `loadKtlintReporters` and `runKtlintCheckOver[source set name]SourceSet` tasks execution outputs
+- `runKtlintFormatOver[source set name]SourceSet` - tries to format according to the code style every Kotlin file in given `SourceSet`
+- `ktlint[source set name]SourceSetCheck` - generates reports and prints issues into Gradle console based on found non-formattable errors.
+  This task execution depends on `loadKtlintReporters` and `runKtlintFormatOver[source set name]SourceSet` tasks execution outputs
 
 ### Additional helper tasks
 

@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.jlleitschuh.gradle.ktlint.KtlintBasePlugin.Companion.LOWEST_SUPPORTED_GRADLE_VERSION
+import org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -49,32 +50,42 @@ abstract class KotlinJsPluginTests : AbstractPluginTest() {
 
     @Test
     internal fun `Should add check tasks`() {
-        build("-m", "ktlintCheck").apply {
+        build("-m", CHECK_PARENT_TASK_NAME).apply {
             val ktlintTasks = output
                 .lineSequence()
                 .toList()
 
             assertThat(ktlintTasks).anySatisfy {
-                assertThat(it).contains("ktlintMainSourceSetCheck")
+                assertThat(it).contains(mainSourceSetCheckTaskName)
             }
             assertThat(ktlintTasks).anySatisfy {
-                assertThat(it).contains("ktlintTestSourceSetCheck")
+                assertThat(it).contains(
+                    GenerateReportsTask.generateNameForSourceSets(
+                        "test",
+                        GenerateReportsTask.LintType.CHECK
+                    )
+                )
             }
         }
     }
 
     @Test
     internal fun `Should add format tasks`() {
-        build("-m", "ktlintFormat").apply {
+        build("-m", FORMAT_PARENT_TASK_NAME).apply {
             val ktlintTasks = output
                 .lineSequence()
                 .toList()
 
             assertThat(ktlintTasks).anySatisfy {
-                assertThat(it).contains("ktlintMainSourceSetFormat")
+                assertThat(it).contains(mainSourceSetFormatTaskName)
             }
             assertThat(ktlintTasks).anySatisfy {
-                assertThat(it).contains("ktlintTestSourceSetFormat")
+                assertThat(it).contains(
+                    GenerateReportsTask.generateNameForSourceSets(
+                        "test",
+                        GenerateReportsTask.LintType.FORMAT
+                    )
+                )
             }
         }
     }
@@ -83,8 +94,8 @@ abstract class KotlinJsPluginTests : AbstractPluginTest() {
     internal fun `Should fail check task on un-formatted sources`() {
         projectRoot.withFailingSources()
 
-        buildAndFail("ktlintCheck").apply {
-            assertThat(task(":ktlintMainSourceSetCheck")?.outcome).isEqualTo(TaskOutcome.FAILED)
+        buildAndFail(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
         }
     }
 }
