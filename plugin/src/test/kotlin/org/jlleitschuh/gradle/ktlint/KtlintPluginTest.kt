@@ -372,14 +372,16 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         projectRoot.createSourceFile(
             "src/main/kotlin/some path with whitespace/some file.kt",
             """
-                class Test
+            class Test
             """.trimIndent()
         )
 
         buildAndFail(CHECK_PARENT_TASK_NAME).apply {
             assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            // TODO: see https://github.com/pinterest/ktlint/issues/997 why check was changed
+            // should be reverted back once next ktlint release is out
             assertThat(output).contains(
-                "class Test should be declared in a file named Test.kt (cannot be auto-corrected)"
+                "File must end with a newline (\\n)"
             )
         }
     }
@@ -454,7 +456,7 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         )
 
         build(":dependencies", "--configuration", KTLINT_RULESET_CONFIGURATION_NAME).apply {
-            assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.39.0")
+            assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.40.0")
         }
     }
 
@@ -472,7 +474,7 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         )
 
         build(":dependencies", "--configuration", KTLINT_REPORTER_CONFIGURATION_NAME).apply {
-            assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.39.0")
+            assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.40.0")
         }
     }
 }
