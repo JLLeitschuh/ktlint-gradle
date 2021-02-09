@@ -5,19 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## Unreleased
-### Added
-  - ?
+## [10.0.0] - 2021.02.09
 ### Changed
   - Updated Kotlin to `1.4.30` version.
 
     **Breaking** - removed support for following deprecated Kotlin plugins:
     1. "kotlin2js"
     2. "kotlin-platform-*"
-  - Updated Android Gradle Plugin to 4.1.0 version.
+  - Updated Android Gradle Plugin to `4.1.0` version.
 
-    **Breaking** - removed build variants meta tasks. Minimum supported AGP version is 4.0.0.
-  - Updated shadow plugin to 6.1.0 version.
+    **Breaking** - removed build variants meta tasks. Minimum supported AGP version is `4.0.0`.
+  - Updated shadow plugin to `6.1.0` version.
   - Set default ktlint version to `0.40.0` 
   - Updated Gradle to `6.8.1` version
   - Set minimal supported Gradle version to `6.0`
@@ -33,8 +31,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
      To configure maximum heap size, use `BaseKtLintCheckTask#workerMaxHeapSize` property.
      5. "ktlintRuleset" and "ktlintReporter" configurations dependencies versions are constraint by main "ktlint" configuration dependencies versions.
 
-### Removed
-  - ?
 ### Fixed
   - Gradle deprecations [#395](https://github.com/JLLeitschuh/ktlint-gradle/issues/395)
   - Fail task on KtLint crash [#229](https://github.com/JLLeitschuh/ktlint-gradle/issues/229)
