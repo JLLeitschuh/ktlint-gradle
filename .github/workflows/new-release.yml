@@ -31,13 +31,13 @@ jobs:
             ${{ runner.os }}-gradle-wrapper-
       - name: Publish plugin
         env:
-          GRADLE_PUBLISH_KEY: {{ secrets.GRADLE_PUBLISH_KEY }}
-          GRADLE_PUBLISH_SECRET: {{ secrets.GRADLE_PUBLISH_SECRET }}
-          GITHUB_KEY: {{ secrets.GithubKey }}
+          GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
+          GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
+          GITHUB_KEY: ${{ secrets.GithubKey }}
         run: ./plugin/gradlew -p ./plugin publishPlugins --no-daemon
       - name: Create new Github release
         env:
-          GRADLE_PUBLISH_KEY: { { secrets.GRADLE_PUBLISH_KEY } }
-          GRADLE_PUBLISH_SECRET: { { secrets.GRADLE_PUBLISH_SECRET } }
-          GITHUB_KEY: { { secrets.GithubKey } }
+          GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
+          GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
+          GITHUB_KEY: ${{ secrets.GithubKey }}
         run: ./plugin/gradlew -p ./plugin githubRelease --no-daemon
