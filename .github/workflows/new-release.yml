@@ -10,12 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      # Github context will not contain tag branch,
-      # see https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#github-context
-      # So creating this workaround to check that tag is present on remotes/origin/master
-      # If not - grep will exit with 1 code and fail the job
-      - name: Validate tag was created on main branch
-        run: git branch -a --contains $GITHUB_REF | grep "^(\s)*remotes/[a-zA-Z0-9]+/master$"
       - name: set up JDK 1.8
         uses: actions/setup-java@v1
         with:
