@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [10.1.0-SNAPSHOT] Unreleased
+### Added
+  - ?
+### Changed
+  - ?
+### Fixed
+  - ?
+### Removed
+  - ?
+
 ## [10.0.0] - 2021.02.09
 ### Changed
   - Updated Kotlin to `1.4.30` version.
