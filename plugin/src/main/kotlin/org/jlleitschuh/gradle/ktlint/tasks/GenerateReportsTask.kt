@@ -17,11 +17,11 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.workers.WorkerExecutor
-import org.jetbrains.kotlin.konan.file.File
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import org.jlleitschuh.gradle.ktlint.worker.ConsoleReportWorkAction
 import org.jlleitschuh.gradle.ktlint.worker.GenerateReportsWorkAction
 import org.jlleitschuh.gradle.ktlint.worker.LoadReportersWorkAction
+import java.io.File
 import java.io.FileInputStream
 import java.io.ObjectInputStream
 import javax.inject.Inject
