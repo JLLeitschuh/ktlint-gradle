@@ -55,11 +55,20 @@ abstract class AbstractPluginTest {
     protected open fun gradleRunnerFor(
         vararg arguments: String,
         projectRoot: File = this.projectRoot
-    ): GradleRunner =
-        GradleRunner.create()
+    ): GradleRunner {
+        val sharedTestKitDir = File(".")
+            .resolve(".gradle-test-kit")
+            .absoluteFile
+            .also {
+                if (!it.exists()) it.mkdir()
+            }
+
+        return GradleRunner.create()
             .withProjectDir(projectRoot)
             .withPluginClasspath()
+            .withTestKitDir(sharedTestKitDir)
             .withArguments(arguments.toList() + "--stacktrace")
+    }
 
     protected
     fun File.withCleanSources() = createSourceFile(

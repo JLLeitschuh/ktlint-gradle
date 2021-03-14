@@ -68,6 +68,7 @@ dependencies {
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
+    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
 }
 
 val shadowJarTask = tasks.named("shadowJar", ShadowJar::class.java)
