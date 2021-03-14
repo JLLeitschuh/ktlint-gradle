@@ -34,6 +34,15 @@ jobs:
           key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradlew') }}
           restore-keys: |
             ${{ runner.os }}-gradle-wrapper-
+      # Inspired by https://github.com/actions/cache/issues/432#issuecomment-740376179
+      - name: Restore TestKit cache
+        uses: actions/cache@v1
+        with:
+          path: plugin/.gradle-test-kit
+          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradlew') }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradlew') }}-
+            ${{ runner.os }}-gradle-wrapper-
       - name: Build plugin
         run: ./plugin/gradlew -p ./plugin build --no-daemon
       - name: Check plugin codestyle
