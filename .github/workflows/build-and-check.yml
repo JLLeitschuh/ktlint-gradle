@@ -23,25 +23,32 @@ jobs:
       - name: Restore Gradle caches
         uses: actions/cache@v1
         with:
-          path: ~/.gradle/caches
+          path: |
+            ~/.gradle/caches/modules-2
+            ~/.gradle/caches/files-2.1
+            ~/.gradle/caches/metadata-2.96
           key: ${{ runner.os }}-gradle-cache-${{ hashFiles('**/*.gradle.kts') }}-${{ hashFiles('**/gradle.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-cache-
-      - name: Restore Gradle wrapper
-        uses: actions/cache@v1
-        with:
-          path: ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradlew') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-wrapper-
       # Inspired by https://github.com/actions/cache/issues/432#issuecomment-740376179
       - name: Restore TestKit cache
         uses: actions/cache@v1
         with:
-          path: plugin/.gradle-test-kit
+          path: |
+            plugin/.gradle-test-kit/caches/modules-2
+            plugin/.gradle-test-kit/caches/files-2.1
+            plugin/.gradle-test-kit/caches/metadata-2.96
           key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradlew') }}-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradlew') }}-
+            ${{ runner.os }}-gradle-wrapper-
+      - name: Restore Gradle wrapper
+        uses: actions/cache@v1
+        with:
+          path: |
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradlew') }}
+          restore-keys: |
             ${{ runner.os }}-gradle-wrapper-
       - name: Build plugin
         run: ./plugin/gradlew -p ./plugin build --no-daemon
