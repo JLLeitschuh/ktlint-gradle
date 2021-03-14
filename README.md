@@ -84,6 +84,11 @@ buildscript {
   }
 }
 
+repositories {
+  // Required to download KtLint
+  mavenCentral()
+}
+
 apply plugin: "org.jlleitschuh.gradle.ktlint"
 ```
 </details>
@@ -100,6 +105,11 @@ buildscript {
   }
 }
 
+repositories {
+  // Required to download KtLint
+  mavenCentral()
+}
+
 apply(plugin = "org.jlleitschuh.gradle.ktlint")
 ```
 </details>
@@ -110,6 +120,11 @@ Build script snippet for new, incubating, plugin mechanism introduced in Gradle 
 ```groovy
 plugins {
   id "org.jlleitschuh.gradle.ktlint" version "<current_version>"
+}
+
+repositories {
+  // Required to download KtLint
+  mavenCentral()
 }
 ```
 
@@ -123,10 +138,15 @@ Optionally apply plugin to all project modules:
 ```groovy
 subprojects {
     apply plugin: "org.jlleitschuh.gradle.ktlint" // Version should be inherited from parent
-    
+
+    repositories {
+        // Required to download KtLint
+        mavenCentral()
+    }
+
     // Optionally configure plugin
     ktlint {
-       debug = true
+        debug = true
     }
 }
 ```
@@ -137,10 +157,15 @@ subprojects {
 ```kotlin
 subprojects {
     apply(plugin = "org.jlleitschuh.gradle.ktlint") // Version should be inherited from parent
+
+    repositories {
+        // Required to download KtLint
+        mavenCentral()
+    }
     
     // Optionally configure plugin
     configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
-       debug.set(true)
+        debug.set(true)
     }
 }
 ```
