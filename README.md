@@ -24,6 +24,7 @@ The assumption being that you would not want to lint code you weren't compiling.
     - [Simple setup](#simple-setup)
     - [Using new plugin API](#using-new-plugin-api)
     - [How to apply to all subprojects](#applying-to-subprojects)
+    - [Testing KtLint snapshots](#testing-ktlint-snapshots)
   - [Intellij IDEA plugin](#intellij-idea-only-plugin)
     - [Simple setup](#idea-plugin-simple-setup)
     - [Using new plugin API](#idea-plugin-setup-using-new-plugin-api)
@@ -167,6 +168,42 @@ subprojects {
     configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
         debug.set(true)
     }
+}
+```
+</details>
+
+#### Testing KtLint snapshots
+
+To test KtLint snapshots add following configuration into project build script (latest KtLint snapshot version name
+you could find [here](https://github.com/pinterest/ktlint/blob/master/gradle.properties#L1)):
+<details>
+<summary>Groovy</summary>
+
+```groovy
+repositories {
+    maven {
+      url 'https://oss.sonatype.org/content/repositories/snapshots'
+    }
+}
+
+ktlint {
+  version = "0.41.0-SNAPSHOT"
+}
+```
+</details>
+
+<details open>
+<summary>Kotlin</summary>
+
+```kotlin
+repositories {
+    maven {
+        setUrl("https://oss.sonatype.org/content/repositories/snapshots")
+    }
+}
+
+ktlint {
+    version.set("0.41.0-SNAPSHOT")
 }
 ```
 </details>
