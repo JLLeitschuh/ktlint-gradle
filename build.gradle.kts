@@ -1,8 +1,7 @@
 buildscript {
     repositories {
         google()
-        jcenter()
-        maven("https://dl.bintray.com/jetbrains/kotlin-native-dependencies")
+        mavenCentral()
     }
 }
 
@@ -16,7 +15,8 @@ plugins {
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
+        jcenter() // required for old html reporter versions
     }
 }
 
