@@ -1,17 +1,16 @@
 package org.jlleitschuh.gradle.ktlint.worker
 
 import com.pinterest.ktlint.core.KtLint
+import com.pinterest.ktlint.core.LintError
 import com.pinterest.ktlint.core.RuleSet
 import com.pinterest.ktlint.core.RuleSetProvider
+import net.swiftzer.semver.SemVer
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
-import java.io.BufferedOutputStream
-import java.io.FileOutputStream
-import java.io.ObjectOutputStream
 import java.util.ServiceLoader
 
 @Suppress("UnstableApiUsage")
@@ -34,7 +33,7 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
         val result = mutableListOf<LintErrorResult>()
 
         parameters.filesToLint.files.forEach {
-            val errors = mutableListOf<Pair<SerializableLintError, Boolean>>()
+            val errors = mutableListOf<Pair<LintError, Boolean>>()
             val ktLintParameters = KtLint.Params(
                 fileName = it.absolutePath,
                 text = it.readText(),
@@ -44,7 +43,7 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
                 editorConfigPath = additionalEditorConfig,
                 script = !it.name.endsWith(".kt", ignoreCase = true),
                 cb = { lintError, isCorrected ->
-                    errors.add(SerializableLintError(lintError) to isCorrected)
+                    errors.add(lintError to isCorrected)
                 }
             )
 
@@ -66,15 +65,14 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
             )
         }
 
-        ObjectOutputStream(
-            BufferedOutputStream(
-                FileOutputStream(
-                    parameters.discoveredErrorsFile.asFile.get()
-                )
+        KtLintClassesSerializer
+            .create(
+                SemVer.parse(parameters.ktLintVersion.get())
             )
-        ).use {
-            it.writeObject(result)
-        }
+            .saveErrors(
+                result,
+                parameters.discoveredErrorsFile.asFile.get()
+            )
     }
 
     private fun generateUserData(): Map<String, String> {
@@ -117,5 +115,6 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
         val additionalEditorconfigFile: RegularFileProperty
         val formatSource: Property<Boolean>
         val discoveredErrorsFile: RegularFileProperty
+        val ktLintVersion: Property<String>
     }
 }

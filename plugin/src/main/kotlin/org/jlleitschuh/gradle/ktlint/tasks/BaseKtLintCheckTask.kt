@@ -140,6 +140,7 @@ abstract class BaseKtLintCheckTask @Inject constructor(
             params.additionalEditorconfigFile.set(additionalEditorconfigFile)
             params.formatSource.set(formatSources)
             params.discoveredErrorsFile.set(discoveredErrors)
+            params.ktLintVersion.set(ktLintVersion)
         }
     }
 

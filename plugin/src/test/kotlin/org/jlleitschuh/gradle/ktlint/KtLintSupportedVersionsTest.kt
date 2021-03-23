@@ -3,6 +3,7 @@ package org.jlleitschuh.gradle.ktlint
 import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.condition.OS
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -16,7 +17,8 @@ class KtLintSupportedVersionsTest : AbstractPluginTest() {
         projectRoot.defaultProjectSetup()
     }
 
-    @ParameterizedTest
+    @DisplayName("Should lint correct sources without errors")
+    @ParameterizedTest(name = "KtLint {0}: {displayName}")
     @MethodSource("provideSupportedKtLintVersions")
     internal fun `Should lint correct sources without errors`(
         ktLintVersion: String
@@ -35,7 +37,8 @@ class KtLintSupportedVersionsTest : AbstractPluginTest() {
         }
     }
 
-    @ParameterizedTest
+    @DisplayName("Lint should fail on sources with style violations")
+    @ParameterizedTest(name = "KtLint {0}: {displayName}")
     @MethodSource("provideSupportedKtLintVersions")
     internal fun `Lint should fail on sources with style violations`(
         ktLintVersion: String
@@ -54,7 +57,8 @@ class KtLintSupportedVersionsTest : AbstractPluginTest() {
         }
     }
 
-    @ParameterizedTest
+    @DisplayName("Format should successfully finish on sources with style violations")
+    @ParameterizedTest(name = "KtLint {0}: {displayName}")
     @MethodSource("provideSupportedKtLintVersions")
     internal fun `Format should successfully finish on sources with style violations`(
         ktLintVersion: String
@@ -87,7 +91,8 @@ class KtLintSupportedVersionsTest : AbstractPluginTest() {
                 // "0.38.0" has been compiled with Kotlin apiLevel 1.4 and not supported by Gradle plugins
                 Arguments.of("0.38.1"),
                 Arguments.of("0.39.0"),
-                Arguments.of("0.40.0")
+                Arguments.of("0.40.0"),
+                Arguments.of("0.41.0")
             )
 
             // "0.37.0" is failing on Windows machines that is fixed in the next version

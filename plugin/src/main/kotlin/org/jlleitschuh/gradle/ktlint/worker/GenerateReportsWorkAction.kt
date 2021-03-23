@@ -1,5 +1,6 @@
 package org.jlleitschuh.gradle.ktlint.worker
 
+import net.swiftzer.semver.SemVer
 import org.gradle.api.GradleException
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.MapProperty
@@ -12,9 +13,17 @@ import java.io.PrintStream
 internal abstract class GenerateReportsWorkAction : WorkAction<GenerateReportsWorkAction.GenerateReportsParameters> {
 
     override fun execute() {
-        val discoveredErrors = loadErrors(parameters.discoveredErrorsFile.get().asFile)
+        val ktLintClassesSerializer = KtLintClassesSerializer
+            .create(
+                SemVer.parse(parameters.ktLintVersion.get())
+            )
+
+        val discoveredErrors = ktLintClassesSerializer.loadErrors(parameters.discoveredErrorsFile.get().asFile)
         val currentReporterId = parameters.reporterId.get()
-        val reporterProvider = loadReporterProviders(parameters.loadedReporterProviders.asFile.get())
+        val reporterProvider = ktLintClassesSerializer
+            .loadReporterProviders(
+                parameters.loadedReporterProviders.asFile.get()
+            )
             .find { it.id == currentReporterId }
             ?: throw GradleException("Could not find ReporterProvider \"$currentReporterId\"")
 
@@ -31,7 +40,7 @@ internal abstract class GenerateReportsWorkAction : WorkAction<GenerateReportsWo
                 val filePath = lintErrorResult.lintedFile.absolutePath
                 reporter.before(filePath)
                 lintErrorResult.lintErrors.forEach {
-                    reporter.onLintError(filePath, it.first.lintError, it.second)
+                    reporter.onLintError(filePath, it.first, it.second)
                 }
                 reporter.after(filePath)
             }
@@ -45,5 +54,6 @@ internal abstract class GenerateReportsWorkAction : WorkAction<GenerateReportsWo
         val reporterId: Property<String>
         val reporterOutput: RegularFileProperty
         val reporterOptions: MapProperty<String, String>
+        val ktLintVersion: Property<String>
     }
 }

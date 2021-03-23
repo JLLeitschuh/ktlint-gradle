@@ -158,4 +158,5 @@ private fun <T : BaseKtLintCheckTask> GenerateReportsTask.commonConfiguration(
     outputColorName.set(pluginHolder.extension.outputColorName)
     ignoreFailures.set(pluginHolder.extension.ignoreFailures)
     verbose.set(pluginHolder.extension.verbose)
+    ktLintVersion.set(pluginHolder.extension.version)
 }

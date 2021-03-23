@@ -78,6 +78,7 @@ internal abstract class LoadReportersTask @Inject constructor(
             param.customReporters.set(customReporters)
             param.loadedReporters.set(loadedReporters)
             param.loadedReporterProviders.set(loadedReporterProviders)
+            param.ktLintVersion.set(ktLintVersion)
         }
     }
 
