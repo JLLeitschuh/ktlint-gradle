@@ -456,7 +456,7 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         )
 
         build(":dependencies", "--configuration", KTLINT_RULESET_CONFIGURATION_NAME).apply {
-            assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.40.0")
+            assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.41.0")
         }
     }
 
@@ -474,7 +474,7 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
         )
 
         build(":dependencies", "--configuration", KTLINT_REPORTER_CONFIGURATION_NAME).apply {
-            assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.40.0")
+            assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.41.0")
         }
     }
 }

@@ -1,6 +1,7 @@
 package org.jlleitschuh.gradle.ktlint.worker
 
 import com.pinterest.ktlint.core.ReporterProvider
+import net.swiftzer.semver.SemVer
 import org.gradle.api.GradleException
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.Logging
@@ -26,17 +27,13 @@ internal abstract class LoadReportersWorkAction : WorkAction<LoadReportersWorkAc
         val allProviders = loadAllReporterProviders()
         val loadedReporters = filterEnabledBuiltInProviders(allProviders) + filterCustomProviders(allProviders)
 
-        ObjectOutputStream(
-            BufferedOutputStream(
-                FileOutputStream(
-                    parameters.loadedReporterProviders.asFile.get()
-                )
-            )
-        ).use { oos ->
-            oos.writeObject(
-                loadedReporters.map { SerializableReporterProvider(it.second) }
-            )
-        }
+        val ktLintClassesSerializer = KtLintClassesSerializer.create(
+            SemVer.parse(parameters.ktLintVersion.get())
+        )
+        ktLintClassesSerializer.saveReporterProviders(
+            loadedReporters.map { it.second },
+            parameters.loadedReporterProviders.asFile.get()
+        )
 
         ObjectOutputStream(
             BufferedOutputStream(
@@ -122,6 +119,7 @@ internal abstract class LoadReportersWorkAction : WorkAction<LoadReportersWorkAc
         val debug: Property<Boolean>
         val loadedReporterProviders: RegularFileProperty
         val loadedReporters: RegularFileProperty
+        val ktLintVersion: Property<String>
     }
 
     internal data class LoadedReporter(

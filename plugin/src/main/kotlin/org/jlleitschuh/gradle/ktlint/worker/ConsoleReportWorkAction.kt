@@ -1,6 +1,7 @@
 package org.jlleitschuh.gradle.ktlint.worker
 
 import com.pinterest.ktlint.core.LintError
+import net.swiftzer.semver.SemVer
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
@@ -16,7 +17,13 @@ internal abstract class ConsoleReportWorkAction : WorkAction<ConsoleReportWorkAc
     private val logger = Logging.getLogger("ktlint-console-report-worker")
 
     override fun execute() {
-        val errors = loadErrors(parameters.discoveredErrors.asFile.get())
+        val errors = KtLintClassesSerializer
+            .create(
+                SemVer.parse(parameters.ktLintVersion.get())
+            )
+            .loadErrors(
+                parameters.discoveredErrors.asFile.get()
+            )
 
         if (parameters.outputToConsole.getOrElse(false)) {
             val verbose = parameters.verbose.get()
@@ -26,7 +33,7 @@ internal abstract class ConsoleReportWorkAction : WorkAction<ConsoleReportWorkAc
                     .lintErrors
                     .filter { !it.second }
                     .forEach {
-                        it.first.lintError.logError(filePath, verbose)
+                        it.first.logError(filePath, verbose)
                     }
             }
         }
@@ -66,5 +73,6 @@ internal abstract class ConsoleReportWorkAction : WorkAction<ConsoleReportWorkAc
         val ignoreFailures: Property<Boolean>
         val verbose: Property<Boolean>
         val generatedReportsPaths: ConfigurableFileCollection
+        val ktLintVersion: Property<String>
     }
 }

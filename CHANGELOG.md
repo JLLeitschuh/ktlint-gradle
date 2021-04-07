@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   - ?
 ### Changed
   - Updated Gradle to `6.8.3` version
+  - Updated default KtLint version to `0.41.0`
 ### Fixed
   - Plugin fails to apply on non-Kotlin projects ([#443](https://github.com/JLLeitschuh/ktlint-gradle/issues/443))
 ### Removed

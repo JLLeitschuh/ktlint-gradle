@@ -76,6 +76,9 @@ abstract class GenerateReportsTask @Inject constructor(
     @get:Input
     internal abstract val verbose: Property<Boolean>
 
+    @get:Input
+    internal abstract val ktLintVersion: Property<String>
+
     init {
         // Workaround for https://github.com/gradle/gradle/issues/2919
         onlyIf {
@@ -122,6 +125,7 @@ abstract class GenerateReportsTask @Inject constructor(
                 param.reporterId.set(loadedReporter.reporterId)
                 param.reporterOutput.set(reporterOutput)
                 param.reporterOptions.set(generateReporterOptions(loadedReporter))
+                param.ktLintVersion.set(ktLintVersion)
             }
         }
 
@@ -131,6 +135,7 @@ abstract class GenerateReportsTask @Inject constructor(
             param.ignoreFailures.set(ignoreFailures)
             param.verbose.set(verbose)
             param.generatedReportsPaths.from(loadedReporters.values)
+            param.ktLintVersion.set(ktLintVersion)
         }
     }
 

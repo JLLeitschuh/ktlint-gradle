@@ -1,5 +1,6 @@
 package org.jlleitschuh.gradle.ktlint.worker
 
+import com.pinterest.ktlint.core.LintError
 import java.io.File
 import java.io.Serializable
 
@@ -11,7 +12,7 @@ import java.io.Serializable
  */
 internal data class LintErrorResult(
     val lintedFile: File,
-    val lintErrors: List<Pair<SerializableLintError, Boolean>>
+    val lintErrors: List<Pair<LintError, Boolean>>
 ) : Serializable {
     companion object {
         private const val serialVersionUID: Long = 2012012585L

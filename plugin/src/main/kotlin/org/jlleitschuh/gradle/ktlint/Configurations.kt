@@ -3,11 +3,11 @@ package org.jlleitschuh.gradle.ktlint
 import net.swiftzer.semver.SemVer
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
-import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.artifacts.component.ModuleComponentSelector
 import org.gradle.api.artifacts.component.ProjectComponentIdentifier
 import org.gradle.api.artifacts.result.ResolvedDependencyResult
+import org.gradle.api.attributes.Bundling
 import org.gradle.util.GradleVersion
 
 internal const val KTLINT_CONFIGURATION_NAME = "ktlint"
@@ -23,16 +23,16 @@ internal fun createKtlintConfiguration(target: Project, extension: KtlintExtensi
         if (state != Configuration.State.UNRESOLVED) return@apply
 
         description = KTLINT_CONFIGURATION_DESCRIPTION
-        val dependencyProvider = target.provider<Dependency> {
+
+        // Starting from KtLint 0.41.0 version published artifact has two variants: "external" and "shadowed"
+        attributes {
+            it.attribute(Bundling.BUNDLING_ATTRIBUTE, target.objects.named(Bundling::class.java, Bundling.EXTERNAL))
+        }
+
+        val dependencyProvider = target.provider {
             val ktlintVersion = extension.version.get()
             target.logger.info("Add dependency: ktlint version $ktlintVersion")
-            target.dependencies.create(
-                mapOf(
-                    "group" to resolveGroup(ktlintVersion),
-                    "name" to "ktlint",
-                    "version" to ktlintVersion
-                )
-            )
+            target.dependencies.create("${resolveGroup(ktlintVersion)}:ktlint:$ktlintVersion")
         }
         dependencies.addLater(dependencyProvider)
     }
