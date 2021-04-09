@@ -10,9 +10,9 @@ object PluginVersions {
     val gradleWrapper = "6.8.3"
     val gradleWrapperSha = "7faa7198769f872826c8ef4f1450f839ec27f0b4d5d1e51bade63667cbccd205"
     val junit5 = "5.5.2"
-    val assertJ = "3.11.1"
+    val assertJ = "3.19.0"
     val shadow = "6.1.0"
-    val githubRelease = "2.2.10"
+    val githubRelease = "2.2.12"
     val commonsIo = "2.8.0"
     val archUnit = "0.16.0"
 }
