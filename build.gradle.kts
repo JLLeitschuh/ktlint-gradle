@@ -16,7 +16,6 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        jcenter() // required for old html reporter versions
     }
 }
 

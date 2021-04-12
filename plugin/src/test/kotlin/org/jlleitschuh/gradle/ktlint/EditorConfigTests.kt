@@ -122,7 +122,7 @@ abstract class EditorConfigTests : AbstractPluginTest() {
 
             allprojects {
                 repositories {
-                    jcenter()
+                    mavenCentral()
                 }
             }
             """.trimIndent()

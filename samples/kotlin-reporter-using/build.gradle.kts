@@ -27,11 +27,6 @@ ktlint {
                 fileExtension = "csv"
                 dependency = project(":samples:kotlin-reporter-creating")
             }
-
-            register("html") {
-                fileExtension = "html"
-                dependency = "me.cassiano:ktlint-html-reporter:0.2.3"
-            }
         }
     }
 }
