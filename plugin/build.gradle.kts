@@ -20,7 +20,6 @@ version = "10.1.0-SNAPSHOT"
 repositories {
     google()
     mavenCentral()
-    jcenter() // required for trove4j: https://youtrack.jetbrains.com/issue/IDEA-261387
 }
 
 tasks.withType<KotlinCompile>() {

@@ -19,8 +19,8 @@ ktlint {
 
         customReporters {
             "html" {
-                fileExtension = "html"
-                dependency = "me.cassiano:ktlint-html-reporter:0.2.3"
+                fileExtension = "csv"
+                dependency = project(":samples:kotlin-reporter-creating")
             }
         }
     }
