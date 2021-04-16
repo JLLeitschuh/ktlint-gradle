@@ -49,10 +49,14 @@ abstract class BaseKtLintCheckTask @Inject constructor(
     @Suppress("unused")
     @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:InputFiles
-    internal val editorConfigFiles: FileCollection by lazy(LazyThreadSafetyMode.NONE) {
-        // Gradle will lazy evaluate this task input only on task execution
-        getEditorConfigFiles(project, additionalEditorconfigFile)
-    }
+    internal val editorConfigFiles: FileCollection = objectFactory.fileCollection().from(
+        {
+            getEditorConfigFiles(
+                projectLayout.projectDirectory.asFile.toPath(),
+                additionalEditorconfigFile
+            )
+        }
+    )
 
     @get:Input
     internal abstract val ktLintVersion: Property<String>
