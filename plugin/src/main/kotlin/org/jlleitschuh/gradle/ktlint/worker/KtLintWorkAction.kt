@@ -7,6 +7,7 @@ import com.pinterest.ktlint.core.RuleSetProvider
 import net.swiftzer.semver.SemVer
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.logging.Logging
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.workers.WorkAction
@@ -15,6 +16,9 @@ import java.util.ServiceLoader
 
 @Suppress("UnstableApiUsage")
 abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParameters> {
+
+    private val logger = Logging.getLogger("ktlint-worker")
+
     override fun execute() {
         val ruleSets = loadRuleSetsAndFilterThem(
             parameters.enableExperimental.getOrElse(false),
@@ -29,6 +33,8 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
         val userData = generateUserData()
         val debug = parameters.debug.get()
         val formatSource = parameters.formatSource.getOrElse(false)
+
+        resetEditorconfigCache()
 
         val result = mutableListOf<LintErrorResult>()
 
@@ -75,6 +81,14 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
             )
     }
 
+    private fun resetEditorconfigCache() {
+        if (parameters.editorconfigFilesWereChanged.get()) {
+            logger.info("Resetting KtLint caches")
+            // Calling trimMemory() will also reset internal loaded `.editorconfig` cache
+            KtLint.trimMemory()
+        }
+    }
+
     private fun generateUserData(): Map<String, String> {
         val userData = mutableMapOf(
             "android" to parameters.android.get().toString()
@@ -116,5 +130,6 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
         val formatSource: Property<Boolean>
         val discoveredErrorsFile: RegularFileProperty
         val ktLintVersion: Property<String>
+        val editorconfigFilesWereChanged: Property<Boolean>
     }
 }

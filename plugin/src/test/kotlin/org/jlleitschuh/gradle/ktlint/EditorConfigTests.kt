@@ -75,9 +75,10 @@ abstract class EditorConfigTests : AbstractPluginTest() {
             assertThat(task(":$lintTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
 
-        projectRoot.modifyEditorconfigFile(100)
-        build(CHECK_PARENT_TASK_NAME).apply {
+        projectRoot.modifyEditorconfigFile(10)
+        buildAndFail(CHECK_PARENT_TASK_NAME).apply {
             assertThat(task(":$lintTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
         }
     }
 
@@ -92,11 +93,12 @@ abstract class EditorConfigTests : AbstractPluginTest() {
         }
 
         projectRoot.modifyEditorconfigFile(
-            maxLineLength = 100,
+            maxLineLength = 10,
             filePath = additionalConfigPath
         )
-        build(CHECK_PARENT_TASK_NAME).apply {
+        buildAndFail(CHECK_PARENT_TASK_NAME).apply {
             assertThat(task(":$lintTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
         }
     }
 
@@ -147,13 +149,14 @@ abstract class EditorConfigTests : AbstractPluginTest() {
                 assertThat(task(":test:module1:$lintTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             }
 
-        projectWithModulesLocation.modifyEditorconfigFile(100)
+        projectWithModulesLocation.modifyEditorconfigFile(10)
 
         gradleRunner
             .withArguments(":test:module1:$CHECK_PARENT_TASK_NAME")
             .forwardOutput()
-            .build().apply {
+            .buildAndFail().apply {
                 assertThat(task(":test:module1:$lintTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(task(":test:module1:$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
             }
     }
 
