@@ -74,11 +74,16 @@ internal fun generateGitHook(
 
     echo "Running ktlint over these files:"
     echo "${'$'}CHANGED_FILES"
-
+    
+    git stash push --keep-index
+    
     ${generateGradleCommand(taskName, gradleRootDirPrefix)}
 
     echo "Completed ktlint run."
     ${postCheck(shouldUpdateCommit)}
+    
+    git stash pop
+    
     echo "Completed ktlint hook."
 
     """.trimIndent()

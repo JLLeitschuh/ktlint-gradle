@@ -138,6 +138,30 @@ class GitHookTasksTest : AbstractPluginTest() {
         }
     }
 
+    @Test
+    internal fun `Format hook should not add non-indexed code to the commit`() {
+        // TODO: This test doesn't run git or verify that only indexed code is committed,
+        //  only that the hook contains the correct commands.
+        //  Ideally an end to end test case would do something like:
+        //
+        //  echo "val a  = 1" > test.kt
+        //  git add test.kt
+        //  echo "val b  = 2" >> test.kt
+        //  git commit -m test
+        //  assert that commit equals "val a = 1"
+        //  assert that test.kt equals "val a = 1\nval b  = 2"
+
+        projectRoot.setupGradleProject()
+        val gitDir = projectRoot.initGit()
+
+        build(":$INSTALL_GIT_HOOK_FORMAT_TASK").run {
+            assertThat(task(":$INSTALL_GIT_HOOK_FORMAT_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            val hookText = gitDir.preCommitGitHook().readText()
+            assertThat(hookText).contains("git stash push")
+            assertThat(hookText).contains("git stash pop")
+        }
+    }
+
     private fun File.initGit(): File {
         val repo = RepositoryBuilder().setWorkTree(this).setMustExist(false).build()
         repo.create()
