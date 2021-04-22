@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   - Updated default KtLint version to `0.41.0`
 ### Fixed
   - Plugin fails to apply on non-Kotlin projects ([#443](https://github.com/JLLeitschuh/ktlint-gradle/issues/443))
+  - Pre-commit hook adds entire file to commit when only part of the file was indexed ([#470](https://github.com/JLLeitschuh/ktlint-gradle/pull/470))
 ### Removed
   - ?
 
