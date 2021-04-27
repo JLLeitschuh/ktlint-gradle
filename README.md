@@ -31,6 +31,7 @@ The assumption being that you would not want to lint code you weren't compiling.
   - [Plugin configuration](#configuration)
     - [Setting reports output directory](#setting-reports-output-directory)
     - [Customer reporters](#custom-reporters)
+    - [Changing workers memory usage](#changing-workers-memory-usage)
   - [Samples](#samples)
 - [Task details](#tasks-added)
   - [Main tasks](#main-tasks)
@@ -384,6 +385,31 @@ class CsvReporter(
 ```
 "some_other_file.txt" won't be captured as task output. This may lead to the problem,
 that task will always be not "UP_TO_DATE" and caching will not work.
+
+#### Changing workers memory usage
+
+By default, KtLint Gradle workers will use at most 256mb of heap size. For some projects it may be not enough, 
+but it is possible to change:
+
+<details>
+<summary>Groovy</summary>
+
+```groovy
+tasks.withType(org.jlleitschuh.gradle.ktlint.tasks.BaseKtLintCheckTask).configureEach {
+    it.workerMaxHeapSize.set("512mb")
+}
+```
+</details>
+
+<details open>
+<summary>Kotlin script</summary>
+
+```kotlin
+tasks.withType<org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask>().configureEach {
+    it.workerMaxHeapSize.set("512mb")
+}
+```
+</details>
 
 ### Samples
 
