@@ -5,6 +5,7 @@ import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTree
+import org.gradle.api.file.FileType
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
@@ -21,6 +22,9 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.SourceTask
+import org.gradle.work.ChangeType
+import org.gradle.work.Incremental
+import org.gradle.work.InputChanges
 import org.gradle.workers.WorkerExecutor
 import org.jlleitschuh.gradle.ktlint.FILTER_INCLUDE_PROPERTY_NAME
 import org.jlleitschuh.gradle.ktlint.KOTLIN_EXTENSIONS
@@ -30,7 +34,6 @@ import org.jlleitschuh.gradle.ktlint.intermediateResultsBuildDir
 import org.jlleitschuh.gradle.ktlint.property
 import org.jlleitschuh.gradle.ktlint.worker.KtLintWorkAction
 import java.io.File
-import java.util.concurrent.Callable
 import javax.inject.Inject
 
 @Suppress("UnstableApiUsage")
@@ -46,13 +49,17 @@ abstract class BaseKtLintCheckTask @Inject constructor(
     @get:Internal
     internal abstract val additionalEditorconfigFile: RegularFileProperty
 
-    @Suppress("unused")
+    @get:Incremental
     @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:InputFiles
-    internal val editorConfigFiles: FileCollection by lazy(LazyThreadSafetyMode.NONE) {
-        // Gradle will lazy evaluate this task input only on task execution
-        getEditorConfigFiles(project, additionalEditorconfigFile)
-    }
+    internal val editorConfigFiles: FileCollection = objectFactory.fileCollection().from(
+        {
+            getEditorConfigFiles(
+                projectLayout.projectDirectory.asFile.toPath(),
+                additionalEditorconfigFile
+            )
+        }
+    )
 
     @get:Input
     internal abstract val ktLintVersion: Property<String>
@@ -99,9 +106,7 @@ abstract class BaseKtLintCheckTask @Inject constructor(
     @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:InputFiles
     internal val stableSources: FileCollection = project.files(
-        Callable {
-            return@Callable source
-        }
+        { source }
     )
 
     @get:PathSensitive(PathSensitivity.RELATIVE)
@@ -116,10 +121,27 @@ abstract class BaseKtLintCheckTask @Inject constructor(
         )
 
     protected fun runLint(
-        filesToCheck: Set<File>,
+        inputChanges: InputChanges?,
         formatSources: Boolean,
     ) {
         checkDisabledRulesSupportedKtLintVersion()
+
+        val editorConfigUpdated = wasEditorConfigFilesUpdated(inputChanges)
+        val filesToCheck = if (formatSources || editorConfigUpdated || inputChanges == null) {
+            stableSources.files
+        } else {
+            getChangedSources(inputChanges)
+        }
+
+        logger.info("Executing ${if (inputChanges?.isIncremental == true) "incrementally" else "non-incrementally"}")
+        logger.info("Editorconfig files were changed: $editorConfigUpdated")
+        if (filesToCheck.isEmpty()) {
+            logger.info("Skipping. No files to lint")
+            didWork = false
+            return
+        } else {
+            logger.debug("Linting files: ${filesToCheck.joinToString()}")
+        }
 
         // Process isolation is used here to run KtLint in a separate java process.
         // This allows to better isolate work actions from different projects tasks between each other
@@ -141,8 +163,27 @@ abstract class BaseKtLintCheckTask @Inject constructor(
             params.formatSource.set(formatSources)
             params.discoveredErrorsFile.set(discoveredErrors)
             params.ktLintVersion.set(ktLintVersion)
+            params.editorconfigFilesWereChanged.set(editorConfigUpdated)
         }
     }
+
+    private fun wasEditorConfigFilesUpdated(
+        inputChanges: InputChanges?
+    ) = inputChanges != null &&
+        inputChanges.isIncremental &&
+        !inputChanges.getFileChanges(editorConfigFiles).none()
+
+    private fun getChangedSources(
+        inputChanges: InputChanges
+    ): Set<File> = inputChanges
+        .getFileChanges(stableSources)
+        .asSequence()
+        .filter {
+            it.fileType != FileType.DIRECTORY &&
+                it.changeType != ChangeType.REMOVED
+        }
+        .map { it.file }
+        .toSet()
 
     private fun checkDisabledRulesSupportedKtLintVersion() {
         if (disabledRules.get().isNotEmpty() &&
