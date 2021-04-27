@@ -162,6 +162,28 @@ class GitHookTasksTest : AbstractPluginTest() {
         }
     }
 
+    @Test
+    internal fun `Format hook should format files when they are renamed`() {
+        projectRoot.setupGradleProject()
+        val gitDir = projectRoot.initGit()
+
+        build(":$INSTALL_GIT_HOOK_FORMAT_TASK").run {
+            assertThat(task(":$INSTALL_GIT_HOOK_FORMAT_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(gitDir.preCommitGitHook().readText()).contains("""{ print $NF }""")
+        }
+    }
+
+    @Test
+    internal fun `Format hook should only format files that end with kt or kts`() {
+        projectRoot.setupGradleProject()
+        val gitDir = projectRoot.initGit()
+
+        build(":$INSTALL_GIT_HOOK_FORMAT_TASK").run {
+            assertThat(task(":$INSTALL_GIT_HOOK_FORMAT_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(gitDir.preCommitGitHook().readText()).contains("""/\.kts?$/""")
+        }
+    }
+
     private fun File.initGit(): File {
         val repo = RepositoryBuilder().setWorkTree(this).setMustExist(false).build()
         repo.create()

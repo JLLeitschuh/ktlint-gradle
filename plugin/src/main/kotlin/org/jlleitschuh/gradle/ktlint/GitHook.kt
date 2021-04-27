@@ -57,6 +57,8 @@ private fun postCheck(
     ""
 }
 
+internal const val NF = "\$NF"
+
 @Language("Sh")
 internal fun generateGitHook(
     taskName: String,
@@ -65,7 +67,7 @@ internal fun generateGitHook(
 ) =
     """
 
-    CHANGED_FILES="${'$'}(${generateGitCommand(gradleRootDirPrefix)} | awk '$1 != "D" && $2 ~ /\.kts|\.kt/ { print $2}')"
+    CHANGED_FILES="${'$'}(${generateGitCommand(gradleRootDirPrefix)} | awk '$1 != "D" && $NF ~ /\.kts?$/ { print $NF }')"
 
     if [ -z "${'$'}CHANGED_FILES" ]; then
         echo "No Kotlin staged files."
