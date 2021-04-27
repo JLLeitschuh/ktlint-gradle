@@ -22,7 +22,7 @@ abstract class KtLintFormatTask @Inject constructor(
 
     @TaskAction
     fun format() {
-        runLint(stableSources.files, true)
+        runLint(null, true)
     }
 
     /**

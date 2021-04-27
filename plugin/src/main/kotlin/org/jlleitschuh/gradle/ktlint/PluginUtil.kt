@@ -4,7 +4,6 @@ import net.swiftzer.semver.SemVer
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.gradle.api.file.FileCollection
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
@@ -18,6 +17,7 @@ import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import java.io.File
+import java.nio.file.Files
 import java.nio.file.Path
 
 internal inline fun <reified T : Task> Project.registerTask(
@@ -30,63 +30,50 @@ internal inline fun <reified T : Task> Project.registerTask(
 internal const val EDITOR_CONFIG_FILE_NAME = ".editorconfig"
 
 internal fun getEditorConfigFiles(
-    currentProject: Project,
+    currentProjectDir: Path,
     additionalEditorconfigFile: RegularFileProperty
-): FileCollection {
-    var editorConfigFileCollection = searchEditorConfigFiles(
-        currentProject,
-        currentProject.projectDir.toPath(),
-        currentProject.files()
+): Set<Path> {
+    val result = mutableSetOf<Path>()
+    searchEditorConfigFiles(
+        currentProjectDir,
+        result
     )
 
     if (additionalEditorconfigFile.isPresent) {
-        editorConfigFileCollection = editorConfigFileCollection.plus(
-            currentProject.files(additionalEditorconfigFile.asFile.get().toPath())
+        result.add(
+            additionalEditorconfigFile.asFile.get().toPath()
         )
     }
 
-    return editorConfigFileCollection
+    return result
 }
 
 private tailrec fun searchEditorConfigFiles(
-    project: Project,
     projectPath: Path,
-    fileCollection: FileCollection
-): FileCollection {
+    result: MutableSet<Path>
+) {
     val editorConfigFC = projectPath.resolve(EDITOR_CONFIG_FILE_NAME)
-    val outputCollection = if (editorConfigFC.toFile().exists()) {
-        fileCollection.plus(project.files(editorConfigFC))
-    } else {
-        fileCollection
+    if (Files.exists(editorConfigFC)) {
+        result.add(editorConfigFC.toAbsolutePath())
     }
 
     val parentDir = projectPath.parent
-    return if (parentDir != null &&
-        projectPath != project.rootDir.toPath() &&
+    if (parentDir != null &&
         !editorConfigFC.isRootEditorConfig()
     ) {
-        searchEditorConfigFiles(project, parentDir, outputCollection)
-    } else {
-        outputCollection
+        searchEditorConfigFiles(parentDir, result)
     }
 }
 
 private val editorConfigRootRegex = "^root\\s?=\\s?true\\R".toRegex()
 
 private fun Path.isRootEditorConfig(): Boolean {
-    val asFile = toFile()
-    if (!asFile.exists() || !asFile.canRead()) return false
+    if (!Files.exists(this) || !Files.isReadable(this)) return false
 
-    val reader = asFile.bufferedReader()
-    var fileLine = reader.readLine()
-    while (fileLine != null) {
-        if (fileLine.contains(editorConfigRootRegex)) {
-            return true
-        }
-        fileLine = reader.readLine()
+    toFile().useLines { lines ->
+        val isRoot = lines.firstOrNull { it.contains(editorConfigRootRegex) }
+        return@isRootEditorConfig isRoot != null
     }
-
-    return false
 }
 
 internal const val VERIFICATION_GROUP = LifecycleBasePlugin.VERIFICATION_GROUP
