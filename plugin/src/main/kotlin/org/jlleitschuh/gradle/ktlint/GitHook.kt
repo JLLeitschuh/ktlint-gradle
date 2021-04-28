@@ -65,7 +65,7 @@ private fun postCheck(
             git add ${'$'}file
         fi
     done
-    """.trimIndent()
+    """.trim('\n', ' ')
 } else {
     ""
 }
