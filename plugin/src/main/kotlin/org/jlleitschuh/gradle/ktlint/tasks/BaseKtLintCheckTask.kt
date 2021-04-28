@@ -30,6 +30,7 @@ import org.jlleitschuh.gradle.ktlint.FILTER_INCLUDE_PROPERTY_NAME
 import org.jlleitschuh.gradle.ktlint.KOTLIN_EXTENSIONS
 import org.jlleitschuh.gradle.ktlint.applyGitFilter
 import org.jlleitschuh.gradle.ktlint.getEditorConfigFiles
+import org.jlleitschuh.gradle.ktlint.hookVersion
 import org.jlleitschuh.gradle.ktlint.intermediateResultsBuildDir
 import org.jlleitschuh.gradle.ktlint.property
 import org.jlleitschuh.gradle.ktlint.worker.KtLintWorkAction
@@ -89,6 +90,10 @@ abstract class BaseKtLintCheckTask @Inject constructor(
 
     init {
         if (project.hasProperty(FILTER_INCLUDE_PROPERTY_NAME)) {
+            // if FILTER_INCLUDE_PROPERTY_NAME exists then we are invoked from a git hook, check hook version
+            if (project.findProperty(hookVersion) != hookVersion) {
+                logger.warn("Your ktlint git hook is outdated, please update by running the addKtlint*GitPreCommitHook Gradle task.")
+            }
             applyGitFilter()
         } else {
             KOTLIN_EXTENSIONS.forEach {

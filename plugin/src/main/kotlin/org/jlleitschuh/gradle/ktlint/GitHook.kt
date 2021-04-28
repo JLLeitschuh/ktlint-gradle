@@ -12,6 +12,19 @@ import javax.inject.Inject
 
 internal const val FILTER_INCLUDE_PROPERTY_NAME = "internalKtlintGitFilter"
 
+/**
+ * The version of the git hook,
+ *
+ * When this value is passed to the gradle task it is validated to ensure users don't have outdated
+ * ktlint git hooks installed.
+ *
+ * This should be manually updated when changes are made to the git hook.
+ *
+ * TODO: Implement a CI/build step that will look for changes to either GitHook.kt or the git hook output and
+ *   automatically increment this value
+ */
+internal const val hookVersion = "1"
+
 @Language("Bash")
 internal val shShebang =
     """
@@ -32,7 +45,7 @@ private fun generateGradleCommand(
     } else {
         "./gradlew"
     }
-    return "$gradleCommand --quiet $taskName -P$FILTER_INCLUDE_PROPERTY_NAME=\"${'$'}CHANGED_FILES\""
+    return "$gradleCommand --quiet $taskName -P$FILTER_INCLUDE_PROPERTY_NAME=\"${'$'}CHANGED_FILES\" -phookVersion=$hookVersion"
 }
 
 private fun generateGitCommand(
@@ -82,6 +95,7 @@ internal fun generateGitHook(
     ${generateGradleCommand(taskName, gradleRootDirPrefix)}
 
     echo "Completed ktlint run."
+
     ${postCheck(shouldUpdateCommit)}
     
     git stash pop
