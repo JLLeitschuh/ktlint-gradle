@@ -1,9 +1,11 @@
 package org.jlleitschuh.gradle.ktlint
 
 import org.gradle.api.file.FileTree
+import org.gradle.api.tasks.TaskCollection
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jlleitschuh.gradle.ktlint.tasks.BaseKtLintCheckTask
+import org.jlleitschuh.gradle.ktlint.tasks.GenerateBaselineTask
 import org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
@@ -159,4 +161,22 @@ private fun <T : BaseKtLintCheckTask> GenerateReportsTask.commonConfiguration(
     ignoreFailures.set(pluginHolder.extension.ignoreFailures)
     verbose.set(pluginHolder.extension.verbose)
     ktLintVersion.set(pluginHolder.extension.version)
+}
+
+internal fun createGenerateBaselineTask(
+    pluginHolder: KtlintPlugin.PluginHolder,
+    lintTasks: TaskCollection<out BaseKtLintCheckTask>
+): TaskProvider<GenerateBaselineTask> = pluginHolder.target.registerTask(
+    GenerateBaselineTask.NAME
+) {
+    description = GenerateBaselineTask.DESCRIPTION
+    group = HELP_GROUP
+
+    dependsOn(lintTasks)
+
+    ktLintClasspath.setFrom(pluginHolder.ktlintConfiguration)
+    baselineReporterClasspath.setFrom(pluginHolder.ktlintBaselineReporterConfiguration)
+    discoveredErrors.from(lintTasks.map { it.discoveredErrors })
+    ktLintVersion.set(pluginHolder.extension.version)
+    baselineFile.set(pluginHolder.extension.baseline)
 }

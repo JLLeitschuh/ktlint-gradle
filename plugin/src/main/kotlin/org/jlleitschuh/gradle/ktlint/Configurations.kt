@@ -16,6 +16,9 @@ internal const val KTLINT_RULESET_CONFIGURATION_NAME = "ktlintRuleset"
 internal const val KTLINT_RULESET_CONFIGURATION_DESCRIPTION = "All ktlint rulesets dependencies"
 internal const val KTLINT_REPORTER_CONFIGURATION_NAME = "ktlintReporter"
 internal const val KTLINT_REPORTER_CONFIGURATION_DESCRIPTION = "All ktlint custom reporters dependencies"
+internal const val KTLINT_BASELINE_REPORTER_CONFIGURATION_NAME = "ktlintBaselineReporter"
+internal const val KTLINT_BASELINE_REPORTER_CONFIGURATION_DESCRIPTION =
+    "Provides KtLint baseline reporter required to generate baseline file"
 
 internal fun createKtlintConfiguration(target: Project, extension: KtlintExtension) =
     target.configurations.maybeCreate(KTLINT_CONFIGURATION_NAME).apply {
@@ -77,6 +80,38 @@ internal fun createKtLintReporterConfiguration(
                         }
                     )
                 }
+        }
+    }
+
+internal fun createKtLintBaselineReporterConfiguration(
+    target: Project,
+    extension: KtlintExtension,
+    ktLintConfiguration: Configuration
+) = target
+    .configurations
+    .maybeCreate(KTLINT_BASELINE_REPORTER_CONFIGURATION_NAME)
+    .apply {
+        description = KTLINT_BASELINE_REPORTER_CONFIGURATION_DESCRIPTION
+        ensureConsistencyWith(target, ktLintConfiguration)
+
+        withDependencies {
+            dependencies.addLater(
+                target.provider {
+                    val ktlintVersion = extension.version.get()
+                    // Baseline reporter is only available starting 0.41.0 release
+                    if (SemVer.parse(ktlintVersion) >= SemVer(0, 41, 0)) {
+                        target.dependencies.create(
+                            "com.pinterest.ktlint:ktlint-reporter-baseline:${extension.version.get()}"
+                        )
+                    } else {
+                        // Adding fake plain reporter as addLater() does not accept `null` value
+                        // Generate baseline tasks anyway will not run on KtLint versions < 0.41.0
+                        target.dependencies.create(
+                            "com.pinterest.ktlint:ktlint-reporter-plain:${extension.version.get()}"
+                        )
+                    }
+                }
+            )
         }
     }
 

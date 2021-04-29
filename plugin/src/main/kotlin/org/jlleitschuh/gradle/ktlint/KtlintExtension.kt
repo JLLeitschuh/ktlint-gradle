@@ -4,6 +4,7 @@ import groovy.lang.Closure
 import org.gradle.api.Action
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.file.ConfigurableFileTree
+import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
@@ -21,6 +22,7 @@ import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 open class KtlintExtension
 internal constructor(
     objectFactory: ObjectFactory,
+    projectLayout: ProjectLayout,
     customReportersContainer: NamedDomainObjectContainer<CustomReporter>,
     private val filterTargetApplier: FilterApplier,
     kotlinScriptAdditionalPathApplier: KotlinScriptAdditionalPathApplier
@@ -102,6 +104,18 @@ internal constructor(
     val disabledRules: SetProperty<String> = objectFactory.setProperty {
         set(emptySet())
     }
+
+    /**
+     * Baseline file location.
+     *
+     * Default location is `<projectDir>/ktlintBaseline.xml`.
+     *
+     * @since KtLint `0.41.0`
+     */
+    val baseline: RegularFileProperty = objectFactory.fileProperty()
+        .convention(
+            projectLayout.projectDirectory.file("ktlintBaseline.xml")
+        )
 
     private val kscriptExtension = KScriptExtension(kotlinScriptAdditionalPathApplier)
 
