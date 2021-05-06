@@ -1,12 +1,16 @@
 package org.jlleitschuh.gradle.ktlint.worker
 
+import com.pinterest.ktlint.core.internal.containsLintError
+import com.pinterest.ktlint.core.internal.loadBaseline
 import net.swiftzer.semver.SemVer
 import org.gradle.api.GradleException
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
+import java.io.File
 import java.io.PrintStream
 
 @Suppress("UnstableApiUsage")
@@ -27,6 +31,10 @@ internal abstract class GenerateReportsWorkAction : WorkAction<GenerateReportsWo
             .find { it.id == currentReporterId }
             ?: throw GradleException("Could not find ReporterProvider \"$currentReporterId\"")
 
+        val baselineRules = parameters.baseline.orNull?.asFile?.absolutePath
+            ?.let { loadBaseline(it).baselineRules }
+        val projectDir = parameters.projectDirectory.asFile.get()
+
         PrintStream(
             parameters
                 .reporterOutput
@@ -38,9 +46,14 @@ internal abstract class GenerateReportsWorkAction : WorkAction<GenerateReportsWo
             reporter.beforeAll()
             discoveredErrors.forEach { lintErrorResult ->
                 val filePath = lintErrorResult.lintedFile.absolutePath
+                val baselineLintErrors = baselineRules?.get(
+                    lintErrorResult.lintedFile.toRelativeString(projectDir).replace(File.separatorChar, '/')
+                )
                 reporter.before(filePath)
                 lintErrorResult.lintErrors.forEach {
-                    reporter.onLintError(filePath, it.first, it.second)
+                    if (baselineLintErrors?.containsLintError(it.first) != true) {
+                        reporter.onLintError(filePath, it.first, it.second)
+                    }
                 }
                 reporter.after(filePath)
             }
@@ -55,5 +68,7 @@ internal abstract class GenerateReportsWorkAction : WorkAction<GenerateReportsWo
         val reporterOutput: RegularFileProperty
         val reporterOptions: MapProperty<String, String>
         val ktLintVersion: Property<String>
+        val baseline: RegularFileProperty
+        val projectDirectory: DirectoryProperty
     }
 }

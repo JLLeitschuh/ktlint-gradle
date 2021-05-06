@@ -108,13 +108,13 @@ internal constructor(
     /**
      * Baseline file location.
      *
-     * Default location is `<projectDir>/ktlintBaseline.xml`.
+     * Default location is `<projectDir>/config/ktlint/baseline.xml`.
      *
      * @since KtLint `0.41.0`
      */
     val baseline: RegularFileProperty = objectFactory.fileProperty()
         .convention(
-            projectLayout.projectDirectory.file("ktlintBaseline.xml")
+            projectLayout.projectDirectory.dir("config").dir("ktlint").file("baseline.xml")
         )
 
     private val kscriptExtension = KScriptExtension(kotlinScriptAdditionalPathApplier)

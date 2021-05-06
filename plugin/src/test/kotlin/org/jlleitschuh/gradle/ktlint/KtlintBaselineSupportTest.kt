@@ -128,5 +128,59 @@ abstract class KtlintBaselineSupportTest : AbstractPluginTest() {
         }
     }
 
-    private val File.defaultBaselineFile get() = resolve("ktlintBaseline.xml")
+    @Test
+    internal fun `Should consider existing issues in baseline`() {
+        with(projectRoot) {
+            defaultProjectSetup()
+            withFailingSources()
+
+            build(GenerateBaselineTask.NAME)
+            build(CHECK_PARENT_TASK_NAME).apply {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+        }
+    }
+
+    @Test
+    internal fun `Check task should still fail on file style violation that is not present in the baseline`() {
+        with(projectRoot) {
+            defaultProjectSetup()
+            withFailingSources()
+
+            build(GenerateBaselineTask.NAME)
+
+            withFailingKotlinScript()
+            buildAndFail(CHECK_PARENT_TASK_NAME).apply {
+                assertThat(task(":$kotlinScriptCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            }
+        }
+    }
+
+    @Test
+    internal fun `Should fail the build if baseline file is present and ktlint version is less then 0_41_0`() {
+        with(projectRoot) {
+            defaultProjectSetup()
+            withCleanSources()
+
+            build(GenerateBaselineTask.NAME)
+
+            buildFile().appendText(
+                """
+                
+                ktlint {
+                    version.set("0.40.0")
+                }
+                """.trimIndent()
+            )
+
+            buildAndFail(CHECK_PARENT_TASK_NAME).apply {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
+                assertThat(output).contains("Baseline support is only enabled for KtLint versions 0.41.0+.")
+            }
+        }
+    }
+
+    private val File.defaultBaselineFile get() = resolve("config")
+        .resolve("ktlint")
+        .resolve("baseline.xml")
 }

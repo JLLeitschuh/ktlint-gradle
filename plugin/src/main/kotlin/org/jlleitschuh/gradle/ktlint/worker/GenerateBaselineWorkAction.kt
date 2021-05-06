@@ -11,6 +11,7 @@ import org.gradle.api.logging.Logging
 import org.gradle.api.provider.Property
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
+import java.io.File
 import java.io.PrintStream
 import java.util.ServiceLoader
 
@@ -34,7 +35,7 @@ internal abstract class GenerateBaselineWorkAction :
             .flatten()
 
         val baselineFile = parameters.baselineFile.asFile.get().apply {
-            if (exists()) delete()
+            if (exists()) delete() else parentFile.mkdirs()
         }
         val projectDir = parameters.projectDirectory.asFile.get()
 
@@ -42,7 +43,11 @@ internal abstract class GenerateBaselineWorkAction :
             val baselineReporter = loadBaselineReporter(it)
             baselineReporter.beforeAll()
             errors.forEach { lintErrorResult ->
-                val filePath = lintErrorResult.lintedFile.toRelativeString(projectDir)
+                val filePath = lintErrorResult
+                    .lintedFile
+                    .toRelativeString(projectDir)
+                    .replace(File.separatorChar, '/')
+
                 baselineReporter.before(filePath)
                 lintErrorResult.lintErrors.forEach {
                     baselineReporter.onLintError(filePath, it.first, it.second)

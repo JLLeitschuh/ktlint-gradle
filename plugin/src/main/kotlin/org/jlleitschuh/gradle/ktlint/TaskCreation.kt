@@ -161,6 +161,17 @@ private fun <T : BaseKtLintCheckTask> GenerateReportsTask.commonConfiguration(
     ignoreFailures.set(pluginHolder.extension.ignoreFailures)
     verbose.set(pluginHolder.extension.verbose)
     ktLintVersion.set(pluginHolder.extension.version)
+    @Suppress("UnstableApiUsage")
+    baseline.set(
+        pluginHolder.extension.baseline
+            .flatMap {
+                if (it.asFile.exists()) {
+                    pluginHolder.target.objects.fileProperty().apply { set(it.asFile) }
+                } else {
+                    pluginHolder.target.objects.fileProperty()
+                }
+            }
+    )
 }
 
 internal fun createGenerateBaselineTask(
