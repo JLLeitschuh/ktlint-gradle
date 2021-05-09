@@ -2,9 +2,11 @@ package org.jlleitschuh.gradle.ktlint.worker
 
 import com.pinterest.ktlint.core.KtLint
 import com.pinterest.ktlint.core.LintError
+import com.pinterest.ktlint.core.ParseException
 import com.pinterest.ktlint.core.RuleSet
 import com.pinterest.ktlint.core.RuleSetProvider
 import net.swiftzer.semver.SemVer
+import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.Logging
@@ -53,16 +55,24 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
                 }
             )
 
-            if (formatSource) {
-                val currentFileContent = it.readText()
-                val updatedFileContent = KtLint.format(ktLintParameters)
+            try {
+                if (formatSource) {
+                    val currentFileContent = it.readText()
+                    val updatedFileContent = KtLint.format(ktLintParameters)
 
-                if (updatedFileContent != currentFileContent) {
-                    it.writeText(updatedFileContent)
+                    if (updatedFileContent != currentFileContent) {
+                        it.writeText(updatedFileContent)
+                    }
+                } else {
+                    KtLint.lint(ktLintParameters)
                 }
-            } else {
-                KtLint.lint(ktLintParameters)
+            } catch (e: ParseException) {
+                throw GradleException(
+                    "KtLint failed to parse file: ${it.absolutePath}",
+                    e
+                )
             }
+
             result.add(
                 LintErrorResult(
                     lintedFile = it,
