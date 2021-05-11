@@ -21,7 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   - Pre-commit hook adds entire file to commit when only part of the file was indexed ([#470](https://github.com/JLLeitschuh/ktlint-gradle/pull/470))
   - Pre-commit hook doesn't format files that have been renamed ([#471](https://github.com/JLLeitschuh/ktlint-gradle/pull/471))
   - Reset KtLint internal caches on any `.editorconfig` files changes ([#456](https://github.com/JLLeitschuh/ktlint-gradle/issues/456))
-  - On KtLint parse error print path to file ([#476](https://github.com/JLLeitschuh/ktlint-gradle/issues/476))
+  - On KtLint parse error print path to file ([#476](https://github.com/JLLeitschuh/ktlint-gradle/issues/476)) 
+  - Add workaround for format tasks showing deprecation messages in Gradle 7.0 ([#480](https://github.com/JLLeitschuh/ktlint-gradle/pull/480))
 ### Removed
   - ?
 
