@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [10.1.0-SNAPSHOT] Unreleased
 ### Added
-  - ?
+  - Added git hook update notifier ([#474](https://github.com/JLLeitschuh/ktlint-gradle/pull/474))
 ### Changed
   - Updated Gradle to `6.8.3` version
   - Updated default KtLint version to `0.41.0`

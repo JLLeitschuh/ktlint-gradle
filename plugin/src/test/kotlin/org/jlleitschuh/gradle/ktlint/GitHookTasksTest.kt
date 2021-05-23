@@ -184,6 +184,17 @@ class GitHookTasksTest : AbstractPluginTest() {
         }
     }
 
+    @Test
+    internal fun `Git hook should send the hook version to gradle`() {
+        projectRoot.setupGradleProject()
+        val gitDir = projectRoot.initGit()
+
+        build(":$INSTALL_GIT_HOOK_FORMAT_TASK").run {
+            assertThat(task(":$INSTALL_GIT_HOOK_FORMAT_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(gitDir.preCommitGitHook().readText()).contains("""-phookVersion=$hookVersion""")
+        }
+    }
+
     private fun File.initGit(): File {
         val repo = RepositoryBuilder().setWorkTree(this).setMustExist(false).build()
         repo.create()
