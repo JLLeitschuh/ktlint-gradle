@@ -3,6 +3,8 @@ package org.jlleitschuh.gradle.ktlint
 import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.condition.DisabledOnOs
+import org.junit.jupiter.api.condition.OS
 import java.io.File
 
 class UnsupportedGradleTest : AbstractPluginTest() {
@@ -14,6 +16,7 @@ class UnsupportedGradleTest : AbstractPluginTest() {
             .withGradleVersion("5.6.4")
 
     @Test
+    @DisabledOnOs(OS.WINDOWS)
     internal fun `Should raise exception on applying plugin`() {
         projectRoot.defaultProjectSetup()
 

@@ -1,15 +1,19 @@
 package org.jlleitschuh.gradle.ktlint.worker
 
 import com.pinterest.ktlint.core.LintError
+import com.pinterest.ktlint.core.internal.containsLintError
+import com.pinterest.ktlint.core.internal.loadBaseline
 import net.swiftzer.semver.SemVer
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.Logging
 import org.gradle.api.provider.Property
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
 import org.jetbrains.kotlin.util.prefixIfNot
+import java.io.File
 
 @Suppress("UnstableApiUsage")
 internal abstract class ConsoleReportWorkAction : WorkAction<ConsoleReportWorkAction.ConsoleReportParameters> {
@@ -25,22 +29,33 @@ internal abstract class ConsoleReportWorkAction : WorkAction<ConsoleReportWorkAc
                 parameters.discoveredErrors.asFile.get()
             )
 
-        if (parameters.outputToConsole.getOrElse(false)) {
+        val baselineRules = parameters.baseline.orNull?.asFile?.absolutePath
+            ?.let { loadBaseline(it).baselineRules }
+        val projectDir = parameters.projectDirectory.asFile.get()
+
+        val lintErrors = errors.associate { lintErrorResult ->
+            val filePath = lintErrorResult.lintedFile.absolutePath
+            val baselineLintErrors = baselineRules?.get(
+                lintErrorResult.lintedFile.toRelativeString(projectDir).replace(File.separatorChar, '/')
+            )
+            filePath to lintErrorResult
+                .lintErrors
+                .filter {
+                    !it.second &&
+                        baselineLintErrors?.containsLintError(it.first) != true
+                }
+                .map { it.first }
+        }
+
+        val isLintErrorsFound = lintErrors.values.flatten().isNotEmpty()
+        if (parameters.outputToConsole.getOrElse(false) && isLintErrorsFound) {
             val verbose = parameters.verbose.get()
-            errors.forEach { lintErrorResult ->
-                val filePath = lintErrorResult.lintedFile.absolutePath
-                lintErrorResult
-                    .lintErrors
-                    .filter { !it.second }
-                    .forEach {
-                        it.first.logError(filePath, verbose)
-                    }
+            lintErrors.forEach { (filePath, errors) ->
+                errors.forEach { it.logError(filePath, verbose) }
             }
         }
 
-        if (errors.any { it.lintErrors.any { !it.second } } &&
-            !parameters.ignoreFailures.getOrElse(false)
-        ) {
+        if (!parameters.ignoreFailures.getOrElse(false) && isLintErrorsFound) {
             val reportsPaths = parameters
                 .generatedReportsPaths
                 .files.joinToString(separator = "\n") { it.absolutePath.prefixIfNot("|- ") }
@@ -74,5 +89,7 @@ internal abstract class ConsoleReportWorkAction : WorkAction<ConsoleReportWorkAc
         val verbose: Property<Boolean>
         val generatedReportsPaths: ConfigurableFileCollection
         val ktLintVersion: Property<String>
+        val baseline: RegularFileProperty
+        val projectDirectory: DirectoryProperty
     }
 }

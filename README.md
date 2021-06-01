@@ -24,6 +24,7 @@ The assumption being that you would not want to lint code you weren't compiling.
     - [Simple setup](#simple-setup)
     - [Using new plugin API](#using-new-plugin-api)
     - [How to apply to all subprojects](#applying-to-subprojects)
+    - [Baseline support](#baseline-support)
     - [Testing KtLint snapshots](#testing-ktlint-snapshots)
   - [Intellij IDEA plugin](#intellij-idea-only-plugin)
     - [Simple setup](#idea-plugin-simple-setup)
@@ -173,6 +174,12 @@ subprojects {
 ```
 </details>
 
+#### Baseline support
+
+Plugin supports KtLint baseline with following limitations:
+- Format tasks ignore baseline. See [#1072](https://github.com/pinterest/ktlint/issues/1072) KtLint issue for more details.
+- One baseline file is generated per one Gradle project (module).
+
 #### Testing KtLint snapshots
 
 To test KtLint snapshots add following configuration into project build script (latest KtLint snapshot version name
@@ -261,6 +268,7 @@ ktlint {
     enableExperimentalRules = true
     additionalEditorconfigFile = file("/some/additional/.editorconfig")
     disabledRules = ["final-newline"]
+    baseline = file("my-project-ktlint-baseline.xml")
     reporters {
         reporter "plain"
         reporter "checkstyle"
@@ -311,6 +319,7 @@ configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
     enableExperimentalRules.set(true)
     additionalEditorconfigFile.set(file("/some/additional/.editorconfig"))
     disabledRules.set(setOf("final-newline"))
+    baseline.set(file("my-project-ktlint-baseline.xml"))
     reporters {
         reporter(ReporterType.PLAIN)
         reporter(ReporterType.CHECKSTYLE)

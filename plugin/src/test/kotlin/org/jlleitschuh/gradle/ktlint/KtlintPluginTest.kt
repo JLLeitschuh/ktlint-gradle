@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.jlleitschuh.gradle.ktlint.KtlintBasePlugin.Companion.LOWEST_SUPPORTED_GRADLE_VERSION
+import org.jlleitschuh.gradle.ktlint.tasks.GenerateBaselineTask
 import org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 import org.junit.jupiter.api.BeforeEach
@@ -84,11 +85,12 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
                 .filter { it.startsWith("ktlint", ignoreCase = true) }
                 .toList()
 
-            assertThat(ktlintTasks).hasSize(4)
+            assertThat(ktlintTasks).hasSize(5)
             assertThat(ktlintTasks).anyMatch { it.startsWith(CHECK_PARENT_TASK_NAME) }
             assertThat(ktlintTasks).anyMatch { it.startsWith(FORMAT_PARENT_TASK_NAME) }
             assertThat(ktlintTasks).anyMatch { it.startsWith(APPLY_TO_IDEA_TASK_NAME) }
             assertThat(ktlintTasks).anyMatch { it.startsWith(APPLY_TO_IDEA_GLOBALLY_TASK_NAME) }
+            assertThat(ktlintTasks).anyMatch { it.startsWith(GenerateBaselineTask.NAME) }
         }
     }
 
@@ -102,7 +104,7 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
 
             // Plus for main and test sources format and check tasks
             // Plus two kotlin script tasks
-            assertThat(ktlintTasks).hasSize(10)
+            assertThat(ktlintTasks).hasSize(11)
             assertThat(ktlintTasks).anyMatch { it.startsWith(CHECK_PARENT_TASK_NAME) }
             assertThat(ktlintTasks).anyMatch { it.startsWith(FORMAT_PARENT_TASK_NAME) }
             assertThat(ktlintTasks).anyMatch { it.startsWith(APPLY_TO_IDEA_TASK_NAME) }
@@ -113,6 +115,7 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
                     GenerateReportsTask.generateNameForKotlinScripts(GenerateReportsTask.LintType.FORMAT)
                 )
             }
+            assertThat(ktlintTasks).anyMatch { it.startsWith(GenerateBaselineTask.NAME) }
         }
     }
 
