@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [10.1.0-SNAPSHOT] Unreleased
+## [10.1.0] - 2021.06.02
 ### Added
   - Baseline support ([#414](https://github.com/JLLeitschuh/ktlint-gradle/issues/414))
 
@@ -23,8 +23,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   - Reset KtLint internal caches on any `.editorconfig` files changes ([#456](https://github.com/JLLeitschuh/ktlint-gradle/issues/456))
   - On KtLint parse error print path to file ([#476](https://github.com/JLLeitschuh/ktlint-gradle/issues/476)) 
   - Add workaround for format tasks showing deprecation messages in Gradle 7.0 ([#480](https://github.com/JLLeitschuh/ktlint-gradle/pull/480))
-### Removed
-  - ?
 
 ## [10.0.0] - 2021.02.09
 ### Changed
