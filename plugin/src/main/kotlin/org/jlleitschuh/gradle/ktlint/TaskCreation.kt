@@ -1,5 +1,6 @@
 package org.jlleitschuh.gradle.ktlint
 
+import org.gradle.api.Project
 import org.gradle.api.file.FileTree
 import org.gradle.api.tasks.TaskCollection
 import org.gradle.api.tasks.TaskProvider
@@ -32,6 +33,18 @@ internal fun createFormatTask(
     .registerTask(
         KtLintFormatTask.buildTaskNameForSourceSet(sourceSetName)
     ) {
+        mustRunAfter(project.tasks.named(KtLintFormatTask.KOTLIN_SCRIPT_TASK_NAME))
+
+        val rootProjectName = project.rootProject.name
+        var parentProject: Project? = project.parent
+        while (parentProject != null && parentProject.name != rootProjectName) {
+            val parentProjectPath = parentProject.path
+            parentProject.plugins.withId("org.jlleitschuh.gradle.ktlint") {
+                mustRunAfter("$parentProjectPath:${KtLintFormatTask.KOTLIN_SCRIPT_TASK_NAME}")
+            }
+            parentProject = parentProject.parent
+        }
+
         description = KtLintFormatTask.buildDescription(".kt")
         configureBaseCheckTask(pluginHolder) {
             setSource(kotlinSourceDirectories)
@@ -127,6 +140,7 @@ internal fun <T : BaseKtLintCheckTask> createGenerateReportsTask(
 ): TaskProvider<GenerateReportsTask> = pluginHolder.target.registerTask(
     GenerateReportsTask.generateNameForSourceSets(sourceSetName, lintType)
 ) {
+    mustRunAfter(project.tasks.named(KtLintFormatTask.KOTLIN_SCRIPT_TASK_NAME))
     reportsName.set(GenerateReportsTask.generateNameForSourceSets(sourceSetName, lintType))
     commonConfiguration(pluginHolder, lintTask)
 }
