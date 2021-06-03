@@ -114,8 +114,8 @@ val ensureDependenciesAreInlined by tasks.registering {
                 if (!path.startsWith("META-INF") &&
                     path.lastName.endsWith(".class") &&
                     !path.pathString.startsWith(
-                        pluginGroup.replace(".", "/")
-                    )
+                            pluginGroup.replace(".", "/")
+                        )
                 ) {
                     nonInlinedDependencies.add(path.pathString)
                 }
