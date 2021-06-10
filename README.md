@@ -405,7 +405,7 @@ but it is possible to change:
 
 ```groovy
 tasks.withType(org.jlleitschuh.gradle.ktlint.tasks.BaseKtLintCheckTask).configureEach {
-    it.workerMaxHeapSize.set("512mb")
+    it.workerMaxHeapSize.set("512m")
 }
 ```
 </details>
@@ -414,8 +414,8 @@ tasks.withType(org.jlleitschuh.gradle.ktlint.tasks.BaseKtLintCheckTask).configur
 <summary>Kotlin script</summary>
 
 ```kotlin
-tasks.withType<org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask>().configureEach {
-    it.workerMaxHeapSize.set("512mb")
+tasks.withType<org.jlleitschuh.gradle.ktlint.tasks.BaseKtLintCheckTask> {
+    workerMaxHeapSize.set("512m")
 }
 ```
 </details>
