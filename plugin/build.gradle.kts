@@ -15,7 +15,7 @@ plugins {
 
 val pluginGroup = "org.jlleitschuh.gradle"
 group = pluginGroup
-version = "10.1.0"
+version = "10.2.0-SNAPSHOT"
 
 repositories {
     google()
@@ -114,8 +114,8 @@ val ensureDependenciesAreInlined by tasks.registering {
                 if (!path.startsWith("META-INF") &&
                     path.lastName.endsWith(".class") &&
                     !path.pathString.startsWith(
-                        pluginGroup.replace(".", "/")
-                    )
+                            pluginGroup.replace(".", "/")
+                        )
                 ) {
                     nonInlinedDependencies.add(path.pathString)
                 }
