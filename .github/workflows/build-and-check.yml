@@ -51,7 +51,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-wrapper-
       - name: Build plugin
-        run: ./plugin/gradlew -p ./plugin build --no-daemon
+        run: ./plugin/gradlew -p ./plugin assemble ensureDependenciesAreInlined test --no-daemon
       - name: Save test results
         uses: actions/upload-artifact@v2
         if: failure()
