@@ -13,11 +13,11 @@ private fun pluginsBlockWithMainPluginAndKotlinPlugin(
     kotlinVersion: String? = null
 ) =
     """
-        plugins {
-            id '$kotlinPluginId'${if (kotlinVersion != null) " version '$kotlinVersion'" else ""}
-            id 'org.jlleitschuh.gradle.ktlint'
-        }
-    """.trimIndent()
+    |plugins {
+    |    id "$kotlinPluginId"${if (kotlinVersion != null) " version \"$kotlinVersion\"" else ""}
+    |    id 'org.jlleitschuh.gradle.ktlint'
+    |}
+    """.trimMargin()
 
 fun File.defaultProjectSetup(kotlinVersion: String? = null) {
     kotlinPluginProjectSetup("org.jetbrains.kotlin.jvm", kotlinVersion)
@@ -30,11 +30,11 @@ fun File.kotlinPluginProjectSetup(
     //language=Groovy
     buildFile().writeText(
         """
-            ${pluginsBlockWithMainPluginAndKotlinPlugin(kotlinPluginId, kotlinPluginVersion)}
-            
-            repositories {
-                gradlePluginPortal()
-            }
-        """.trimIndent()
+        |${pluginsBlockWithMainPluginAndKotlinPlugin(kotlinPluginId, kotlinPluginVersion)}
+        |
+        |repositories {
+        |    gradlePluginPortal()
+        |}
+        """.trimMargin()
     )
 }
