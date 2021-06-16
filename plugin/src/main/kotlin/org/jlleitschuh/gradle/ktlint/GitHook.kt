@@ -77,14 +77,22 @@ internal fun generateGitHook(
     echo "Running ktlint over these files:"
     echo "${'$'}CHANGED_FILES"
     
-    git stash push --keep-index
+    diff=.git/unstaged-ktlint-git-hook.diff
+    git diff --color=never > ${'$'}diff
+    if [ -s ${'$'}diff ]; then
+      git apply -R ${'$'}diff
+    fi
     
     ${generateGradleCommand(taskName, gradleRootDirPrefix)}
 
     echo "Completed ktlint run."
     ${postCheck(shouldUpdateCommit)}
     
-    git stash pop
+    if [ -s ${'$'}diff ]; then
+      git apply --ignore-whitespace ${'$'}diff
+    fi
+    rm ${'$'}diff
+    unset diff
     
     echo "Completed ktlint hook."
 
