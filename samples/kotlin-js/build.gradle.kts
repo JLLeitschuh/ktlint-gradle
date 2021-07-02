@@ -5,10 +5,6 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint")
 }
 
-dependencies {
-    "implementation"(kotlin("stdlib-js"))
-}
-
 kotlin {
     js {
         nodejs()

@@ -42,16 +42,14 @@ android {
 }
 
 dependencies {
-    implementation("androidx.fragment:fragment-ktx:${SamplesVersions.androidXFragment}")
-    implementation("androidx.recyclerview:recyclerview:${SamplesVersions.androidXRecyclerView}")
-    implementation("com.google.android.material:material:${SamplesVersions.androidMaterial}")
+    implementation(libs.androidx.fragment)
+    implementation(libs.androidx.recycler.view)
+    implementation(libs.android.material)
 
-    testImplementation("junit:junit:${SamplesVersions.junit}")
+    testImplementation(libs.junit)
 
-    androidTestImplementation("androidx.test:runner:${SamplesVersions.androidXTestRunner}")
-    androidTestImplementation(
-        "androidx.test.espresso:espresso-core:${SamplesVersions.androidXEspresso}"
-    )
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.espresso)
 }
 
 ktlint {
