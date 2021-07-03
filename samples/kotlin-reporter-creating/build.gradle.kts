@@ -4,6 +4,5 @@ plugins {
 }
 
 dependencies {
-    implementation(kotlin("stdlib"))
-    compileOnly("com.pinterest.ktlint:ktlint-core:${SamplesVersions.ktlintCore}")
+    compileOnly(pluginLibs.ktlint.core)
 }

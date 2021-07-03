@@ -7,12 +7,11 @@ plugins {
 }
 
 application {
-    mainClassName = "org.jlleitschuh.gradle.ktlint.sample.kotlin.MainKt"
+    mainClass.set("org.jlleitschuh.gradle.ktlint.sample.kotlin.MainKt")
 }
 
 dependencies {
-    implementation(kotlin("stdlib"))
-    ktlintRuleset(project(":samples:kotlin-rulesets-creating"))
+    ktlintRuleset(projects.samples.kotlinRulesetsCreating)
 }
 
 ktlint {

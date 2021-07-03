@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   - ?
 
 ### Changed
-  - ?
+  - Update Gradle to `7.1.1` version
 
 ### Fixed
   - Pre-commit hook causing conflicts ([issue: #443](https://github.com/JLLeitschuh/ktlint-gradle/issues/443)) ([#502](https://github.com/JLLeitschuh/ktlint-gradle/pull/502))

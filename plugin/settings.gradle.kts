@@ -1,3 +1,17 @@
+pluginManagement {
+    plugins {
+        id("org.jetbrains.kotlin.jvm") version "1.4.30"
+        id("com.gradle.plugin-publish") version "0.12.0"
+        `java-gradle-plugin`
+        `maven-publish`
+        id("org.jlleitschuh.gradle.ktlint") version "10.1.0"
+        id("com.github.johnrengelman.shadow") version "6.1.0"
+        id("com.github.breadmoirai.github-release") version "2.2.10"
+    }
+}
+
+enableFeaturePreview("VERSION_CATALOGS")
+
 plugins {
     `gradle-enterprise`
 }
