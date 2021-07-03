@@ -5,7 +5,7 @@ pluginManagement {
         `java-gradle-plugin`
         `maven-publish`
         id("org.jlleitschuh.gradle.ktlint") version "10.1.0"
-        id("com.github.johnrengelman.shadow") version "6.1.0"
+        id("com.github.johnrengelman.shadow") version "7.0.0"
         id("com.github.breadmoirai.github-release") version "2.2.10"
     }
 }
