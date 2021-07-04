@@ -46,6 +46,7 @@ dependencies {
     compileOnly(libs.ktlint.core)
     compileOnly(libs.kotlin.gradle.plugin)
     compileOnly(libs.android.gradle.plugin)
+    compileOnly(kotlin("stdlib-jdk8"))
     shadowImplementation(libs.semver)
     shadowImplementation(libs.jgit)
     shadowImplementation(libs.commons.io)
@@ -85,9 +86,12 @@ val shadowJarTask = tasks.named<ShadowJar>("shadowJar") {
     configurations = listOf(shadowImplementation)
 }
 
-// Required for plugin substitution to work in samples project
-artifacts {
-    add("runtimeOnly", shadowJarTask)
+// Add shadow jar to the Gradle module metadata api and runtime configurations
+configurations {
+    artifacts {
+        runtimeElements(shadowJarTask)
+        apiElements(shadowJarTask)
+    }
 }
 
 tasks.whenTaskAdded {
