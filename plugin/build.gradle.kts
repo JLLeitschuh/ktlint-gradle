@@ -67,6 +67,11 @@ dependencies {
     testImplementation(libs.archunit.junit5)
 }
 
+// Test tasks loods plugin from local maven repository
+tasks.named("test").configure {
+    dependsOn("publishToMavenLocal")
+}
+
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
     maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1

@@ -1,23 +1,20 @@
 package org.jlleitschuh.gradle.ktlint
 
 import org.assertj.core.api.Assertions.assertThat
-import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
+import org.gradle.util.GradleVersion
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import java.io.File
+import org.jlleitschuh.gradle.ktlint.testdsl.CommonTest
+import org.jlleitschuh.gradle.ktlint.testdsl.GradleTestVersions
+import org.jlleitschuh.gradle.ktlint.testdsl.build
+import org.jlleitschuh.gradle.ktlint.testdsl.project
+import org.junit.jupiter.api.DisplayName
 
-class GradleCurrentConfigurationTest : ConfigurationCacheTest() {
-    override fun gradleRunnerFor(vararg arguments: String, projectRoot: File): GradleRunner {
-        return super.gradleRunnerFor(*arguments, projectRoot = projectRoot)
-            .withGradleVersion("6.8-rc-5")
-    }
-}
-
-abstract class ConfigurationCacheTest : AbstractPluginTest() {
+@GradleTestVersions(minVersion = "6.6.1")
+class ConfigurationCacheTest : AbstractPluginTest() {
     private val configurationCacheFlag = "--configuration-cache"
     private val configurationCacheWarnFlag = "--configuration-cache-problems=warn"
+
     /**
      * 2 warnings are still reported by the Kotlin plugin. We can't fix them.
      * But make sure we aren't creating more issues.
@@ -29,68 +26,71 @@ abstract class ConfigurationCacheTest : AbstractPluginTest() {
      */
     private val maxProblemsFlag = "-Dorg.gradle.unsafe.configuration-cache.max-problems=2"
 
-    @BeforeEach
-    fun setupBuild() {
-        projectRoot.defaultProjectSetup()
+    @DisplayName("Should support configuration cache without errors on running linting")
+    @CommonTest
+    internal fun configurationCacheForCheckTask(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            createSourceFile(
+                "src/main/kotlin/clean-source.kt",
+                """
+                val foo = "bar"
+                
+                """.trimIndent()
+            )
+
+            build(
+                configurationCacheFlag,
+                configurationCacheWarnFlag,
+                maxProblemsFlag,
+                CHECK_PARENT_TASK_NAME
+            ) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+
+            build(
+                configurationCacheFlag,
+                configurationCacheWarnFlag,
+                maxProblemsFlag,
+                CHECK_PARENT_TASK_NAME
+            ) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+                assertThat(output).contains("Reusing configuration cache.")
+            }
+        }
     }
 
-    @Test
-    internal fun `Should support configuration cache without errors when checking`() {
-        projectRoot.createSourceFile(
-            "src/main/kotlin/clean-source.kt",
-            """
-            val foo = "bar"
-            
-            """.trimIndent()
-        )
-        build(
-            configurationCacheFlag,
-            configurationCacheWarnFlag,
-            maxProblemsFlag,
-            CHECK_PARENT_TASK_NAME
-        ).apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-        }
+    @DisplayName("Should support configuration cache on running format tasks")
+    @CommonTest
+    fun configurationCacheForFormatTasks(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            createSourceFile(
+                "src/main/kotlin/clean-source.kt",
+                """
+                val foo = "bar"
+                """.trimIndent()
+            )
+            val formatTaskName = KtLintFormatTask.buildTaskNameForSourceSet("main")
 
-        build(
-            configurationCacheFlag,
-            configurationCacheWarnFlag,
-            maxProblemsFlag,
-            CHECK_PARENT_TASK_NAME
-        ).apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
-            assertThat(output).contains("Reusing configuration cache.")
-        }
-    }
-    @Test
-    internal fun `Should support configuration cache without errors when reformatting`() {
-        projectRoot.createSourceFile(
-            "src/main/kotlin/clean-source.kt",
-            """
-            val foo = "bar"
-            """.trimIndent()
-        )
-        val formatTaskName = KtLintFormatTask.buildTaskNameForSourceSet("main")
+            build(
+                configurationCacheFlag,
+                configurationCacheWarnFlag,
+                maxProblemsFlag,
+                FORMAT_PARENT_TASK_NAME
+            ) {
+                assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(task(":$mainSourceSetFormatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
 
-        build(
-            configurationCacheFlag,
-            configurationCacheWarnFlag,
-            maxProblemsFlag,
-            FORMAT_PARENT_TASK_NAME
-        ).apply {
-            assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(task(":$mainSourceSetFormatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-        }
-
-        build(
-            configurationCacheFlag,
-            configurationCacheWarnFlag,
-            maxProblemsFlag,
-            FORMAT_PARENT_TASK_NAME
-        ).apply {
-            assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(task(":$mainSourceSetFormatTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
-            assertThat(output).contains("Reusing configuration cache.")
+            build(
+                configurationCacheFlag,
+                configurationCacheWarnFlag,
+                maxProblemsFlag,
+                FORMAT_PARENT_TASK_NAME
+            ) {
+                assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(task(":$mainSourceSetFormatTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+                assertThat(output).contains("Reusing configuration cache.")
+            }
         }
     }
 }

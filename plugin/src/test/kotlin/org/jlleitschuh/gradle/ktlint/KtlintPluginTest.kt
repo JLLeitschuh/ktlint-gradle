@@ -1,483 +1,555 @@
 package org.jlleitschuh.gradle.ktlint
 
 import org.assertj.core.api.Assertions.assertThat
-import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
-import org.jlleitschuh.gradle.ktlint.KtlintBasePlugin.Companion.LOWEST_SUPPORTED_GRADLE_VERSION
+import org.gradle.util.GradleVersion
 import org.jlleitschuh.gradle.ktlint.tasks.GenerateBaselineTask
 import org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import org.jlleitschuh.gradle.ktlint.testdsl.CommonTest
+import org.jlleitschuh.gradle.ktlint.testdsl.GradleTestVersions
+import org.jlleitschuh.gradle.ktlint.testdsl.TestProject.Companion.FAIL_SOURCE_FILE
+import org.jlleitschuh.gradle.ktlint.testdsl.build
+import org.jlleitschuh.gradle.ktlint.testdsl.buildAndFail
+import org.jlleitschuh.gradle.ktlint.testdsl.project
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.condition.EnabledOnOs
+import org.junit.jupiter.api.condition.OS
 import java.io.File
 
-/**
- * Runs the tests with the current version of Gradle.
- */
-class GradleCurrentKtlintPluginTest : BaseKtlintPluginTest()
+@GradleTestVersions
+class KtlintPluginTest : AbstractPluginTest() {
 
-@Suppress("ClassName")
-class GradleLowestSupportedKtlintPluginTest : BaseKtlintPluginTest() {
+    @DisplayName("Should fail on failing sources")
+    @CommonTest
+    fun failOnStyleViolation(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withFailingSources()
 
-    override fun gradleRunnerFor(
-        vararg arguments: String,
-        projectRoot: File
-    ): GradleRunner =
-        super.gradleRunnerFor(*arguments, projectRoot = projectRoot)
-            .withGradleVersion(LOWEST_SUPPORTED_GRADLE_VERSION)
-}
-
-abstract class BaseKtlintPluginTest : AbstractPluginTest() {
-
-    @BeforeEach
-    fun setupBuild() {
-        projectRoot.defaultProjectSetup()
-    }
-
-    @Test
-    fun `should fail check on failing sources`() {
-        projectRoot.withFailingSources()
-
-        buildAndFail(CHECK_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
-            assertThat(output).contains("Unnecessary space(s)")
+            buildAndFail(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
+                assertThat(output).contains("Unnecessary space(s)")
+            }
         }
     }
 
-    @Test
-    fun `should succeed check on clean sources`() {
+    @DisplayName("Should succeed check on clean sources")
+    @CommonTest
+    fun passCleanSources(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
 
-        projectRoot.withCleanSources()
-
-        build(CHECK_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            build(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
         }
     }
 
-    @Test
-    fun `should generate code style files in project`() {
-        projectRoot.withCleanSources()
-        val ideaRootDir = projectRoot.resolve(".idea").apply { mkdir() }
+    @DisplayName("Should generate code style files in project")
+    @CommonTest
+    fun generateIdeaCodeStyle(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
+            val ideaRootDir = projectPath.resolve(".idea").apply { mkdir() }
 
-        build(APPLY_TO_IDEA_TASK_NAME).apply {
-            assertThat(task(":$APPLY_TO_IDEA_TASK_NAME")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(ideaRootDir.listFiles()?.isNullOrEmpty()).isFalse()
+            build(APPLY_TO_IDEA_TASK_NAME) {
+                assertThat(task(":$APPLY_TO_IDEA_TASK_NAME")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(ideaRootDir.listFiles()?.isNullOrEmpty()).isFalse()
+            }
         }
     }
 
-    @Test
-    fun `should generate code style file globally`() {
-        val ideaRootDir = projectRoot.resolve(".idea").apply { mkdir() }
+    @DisplayName("Should generate code style file globally")
+    @CommonTest
+    fun generateIdeaCodeStyleGlobally(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            val ideaRootDir = projectPath.resolve(".idea").apply { mkdir() }
 
-        build(APPLY_TO_IDEA_GLOBALLY_TASK_NAME).apply {
-            assertThat(task(":$APPLY_TO_IDEA_GLOBALLY_TASK_NAME")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(ideaRootDir.listFiles()?.isNullOrEmpty()).isFalse()
+            build(APPLY_TO_IDEA_GLOBALLY_TASK_NAME) {
+                assertThat(task(":$APPLY_TO_IDEA_GLOBALLY_TASK_NAME")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(ideaRootDir.listFiles()?.isNullOrEmpty()).isFalse()
+            }
         }
     }
 
-    @Test
-    fun `should show only plugin meta tasks in task output`() {
-        projectRoot.withCleanSources()
+    @DisplayName("Should show only plugin meta tasks in task output")
+    @CommonTest
+    fun showOnlyMetaTasks(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
 
-        build("tasks").apply {
-            val ktlintTasks = output
-                .lineSequence()
-                .filter { it.startsWith("ktlint", ignoreCase = true) }
-                .toList()
+            build("tasks") {
+                val ktlintTasks = output
+                    .lineSequence()
+                    .filter { it.startsWith("ktlint", ignoreCase = true) }
+                    .toList()
 
-            assertThat(ktlintTasks).hasSize(5)
-            assertThat(ktlintTasks).anyMatch { it.startsWith(CHECK_PARENT_TASK_NAME) }
-            assertThat(ktlintTasks).anyMatch { it.startsWith(FORMAT_PARENT_TASK_NAME) }
-            assertThat(ktlintTasks).anyMatch { it.startsWith(APPLY_TO_IDEA_TASK_NAME) }
-            assertThat(ktlintTasks).anyMatch { it.startsWith(APPLY_TO_IDEA_GLOBALLY_TASK_NAME) }
-            assertThat(ktlintTasks).anyMatch { it.startsWith(GenerateBaselineTask.NAME) }
+                assertThat(ktlintTasks).hasSize(5)
+                assertThat(ktlintTasks).anyMatch { it.startsWith(CHECK_PARENT_TASK_NAME) }
+                assertThat(ktlintTasks).anyMatch { it.startsWith(FORMAT_PARENT_TASK_NAME) }
+                assertThat(ktlintTasks).anyMatch { it.startsWith(APPLY_TO_IDEA_TASK_NAME) }
+                assertThat(ktlintTasks).anyMatch { it.startsWith(APPLY_TO_IDEA_GLOBALLY_TASK_NAME) }
+                assertThat(ktlintTasks).anyMatch { it.startsWith(GenerateBaselineTask.NAME) }
+            }
         }
     }
 
-    @Test
-    fun `should show all ktlint tasks in task output`() {
-        build("tasks", "--all").apply {
-            val ktlintTasks = output
-                .lineSequence()
-                .filter { it.startsWith("ktlint", ignoreCase = true) }
-                .toList()
+    @DisplayName("Should show all KtLint tasks in task output")
+    @CommonTest
+    fun allKtlintTasks(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            build("tasks", "--all") {
+                val ktlintTasks = output
+                    .lineSequence()
+                    .filter { it.startsWith("ktlint", ignoreCase = true) }
+                    .toList()
 
-            // Plus for main and test sources format and check tasks
-            // Plus two kotlin script tasks
-            assertThat(ktlintTasks).hasSize(11)
-            assertThat(ktlintTasks).anyMatch { it.startsWith(CHECK_PARENT_TASK_NAME) }
-            assertThat(ktlintTasks).anyMatch { it.startsWith(FORMAT_PARENT_TASK_NAME) }
-            assertThat(ktlintTasks).anyMatch { it.startsWith(APPLY_TO_IDEA_TASK_NAME) }
-            assertThat(ktlintTasks).anyMatch { it.startsWith(APPLY_TO_IDEA_GLOBALLY_TASK_NAME) }
-            assertThat(ktlintTasks).anyMatch { it.startsWith(kotlinScriptCheckTaskName) }
-            assertThat(ktlintTasks).anyMatch {
-                it.startsWith(
-                    GenerateReportsTask.generateNameForKotlinScripts(GenerateReportsTask.LintType.FORMAT)
+                // Plus for main and test sources format and check tasks
+                // Plus two kotlin script tasks
+                assertThat(ktlintTasks).hasSize(11)
+                assertThat(ktlintTasks).anyMatch { it.startsWith(CHECK_PARENT_TASK_NAME) }
+                assertThat(ktlintTasks).anyMatch { it.startsWith(FORMAT_PARENT_TASK_NAME) }
+                assertThat(ktlintTasks).anyMatch { it.startsWith(APPLY_TO_IDEA_TASK_NAME) }
+                assertThat(ktlintTasks).anyMatch { it.startsWith(APPLY_TO_IDEA_GLOBALLY_TASK_NAME) }
+                assertThat(ktlintTasks).anyMatch { it.startsWith(kotlinScriptCheckTaskName) }
+                assertThat(ktlintTasks).anyMatch {
+                    it.startsWith(
+                        GenerateReportsTask.generateNameForKotlinScripts(GenerateReportsTask.LintType.FORMAT)
+                    )
+                }
+                assertThat(ktlintTasks).anyMatch { it.startsWith(GenerateBaselineTask.NAME) }
+            }
+        }
+    }
+
+    @DisplayName("Should ignore excluded sources")
+    @CommonTest
+    fun ignoreExcludedSources(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
+            withFailingSources()
+
+            //language=Groovy
+            buildGradle.appendText(
+                """
+    
+                ktlint.filter { exclude("**/fail-source.kt") }
+                """.trimIndent()
+            )
+
+            build(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+        }
+    }
+
+    @DisplayName("Should fail on additional source set directories files style violation")
+    @CommonTest
+    fun additionalSourceSetsViolations(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
+            val alternativeDirectory = "src/main/shared"
+            projectPath.withAlternativeFailingSources(alternativeDirectory)
+
+            //language=Groovy
+            buildGradle.appendText(
+                """
+    
+                sourceSets {
+                    findByName("main")?.java?.srcDirs(project.file("$alternativeDirectory"))
+                }
+                """.trimIndent()
+            )
+
+            buildAndFail(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            }
+        }
+    }
+
+    @DisplayName("Should always format again restored to pre-format state sources")
+    @CommonTest
+    fun repeatFormatForRestoredSources(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withFailingSources()
+            val formatTaskName = KtLintFormatTask.buildTaskNameForSourceSet("main")
+
+            build(FORMAT_PARENT_TASK_NAME) {
+                assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+
+            restoreFailingSources()
+
+            build(FORMAT_PARENT_TASK_NAME) {
+                assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+            assertThat(projectPath.resolve(FAIL_SOURCE_FILE)).exists()
+        }
+    }
+
+    @DisplayName("Format task should be UP-TO-DATE on 3rd run")
+    @CommonTest
+    fun formatUpToDate(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withFailingSources()
+            val formatTaskName = KtLintFormatTask.buildTaskNameForSourceSet("main")
+
+            build(FORMAT_PARENT_TASK_NAME) {
+                assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+            build(FORMAT_PARENT_TASK_NAME) {
+                assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+            build(FORMAT_PARENT_TASK_NAME) {
+                assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            }
+        }
+    }
+
+    @DisplayName("Should apply KtLint version from extension")
+    @CommonTest
+    fun ktlintVersionFromExtension(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
+
+            //language=Groovy
+            buildGradle.appendText(
+                """
+    
+                ktlint.version = "0.35.0"
+                """.trimIndent()
+            )
+
+            build(":dependencies") {
+                assertThat(output).contains(
+                    "$KTLINT_CONFIGURATION_NAME - $KTLINT_CONFIGURATION_DESCRIPTION${System.lineSeparator()}" +
+                        "\\--- com.pinterest:ktlint:0.35.0${System.lineSeparator()}"
                 )
             }
-            assertThat(ktlintTasks).anyMatch { it.startsWith(GenerateBaselineTask.NAME) }
         }
     }
 
-    @Test
-    fun `Should ignore excluded sources`() {
-        projectRoot.withCleanSources()
-        projectRoot.withFailingSources()
+    @DisplayName("Should check Kotlin script file in project folder")
+    @CommonTest
+    fun checkKotlinScript(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
+            withCleanKotlinScript()
 
-        projectRoot.buildFile().appendText(
-            """
-
-            ktlint.filter { exclude("**/fail-source.kt") }
-            """.trimIndent()
-        )
-
-        build(CHECK_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-        }
-    }
-
-    @Test
-    fun `Should fail on additional source set directories files style violation`() {
-        projectRoot.withCleanSources()
-        val alternativeDirectory = "src/main/shared"
-        projectRoot.withAlternativeFailingSources(alternativeDirectory)
-
-        projectRoot.buildFile().appendText(
-            """
-
-            sourceSets {
-                findByName("main")?.java?.srcDirs(project.file("$alternativeDirectory"))
+            build(kotlinScriptCheckTaskName) {
+                assertThat(task(":$kotlinScriptCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             }
-            """.trimIndent()
-        )
-
-        buildAndFail(CHECK_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
         }
     }
 
-    @Test
-    fun `Should always format again restored to pre-format state sources`() {
-        projectRoot.withFailingSources()
-        val formatTaskName = KtLintFormatTask.buildTaskNameForSourceSet("main")
-        build(FORMAT_PARENT_TASK_NAME).apply {
-            assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-        }
+    @DisplayName("Should fail check for Kotlin script file in project folder with style violations")
+    @CommonTest
+    fun checkAndFailKotlinScript(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
+            withFailingKotlinScript()
 
-        projectRoot.restoreFailingSources()
-
-        build(FORMAT_PARENT_TASK_NAME).apply {
-            assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-        }
-        assertThat(projectRoot.resolve(FAIL_SOURCE_FILE)).exists()
-    }
-
-    @Test
-    fun `Format task should be up-to-date on 3rd run`() {
-        projectRoot.withFailingSources()
-        val formatTaskName = KtLintFormatTask.buildTaskNameForSourceSet("main")
-
-        build(FORMAT_PARENT_TASK_NAME).apply {
-            assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-        }
-        build(FORMAT_PARENT_TASK_NAME).apply {
-            assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-        }
-        build(FORMAT_PARENT_TASK_NAME).apply {
-            assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            buildAndFail(kotlinScriptCheckTaskName) {
+                assertThat(task(":$kotlinScriptCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            }
         }
     }
 
-    @Test
-    fun `Should apply ktLint version from extension`() {
-        projectRoot.withCleanSources()
+    @DisplayName("Should not check Kotlin script file in child project folder")
+    @CommonTest
+    fun ignoreKotlinScript(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
+            val additionalFolder = projectPath.resolve("scripts/").also { it.mkdirs() }
+            additionalFolder.withFailingKotlinScript()
 
-        projectRoot.buildFile().appendText(
-            """
+            build(kotlinScriptCheckTaskName) {
+                assertThat(task(":$kotlinScriptCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SKIPPED)
+            }
+        }
+    }
 
-            ktlint.version = "0.35.0"
-            """.trimIndent()
-        )
-
-        build(":dependencies").apply {
-            assertThat(output).contains(
-                "$KTLINT_CONFIGURATION_NAME - $KTLINT_CONFIGURATION_DESCRIPTION${System.lineSeparator()}" +
-                    "\\--- com.pinterest:ktlint:0.35.0${System.lineSeparator()}"
+    @DisplayName("Should check kts files in configured child project folder")
+    @CommonTest
+    fun checkAdditionallyAddedKtsFiles(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
+            val additionalFolder = projectPath.resolve("scripts/")
+            additionalFolder.withCleanKotlinScript()
+            //language=Groovy
+            buildGradle.appendText(
+                """
+    
+                ktlint.kotlinScriptAdditionalPaths { include fileTree("scripts/") }
+                """.trimIndent()
             )
+
+            build(kotlinScriptCheckTaskName) {
+                assertThat(task(":$kotlinScriptCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
         }
     }
 
-    @Test
-    internal fun `Should check kotlin script file in project folder`() {
-        projectRoot.withCleanSources()
-        projectRoot.withCleanKotlinScript()
+    @DisplayName("Should apply internal git filter to check task")
+    @CommonTest
+    fun gitFilterOnCheck(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
+            withFailingSources()
 
-        build(kotlinScriptCheckTaskName).apply {
-            assertThat(task(":$kotlinScriptCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            build(
+                ":$CHECK_PARENT_TASK_NAME",
+                "-P$FILTER_INCLUDE_PROPERTY_NAME=src/main/kotlin/clean-source.kt"
+            ) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
         }
     }
 
-    @Test
-    internal fun `Should fail check of kotlin script file in project folder`() {
-        projectRoot.withCleanSources()
-        projectRoot.withFailingKotlinScript()
+    @DisplayName("Internal Git filter works with Windows")
+    @CommonTest
+    @EnabledOnOs(OS.WINDOWS)
+    fun gitFilterOnCheckWindows(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
+            withFailingSources()
 
-        buildAndFail(kotlinScriptCheckTaskName).apply {
-            assertThat(task(":$kotlinScriptCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            build(
+                ":$CHECK_PARENT_TASK_NAME",
+                "-P$FILTER_INCLUDE_PROPERTY_NAME=src\\main\\kotlin\\clean-source.kt"
+            ) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
         }
     }
 
-    @Test
-    internal fun `Should not check kotlin script file in child project folder`() {
-        projectRoot.withCleanSources()
-        val additionalFolder = projectRoot.resolve("scripts/")
-        additionalFolder.withFailingKotlinScript()
+    @DisplayName("Git filter should respect already applied filters")
+    @CommonTest
+    fun gitFilterAlreadyAppliedFilters(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withFailingSources()
+            //language=Groovy
+            buildGradle.appendText(
+                """
+    
+                ktlint.filter { exclude("**/fail-source.kt") }
+                """.trimIndent()
+            )
 
-        build(kotlinScriptCheckTaskName).apply {
-            assertThat(task(":$kotlinScriptCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SKIPPED)
+            build(
+                ":$CHECK_PARENT_TASK_NAME",
+                "-P$FILTER_INCLUDE_PROPERTY_NAME=src/main/kotlin/fail-source.kt"
+            ) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SKIPPED)
+            }
         }
     }
 
-    @Test
-    internal fun `Should check kts file in configured child project folder`() {
-        projectRoot.withCleanSources()
-        val additionalFolder = projectRoot.resolve("scripts/")
-        additionalFolder.withCleanKotlinScript()
-        projectRoot.buildFile().appendText(
-            """
+    @DisplayName("Git filter should ignore task if no files related to it")
+    @CommonTest
+    fun gitFilterIgnoreTask(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
 
-            ktlint.kotlinScriptAdditionalPaths { include fileTree("scripts/") }
-            """.trimIndent()
-        )
-
-        build(kotlinScriptCheckTaskName).apply {
-            assertThat(task(":$kotlinScriptCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            build(
+                ":$CHECK_PARENT_TASK_NAME",
+                "-P$FILTER_INCLUDE_PROPERTY_NAME=src/main/kotlin/failing-sources.kt"
+            ) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SKIPPED)
+            }
         }
     }
 
-    @Test
-    internal fun `Should apply internal git filter to check task`() {
-        projectRoot.withCleanSources()
-        projectRoot.withFailingSources()
+    @DisplayName("Should enable experimental indentation rule")
+    @CommonTest
+    fun enableExperimentalIndentationRule(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            //language=Kotlin
+            createSourceFile(
+                "src/main/kotlin/C.kt",
+                """
+                    class C {
+    
+                        private val Any.className
+                            get() = this.javaClass.name
+                                .fn()
+    
+                        private fun String.escape() =
+                            this.fn()
+                    }
+                """.trimIndent()
+            )
+            //language=Groovy
+            buildGradle.appendText(
+                """
+    
+                ktlint.enableExperimentalRules = true
+                ktlint.version = "0.34.0"
+                """.trimIndent()
+            )
 
-        build(
-            ":$CHECK_PARENT_TASK_NAME",
-            "-P$FILTER_INCLUDE_PROPERTY_NAME=src/main/kotlin/clean-source.kt"
-        ).run {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            buildAndFail(":$CHECK_PARENT_TASK_NAME", "-s") {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            }
         }
     }
 
-    @Test
-    internal fun `Should internal git filter work with Windows`() {
-        projectRoot.withCleanSources()
-        projectRoot.withFailingSources()
+    @DisplayName("Lint check should run incrementally")
+    @CommonTest
+    fun checkIsIncremental(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            val initialSourceFile = "src/main/kotlin/initial.kt"
+            createSourceFile(
+                initialSourceFile,
+                """
+                val foo = "bar"
+                
+                """.trimIndent()
+            )
 
-        build(
-            ":$CHECK_PARENT_TASK_NAME",
-            "-P$FILTER_INCLUDE_PROPERTY_NAME=src\\main\\kotlin\\clean-source.kt"
-        ).run {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            build(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+
+            val additionalSourceFile = "src/main/kotlin/another-file.kt"
+            createSourceFile(
+                additionalSourceFile,
+                """
+                val bar = "foo"
+            
+                """.trimIndent()
+            )
+
+            build(CHECK_PARENT_TASK_NAME, "--info") {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(output).contains("Executing incrementally")
+            }
         }
     }
 
-    @Test
-    internal fun `Git filter should respect already applied filters`() {
-        projectRoot.withFailingSources()
-        projectRoot.buildFile().appendText(
-            """
+    @DisplayName("Should check files which path conatins whitespace")
+    @CommonTest
+    fun pathsWithWhitespace(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            createSourceFile(
+                "src/main/kotlin/some path with whitespace/some file.kt",
+                """
+                class Test
+                """.trimIndent()
+            )
 
-            ktlint.filter { exclude("**/fail-source.kt") }
-            """.trimIndent()
-        )
-
-        build(
-            ":$CHECK_PARENT_TASK_NAME",
-            "-P$FILTER_INCLUDE_PROPERTY_NAME=src/main/kotlin/fail-source.kt"
-        ).run {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SKIPPED)
+            buildAndFail(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            }
         }
     }
 
-    @Test
-    internal fun `Git filter should ignore task if no files related to it`() {
-        projectRoot.withCleanSources()
+    @DisplayName("Should do nothing when there are no eligible incremental updates")
+    @CommonTest
+    fun noIncrementalUpdates(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            val passingContents =
+                """
+                val foo = "bar"
 
-        build(
-            ":$CHECK_PARENT_TASK_NAME",
-            "-P$FILTER_INCLUDE_PROPERTY_NAME=src/main/kotlin/failing-sources.kt"
-        ).run {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SKIPPED)
+                """.trimIndent()
+
+            val failingContents =
+                """
+                val foo="bar"
+
+                """.trimIndent()
+
+            val initialSourceFile = "src/main/kotlin/initial.kt"
+            createSourceFile(initialSourceFile, passingContents)
+
+            val additionalSourceFile = "src/main/kotlin/another-file.kt"
+            createSourceFile(additionalSourceFile, passingContents)
+
+            val testSourceFile = "src/test/kotlin/another-file.kt"
+            createSourceFile(testSourceFile, failingContents)
+
+            build(mainSourceSetCheckTaskName) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+
+            // Removing a source file will cause the task to run, but the only incremental change will
+            // be REMOVED, which does need to call ktlint
+            removeSourceFile(initialSourceFile)
+            build(mainSourceSetCheckTaskName) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            }
         }
     }
 
-    @Test
-    internal fun `Should enable experimental indentation rule`() {
-        projectRoot.createSourceFile(
-            "src/main/kotlin/C.kt",
-            """
-                class C {
+    @DisplayName("Should not leak KtLint into buildscript classpath")
+    @CommonTest
+    fun noLeakIntoBuildscriptClasspath(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
 
-                    private val Any.className
-                        get() = this.javaClass.name
-                            .fn()
+            build("buildEnvironment") {
+                assertThat(output).doesNotContain("com.pinterest.ktlint")
+            }
+        }
+    }
 
-                    private fun String.escape() =
-                        this.fn()
+    @DisplayName("Should print paths to the generated reports on code style violations")
+    @CommonTest
+    fun printReportsPaths(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withFailingSources()
+
+            buildAndFail(CHECK_PARENT_TASK_NAME) {
+                val s = File.separator
+                assertThat(output).contains(
+                    "build${s}reports${s}ktlint${s}ktlintMainSourceSetCheck${s}ktlintMainSourceSetCheck.txt"
+                )
+            }
+        }
+    }
+
+    @DisplayName("Should force dependencies versions from KtLint configuration for ruleset configuration")
+    @CommonTest
+    fun forceDependenciesRuleSetConfiguration(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
+
+            //language=Groovy
+            buildGradle.appendText(
+                """
+
+                dependencies {
+                    $KTLINT_RULESET_CONFIGURATION_NAME "com.pinterest.ktlint:ktlint-core:0.34.2"
                 }
-            """.trimIndent()
-        )
-        projectRoot.buildFile().appendText(
-            """
-
-            ktlint.enableExperimentalRules = true
-            ktlint.version = "0.34.0"
-            """.trimIndent()
-        )
-
-        buildAndFail(":$CHECK_PARENT_TASK_NAME", "-s").apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
-        }
-    }
-
-    @Test
-    internal fun `Lint check should run incrementally`() {
-        val initialSourceFile = "src/main/kotlin/initial.kt"
-        projectRoot.createSourceFile(
-            initialSourceFile,
-            """
-            val foo = "bar"
-            
-            """.trimIndent()
-        )
-
-        build(CHECK_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-        }
-
-        val additionalSourceFile = "src/main/kotlin/another-file.kt"
-        projectRoot.createSourceFile(
-            additionalSourceFile,
-            """
-            val bar = "foo"
-            
-            """.trimIndent()
-        )
-
-        build(CHECK_PARENT_TASK_NAME, "--info").apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(output).contains("Executing incrementally")
-        }
-    }
-
-    @Test
-    internal fun `Should check files which path contains whitespace`() {
-        projectRoot.createSourceFile(
-            "src/main/kotlin/some path with whitespace/some file.kt",
-            """
-            class Test
-            """.trimIndent()
-        )
-
-        buildAndFail(CHECK_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
-            // TODO: see https://github.com/pinterest/ktlint/issues/997 why check was changed
-            // should be reverted back once next ktlint release is out
-            assertThat(output).contains(
-                "File must end with a newline (\\n)"
+                """.trimIndent()
             )
+
+            build(":dependencies", "--configuration", KTLINT_RULESET_CONFIGURATION_NAME) {
+                assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.41.0")
+            }
         }
     }
 
-    @Test
-    internal fun `Should do nothing when there are no eligible incremental updates`() {
-        val passingContents =
-            """
-            val foo = "bar"
+    @DisplayName("Should force dependencies versions from KtLint configuration for reporters configuration")
+    @CommonTest
+    fun forceDependenciesReportersConfiguration(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
 
-            """.trimIndent()
+            //language=Groovy
+            buildGradle.appendText(
+                """
 
-        val failingContents =
-            """
-            val foo="bar"
-
-            """.trimIndent()
-
-        val initialSourceFile = "src/main/kotlin/initial.kt"
-        projectRoot.createSourceFile(initialSourceFile, passingContents)
-
-        val additionalSourceFile = "src/main/kotlin/another-file.kt"
-        projectRoot.createSourceFile(additionalSourceFile, passingContents)
-
-        val testSourceFile = "src/test/kotlin/another-file.kt"
-        projectRoot.createSourceFile(testSourceFile, failingContents)
-
-        build(mainSourceSetCheckTaskName).apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-        }
-
-        // Removing a source file will cause the task to run, but the only incremental change will
-        // be REMOVED, which does need to call ktlint
-        projectRoot.removeSourceFile(initialSourceFile)
-        build(mainSourceSetCheckTaskName).apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
-        }
-    }
-
-    @Test
-    internal fun `Should not leak KtLint into buildscript classpath`() {
-        projectRoot.withCleanSources()
-
-        build("buildEnvironment").apply {
-            assertThat(output).doesNotContain("com.pinterest.ktlint")
-        }
-    }
-
-    @Test
-    internal fun `Should print pathes to generated reports on code style violations`() {
-        projectRoot.withFailingSources()
-
-        buildAndFail(CHECK_PARENT_TASK_NAME).apply {
-            val s = File.separator
-            assertThat(output).contains(
-                "build${s}reports${s}ktlint${s}ktlintMainSourceSetCheck${s}ktlintMainSourceSetCheck.txt"
+                dependencies {
+                    $KTLINT_REPORTER_CONFIGURATION_NAME "com.pinterest.ktlint:ktlint-core:0.34.2"
+                }
+                """.trimIndent()
             )
-        }
-    }
 
-    @Test
-    internal fun `Should force dependencies versions from KtLint configuration for ruleset configuration`() {
-        projectRoot.withCleanSources()
-
-        projectRoot.buildFile().appendText(
-            """
-
-            dependencies {
-                $KTLINT_RULESET_CONFIGURATION_NAME "com.pinterest.ktlint:ktlint-core:0.34.2"
+            build(":dependencies", "--configuration", KTLINT_REPORTER_CONFIGURATION_NAME) {
+                assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.41.0")
             }
-            """.trimIndent()
-        )
-
-        build(":dependencies", "--configuration", KTLINT_RULESET_CONFIGURATION_NAME).apply {
-            assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.41.0")
-        }
-    }
-
-    @Test
-    internal fun `Should force dependencies versions from KtLint configuration for reporters configuration`() {
-        projectRoot.withCleanSources()
-
-        projectRoot.buildFile().appendText(
-            """
-
-            dependencies {
-                $KTLINT_REPORTER_CONFIGURATION_NAME "com.pinterest.ktlint:ktlint-core:0.34.2"
-            }
-            """.trimIndent()
-        )
-
-        build(":dependencies", "--configuration", KTLINT_REPORTER_CONFIGURATION_NAME).apply {
-            assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.41.0")
         }
     }
 }

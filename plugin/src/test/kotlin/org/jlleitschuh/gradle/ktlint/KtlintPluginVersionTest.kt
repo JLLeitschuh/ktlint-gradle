@@ -2,49 +2,54 @@ package org.jlleitschuh.gradle.ktlint
 
 import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testkit.runner.TaskOutcome
+import org.gradle.util.GradleVersion
 import org.jlleitschuh.gradle.ktlint.tasks.LoadReportersTask
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import org.jlleitschuh.gradle.ktlint.testdsl.CommonTest
+import org.jlleitschuh.gradle.ktlint.testdsl.GradleTestVersions
+import org.jlleitschuh.gradle.ktlint.testdsl.build
+import org.jlleitschuh.gradle.ktlint.testdsl.buildAndFail
+import org.jlleitschuh.gradle.ktlint.testdsl.project
+import org.junit.jupiter.api.DisplayName
 import java.io.File
 
+@GradleTestVersions
 class KtlintPluginVersionTest : AbstractPluginTest() {
 
-    private fun File.buildScriptUsingKtlintVersion(version: String) {
-        buildFile().writeText(
+    private fun File.useKtlintVersion(version: String) {
+        //language=Groovy
+        appendText(
             """
-                ${pluginsBlockWithMainPluginAndKotlinJvm()}
+            buildDir = file("directory with spaces")
 
-                repositories {
-                    gradlePluginPortal()
-                }
-
-                buildDir = file("directory with spaces")
-
-                ktlint {
-                    version = "$version"
-                }
+            ktlint {
+                version = "$version"
+            }
             """.trimIndent()
         )
     }
 
-    @BeforeEach
-    fun setup() {
-        projectRoot.withCleanSources()
-    }
+    @DisplayName("Should allow to use KtLint version 0.34.0")
+    @CommonTest
+    fun allowSupportedMinimalKtLintVersion(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
+            buildGradle.useKtlintVersion("0.34.0")
 
-    @Test
-    fun `with ktLint version equal to 0_34`() {
-        projectRoot.buildScriptUsingKtlintVersion("0.34.0")
-        build(CHECK_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            build(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
         }
     }
 
-    @Test
-    fun `with ktLint version less than 0_34`() {
-        projectRoot.buildScriptUsingKtlintVersion("0.33.0")
-        buildAndFail(CHECK_PARENT_TASK_NAME).apply {
-            assertThat(task(":${LoadReportersTask.TASK_NAME}")?.outcome).isEqualTo(TaskOutcome.FAILED)
+    @DisplayName("Should fail the build on using KtLint version <0.34.0")
+    @CommonTest
+    fun failOnUnsupportedOldKtLintVersion(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
+            buildGradle.useKtlintVersion("0.33.0")
+            buildAndFail(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":${LoadReportersTask.TASK_NAME}")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            }
         }
     }
 }
