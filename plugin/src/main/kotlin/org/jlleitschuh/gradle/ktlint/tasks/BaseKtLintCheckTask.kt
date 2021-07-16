@@ -10,6 +10,8 @@ import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.model.ReplacedBy
+import org.gradle.api.plugins.JavaBasePlugin
+import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Classpath
@@ -17,11 +19,15 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.SourceTask
+import org.gradle.jvm.toolchain.JavaLauncher
+import org.gradle.jvm.toolchain.JavaToolchainService
 import org.gradle.work.ChangeType
 import org.gradle.work.Incremental
 import org.gradle.work.InputChanges
@@ -42,6 +48,10 @@ abstract class BaseKtLintCheckTask @Inject constructor(
     projectLayout: ProjectLayout,
     private val workerExecutor: WorkerExecutor,
 ) : SourceTask() {
+
+    @get:Nested
+    @get:Optional
+    abstract val launcher: Property<JavaLauncher>
 
     @get:Classpath
     internal abstract val ktLintClasspath: ConfigurableFileCollection
@@ -94,6 +104,14 @@ abstract class BaseKtLintCheckTask @Inject constructor(
             KOTLIN_EXTENSIONS.forEach {
                 include("**/*.$it")
             }
+        }
+
+        project.plugins.withType(JavaBasePlugin::class.java).configureEach {
+            val toolchain = project.extensions.getByType(JavaPluginExtension::class.java).toolchain
+
+            val service = project.extensions.getByType(JavaToolchainService::class.java)
+            val defaultLauncher = service.launcherFor(toolchain)
+            launcher.convention(defaultLauncher)
         }
     }
 
@@ -150,6 +168,9 @@ abstract class BaseKtLintCheckTask @Inject constructor(
             spec.classpath.from(ktLintClasspath, ruleSetsClasspath)
             spec.forkOptions { options ->
                 options.maxHeapSize = workerMaxHeapSize.get()
+                if(launcher.isPresent) {
+                    options.executable = launcher.get().executablePath.asFile.absolutePath
+                }
             }
         }
 

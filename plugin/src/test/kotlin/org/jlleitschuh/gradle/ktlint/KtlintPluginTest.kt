@@ -480,4 +480,40 @@ abstract class BaseKtlintPluginTest : AbstractPluginTest() {
             assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.41.0")
         }
     }
+
+    @Test
+    internal fun `Should use JVM Toolchains`() {
+        val initialSourceFile = "src/main/kotlin/initial.kt"
+        projectRoot.createSourceFile(
+            initialSourceFile,
+            """
+            val foo = "bar"
+            
+            """.trimIndent()
+        )
+
+
+        projectRoot.buildFile().appendText(
+            """
+            
+            java {
+                toolchain {
+                    languageVersion.set(JavaLanguageVersion.of(16))
+                }
+            }
+            
+            tasks.withType(org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask) {
+                doLast {
+                    project.logger.lifecycle("Running ktlint task with JDK ${'$'}{it.launcher.get().metadata.languageVersion.asInt()}")
+                }
+            }
+            """.trimIndent()
+        )
+
+        build(CHECK_PARENT_TASK_NAME).apply {
+            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(output.contains("Running ktlint task with JDK 16"))
+        }
+
+    }
 }
