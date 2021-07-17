@@ -6,7 +6,6 @@ import org.gradle.util.GradleVersion
 import org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask
 import org.jlleitschuh.gradle.ktlint.testdsl.CommonTest
 import org.jlleitschuh.gradle.ktlint.testdsl.GradleTestVersions
-import org.jlleitschuh.gradle.ktlint.testdsl.TestVersions
 import org.jlleitschuh.gradle.ktlint.testdsl.build
 import org.jlleitschuh.gradle.ktlint.testdsl.buildAndFail
 import org.jlleitschuh.gradle.ktlint.testdsl.project
@@ -19,8 +18,8 @@ import java.io.File
  */
 @GradleTestVersions
 class KotlinJsPluginTests : AbstractPluginTest() {
-    private val jsProjectSetup: (File) -> Unit = {
-        projectSetup("js", TestVersions.kotlinPluginVersion).invoke(it)
+    private fun jsProjectSetup(gradleVersion: GradleVersion): (File) -> Unit = {
+        projectSetup("js", gradleVersion).invoke(it)
 
         //language=Groovy
         it.resolve("build.gradle").appendText(
@@ -38,7 +37,7 @@ class KotlinJsPluginTests : AbstractPluginTest() {
     @DisplayName("Should add check tasks")
     @CommonTest
     fun addCheckTasks(gradleVersion: GradleVersion) {
-        project(gradleVersion, projectSetup = jsProjectSetup) {
+        project(gradleVersion, projectSetup = jsProjectSetup(gradleVersion)) {
             build("-m", CHECK_PARENT_TASK_NAME) {
                 val ktlintTasks = output.lineSequence().toList()
 
@@ -60,7 +59,7 @@ class KotlinJsPluginTests : AbstractPluginTest() {
     @DisplayName("Should add format tasks")
     @CommonTest
     fun addFormatTasks(gradleVersion: GradleVersion) {
-        project(gradleVersion, projectSetup = jsProjectSetup) {
+        project(gradleVersion, projectSetup = jsProjectSetup(gradleVersion)) {
             build("-m", FORMAT_PARENT_TASK_NAME) {
                 val ktlintTasks = output.lineSequence().toList()
 
@@ -82,7 +81,7 @@ class KotlinJsPluginTests : AbstractPluginTest() {
     @DisplayName("Should fail check task on un-formatted sources")
     @CommonTest
     fun failOnStyleViolation(gradleVersion: GradleVersion) {
-        project(gradleVersion, projectSetup = jsProjectSetup) {
+        project(gradleVersion, projectSetup = jsProjectSetup(gradleVersion)) {
             withFailingSources()
 
             buildAndFail(CHECK_PARENT_TASK_NAME) {
