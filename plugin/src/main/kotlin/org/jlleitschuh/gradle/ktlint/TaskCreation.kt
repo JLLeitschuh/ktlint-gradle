@@ -74,7 +74,7 @@ internal fun createKotlinScriptCheckTask(
     .registerTask(KtLintCheckTask.KOTLIN_SCRIPT_TASK_NAME) {
         description = KtLintCheckTask.buildDescription(".kts")
         configureBaseCheckTask(pluginHolder) {
-            source = projectScriptFiles
+            setSource(projectScriptFiles)
         }
     }
 
@@ -86,7 +86,7 @@ internal fun createKotlinScriptFormatTask(
     .registerTask(KtLintFormatTask.KOTLIN_SCRIPT_TASK_NAME) {
         description = KtLintFormatTask.buildDescription(".kts")
         configureBaseCheckTask(pluginHolder) {
-            source = projectScriptFiles
+            setSource(projectScriptFiles)
         }
     }
 

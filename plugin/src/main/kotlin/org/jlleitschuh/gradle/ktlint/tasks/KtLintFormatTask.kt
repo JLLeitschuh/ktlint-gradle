@@ -1,6 +1,6 @@
 package org.jlleitschuh.gradle.ktlint.tasks
 
-import org.gradle.api.file.FileTree
+import org.gradle.api.file.FileCollection
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.CacheableTask
@@ -33,9 +33,7 @@ abstract class KtLintFormatTask @Inject constructor(
      */
     @Suppress("unused")
     @OutputFiles
-    fun getOutputSources(): FileTree {
-        return source
-    }
+    fun getOutputSources(): FileCollection = source.filter { !it.exists() }
 
     internal companion object {
         fun buildTaskNameForSourceSet(
