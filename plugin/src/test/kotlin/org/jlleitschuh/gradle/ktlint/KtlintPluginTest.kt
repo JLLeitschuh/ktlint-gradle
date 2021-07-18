@@ -206,6 +206,18 @@ class KtlintPluginTest : AbstractPluginTest() {
         }
     }
 
+    @DisplayName("Format task should not create directories for empty SourceSets")
+    @CommonTest
+    fun formatNotCreateEmpty(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withFailingSources()
+
+            build(FORMAT_PARENT_TASK_NAME) {
+                assertThat(projectPath.resolve("src/main/java")).doesNotExist()
+            }
+        }
+    }
+
     @DisplayName("Should apply KtLint version from extension")
     @CommonTest
     fun ktlintVersionFromExtension(gradleVersion: GradleVersion) {

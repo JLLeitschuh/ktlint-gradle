@@ -1,15 +1,14 @@
 package org.jlleitschuh.gradle.ktlint.tasks
 
+import groovy.lang.Closure
 import net.swiftzer.semver.SemVer
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
-import org.gradle.api.file.FileTree
 import org.gradle.api.file.FileType
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.model.ReplacedBy
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Classpath
@@ -21,7 +20,6 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
-import org.gradle.api.tasks.SourceTask
 import org.gradle.work.ChangeType
 import org.gradle.work.Incremental
 import org.gradle.work.InputChanges
@@ -35,13 +33,20 @@ import org.jlleitschuh.gradle.ktlint.property
 import org.jlleitschuh.gradle.ktlint.worker.KtLintWorkAction
 import java.io.File
 import javax.inject.Inject
+import org.gradle.api.DefaultTask
+import org.gradle.api.file.FileTreeElement
+import org.gradle.api.specs.Spec
+import org.gradle.api.tasks.IgnoreEmptyDirectories
+import org.gradle.api.tasks.util.PatternFilterable
+import org.gradle.api.tasks.util.PatternSet
 
 @Suppress("UnstableApiUsage")
 abstract class BaseKtLintCheckTask @Inject constructor(
-    objectFactory: ObjectFactory,
+    private val objectFactory: ObjectFactory,
     projectLayout: ProjectLayout,
-    private val workerExecutor: WorkerExecutor,
-) : SourceTask() {
+    private val workerExecutor: WorkerExecutor
+) : DefaultTask(),
+    PatternFilterable {
 
     @get:Classpath
     internal abstract val ktLintClasspath: ConfigurableFileCollection
@@ -87,6 +92,9 @@ abstract class BaseKtLintCheckTask @Inject constructor(
         convention("256m")
     }
 
+    private var sourceFiles: ConfigurableFileCollection = objectFactory.fileCollection()
+    private val patternSet: PatternFilterable = PatternSet()
+
     init {
         if (project.hasProperty(FILTER_INCLUDE_PROPERTY_NAME)) {
             applyGitFilter()
@@ -97,17 +105,33 @@ abstract class BaseKtLintCheckTask @Inject constructor(
         }
     }
 
-    @ReplacedBy("stableSources")
-    override fun getSource(): FileTree {
-        return super.getSource()
-    }
-
+    @get:IgnoreEmptyDirectories
     @get:SkipWhenEmpty
     @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:InputFiles
-    internal val stableSources: FileCollection = project.files(
-        { source }
-    )
+    val source: FileCollection = objectFactory
+        .fileCollection()
+        .from({ sourceFiles.asFileTree.matching(patternSet) })
+
+    /**
+     * Sets the source from this task.
+     *
+     * @param source given source objects will be evaluated as per [org.gradle.api.Project.file].
+     */
+    fun setSource(source: Any): BaseKtLintCheckTask {
+        sourceFiles = objectFactory.fileCollection().from(source)
+        return this
+    }
+
+    /**
+     * Adds some source to this task.
+     *
+     * @param sources given source objects will be evaluated as per [org.gradle.api.Project.files].
+     */
+    fun source(vararg sources: Any): BaseKtLintCheckTask {
+        sourceFiles.from(sources)
+        return this
+    }
 
     @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:InputFile
@@ -120,6 +144,41 @@ abstract class BaseKtLintCheckTask @Inject constructor(
             projectLayout.intermediateResultsBuildDir("${name}_errors.bin")
         )
 
+    @Internal
+    override fun getIncludes(): MutableSet<String> = patternSet.includes
+    @Internal
+    override fun getExcludes(): MutableSet<String> = patternSet.excludes
+
+    override fun setIncludes(includes: MutableIterable<String>): BaseKtLintCheckTask =
+        also { patternSet.setIncludes(includes) }
+
+    override fun setExcludes(excludes: MutableIterable<String>): BaseKtLintCheckTask =
+        also { patternSet.setExcludes(excludes) }
+
+    override fun include(vararg includes: String?): BaseKtLintCheckTask =
+        also { patternSet.include(*includes) }
+
+    override fun include(includes: MutableIterable<String>): BaseKtLintCheckTask =
+        also { patternSet.include(includes) }
+
+    override fun include(includeSpec: Spec<FileTreeElement>): BaseKtLintCheckTask =
+        also { patternSet.include(includeSpec) }
+
+    override fun include(includeSpec: Closure<*>): BaseKtLintCheckTask =
+        also { patternSet.include(includeSpec) }
+
+    override fun exclude(vararg excludes: String?): BaseKtLintCheckTask =
+        also { patternSet.exclude(*excludes) }
+
+    override fun exclude(excludes: MutableIterable<String>): BaseKtLintCheckTask =
+        also { patternSet.exclude(excludes) }
+
+    override fun exclude(excludeSpec: Spec<FileTreeElement>): BaseKtLintCheckTask =
+        also { patternSet.exclude(excludeSpec) }
+
+    override fun exclude(excludeSpec: Closure<*>): BaseKtLintCheckTask =
+        also { patternSet.exclude(excludeSpec) }
+
     protected fun runLint(
         inputChanges: InputChanges?,
         formatSources: Boolean,
@@ -128,7 +187,7 @@ abstract class BaseKtLintCheckTask @Inject constructor(
 
         val editorConfigUpdated = wasEditorConfigFilesUpdated(inputChanges)
         val filesToCheck = if (formatSources || editorConfigUpdated || inputChanges == null) {
-            stableSources.files
+            source.files
         } else {
             getChangedSources(inputChanges)
         }
@@ -176,7 +235,7 @@ abstract class BaseKtLintCheckTask @Inject constructor(
     private fun getChangedSources(
         inputChanges: InputChanges
     ): Set<File> = inputChanges
-        .getFileChanges(stableSources)
+        .getFileChanges(source)
         .asSequence()
         .filter {
             it.fileType != FileType.DIRECTORY &&
