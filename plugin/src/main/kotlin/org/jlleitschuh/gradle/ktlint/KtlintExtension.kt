@@ -160,7 +160,7 @@ internal constructor(
          *
          * _By default_ `plain` type is enabled if no reporter is explicitly specified.
          *
-         * @param reporterType one of `plain`, `plain_group_by_file`, `checkstyle`, `json`.
+         * @param reporterType one of `plain`, `plain_group_by_file`, `checkstyle`, `json`, `sarif`.
          */
         fun reporter(reporterType: ReporterType) {
             reporters.add(reporterType)

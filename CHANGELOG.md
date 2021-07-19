@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [10.2.0-SNAPSHOT] - Unreleased
 ### Added
-  - ?
+  - sarif reporter to provided reporters
 
 ### Changed
   - Update Gradle to `7.1.1` version

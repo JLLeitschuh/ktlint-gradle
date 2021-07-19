@@ -272,7 +272,8 @@ ktlint {
     reporters {
         reporter "plain"
         reporter "checkstyle"
-        
+        reporter "sarif"
+
         customReporters {
             "csv" {
                 fileExtension = "csv"

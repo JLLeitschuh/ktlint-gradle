@@ -184,6 +184,28 @@ class ReportersTest : AbstractPluginTest() {
         }
     }
 
+    @DisplayName("Should generate sarif report")
+    @CommonTest
+    internal fun sarifReport(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
+            //language=Groovy
+            buildGradle.appendText(
+                """
+
+                ktlint.reporters {
+                    reporter "sarif"
+                }
+                """.trimIndent()
+            )
+
+            build(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertReportCreated(ReporterType.SARIF.fileExtension, mainSourceSetCheckTaskName)
+            }
+        }
+    }
+
     @DisplayName("Should ignore html reporter on KtLint versions less then 0.36.0")
     @CommonTest
     internal fun ignoreHtmlOnOldVersions(gradleVersion: GradleVersion) {
