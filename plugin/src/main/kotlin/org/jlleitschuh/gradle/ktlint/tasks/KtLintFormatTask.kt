@@ -1,12 +1,17 @@
 package org.jlleitschuh.gradle.ktlint.tasks
 
-import org.gradle.api.file.FileCollection
 import org.gradle.api.file.ProjectLayout
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.CacheableTask
-import org.gradle.api.tasks.OutputFiles
+import org.gradle.api.tasks.LocalState
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.util.PatternFilterable
+import org.gradle.work.InputChanges
 import org.gradle.workers.WorkerExecutor
+import org.jlleitschuh.gradle.ktlint.intermediateResultsBuildDir
+import org.jlleitschuh.gradle.ktlint.worker.KtLintWorkAction
+import org.jlleitschuh.gradle.ktlint.worker.KtLintWorkAction.FormatTaskSnapshot.Companion.contentHash
 import javax.inject.Inject
 
 @CacheableTask
@@ -14,26 +19,45 @@ abstract class KtLintFormatTask @Inject constructor(
     objectFactory: ObjectFactory,
     projectLayout: ProjectLayout,
     workerExecutor: WorkerExecutor,
+    patternFilterable: PatternFilterable
 ) : BaseKtLintCheckTask(
     objectFactory,
     projectLayout,
     workerExecutor,
+    patternFilterable
 ) {
+    @get:LocalState
+    internal val previousRunSnapshot: RegularFileProperty = objectFactory
+        .fileProperty()
+        .convention(
+            projectLayout.intermediateResultsBuildDir("$name-snapshot.bin")
+        )
 
-    @TaskAction
-    fun format() {
-        runLint(null, true)
+    private val previousSnapshot get() = previousRunSnapshot.asFile.get()
+        .run {
+            if (exists()) {
+                KtLintWorkAction.FormatTaskSnapshot.readFromFile(this)
+            } else {
+                KtLintWorkAction.FormatTaskSnapshot(emptyMap())
+            }
+        }
+
+    init {
+        // Special UP-TO-DATE check to avoid situation when task does not check restored to pre-formatted state
+        // files
+        outputs.upToDateWhen {
+            val inputSources = source.files
+            previousSnapshot.formattedSources.none {
+                inputSources.contains(it.key) &&
+                    contentHash(it.key).contentEquals(it.value)
+            }
+        }
     }
 
-    /**
-     * Fixes the issue when input file is restored to pre-format state and running format task again fails
-     * with "up-to-date" task state.
-     *
-     * Note this approach sets task to "up-to-date" only on 3rd run when both input and output sources are the same.
-     */
-    @Suppress("unused")
-    @OutputFiles
-    fun getOutputSources(): FileCollection = source.filter { !it.exists() }
+    @TaskAction
+    fun format(inputChanges: InputChanges) {
+        runFormat(inputChanges, previousRunSnapshot.get().asFile)
+    }
 
     internal companion object {
         fun buildTaskNameForSourceSet(

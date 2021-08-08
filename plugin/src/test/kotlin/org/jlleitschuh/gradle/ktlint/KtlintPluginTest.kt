@@ -182,8 +182,10 @@ class KtlintPluginTest : AbstractPluginTest() {
 
             build(FORMAT_PARENT_TASK_NAME) {
                 assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(projectPath.resolve(FAIL_SOURCE_FILE)).exists()
             }
-            assertThat(projectPath.resolve(FAIL_SOURCE_FILE)).exists()
+
+            build(CHECK_PARENT_TASK_NAME)
         }
     }
 

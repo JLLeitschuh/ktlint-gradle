@@ -2,16 +2,20 @@ package org.jlleitschuh.gradle.ktlint.tasks
 
 import groovy.lang.Closure
 import net.swiftzer.semver.SemVer
+import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
+import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.FileType
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
+import org.gradle.api.specs.Spec
 import org.gradle.api.tasks.Classpath
+import org.gradle.api.tasks.IgnoreEmptyDirectories
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
@@ -20,6 +24,7 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
+import org.gradle.api.tasks.util.PatternFilterable
 import org.gradle.work.ChangeType
 import org.gradle.work.Incremental
 import org.gradle.work.InputChanges
@@ -33,18 +38,13 @@ import org.jlleitschuh.gradle.ktlint.property
 import org.jlleitschuh.gradle.ktlint.worker.KtLintWorkAction
 import java.io.File
 import javax.inject.Inject
-import org.gradle.api.DefaultTask
-import org.gradle.api.file.FileTreeElement
-import org.gradle.api.specs.Spec
-import org.gradle.api.tasks.IgnoreEmptyDirectories
-import org.gradle.api.tasks.util.PatternFilterable
-import org.gradle.api.tasks.util.PatternSet
 
 @Suppress("UnstableApiUsage")
 abstract class BaseKtLintCheckTask @Inject constructor(
     private val objectFactory: ObjectFactory,
     projectLayout: ProjectLayout,
-    private val workerExecutor: WorkerExecutor
+    private val workerExecutor: WorkerExecutor,
+    private val patternFilterable: PatternFilterable
 ) : DefaultTask(),
     PatternFilterable {
 
@@ -93,7 +93,6 @@ abstract class BaseKtLintCheckTask @Inject constructor(
     }
 
     private var sourceFiles: ConfigurableFileCollection = objectFactory.fileCollection()
-    private val patternSet: PatternFilterable = PatternSet()
 
     init {
         if (project.hasProperty(FILTER_INCLUDE_PROPERTY_NAME)) {
@@ -111,7 +110,7 @@ abstract class BaseKtLintCheckTask @Inject constructor(
     @get:InputFiles
     val source: FileCollection = objectFactory
         .fileCollection()
-        .from({ sourceFiles.asFileTree.matching(patternSet) })
+        .from({ sourceFiles.asFileTree.matching(patternFilterable) })
 
     /**
      * Sets the source from this task.
@@ -145,63 +144,108 @@ abstract class BaseKtLintCheckTask @Inject constructor(
         )
 
     @Internal
-    override fun getIncludes(): MutableSet<String> = patternSet.includes
+    override fun getIncludes(): MutableSet<String> = patternFilterable.includes
     @Internal
-    override fun getExcludes(): MutableSet<String> = patternSet.excludes
+    override fun getExcludes(): MutableSet<String> = patternFilterable.excludes
 
     override fun setIncludes(includes: MutableIterable<String>): BaseKtLintCheckTask =
-        also { patternSet.setIncludes(includes) }
+        also { patternFilterable.setIncludes(includes) }
 
     override fun setExcludes(excludes: MutableIterable<String>): BaseKtLintCheckTask =
-        also { patternSet.setExcludes(excludes) }
+        also { patternFilterable.setExcludes(excludes) }
 
     override fun include(vararg includes: String?): BaseKtLintCheckTask =
-        also { patternSet.include(*includes) }
+        also { patternFilterable.include(*includes) }
 
     override fun include(includes: MutableIterable<String>): BaseKtLintCheckTask =
-        also { patternSet.include(includes) }
+        also { patternFilterable.include(includes) }
 
     override fun include(includeSpec: Spec<FileTreeElement>): BaseKtLintCheckTask =
-        also { patternSet.include(includeSpec) }
+        also { patternFilterable.include(includeSpec) }
 
     override fun include(includeSpec: Closure<*>): BaseKtLintCheckTask =
-        also { patternSet.include(includeSpec) }
+        also { patternFilterable.include(includeSpec) }
 
     override fun exclude(vararg excludes: String?): BaseKtLintCheckTask =
-        also { patternSet.exclude(*excludes) }
+        also { patternFilterable.exclude(*excludes) }
 
     override fun exclude(excludes: MutableIterable<String>): BaseKtLintCheckTask =
-        also { patternSet.exclude(excludes) }
+        also { patternFilterable.exclude(excludes) }
 
     override fun exclude(excludeSpec: Spec<FileTreeElement>): BaseKtLintCheckTask =
-        also { patternSet.exclude(excludeSpec) }
+        also { patternFilterable.exclude(excludeSpec) }
 
     override fun exclude(excludeSpec: Closure<*>): BaseKtLintCheckTask =
-        also { patternSet.exclude(excludeSpec) }
+        also { patternFilterable.exclude(excludeSpec) }
 
     protected fun runLint(
-        inputChanges: InputChanges?,
-        formatSources: Boolean,
+        inputChanges: InputChanges
     ) {
         checkDisabledRulesSupportedKtLintVersion()
 
         val editorConfigUpdated = wasEditorConfigFilesUpdated(inputChanges)
-        val filesToCheck = if (formatSources || editorConfigUpdated || inputChanges == null) {
+        val filesToCheck = if (editorConfigUpdated) {
             source.files
         } else {
             getChangedSources(inputChanges)
         }
 
-        logger.info("Executing ${if (inputChanges?.isIncremental == true) "incrementally" else "non-incrementally"}")
-        logger.info("Editorconfig files were changed: $editorConfigUpdated")
-        if (filesToCheck.isEmpty()) {
-            logger.info("Skipping. No files to lint")
-            didWork = false
-            return
+        logTaskExecutionState(inputChanges, editorConfigUpdated)
+        if (skipExecution(filesToCheck)) return
+
+        submitKtLintWork(filesToCheck, false, editorConfigUpdated, null)
+    }
+
+    protected fun runFormat(
+        inputChanges: InputChanges,
+        formatSnapshot: File
+    ) {
+        checkDisabledRulesSupportedKtLintVersion()
+
+        val editorConfigUpdated = wasEditorConfigFilesUpdated(inputChanges)
+        val filesToCheck = if (editorConfigUpdated) {
+            source.files
         } else {
-            logger.debug("Linting files: ${filesToCheck.joinToString()}")
+            val snapshot = if (formatSnapshot.exists()) {
+                KtLintWorkAction.FormatTaskSnapshot.readFromFile(formatSnapshot)
+            } else {
+                KtLintWorkAction.FormatTaskSnapshot(emptyMap())
+            }
+
+            getChangedSources(inputChanges) + snapshot.formattedSources.keys
         }
 
+        logTaskExecutionState(inputChanges, editorConfigUpdated)
+        if (skipExecution(filesToCheck)) return
+
+        submitKtLintWork(filesToCheck, true, editorConfigUpdated, formatSnapshot)
+    }
+
+    private fun logTaskExecutionState(
+        inputChanges: InputChanges,
+        editorConfigUpdated: Boolean,
+    ) {
+        logger.info("Executing ${if (inputChanges.isIncremental) "incrementally" else "non-incrementally"}")
+        logger.info("Editorconfig files were changed: $editorConfigUpdated")
+    }
+
+    private fun skipExecution(filesToCheck: Set<File>): Boolean {
+        return if (filesToCheck.isEmpty()) {
+            logger.info("Skipping. No files to lint")
+            didWork = false
+            true
+        } else {
+            logger.debug("Linting files: ${filesToCheck.joinToString()}")
+            false
+        }
+    }
+
+    private fun submitKtLintWork(
+        filesToCheck: Set<File>,
+        formatSources: Boolean,
+        editorConfigUpdated: Boolean,
+        formatSnapshot: File? = null
+    ) {
         // Process isolation is used here to run KtLint in a separate java process.
         // This allows to better isolate work actions from different projects tasks between each other
         // and to not pollute Gradle daemon heap, which otherwise greatly increases GC time.
@@ -223,6 +267,7 @@ abstract class BaseKtLintCheckTask @Inject constructor(
             params.discoveredErrorsFile.set(discoveredErrors)
             params.ktLintVersion.set(ktLintVersion)
             params.editorconfigFilesWereChanged.set(editorConfigUpdated)
+            params.formatSnapshot.set(formatSnapshot)
         }
     }
 

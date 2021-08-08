@@ -4,6 +4,7 @@ import org.gradle.api.Project
 import org.gradle.api.file.FileTree
 import org.gradle.api.tasks.TaskCollection
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.api.tasks.util.PatternSet
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jlleitschuh.gradle.ktlint.tasks.BaseKtLintCheckTask
 import org.jlleitschuh.gradle.ktlint.tasks.GenerateBaselineTask
@@ -31,7 +32,8 @@ internal fun createFormatTask(
 ): TaskProvider<KtLintFormatTask> = pluginHolder
     .target
     .registerTask(
-        KtLintFormatTask.buildTaskNameForSourceSet(sourceSetName)
+        KtLintFormatTask.buildTaskNameForSourceSet(sourceSetName),
+        PatternSet()
     ) {
         mustRunAfter(project.tasks.named(KtLintFormatTask.KOTLIN_SCRIPT_TASK_NAME))
 
@@ -58,7 +60,8 @@ internal fun createCheckTask(
 ): TaskProvider<KtLintCheckTask> = pluginHolder
     .target
     .registerTask(
-        KtLintCheckTask.buildTaskNameForSourceSet(sourceSetName)
+        KtLintCheckTask.buildTaskNameForSourceSet(sourceSetName),
+        PatternSet()
     ) {
         description = KtLintCheckTask.buildDescription(".kt")
         configureBaseCheckTask(pluginHolder) {
@@ -71,7 +74,10 @@ internal fun createKotlinScriptCheckTask(
     projectScriptFiles: FileTree
 ): TaskProvider<KtLintCheckTask> = pluginHolder
     .target
-    .registerTask(KtLintCheckTask.KOTLIN_SCRIPT_TASK_NAME) {
+    .registerTask(
+        KtLintCheckTask.KOTLIN_SCRIPT_TASK_NAME,
+        PatternSet()
+    ) {
         description = KtLintCheckTask.buildDescription(".kts")
         configureBaseCheckTask(pluginHolder) {
             setSource(projectScriptFiles)
@@ -83,7 +89,10 @@ internal fun createKotlinScriptFormatTask(
     projectScriptFiles: FileTree
 ): TaskProvider<KtLintFormatTask> = pluginHolder
     .target
-    .registerTask(KtLintFormatTask.KOTLIN_SCRIPT_TASK_NAME) {
+    .registerTask(
+        KtLintFormatTask.KOTLIN_SCRIPT_TASK_NAME,
+        PatternSet()
+    ) {
         description = KtLintFormatTask.buildDescription(".kts")
         configureBaseCheckTask(pluginHolder) {
             setSource(projectScriptFiles)
