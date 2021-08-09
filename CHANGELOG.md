@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   - Update Gradle to `7.1.1` version
   - Update Shadow plugin to `7.0.0` version
   - Update Kotlin to `1.5.21` version
+  - Set default KtLint version to `0.42.1`
 
 ### Fixed
   - Pre-commit hook causing conflicts ([issue: #443](https://github.com/JLLeitschuh/ktlint-gradle/issues/443)) ([#502](https://github.com/JLLeitschuh/ktlint-gradle/pull/502))
