@@ -22,9 +22,14 @@ import java.nio.file.Path
 
 internal inline fun <reified T : Task> Project.registerTask(
     name: String,
+    vararg constructorArguments: Any = emptyArray(),
     noinline configuration: T.() -> Unit
 ): TaskProvider<T> {
-    return this.tasks.register(name, T::class.java, configuration)
+    return tasks
+        .register(name, T::class.java, *constructorArguments)
+        .apply {
+            configure { configuration(it) }
+        }
 }
 
 internal const val EDITOR_CONFIG_FILE_NAME = ".editorconfig"

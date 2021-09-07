@@ -182,8 +182,10 @@ class KtlintPluginTest : AbstractPluginTest() {
 
             build(FORMAT_PARENT_TASK_NAME) {
                 assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(projectPath.resolve(FAIL_SOURCE_FILE)).exists()
             }
-            assertThat(projectPath.resolve(FAIL_SOURCE_FILE)).exists()
+
+            build(CHECK_PARENT_TASK_NAME)
         }
     }
 
@@ -202,6 +204,18 @@ class KtlintPluginTest : AbstractPluginTest() {
             }
             build(FORMAT_PARENT_TASK_NAME) {
                 assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            }
+        }
+    }
+
+    @DisplayName("Format task should not create directories for empty SourceSets")
+    @CommonTest
+    fun formatNotCreateEmpty(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withFailingSources()
+
+            build(FORMAT_PARENT_TASK_NAME) {
+                assertThat(projectPath.resolve("src/main/java")).doesNotExist()
             }
         }
     }
