@@ -2,9 +2,12 @@ package org.jlleitschuh.gradle.ktlint
 
 import org.eclipse.jgit.lib.RepositoryBuilder
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.intellij.lang.annotations.Language
 import org.jlleitschuh.gradle.ktlint.tasks.BaseKtLintCheckTask
@@ -133,7 +136,8 @@ private fun KtlintPlugin.PluginHolder.addInstallGitHookCheckTask() {
 }
 
 open class KtlintInstallGitHookTask @Inject constructor(
-    objectFactory: ObjectFactory
+    objectFactory: ObjectFactory,
+    projectLayout: ProjectLayout
 ) : DefaultTask() {
     @get:Input
     internal val taskName: Property<String> = objectFactory.property(String::class.java)
@@ -144,9 +148,19 @@ open class KtlintInstallGitHookTask @Inject constructor(
     @get:Input
     internal val hookName: Property<String> = objectFactory.property(String::class.java)
 
+    @get:InputDirectory
+    internal val projectDir: DirectoryProperty = objectFactory.directoryProperty().apply {
+        set(projectLayout.projectDirectory)
+    }
+
+    @get:InputDirectory
+    internal val rootDirectory: DirectoryProperty = objectFactory.directoryProperty().apply {
+        set(project.rootDir)
+    }
+
     @TaskAction
     fun installHook() {
-        val repo = RepositoryBuilder().findGitDir(project.projectDir).setMustExist(false).build()
+        val repo = RepositoryBuilder().findGitDir(projectDir.get().asFile).setMustExist(false).build()
         if (!repo.objectDatabase.exists()) {
             logger.warn("No git folder was found!")
             return
@@ -159,7 +173,7 @@ open class KtlintInstallGitHookTask @Inject constructor(
             gitHookFile.createNewFile()
             gitHookFile.setExecutable(true)
         }
-        val gradleRootDirPrefix = project.rootDir.relativeTo(repo.workTree).path
+        val gradleRootDirPrefix = rootDirectory.get().asFile.relativeTo(repo.workTree).path
 
         if (gitHookFile.length() == 0L) {
             gitHookFile.writeText(

@@ -93,4 +93,54 @@ class ConfigurationCacheTest : AbstractPluginTest() {
             }
         }
     }
+
+    @DisplayName("Should support configuration cache for git hook format install task")
+    @CommonTest
+    internal fun configurationCacheForGitHookFormatInstallTask(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            projectPath.initGit()
+
+            build(
+                configurationCacheFlag,
+                configurationCacheWarnFlag,
+                INSTALL_GIT_HOOK_FORMAT_TASK
+            ) {
+                assertThat(task(":$INSTALL_GIT_HOOK_FORMAT_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+
+            build(
+                configurationCacheFlag,
+                configurationCacheWarnFlag,
+                INSTALL_GIT_HOOK_FORMAT_TASK
+            ) {
+                assertThat(task(":$INSTALL_GIT_HOOK_FORMAT_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(output).contains("Reusing configuration cache.")
+            }
+        }
+    }
+
+    @DisplayName("Should support configuration cache for git hook check install task")
+    @CommonTest
+    internal fun configurationCacheForGitHookCheckInstallTask(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            projectPath.initGit()
+
+            build(
+                configurationCacheFlag,
+                configurationCacheWarnFlag,
+                INSTALL_GIT_HOOK_CHECK_TASK
+            ) {
+                assertThat(task(":$INSTALL_GIT_HOOK_CHECK_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+
+            build(
+                configurationCacheFlag,
+                configurationCacheWarnFlag,
+                INSTALL_GIT_HOOK_CHECK_TASK
+            ) {
+                assertThat(task(":$INSTALL_GIT_HOOK_CHECK_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(output).contains("Reusing configuration cache.")
+            }
+        }
+    }
 }

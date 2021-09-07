@@ -1,5 +1,6 @@
 package org.jlleitschuh.gradle.ktlint
 
+import org.eclipse.jgit.lib.RepositoryBuilder
 import org.intellij.lang.annotations.Language
 import java.io.File
 
@@ -37,4 +38,10 @@ fun File.kotlinPluginProjectSetup(
             }
         """.trimIndent()
     )
+}
+
+internal fun File.initGit(): File {
+    val repo = RepositoryBuilder().setWorkTree(this).setMustExist(false).build()
+    repo.create()
+    return repo.directory
 }

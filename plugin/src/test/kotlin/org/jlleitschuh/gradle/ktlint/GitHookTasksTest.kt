@@ -1,7 +1,6 @@
 package org.jlleitschuh.gradle.ktlint
 
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.jgit.lib.RepositoryBuilder
 import org.gradle.testkit.runner.TaskOutcome
 import org.gradle.util.GradleVersion
 import org.jlleitschuh.gradle.ktlint.testdsl.CommonTest
@@ -217,12 +216,6 @@ class GitHookTasksTest : AbstractPluginTest() {
                 assertThat(gitDir.preCommitGitHook().readText()).contains("""/\.kts?$/""")
             }
         }
-    }
-
-    private fun File.initGit(): File {
-        val repo = RepositoryBuilder().setWorkTree(this).setMustExist(false).build()
-        repo.create()
-        return repo.directory
     }
 
     private fun File.preCommitGitHook(): File = gitHookFolder().resolve("pre-commit")
