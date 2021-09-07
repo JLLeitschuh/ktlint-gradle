@@ -182,8 +182,10 @@ class KtlintPluginTest : AbstractPluginTest() {
 
             build(FORMAT_PARENT_TASK_NAME) {
                 assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(projectPath.resolve(FAIL_SOURCE_FILE)).exists()
             }
-            assertThat(projectPath.resolve(FAIL_SOURCE_FILE)).exists()
+
+            build(CHECK_PARENT_TASK_NAME)
         }
     }
 
@@ -202,6 +204,18 @@ class KtlintPluginTest : AbstractPluginTest() {
             }
             build(FORMAT_PARENT_TASK_NAME) {
                 assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            }
+        }
+    }
+
+    @DisplayName("Format task should not create directories for empty SourceSets")
+    @CommonTest
+    fun formatNotCreateEmpty(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withFailingSources()
+
+            build(FORMAT_PARENT_TASK_NAME) {
+                assertThat(projectPath.resolve("src/main/java")).doesNotExist()
             }
         }
     }
@@ -526,7 +540,7 @@ class KtlintPluginTest : AbstractPluginTest() {
             )
 
             build(":dependencies", "--configuration", KTLINT_RULESET_CONFIGURATION_NAME) {
-                assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.41.0")
+                assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.42.1")
             }
         }
     }
@@ -548,7 +562,7 @@ class KtlintPluginTest : AbstractPluginTest() {
             )
 
             build(":dependencies", "--configuration", KTLINT_REPORTER_CONFIGURATION_NAME) {
-                assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.41.0")
+                assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.42.1")
             }
         }
     }

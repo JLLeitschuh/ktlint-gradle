@@ -4,6 +4,7 @@ import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.util.PatternFilterable
 import org.gradle.work.InputChanges
 import org.gradle.workers.WorkerExecutor
 import javax.inject.Inject
@@ -14,15 +15,17 @@ abstract class KtLintCheckTask @Inject constructor(
     objectFactory: ObjectFactory,
     projectLayout: ProjectLayout,
     workerExecutor: WorkerExecutor,
+    patternFilterable: PatternFilterable
 ) : BaseKtLintCheckTask(
     objectFactory,
     projectLayout,
     workerExecutor,
+    patternFilterable
 ) {
 
     @TaskAction
     fun lint(inputChanges: InputChanges) {
-        runLint(inputChanges, false)
+        runLint(inputChanges)
     }
 
     internal companion object {

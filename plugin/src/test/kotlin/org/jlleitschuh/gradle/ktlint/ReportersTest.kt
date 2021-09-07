@@ -11,6 +11,8 @@ import org.jlleitschuh.gradle.ktlint.testdsl.build
 import org.jlleitschuh.gradle.ktlint.testdsl.buildAndFail
 import org.jlleitschuh.gradle.ktlint.testdsl.project
 import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.condition.DisabledOnOs
+import org.junit.jupiter.api.condition.OS
 
 @GradleTestVersions
 class ReportersTest : AbstractPluginTest() {
@@ -208,6 +210,7 @@ class ReportersTest : AbstractPluginTest() {
 
     @DisplayName("Should ignore html reporter on KtLint versions less then 0.36.0")
     @CommonTest
+    @DisabledOnOs(OS.WINDOWS)
     internal fun ignoreHtmlOnOldVersions(gradleVersion: GradleVersion) {
         project(gradleVersion) {
             withCleanSources()
