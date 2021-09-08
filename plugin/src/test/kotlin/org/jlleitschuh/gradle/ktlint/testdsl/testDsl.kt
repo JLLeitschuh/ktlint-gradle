@@ -165,7 +165,7 @@ fun projectSetup(
             
             plugins {
                  id 'org.jetbrains.kotlin.$kotlinPluginType' version '$kotlinPluginVersion'
-                 id 'org.jlleitschuh.gradle.ktlint' version '10.2.0-SNAPSHOT'
+                 id 'org.jlleitschuh.gradle.ktlint' version '${TestVersions.pluginVersion}'
             }
         }
         
