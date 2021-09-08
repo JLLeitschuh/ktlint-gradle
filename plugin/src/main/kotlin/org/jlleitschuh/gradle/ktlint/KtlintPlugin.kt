@@ -22,8 +22,8 @@ open class KtlintPlugin : Plugin<Project> {
         // Apply the idea plugin
         target.plugins.apply(KtlintIdeaPlugin::class.java)
 
-        holder.addKtLintTasksToKotlinPlugin()
         holder.addKotlinScriptTasks()
+        holder.addKtLintTasksToKotlinPlugin()
         holder.addGenerateBaselineTask()
         holder.addGitHookTasks()
     }
