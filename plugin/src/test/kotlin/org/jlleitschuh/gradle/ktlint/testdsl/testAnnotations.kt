@@ -12,7 +12,7 @@ import kotlin.streams.asStream
 object TestVersions {
     const val minSupportedGradleVersion = KtlintBasePlugin.LOWEST_SUPPORTED_GRADLE_VERSION
     const val maxSupportedGradleVersion = "7.1.1"
-    const val pluginVersion = "10.2.0-SNAPSHOT"
+    const val pluginVersion = "10.2.0"
     const val minSupportedKotlinPluginVersion = "1.4.32"
     const val maxSupportedKotlinPluginVersion = "1.5.21"
 }
