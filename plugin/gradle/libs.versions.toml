@@ -13,13 +13,13 @@ commonsIo = "2.8.0"
 archUnit = "0.16.0"
 
 [libraries]
-android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "androidPlugin" }
+android-gradle = { module = "com.android.tools.build:gradle", version.ref = "androidPlugin" }
 archunit-junit5 = { module = "com.tngtech.archunit:archunit-junit5", version.ref = "archUnit" }
 assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertJ" }
 commons-io = { module = "commons-io:commons-io", version.ref = "commonsIo" }
 jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "jgit" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit5" }
-kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlin-script-runtime = { module = "org.jetbrains.kotlin:kotlin-script-runtime", version.ref = "kotlin" }
 ktlint-core = { module = "com.pinterest.ktlint:ktlint-core", version.ref = "ktlint" }
