@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [10.3.0-SNAPSHOT] - Unreleased
+### Added
+  - ?
+
+### Changed
+  - ?
+
+### Fixed
+  - ?
+
+### Removed
+  - ?
+
 ## [10.2.0] - 2021.09.08
 ### Added
   - sarif reporter to provided reporters ([#516](https://github.com/JLLeitschuh/ktlint-gradle/pull/516))
