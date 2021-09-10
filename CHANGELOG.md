@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   - ?
 
 ### Changed
-  - ?
+  - Updated Gradle to `7.2` version ([#529](https://github.com/JLLeitschuh/ktlint-gradle/pull/529))
 
 ### Fixed
   - ?
