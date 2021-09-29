@@ -22,13 +22,13 @@ The assumption being that you would not want to lint code you weren't compiling.
   - [Minimal support versions](#minimal_supported_versions)
   - [Ktlint plugin](#ktlint-plugin)
     - [Simple setup](#simple-setup)
-    - [Using new plugin API](#using-new-plugin-api)
+    - [Using legacy apply method](#using-legacy-apply-method)
     - [How to apply to all subprojects](#applying-to-subprojects)
     - [Baseline support](#baseline-support)
     - [Testing KtLint snapshots](#testing-ktlint-snapshots)
   - [Intellij IDEA plugin](#intellij-idea-only-plugin)
     - [Simple setup](#idea-plugin-simple-setup)
-    - [Using new plugin API](#idea-plugin-setup-using-new-plugin-api)
+    - [Using legacy apply method](#idea-plugin-setup-using-legacy-apply-method)
   - [Plugin configuration](#configuration)
     - [Setting reports output directory](#setting-reports-output-directory)
     - [Customer reporters](#custom-reporters)
@@ -71,6 +71,38 @@ Minimal supported [ktlint](https://github.com/pinterest/ktlint) version: `0.34.0
 
 #### Simple setup
 
+Build script snippet for new plugin mechanism introduced in Gradle 2.1:
+<details>
+<summary>Groovy</summary>
+
+```groovy
+plugins {
+  id "org.jlleitschuh.gradle.ktlint" version "<current_version>"
+}
+
+repositories {
+  // Required to download KtLint
+  mavenCentral()
+}
+```
+</details>
+<details open>
+<summary>Kotlin</summary>
+
+```kotlin
+plugins {
+  id("org.jlleitschuh.gradle.ktlint") version "<current_version>"
+}
+
+repositories {
+  // Required to download KtLint
+  mavenCentral()
+}
+```
+</details>
+
+#### Using legacy apply method
+
 Build script snippet for use in all Gradle versions:
 <details>
 <summary>Groovy</summary>
@@ -95,7 +127,7 @@ repositories {
 apply plugin: "org.jlleitschuh.gradle.ktlint"
 ```
 </details>
-<details open>
+<details>
 <summary>Kotlin</summary>
 
 ```kotlin
@@ -116,21 +148,6 @@ repositories {
 apply(plugin = "org.jlleitschuh.gradle.ktlint")
 ```
 </details>
-
-#### Using new plugin API
-
-Build script snippet for new, incubating, plugin mechanism introduced in Gradle 2.1:
-```groovy
-plugins {
-  id "org.jlleitschuh.gradle.ktlint" version "<current_version>"
-}
-
-repositories {
-  // Required to download KtLint
-  mavenCentral()
-}
-```
-
 
 #### Applying to subprojects
 
@@ -225,21 +242,21 @@ rules using ktlint.
 
 #### Idea plugin simple setup
 
+Build script snippet for new plugin mechanism introduced in Gradle 2.1:
+```kotlin
+plugins {
+  id("org.jlleitschuh.gradle.ktlint-idea") version "<current_version>"
+}
+```
+
+#### Idea plugin setup using legacy apply method
+
 For all Gradle versions:
 
 Use the same `buildscript` logic as [above](#simple-setup), but with this instead of the above suggested `apply` line. If you also want the GIT pre-commit gradle tasks, keep both `apply` variations.
 
 ```groovy
 apply plugin: "org.jlleitschuh.gradle.ktlint-idea"
-```
-
-#### Idea plugin setup using new plugin API
-
-Build script snippet for new, incubating, plugin mechanism introduced in Gradle 2.1:
-```kotlin
-plugins {
-  id("org.jlleitschuh.gradle.ktlint-idea") version "<current_version>"
-}
 ```
 
 ### Configuration
@@ -481,7 +498,7 @@ $ ./gradlew --continue ktlintCheck
 ```
 
 - Can I mix old plugin and new plugin API setup in my project
-(see [simple-setup](#simple-setup) and [using new plugin API setup](#using-new-plugin-api))?
+(see [simple-setup](#simple-setup) and [using legacy apply method](#using-legacy-apply-method))?
 
 No. These approaches are not equivalent to how they work. The problem that
 the plugin may not find some of the kotlin plugins if both approaches are used
