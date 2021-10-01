@@ -2,14 +2,18 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+        gradlePluginPortal()
+    }
+
+    dependencies {
+        classpath(libs.android.gradle)
     }
 }
 
 plugins {
-    kotlin("jvm") apply false
-    id("com.android.application") apply false
-    kotlin("js") apply false
-    id("org.jlleitschuh.gradle.ktlint") version "10.2.0"
+    alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.kotlin.js) apply false
+    alias(libs.plugins.ktlint.gradle) apply false
 }
 
 allprojects {

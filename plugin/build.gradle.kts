@@ -5,22 +5,17 @@ import org.jetbrains.kotlin.util.prefixIfNot
 
 plugins {
     kotlin("jvm")
-    id("com.gradle.plugin-publish") version "0.15.0"
+    alias(libs.plugins.publish)
     `java-gradle-plugin`
     `maven-publish`
     id("org.jlleitschuh.gradle.ktlint")
-    id("com.github.johnrengelman.shadow") version "7.0.0"
-    id("com.github.breadmoirai.github-release") version "2.2.10"
+    alias(libs.plugins.shadow)
+    alias(libs.plugins.gihutbRelease)
 }
 
 val pluginGroup = "org.jlleitschuh.gradle"
 group = pluginGroup
 version = "10.3.0-SNAPSHOT"
-
-repositories {
-    google()
-    mavenCentral()
-}
 
 tasks.withType<KotlinCompile>() {
     kotlinOptions {

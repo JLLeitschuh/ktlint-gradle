@@ -18,6 +18,14 @@ assertJ = "3.11.1"
 commonsIo = "2.8.0"
 archUnit = "0.16.0"
 
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-js = { id = "org.jetbrains.kotlin.js", version.ref = "kotlin" }
+ktlint-gradle = "org.jlleitschuh.gradle.ktlint:10.2.0"
+publish = "com.gradle.plugin-publish:0.15.0"
+shadow = "com.github.johnrengelman.shadow:7.0.0"
+gihutbRelease = "com.github.breadmoirai.github-release:2.2.10"
+
 [libraries]
 android-gradle = { module = "com.android.tools.build:gradle", version.ref = "androidPlugin" }
 android-material = { module = "com.google.android.material:material", version.ref = "androidMaterial" }
