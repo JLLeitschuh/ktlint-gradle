@@ -23,7 +23,7 @@ allprojects {
     }
 }
 
-tasks.withType(Wrapper::class.java).configureEach {
+tasks.wrapper {
     gradleVersion = libs.versions.gradleWrapper.get()
     distributionSha256Sum = libs.versions.gradleWrapperSha.get()
     distributionType = Wrapper.DistributionType.BIN

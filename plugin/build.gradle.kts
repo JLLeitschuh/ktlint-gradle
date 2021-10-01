@@ -1,6 +1,4 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.util.prefixIfNot
 
 plugins {
@@ -17,7 +15,7 @@ val pluginGroup = "org.jlleitschuh.gradle"
 group = pluginGroup
 version = "10.3.0-SNAPSHOT"
 
-tasks.withType<KotlinCompile>() {
+tasks.compileKotlin {
     kotlinOptions {
         apiVersion = "1.3"
         jvmTarget = "1.8"
@@ -32,7 +30,7 @@ tasks.withType<PluginUnderTestMetadata>().configureEach {
  * Special configuration to be included in resulting shadowed jar, but not added to the generated pom and gradle
  * metadata files.
  */
-val shadowImplementation by configurations.creating
+val shadowImplementation: Configuration by configurations.creating
 configurations["compileOnly"].extendsFrom(shadowImplementation)
 configurations["testImplementation"].extendsFrom(shadowImplementation)
 
@@ -63,21 +61,18 @@ dependencies {
 }
 
 // Test tasks loods plugin from local maven repository
-tasks.named("test").configure {
+tasks.test {
     dependsOn("publishToMavenLocal")
-}
-
-tasks.withType<Test>().configureEach {
     useJUnitPlatform()
     maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
 }
 
 val relocateShadowJar = tasks.register<ConfigureShadowRelocation>("relocateShadowJar")
-val shadowJarTask = tasks.named<ShadowJar>("shadowJar") {
+tasks.shadowJar {
     // Enable package relocation in resulting shadow jar
     relocateShadowJar.get().apply {
         prefix = "$pluginGroup.shadow"
-        target = this@named
+        target = this@shadowJar
     }
 
     dependsOn(relocateShadowJar)
@@ -89,8 +84,8 @@ val shadowJarTask = tasks.named<ShadowJar>("shadowJar") {
 // Add shadow jar to the Gradle module metadata api and runtime configurations
 configurations {
     artifacts {
-        runtimeElements(shadowJarTask)
-        apiElements(shadowJarTask)
+        runtimeElements(tasks.shadowJar)
+        apiElements(tasks.shadowJar)
     }
 }
 
@@ -101,7 +96,7 @@ tasks.whenTaskAdded {
 }
 
 // Disabling default jar task as it is overridden by shadowJar
-tasks.named("jar").configure {
+tasks.jar {
     enabled = false
 }
 
@@ -128,7 +123,7 @@ val ensureDependenciesAreInlined by tasks.registering {
         }
     }
 }
-tasks.named("check") {
+tasks.check {
     dependsOn(ensureDependenciesAreInlined)
 }
 
@@ -138,10 +133,6 @@ tasks.named("check") {
  * release of the plugin using the current [Project.getVersion].
  */
 fun setupPublishingEnvironment() {
-    val keyEnvironmentVariable = "GRADLE_PUBLISH_KEY"
-    val secretEnvironmentVariable = "GRADLE_PUBLISH_SECRET"
-    val githubEnvironmentVariable = "GITHUB_KEY"
-
     val keyProperty = "gradle.publish.key"
     val secretProperty = "gradle.publish.secret"
     val githubProperty = "github.secret"
@@ -150,8 +141,8 @@ fun setupPublishingEnvironment() {
         logger
             .info("`$keyProperty` or `$secretProperty` were not set. Attempting to configure from environment variables")
 
-        val key: String? = System.getenv(keyEnvironmentVariable)
-        val secret: String? = System.getenv(secretEnvironmentVariable)
+        val key: String? = System.getenv("GRADLE_PUBLISH_KEY")
+        val secret: String? = System.getenv("GRADLE_PUBLISH_SECRET")
         if (key != null && secret != null) {
             System.setProperty(keyProperty, key)
             System.setProperty(secretProperty, secret)
@@ -165,7 +156,7 @@ fun setupPublishingEnvironment() {
             "`$githubProperty` was not set. Attempting to configure it from environment variable"
         )
 
-        val key: String? = System.getenv(githubEnvironmentVariable)
+        val key: String? = System.getenv("GITHUB_KEY")
         if (key != null) {
             System.setProperty(githubProperty, key)
         } else {
@@ -177,7 +168,7 @@ fun setupPublishingEnvironment() {
 setupPublishingEnvironment()
 
 gradlePlugin {
-    (plugins) {
+    plugins {
         register("ktlintPlugin") {
             id = "org.jlleitschuh.gradle.ktlint"
             implementationClass = "org.jlleitschuh.gradle.ktlint.KtlintPlugin"
@@ -199,11 +190,7 @@ afterEvaluate {
                 // Special workaround to publish shadow jar instead of normal one. Name to override peeked here:
                 // https://github.com/gradle/gradle/blob/master/subprojects/plugin-development/src/main/java/org/gradle/plugin/devel/plugins/MavenPluginPublishPlugin.java#L73
                 if (name == "pluginMaven") {
-                    setArtifacts(
-                        listOf(
-                            shadowJarTask.get()
-                        )
-                    )
+                    setArtifacts(listOf(tasks.shadowJar))
                 }
             }
         }
@@ -238,10 +225,4 @@ githubRelease {
             .substringBefore("## [")
             .prefixIfNot("## ")
     }
-}
-
-tasks.withType<Wrapper>().configureEach {
-    gradleVersion = libs.versions.gradleWrapper.get()
-    distributionSha256Sum = libs.versions.gradleWrapperSha.get()
-    distributionType = Wrapper.DistributionType.BIN
 }
