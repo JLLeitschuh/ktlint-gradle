@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-    compileOnly(pluginLibs.kotlin.reflect)
-    compileOnly(pluginLibs.kotlin.script.runtime)
-    compileOnly(pluginLibs.ktlint.core)
+    compileOnly(libs.kotlin.reflect)
+    compileOnly(libs.kotlin.script.runtime)
+    compileOnly(libs.ktlint.core)
 }

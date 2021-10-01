@@ -9,7 +9,7 @@ plugins {
     kotlin("jvm") apply false
     id("com.android.application") apply false
     kotlin("js") apply false
-    id("org.jlleitschuh.gradle.ktlint")
+    id("org.jlleitschuh.gradle.ktlint") version "10.2.0"
 }
 
 allprojects {
@@ -20,7 +20,7 @@ allprojects {
 }
 
 tasks.withType(Wrapper::class.java).configureEach {
-    gradleVersion = pluginLibs.versions.gradleWrapper.get()
-    distributionSha256Sum = pluginLibs.versions.gradleWrapperSha.get()
+    gradleVersion = libs.versions.gradleWrapper.get()
+    distributionSha256Sum = libs.versions.gradleWrapperSha.get()
     distributionType = Wrapper.DistributionType.BIN
 }

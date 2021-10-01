@@ -1,8 +1,6 @@
 import java.util.Properties
 
 pluginManagement {
-    includeBuild("./plugin")
-
     plugins {
         id("org.jetbrains.kotlin.jvm") version "1.5.21"
         id("org.jetbrains.kotlin.js") version "1.5.21"
@@ -26,14 +24,6 @@ pluginManagement {
 
 enableFeaturePreview("VERSION_CATALOGS")
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
-
-dependencyResolutionManagement {
-    versionCatalogs {
-        create("pluginLibs") {
-            from(files("plugin/gradle/libs.versions.toml"))
-        }
-    }
-}
 
 plugins {
     `gradle-enterprise`
@@ -64,6 +54,7 @@ fun isAndroidSdkInLocalPropertiesSet(): Boolean {
 fun isAndroidSdkVariableSet(): Boolean = System.getenv().containsKey("ANDROID_HOME")
 fun isAndroidSdkAvailable(): Boolean = isAndroidSdkVariableSet() || isAndroidSdkInLocalPropertiesSet()
 
+include("plugin")
 include("samples:kotlin-ks")
 include("samples:kotlin-gradle")
 if (isAndroidSdkAvailable()) {

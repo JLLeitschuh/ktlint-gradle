@@ -4,5 +4,5 @@ plugins {
 }
 
 dependencies {
-    compileOnly(pluginLibs.ktlint.core)
+    compileOnly(libs.ktlint.core)
 }

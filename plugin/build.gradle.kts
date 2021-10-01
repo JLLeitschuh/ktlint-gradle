@@ -5,12 +5,12 @@ import org.jetbrains.kotlin.util.prefixIfNot
 
 plugins {
     kotlin("jvm")
-    id("com.gradle.plugin-publish")
+    id("com.gradle.plugin-publish") version "0.15.0"
     `java-gradle-plugin`
     `maven-publish`
     id("org.jlleitschuh.gradle.ktlint")
-    id("com.github.johnrengelman.shadow")
-    id("com.github.breadmoirai.github-release")
+    id("com.github.johnrengelman.shadow") version "7.0.0"
+    id("com.github.breadmoirai.github-release") version "2.2.10"
 }
 
 val pluginGroup = "org.jlleitschuh.gradle"
@@ -122,9 +122,7 @@ val ensureDependenciesAreInlined by tasks.registering {
                 val path = relativePath
                 if (!path.startsWith("META-INF") &&
                     path.lastName.endsWith(".class") &&
-                    !path.pathString.startsWith(
-                            pluginGroup.replace(".", "/")
-                        )
+                    !path.pathString.startsWith(pluginGroup.replace(".", "/"))
                 ) {
                     nonInlinedDependencies.add(path.pathString)
                 }
