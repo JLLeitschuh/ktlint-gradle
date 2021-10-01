@@ -52,7 +52,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-wrapper-
       - name: Build plugin
-        run: ./plugin/gradlew -p ./plugin assemble ensureDependenciesAreInlined test --no-daemon
+        run: ./gradlew plugin:assemble ensureDependenciesAreInlined test --no-daemon
       - name: Save test results
         uses: actions/upload-artifact@v2
         if: failure()
@@ -60,7 +60,7 @@ jobs:
           name: test-results
           path: plugin/build/reports/tests/test/
       - name: Check plugin codestyle
-        run: ./plugin/gradlew -p ./plugin ktlintCheck --no-daemon
+        run: ./gradlew plugin:ktlintCheck --no-daemon
 
   check_bashisms:
     runs-on: ubuntu-latest
