@@ -38,7 +38,7 @@ class ItemDetailActivity : AppCompatActivity() {
         // to its container so we don't need to manually add it.
         // For more information, see the Fragments API guide at:
         //
-        // http://developer.android.com/guide/components/fragments.html
+        // https://developer.android.com/guide/components/fragments.html
         //
         if (savedInstanceState == null) {
             // Create the detail fragment and add it to the activity
@@ -63,7 +63,7 @@ class ItemDetailActivity : AppCompatActivity() {
                 // activity, the Up button is shown. For
                 // more details, see the Navigation pattern on Android Design:
                 //
-                // http://developer.android.com/design/patterns/navigation.html#up-vs-back
+                // https://developer.android.com/design/patterns/navigation.html#up-vs-back
 
                 navigateUpTo(Intent(this, ItemListActivity::class.java))
                 true
