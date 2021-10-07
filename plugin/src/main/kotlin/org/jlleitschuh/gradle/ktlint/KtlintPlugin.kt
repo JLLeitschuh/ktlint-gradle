@@ -150,14 +150,14 @@ open class KtlintPlugin : Plugin<Project> {
         val extension = target.plugins.apply(KtlintBasePlugin::class.java).extension
 
         val metaKtlintCheckTask: TaskProvider<Task> by lazy {
-            target.registerTask<Task>(CHECK_PARENT_TASK_NAME) {
+            target.registerTask(CHECK_PARENT_TASK_NAME) {
                 group = VERIFICATION_GROUP
                 description = "Runs ktlint on all kotlin sources in this project."
             }
         }
 
         val metaKtlintFormatTask: TaskProvider<Task> by lazy {
-            target.registerTask<Task>(FORMAT_PARENT_TASK_NAME) {
+            target.registerTask(FORMAT_PARENT_TASK_NAME) {
                 group = FORMATTING_GROUP
                 description = "Runs the ktlint formatter on all kotlin sources in this project."
             }

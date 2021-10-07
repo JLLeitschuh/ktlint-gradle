@@ -22,7 +22,7 @@ class GitHookTasksTest : AbstractPluginTest() {
             projectPath.initGit()
             settingsGradle.appendText(
                 """
-                    
+
                 include ":some-module"
                 """.trimIndent()
             )
@@ -97,11 +97,11 @@ class GitHookTasksTest : AbstractPluginTest() {
             gitDir.preCommitGitHook().writeText(
                 """
                 $shShebang
-    
+
                 echo "test1"
                 $startHookSection
-    
-    
+
+
                 $endHookSection
                 echo "test2"
                 """.trimIndent()
@@ -114,7 +114,7 @@ class GitHookTasksTest : AbstractPluginTest() {
             assertThat(hookContent).startsWith(
                 """
                 $shShebang
-    
+
                 echo "test1"
                 """.trimIndent()
             )
@@ -132,7 +132,7 @@ class GitHookTasksTest : AbstractPluginTest() {
             build(":$INSTALL_GIT_HOOK_CHECK_TASK") {
                 assertThat(task(":$INSTALL_GIT_HOOK_CHECK_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
                 assertThat(gitDir.preCommitGitHook()).exists()
-                assertThat(gitDir.preCommitGitHook().canExecute()).isTrue()
+                assertThat(gitDir.preCommitGitHook().canExecute()).isTrue
                 assertThat(gitDir.preCommitGitHook().readText()).contains(CHECK_PARENT_TASK_NAME)
             }
         }
