@@ -132,7 +132,7 @@ class KtlintPluginTest : AbstractPluginTest() {
             //language=Groovy
             buildGradle.appendText(
                 """
-    
+
                 ktlint.filter { exclude("**/fail-source.kt") }
                 """.trimIndent()
             )
@@ -154,7 +154,7 @@ class KtlintPluginTest : AbstractPluginTest() {
             //language=Groovy
             buildGradle.appendText(
                 """
-    
+
                 sourceSets {
                     findByName("main")?.java?.srcDirs(project.file("$alternativeDirectory"))
                 }
@@ -229,7 +229,7 @@ class KtlintPluginTest : AbstractPluginTest() {
             //language=Groovy
             buildGradle.appendText(
                 """
-    
+
                 ktlint.version = "0.35.0"
                 """.trimIndent()
             )
@@ -293,7 +293,7 @@ class KtlintPluginTest : AbstractPluginTest() {
             //language=Groovy
             buildGradle.appendText(
                 """
-    
+
                 ktlint.kotlinScriptAdditionalPaths { include fileTree("scripts/") }
                 """.trimIndent()
             )
@@ -345,7 +345,7 @@ class KtlintPluginTest : AbstractPluginTest() {
             //language=Groovy
             buildGradle.appendText(
                 """
-    
+
                 ktlint.filter { exclude("**/fail-source.kt") }
                 """.trimIndent()
             )
@@ -383,11 +383,11 @@ class KtlintPluginTest : AbstractPluginTest() {
                 "src/main/kotlin/C.kt",
                 """
                     class C {
-    
+
                         private val Any.className
                             get() = this.javaClass.name
                                 .fn()
-    
+
                         private fun String.escape() =
                             this.fn()
                     }
@@ -396,7 +396,7 @@ class KtlintPluginTest : AbstractPluginTest() {
             //language=Groovy
             buildGradle.appendText(
                 """
-    
+
                 ktlint.enableExperimentalRules = true
                 ktlint.version = "0.34.0"
                 """.trimIndent()
@@ -417,7 +417,7 @@ class KtlintPluginTest : AbstractPluginTest() {
                 initialSourceFile,
                 """
                 val foo = "bar"
-                
+
                 """.trimIndent()
             )
 
@@ -430,7 +430,7 @@ class KtlintPluginTest : AbstractPluginTest() {
                 additionalSourceFile,
                 """
                 val bar = "foo"
-            
+
                 """.trimIndent()
             )
 
@@ -564,6 +564,34 @@ class KtlintPluginTest : AbstractPluginTest() {
             build(":dependencies", "--configuration", KTLINT_REPORTER_CONFIGURATION_NAME) {
                 assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.42.1")
             }
+        }
+    }
+
+    @DisplayName("Format task should succeed on renamed file")
+    @CommonTest
+    fun formatShouldSucceedOnRenamedFile(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withFailingSources()
+
+            val formatTaskName = KtLintFormatTask.buildTaskNameForSourceSet("main")
+            build(FORMAT_PARENT_TASK_NAME) {
+                assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+
+            val sourceFile = projectPath.resolve(FAIL_SOURCE_FILE)
+            sourceFile.writeText(
+                """
+                val  foo    =    "bar"
+            """
+            )
+            val destinationFile = projectPath.resolve("src/main/kotlin/renamed-file.kt")
+            sourceFile.renameTo(destinationFile)
+
+            build(FORMAT_PARENT_TASK_NAME) {
+                assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+
+            build(CHECK_PARENT_TASK_NAME)
         }
     }
 }

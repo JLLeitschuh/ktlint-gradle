@@ -211,8 +211,9 @@ abstract class BaseKtLintCheckTask @Inject constructor(
             } else {
                 KtLintWorkAction.FormatTaskSnapshot(emptyMap())
             }
+            val formattedSources = snapshot.formattedSources.keys.filter { it.exists() }
 
-            getChangedSources(inputChanges) + snapshot.formattedSources.keys
+            getChangedSources(inputChanges) + formattedSources
         }
 
         logTaskExecutionState(inputChanges, editorConfigUpdated)
