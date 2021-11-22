@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   - ?
 
 ### Changed
-  - ?
+  - Set default KtLint version to `0.43.2` ([#549](https://github.com/JLLeitschuh/ktlint-gradle/pull/549))
 
 ### Fixed
   - Deleted file causes file not found exception ([issue: #539](https://github.com/JLLeitschuh/ktlint-gradle/issues/539), [#548](https://github.com/JLLeitschuh/ktlint-gradle/pull/548))
