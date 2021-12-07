@@ -22,7 +22,7 @@ class GitHookTasksTest : AbstractPluginTest() {
             projectPath.initGit()
             settingsGradle.appendText(
                 """
-                    
+
                 include ":some-module"
                 """.trimIndent()
             )
@@ -97,11 +97,11 @@ class GitHookTasksTest : AbstractPluginTest() {
             gitDir.preCommitGitHook().writeText(
                 """
                 $shShebang
-    
+
                 echo "test1"
                 $startHookSection
-    
-    
+
+
                 $endHookSection
                 echo "test2"
                 """.trimIndent()
@@ -114,7 +114,7 @@ class GitHookTasksTest : AbstractPluginTest() {
             assertThat(hookContent).startsWith(
                 """
                 $shShebang
-    
+
                 echo "test1"
                 """.trimIndent()
             )
@@ -147,6 +147,44 @@ class GitHookTasksTest : AbstractPluginTest() {
             build(":$INSTALL_GIT_HOOK_CHECK_TASK") {
                 assertThat(task(":$INSTALL_GIT_HOOK_CHECK_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
                 assertThat(gitDir.preCommitGitHook().readText()).doesNotContain("git add")
+            }
+        }
+    }
+
+    @DisplayName("Collects check run exit code and uses it to indicate check success")
+    @CommonTest
+    fun checkUsesGradleExitCode(gradleVersion: GradleVersion) {
+        // This test ensures that we use the exit code of the check gradle command as the exit code
+        // of the hook script to indicate success/failure instead of using set -e, because
+        // that will prevent the saved un-staged changes from being re-applied to the working dir.
+        // See [#551](https://github.com/JLLeitschuh/ktlint-gradle/pull/551)
+        project(gradleVersion) {
+            val gitDir = projectPath.initGit()
+
+            build(":$INSTALL_GIT_HOOK_CHECK_TASK") {
+                assertThat(task(":$INSTALL_GIT_HOOK_CHECK_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(gitDir.preCommitGitHook().readText()).doesNotContain("set -e")
+                assertThat(gitDir.preCommitGitHook().readText()).contains("gradleCommandExitCode=\$?")
+                assertThat(gitDir.preCommitGitHook().readText()).contains("exit \$gradleCommandExitCode")
+            }
+        }
+    }
+
+    @DisplayName("Collects format run exit code and uses it to indicate format success")
+    @CommonTest
+    fun formatUsesGradleExitCode(gradleVersion: GradleVersion) {
+        // This test ensures that we use the exit code of the format gradle command as the exit code
+        // of the hook script to indicate success/failure instead of using set -e, because
+        // that will prevent the saved un-staged changes from being re-applied to the working dir.
+        // See [#551](https://github.com/JLLeitschuh/ktlint-gradle/pull/551)
+        project(gradleVersion) {
+            val gitDir = projectPath.initGit()
+
+            build(":$INSTALL_GIT_HOOK_FORMAT_TASK") {
+                assertThat(task(":$INSTALL_GIT_HOOK_FORMAT_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(gitDir.preCommitGitHook().readText()).doesNotContain("set -e")
+                assertThat(gitDir.preCommitGitHook().readText()).contains("gradleCommandExitCode=\$?")
+                assertThat(gitDir.preCommitGitHook().readText()).contains("exit \$gradleCommandExitCode")
             }
         }
     }
