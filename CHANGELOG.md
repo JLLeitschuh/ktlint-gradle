@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   - ?
 
 ### Changed
-  - Updated Gradle to `7.2` version ([#529](https://github.com/JLLeitschuh/ktlint-gradle/pull/529))
+  - Updated Gradle to `7.3.1` version ([#529](https://github.com/JLLeitschuh/ktlint-gradle/pull/529))
 
 ### Fixed
   - Deleted file causes file not found exception ([issue: #539](https://github.com/JLLeitschuh/ktlint-gradle/issues/539), [#548](https://github.com/JLLeitschuh/ktlint-gradle/pull/548))
