@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [10.3.0-SNAPSHOT] - Unreleased
+### Added
+  - ?
+
+### Changed
+  - ?
+
+### Fixed
+  - ?
+
+### Removed
+  - ?
+
 ## [10.2.1] - 2021.12.27
 ### Fixed
   - Deleted file causes file not found exception ([issue: #539](https://github.com/JLLeitschuh/ktlint-gradle/issues/539), [#548](https://github.com/JLLeitschuh/ktlint-gradle/pull/548))
