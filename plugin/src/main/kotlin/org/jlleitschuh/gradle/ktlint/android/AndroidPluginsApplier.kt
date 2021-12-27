@@ -1,14 +1,6 @@
 package org.jlleitschuh.gradle.ktlint.android
 
-import com.android.build.api.dsl.AndroidSourceSet
-import com.android.build.api.dsl.BuildFeatures
-import com.android.build.api.dsl.BuildType
-import com.android.build.api.dsl.CommonExtension
-import com.android.build.api.dsl.DefaultConfig
-import com.android.build.api.dsl.ProductFlavor
-import com.android.build.api.dsl.SigningConfig
-import com.android.build.api.variant.Variant
-import com.android.build.api.variant.VariantProperties
+import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.internal.api.DefaultAndroidSourceDirectorySet
 import org.gradle.api.Plugin
 import org.gradle.api.file.FileCollection
@@ -43,18 +35,6 @@ internal fun KtlintPlugin.PluginHolder.applyKtLintToAndroid(): (Plugin<in Any>) 
     }
 }
 
-@Suppress("UnstableApiUsage")
-private typealias AndroidCommonExtension = CommonExtension<
-    AndroidSourceSet,
-    BuildFeatures,
-    BuildType,
-    DefaultConfig,
-    ProductFlavor,
-    SigningConfig,
-    Variant<VariantProperties>,
-    VariantProperties
-    >
-
 /*
  * Variant manager returns all sources for variant,
  * so most probably main source set maybe checked several times.
@@ -64,20 +44,13 @@ private typealias AndroidCommonExtension = CommonExtension<
 private fun androidPluginConfigureAction(
     pluginHolder: KtlintPlugin.PluginHolder
 ): (Plugin<Any>) -> Unit = {
-    pluginHolder.target.extensions.configure(CommonExtension::class.java) { ext ->
-        val androidCommonExtension = ext as AndroidCommonExtension
-
-        androidCommonExtension.sourceSets.all { sourceSet ->
-            // https://issuetracker.google.com/u/1/issues/170650362
-            val androidSourceSet = sourceSet.java as DefaultAndroidSourceDirectorySet
-            // Passing Callable, so returned FileCollection, will lazy evaluate it
-            // only when task will need it.
-            // Solves the problem of having additional source dirs in
-            // current AndroidSourceSet, that are not available on eager
-            // evaluation.
+    pluginHolder.target.extensions.configure<BaseExtension>("android") { android ->
+        android.sourceSets.configureEach { sourceSet ->
+            val srcDirs = sourceSet.java.srcDirs +
+                (sourceSet.kotlin as? DefaultAndroidSourceDirectorySet)?.srcDirs.orEmpty()
             pluginHolder.createAndroidTasks(
                 sourceSet.name,
-                pluginHolder.target.files(Callable { androidSourceSet.srcDirs })
+                pluginHolder.target.files(Callable { srcDirs })
             )
         }
     }
