@@ -18,7 +18,7 @@ pluginManagement {
         eachPlugin {
             when (requested.id.id) {
                 "com.android.application" ->
-                    useModule("com.android.tools.build:gradle:4.1.0")
+                    useModule("com.android.tools.build:gradle:7.0.4")
             }
         }
     }

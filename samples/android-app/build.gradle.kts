@@ -5,26 +5,26 @@ plugins {
 }
 
 android {
-    compileSdkVersion(30)
+    compileSdk = 30
 
     buildFeatures.viewBinding = true
 
     defaultConfig {
-        minSdkVersion(23)
-        targetSdkVersion(30)
+        minSdk = 23
+        targetSdk = 30
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
-        getByName("release") {
+        release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
         }
     }
 
-    flavorDimensions("beer")
+    flavorDimensions += "beer"
     productFlavors {
         register("weissbier")
         register("kellerbier")
@@ -33,11 +33,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
-    }
-
-    sourceSets {
-        val kotlinAdditionalSourceSets = project.file("src/main/kotlin")
-        findByName("main")?.java?.srcDirs(kotlinAdditionalSourceSets)
     }
 }
 
