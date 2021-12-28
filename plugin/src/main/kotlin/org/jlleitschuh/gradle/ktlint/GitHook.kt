@@ -19,7 +19,6 @@ internal const val FILTER_INCLUDE_PROPERTY_NAME = "internalKtlintGitFilter"
 internal val shShebang =
     """
     #!/bin/sh
-    set -e
 
     """.trimIndent()
 
@@ -61,6 +60,7 @@ private fun postCheck(
 }
 
 internal const val NF = "\$NF"
+internal const val gradleCommandExitCode = "\$gradleCommandExitCode"
 
 @Language("Sh")
 internal fun generateGitHook(
@@ -79,25 +79,27 @@ internal fun generateGitHook(
 
     echo "Running ktlint over these files:"
     echo "${'$'}CHANGED_FILES"
-    
+
     diff=.git/unstaged-ktlint-git-hook.diff
     git diff --color=never > ${'$'}diff
     if [ -s ${'$'}diff ]; then
       git apply -R ${'$'}diff
     fi
-    
+
     ${generateGradleCommand(taskName, gradleRootDirPrefix)}
+    $gradleCommandExitCode=$?
 
     echo "Completed ktlint run."
     ${postCheck(shouldUpdateCommit)}
-    
+
     if [ -s ${'$'}diff ]; then
       git apply --ignore-whitespace ${'$'}diff
     fi
     rm ${'$'}diff
     unset diff
-    
+
     echo "Completed ktlint hook."
+    exit $gradleCommandExitCode
 
     """.trimIndent()
 
