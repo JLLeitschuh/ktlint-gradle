@@ -13,10 +13,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   - ?
 
 ### Fixed
-  - Deleted file causes file not found exception ([issue: #539](https://github.com/JLLeitschuh/ktlint-gradle/issues/539), [#548](https://github.com/JLLeitschuh/ktlint-gradle/pull/548))
+  - ?
 
 ### Removed
   - ?
+
+## [10.2.1] - 2021.12.27
+### Fixed
+  - Deleted file causes file not found exception ([issue: #539](https://github.com/JLLeitschuh/ktlint-gradle/issues/539), [#548](https://github.com/JLLeitschuh/ktlint-gradle/pull/548))
+  - Use Gradle command exit code as hook exit code to ensure un-staged changes are always re-applied to the working directory [#551](https://github.com/JLLeitschuh/ktlint-gradle/pull/551)
 
 ## [10.2.0] - 2021.09.08
 ### Added
