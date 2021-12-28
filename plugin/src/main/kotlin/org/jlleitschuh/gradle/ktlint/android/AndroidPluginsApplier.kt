@@ -46,8 +46,10 @@ private fun androidPluginConfigureAction(
 ): (Plugin<Any>) -> Unit = {
     pluginHolder.target.extensions.configure<BaseExtension>("android") { android ->
         android.sourceSets.configureEach { sourceSet ->
-            val srcDirs = sourceSet.java.srcDirs +
-                (sourceSet.kotlin as? DefaultAndroidSourceDirectorySet)?.srcDirs.orEmpty()
+            val srcDirs = sourceSet.java.srcDirs + runCatching {
+                // As sourceSet.kotlin doesn't exist before AGP 7
+                (sourceSet.kotlin as? DefaultAndroidSourceDirectorySet)?.srcDirs
+            }.getOrNull().orEmpty()
             pluginHolder.createAndroidTasks(
                 sourceSet.name,
                 pluginHolder.target.files(Callable { srcDirs })
