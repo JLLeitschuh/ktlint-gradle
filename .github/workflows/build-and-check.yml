@@ -67,10 +67,10 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v2
-      - name: set up JDK 1.8
+      - name: set up JDK 11
         uses: actions/setup-java@v2
         with:
-          java-version: 8
+          java-version: 11
           distribution: 'zulu'
       - name: Install checkbashisms
         run: sudo apt-get install -qq devscripts
@@ -99,10 +99,10 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v2
-      - name: set up JDK 1.8
+      - name: set up JDK 11
         uses: actions/setup-java@v2
         with:
-          java-version: 8
+          java-version: 11
           distribution: 'zulu'
       - name: Restore Gradle caches
         uses: actions/cache@v2
