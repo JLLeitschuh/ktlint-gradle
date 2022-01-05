@@ -3,6 +3,7 @@ package org.jlleitschuh.gradle.ktlint
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
@@ -163,10 +164,10 @@ open class KtlintPlugin : Plugin<Project> {
             }
         }
 
-        val ktlintConfiguration = createKtlintConfiguration(target, extension)
-        val ktlintRulesetConfiguration = createKtlintRulesetConfiguration(target, ktlintConfiguration)
-        val ktlintReporterConfiguration = createKtLintReporterConfiguration(target, extension, ktlintConfiguration)
-        val ktlintBaselineReporterConfiguration = createKtLintBaselineReporterConfiguration(
+        val ktlintConfiguration: Configuration = createKtlintConfiguration(target, extension)
+        val ktlintRulesetConfiguration: Configuration = createKtlintRulesetConfiguration(target, ktlintConfiguration)
+        val ktlintReporterConfiguration: Configuration = createKtLintReporterConfiguration(target, extension, ktlintConfiguration)
+        val ktlintBaselineReporterConfiguration: Configuration = createKtLintBaselineReporterConfiguration(
             target,
             extension,
             ktlintConfiguration
