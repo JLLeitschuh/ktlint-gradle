@@ -169,6 +169,12 @@ open class KtlintInstallGitHookTask @Inject constructor(
         }
 
         logger.info(".git directory path: ${repo.directory}")
+        val gitHookDirectory = repo.directory.resolve("hooks")
+        if (!gitHookDirectory.exists()) {
+            logger.info("hooks directory doesn't exist, creating one")
+            gitHookDirectory.mkdir()
+        }
+
         val gitHookFile = repo.directory.resolve("hooks/${hookName.get()}")
         logger.info("Hook file: $gitHookFile")
         if (!gitHookFile.exists()) {
