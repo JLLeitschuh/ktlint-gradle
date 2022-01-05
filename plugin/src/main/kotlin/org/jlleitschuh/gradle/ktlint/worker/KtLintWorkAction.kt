@@ -16,11 +16,7 @@ import org.gradle.api.provider.SetProperty
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
 import org.jlleitschuh.gradle.ktlint.worker.KtLintWorkAction.FormatTaskSnapshot.Companion.contentHash
-import java.io.BufferedInputStream
-import java.io.BufferedOutputStream
 import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
@@ -173,7 +169,7 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
             private const val serialVersionUID = 1L
 
             fun readFromFile(snapshotFile: File) =
-                ObjectInputStream(BufferedInputStream(FileInputStream(snapshotFile)))
+                ObjectInputStream(snapshotFile.inputStream().buffered())
                     .use {
                         it.readObject() as FormatTaskSnapshot
                     }
@@ -181,13 +177,13 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
             fun writeIntoFile(
                 snapshotFile: File,
                 formatSnapshot: FormatTaskSnapshot
-            ) = ObjectOutputStream(BufferedOutputStream(FileOutputStream(snapshotFile)))
+            ) = ObjectOutputStream(snapshotFile.outputStream().buffered())
                 .use {
                     it.writeObject(formatSnapshot)
                 }
 
             fun contentHash(file: File): ByteArray {
-                return MessageDigestCalculatingInputStream(BufferedInputStream(FileInputStream(file))).use {
+                return MessageDigestCalculatingInputStream(file.inputStream().buffered()).use {
                     it.readBytes()
                     it.messageDigest.digest()
                 }

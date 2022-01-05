@@ -4,11 +4,7 @@ import com.pinterest.ktlint.core.LintError
 import com.pinterest.ktlint.core.ReporterProvider
 import net.swiftzer.semver.SemVer
 import org.apache.commons.io.serialization.ValidatingObjectInputStream
-import java.io.BufferedInputStream
-import java.io.BufferedOutputStream
 import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
@@ -49,20 +45,12 @@ private class CurrentKtLintClassesSerializer : KtLintClassesSerializer {
     override fun saveErrors(
         lintErrors: List<LintErrorResult>,
         serializedErrors: File
-    ) = ObjectOutputStream(
-        BufferedOutputStream(
-            FileOutputStream(
-                serializedErrors
-            )
-        )
-    ).use {
+    ) = ObjectOutputStream(serializedErrors.outputStream().buffered()).use {
         it.writeObject(lintErrors)
     }
 
     override fun loadErrors(serializedErrors: File): List<LintErrorResult> = ValidatingObjectInputStream(
-        BufferedInputStream(
-            FileInputStream(serializedErrors)
-        )
+        serializedErrors.inputStream().buffered()
     )
         .use {
             it.accept(
@@ -82,11 +70,7 @@ private class CurrentKtLintClassesSerializer : KtLintClassesSerializer {
         reporterProviders: List<ReporterProvider>,
         serializedReporterProviders: File
     ) = ObjectOutputStream(
-        BufferedOutputStream(
-            FileOutputStream(
-                serializedReporterProviders
-            )
-        )
+        serializedReporterProviders.outputStream().buffered()
     ).use { oos ->
         oos.writeObject(
             reporterProviders
@@ -96,9 +80,7 @@ private class CurrentKtLintClassesSerializer : KtLintClassesSerializer {
     override fun loadReporterProviders(
         serializedReporterProviders: File
     ): List<ReporterProvider> = ObjectInputStream(
-        BufferedInputStream(
-            FileInputStream(serializedReporterProviders)
-        )
+        serializedReporterProviders.inputStream().buffered()
     )
         .use {
             @Suppress("UNCHECKED_CAST")
@@ -114,11 +96,7 @@ private class OldKtLintClassesSerializer : KtLintClassesSerializer {
         lintErrors: List<LintErrorResult>,
         serializedErrors: File
     ) = ObjectOutputStream(
-        BufferedOutputStream(
-            FileOutputStream(
-                serializedErrors
-            )
-        )
+        serializedErrors.outputStream().buffered()
     ).use {
         it.writeObject(lintErrors.map(LintErrorResultCompat::from))
     }
@@ -126,9 +104,7 @@ private class OldKtLintClassesSerializer : KtLintClassesSerializer {
     override fun loadErrors(
         serializedErrors: File
     ): List<LintErrorResult> = ValidatingObjectInputStream(
-        BufferedInputStream(
-            FileInputStream(serializedErrors)
-        )
+        serializedErrors.inputStream().buffered()
     )
         .use {
             it.accept(
@@ -148,11 +124,7 @@ private class OldKtLintClassesSerializer : KtLintClassesSerializer {
         reporterProviders: List<ReporterProvider>,
         serializedReporterProviders: File
     ) = ObjectOutputStream(
-        BufferedOutputStream(
-            FileOutputStream(
-                serializedReporterProviders
-            )
-        )
+        serializedReporterProviders.outputStream().buffered()
     ).use { oos ->
         oos.writeObject(
             reporterProviders.map(::SerializableReporterProvider)
@@ -162,9 +134,7 @@ private class OldKtLintClassesSerializer : KtLintClassesSerializer {
     override fun loadReporterProviders(
         serializedReporterProviders: File
     ): List<ReporterProvider> = ValidatingObjectInputStream(
-        BufferedInputStream(
-            FileInputStream(serializedReporterProviders)
-        )
+        serializedReporterProviders.inputStream().buffered()
     )
         .use {
             it.accept(
@@ -184,6 +154,7 @@ private class OldKtLintClassesSerializer : KtLintClassesSerializer {
             lintedFile,
             lintErrors.map { Pair(it.first.lintError, it.second) }
         )
+
         companion object {
             fun from(
                 lintError: LintErrorResult
