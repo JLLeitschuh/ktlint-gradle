@@ -4,11 +4,7 @@ import com.pinterest.ktlint.core.LintError
 import com.pinterest.ktlint.core.ReporterProvider
 import net.swiftzer.semver.SemVer
 import org.apache.commons.io.serialization.ValidatingObjectInputStream
-import java.io.BufferedInputStream
-import java.io.BufferedOutputStream
 import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
@@ -49,44 +45,31 @@ private class CurrentKtLintClassesSerializer : KtLintClassesSerializer {
     override fun saveErrors(
         lintErrors: List<LintErrorResult>,
         serializedErrors: File
-    ) = ObjectOutputStream(
-        BufferedOutputStream(
-            FileOutputStream(
-                serializedErrors
-            )
-        )
-    ).use {
+    ) = ObjectOutputStream(serializedErrors.outputStream().buffered()).use {
         it.writeObject(lintErrors)
     }
 
     override fun loadErrors(serializedErrors: File): List<LintErrorResult> = ValidatingObjectInputStream(
-        BufferedInputStream(
-            FileInputStream(serializedErrors)
+        serializedErrors.inputStream().buffered()
+    ).use {
+        it.accept(
+            ArrayList::class.java,
+            LintErrorResult::class.java,
+            File::class.java,
+            Pair::class.java,
+            LintError::class.java,
+            java.lang.Boolean::class.java
         )
-    )
-        .use {
-            it.accept(
-                ArrayList::class.java,
-                LintErrorResult::class.java,
-                File::class.java,
-                Pair::class.java,
-                LintError::class.java,
-                java.lang.Boolean::class.java
-            )
-            it.accept("kotlin.Pair")
-            @Suppress("UNCHECKED_CAST")
-            it.readObject() as List<LintErrorResult>
-        }
+        it.accept("kotlin.Pair")
+        @Suppress("UNCHECKED_CAST")
+        it.readObject() as List<LintErrorResult>
+    }
 
     override fun saveReporterProviders(
         reporterProviders: List<ReporterProvider>,
         serializedReporterProviders: File
     ) = ObjectOutputStream(
-        BufferedOutputStream(
-            FileOutputStream(
-                serializedReporterProviders
-            )
-        )
+        serializedReporterProviders.outputStream().buffered()
     ).use { oos ->
         oos.writeObject(
             reporterProviders
@@ -96,14 +79,11 @@ private class CurrentKtLintClassesSerializer : KtLintClassesSerializer {
     override fun loadReporterProviders(
         serializedReporterProviders: File
     ): List<ReporterProvider> = ObjectInputStream(
-        BufferedInputStream(
-            FileInputStream(serializedReporterProviders)
-        )
-    )
-        .use {
-            @Suppress("UNCHECKED_CAST")
-            it.readObject() as List<ReporterProvider>
-        }
+        serializedReporterProviders.inputStream().buffered()
+    ).use {
+        @Suppress("UNCHECKED_CAST")
+        it.readObject() as List<ReporterProvider>
+    }
 }
 
 /**
@@ -114,11 +94,7 @@ private class OldKtLintClassesSerializer : KtLintClassesSerializer {
         lintErrors: List<LintErrorResult>,
         serializedErrors: File
     ) = ObjectOutputStream(
-        BufferedOutputStream(
-            FileOutputStream(
-                serializedErrors
-            )
-        )
+        serializedErrors.outputStream().buffered()
     ).use {
         it.writeObject(lintErrors.map(LintErrorResultCompat::from))
     }
@@ -126,33 +102,26 @@ private class OldKtLintClassesSerializer : KtLintClassesSerializer {
     override fun loadErrors(
         serializedErrors: File
     ): List<LintErrorResult> = ValidatingObjectInputStream(
-        BufferedInputStream(
-            FileInputStream(serializedErrors)
+        serializedErrors.inputStream().buffered()
+    ).use {
+        it.accept(
+            ArrayList::class.java,
+            LintErrorResultCompat::class.java,
+            File::class.java,
+            Pair::class.java,
+            SerializableLintError::class.java,
+            java.lang.Boolean::class.java
         )
-    )
-        .use {
-            it.accept(
-                ArrayList::class.java,
-                LintErrorResultCompat::class.java,
-                File::class.java,
-                Pair::class.java,
-                SerializableLintError::class.java,
-                java.lang.Boolean::class.java
-            )
-            it.accept("kotlin.Pair")
-            @Suppress("UNCHECKED_CAST")
-            (it.readObject() as List<LintErrorResultCompat>).map(LintErrorResultCompat::to)
-        }
+        it.accept("kotlin.Pair")
+        @Suppress("UNCHECKED_CAST")
+        (it.readObject() as List<LintErrorResultCompat>).map(LintErrorResultCompat::to)
+    }
 
     override fun saveReporterProviders(
         reporterProviders: List<ReporterProvider>,
         serializedReporterProviders: File
     ) = ObjectOutputStream(
-        BufferedOutputStream(
-            FileOutputStream(
-                serializedReporterProviders
-            )
-        )
+        serializedReporterProviders.outputStream().buffered()
     ).use { oos ->
         oos.writeObject(
             reporterProviders.map(::SerializableReporterProvider)
@@ -162,19 +131,15 @@ private class OldKtLintClassesSerializer : KtLintClassesSerializer {
     override fun loadReporterProviders(
         serializedReporterProviders: File
     ): List<ReporterProvider> = ValidatingObjectInputStream(
-        BufferedInputStream(
-            FileInputStream(serializedReporterProviders)
+        serializedReporterProviders.inputStream().buffered()
+    ).use {
+        it.accept(
+            ArrayList::class.java,
+            SerializableReporterProvider::class.java
         )
-    )
-        .use {
-            it.accept(
-                ArrayList::class.java,
-                SerializableReporterProvider::class.java
-            )
-            @Suppress("UNCHECKED_CAST")
-            it.readObject() as List<SerializableReporterProvider>
-        }
-        .map { it.reporterProvider }
+        @Suppress("UNCHECKED_CAST")
+        it.readObject() as List<SerializableReporterProvider>
+    }.map { it.reporterProvider }
 
     private data class LintErrorResultCompat(
         val lintedFile: File,
@@ -184,6 +149,7 @@ private class OldKtLintClassesSerializer : KtLintClassesSerializer {
             lintedFile,
             lintErrors.map { Pair(it.first.lintError, it.second) }
         )
+
         companion object {
             fun from(
                 lintError: LintErrorResult
