@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   - ?
 
 ### Fixed
-  - ?
+  - Fix install hook action when git `hooks` folder doesn't exist [issue: #557](https://github.com/JLLeitschuh/ktlint-gradle/issues/557), [#563](https://github.com/JLLeitschuh/ktlint-gradle/pull/563)
 
 ### Removed
   - ?
