@@ -5,8 +5,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 
@@ -22,11 +20,11 @@ internal class SerializableLintErrorTest {
         val wrappedLintError = SerializableLintError(lintError)
         val serializeIntoFile = temporaryFolder.resolve("lintError.test")
 
-        ObjectOutputStream(FileOutputStream(serializeIntoFile)).use {
+        ObjectOutputStream(serializeIntoFile.outputStream()).use {
             it.writeObject(wrappedLintError)
         }
 
-        ObjectInputStream(FileInputStream(serializeIntoFile)).use {
+        ObjectInputStream(serializeIntoFile.inputStream()).use {
             val restoredWrappedLintError = it.readObject() as SerializableLintError
             assertThat(restoredWrappedLintError.lintError).isEqualTo(lintError)
             assertThat(restoredWrappedLintError.lintError.canBeAutoCorrected)

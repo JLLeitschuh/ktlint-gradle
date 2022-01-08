@@ -6,8 +6,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.PrintStream
@@ -22,11 +20,11 @@ internal class SerializableReporterProviderTest {
         val wrappedReporterProvider = SerializableReporterProvider(reporterProvider)
         val serializeIntoFile = temporaryFolder.resolve("reporters.test")
 
-        ObjectOutputStream(FileOutputStream(serializeIntoFile)).use {
+        ObjectOutputStream(serializeIntoFile.outputStream()).use {
             it.writeObject(wrappedReporterProvider)
         }
 
-        ObjectInputStream(FileInputStream(serializeIntoFile)).use {
+        ObjectInputStream(serializeIntoFile.inputStream()).use {
             val restoredWrappedReporterProvider = it.readObject() as SerializableReporterProvider
             assertThat(restoredWrappedReporterProvider.reporterProvider).isInstanceOf(TestReporterProvider::class.java)
             assertThat(restoredWrappedReporterProvider.reporterProvider.id)

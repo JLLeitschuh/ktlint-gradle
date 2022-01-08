@@ -20,7 +20,7 @@ internal const val KTLINT_BASELINE_REPORTER_CONFIGURATION_NAME = "ktlintBaseline
 internal const val KTLINT_BASELINE_REPORTER_CONFIGURATION_DESCRIPTION =
     "Provides KtLint baseline reporter required to generate baseline file"
 
-internal fun createKtlintConfiguration(target: Project, extension: KtlintExtension) =
+internal fun createKtlintConfiguration(target: Project, extension: KtlintExtension): Configuration =
     target.configurations.maybeCreate(KTLINT_CONFIGURATION_NAME).apply {
         // Configurations in resolved state are not allowed to modify dependencies
         if (state != Configuration.State.UNRESOLVED) return@apply
@@ -48,8 +48,8 @@ private fun resolveGroup(ktlintVersion: String) = when {
 internal fun createKtlintRulesetConfiguration(
     target: Project,
     ktLintConfiguration: Configuration
-) =
-    target.configurations.maybeCreate(KTLINT_RULESET_CONFIGURATION_NAME).apply {
+): Configuration = target
+    .configurations.maybeCreate(KTLINT_RULESET_CONFIGURATION_NAME).apply {
         description = KTLINT_RULESET_CONFIGURATION_DESCRIPTION
         ensureConsistencyWith(target, ktLintConfiguration)
     }
@@ -58,7 +58,7 @@ internal fun createKtLintReporterConfiguration(
     target: Project,
     extension: KtlintExtension,
     ktLintConfiguration: Configuration
-) = target
+): Configuration = target
     .configurations
     .maybeCreate(KTLINT_REPORTER_CONFIGURATION_NAME)
     .apply {
@@ -87,7 +87,7 @@ internal fun createKtLintBaselineReporterConfiguration(
     target: Project,
     extension: KtlintExtension,
     ktLintConfiguration: Configuration
-) = target
+): Configuration = target
     .configurations
     .maybeCreate(KTLINT_BASELINE_REPORTER_CONFIGURATION_NAME)
     .apply {
