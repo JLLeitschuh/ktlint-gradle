@@ -60,7 +60,7 @@ private fun postCheck(
 }
 
 internal const val NF = "\$NF"
-internal const val gradleCommandExitCode = "\$gradleCommandExitCode"
+internal const val gradleCommandExitCode = "gradleCommandExitCode"
 
 @Language("Sh")
 internal fun generateGitHook(
@@ -99,7 +99,7 @@ internal fun generateGitHook(
     unset diff
 
     echo "Completed ktlint hook."
-    exit $gradleCommandExitCode
+    exit ${'$'}$gradleCommandExitCode
 
     """.trimIndent()
 
