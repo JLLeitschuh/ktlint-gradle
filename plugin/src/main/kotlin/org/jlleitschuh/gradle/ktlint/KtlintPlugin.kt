@@ -3,6 +3,7 @@ package org.jlleitschuh.gradle.ktlint
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
@@ -150,23 +151,23 @@ open class KtlintPlugin : Plugin<Project> {
         val extension = target.plugins.apply(KtlintBasePlugin::class.java).extension
 
         val metaKtlintCheckTask: TaskProvider<Task> by lazy {
-            target.registerTask<Task>(CHECK_PARENT_TASK_NAME) {
+            target.registerTask(CHECK_PARENT_TASK_NAME) {
                 group = VERIFICATION_GROUP
                 description = "Runs ktlint on all kotlin sources in this project."
             }
         }
 
         val metaKtlintFormatTask: TaskProvider<Task> by lazy {
-            target.registerTask<Task>(FORMAT_PARENT_TASK_NAME) {
+            target.registerTask(FORMAT_PARENT_TASK_NAME) {
                 group = FORMATTING_GROUP
                 description = "Runs the ktlint formatter on all kotlin sources in this project."
             }
         }
 
-        val ktlintConfiguration = createKtlintConfiguration(target, extension)
-        val ktlintRulesetConfiguration = createKtlintRulesetConfiguration(target, ktlintConfiguration)
-        val ktlintReporterConfiguration = createKtLintReporterConfiguration(target, extension, ktlintConfiguration)
-        val ktlintBaselineReporterConfiguration = createKtLintBaselineReporterConfiguration(
+        val ktlintConfiguration: Configuration = createKtlintConfiguration(target, extension)
+        val ktlintRulesetConfiguration: Configuration = createKtlintRulesetConfiguration(target, ktlintConfiguration)
+        val ktlintReporterConfiguration: Configuration = createKtLintReporterConfiguration(target, extension, ktlintConfiguration)
+        val ktlintBaselineReporterConfiguration: Configuration = createKtLintBaselineReporterConfiguration(
             target,
             extension,
             ktlintConfiguration

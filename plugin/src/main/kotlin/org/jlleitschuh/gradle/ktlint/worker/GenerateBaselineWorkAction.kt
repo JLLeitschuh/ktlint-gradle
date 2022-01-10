@@ -29,9 +29,7 @@ internal abstract class GenerateBaselineWorkAction :
             .discoveredErrors
             .files
             .filter { it.exists() }
-            .map {
-                ktLintClassesSerializer.loadErrors(it)
-            }
+            .map(ktLintClassesSerializer::loadErrors)
             .flatten()
 
         val baselineFile = parameters.baselineFile.asFile.get().apply {
@@ -39,8 +37,8 @@ internal abstract class GenerateBaselineWorkAction :
         }
         val projectDir = parameters.projectDirectory.asFile.get()
 
-        PrintStream(baselineFile.outputStream()).use {
-            val baselineReporter = loadBaselineReporter(it)
+        PrintStream(baselineFile.outputStream()).use { file ->
+            val baselineReporter = loadBaselineReporter(file)
             baselineReporter.beforeAll()
             errors.forEach { lintErrorResult ->
                 val filePath = lintErrorResult
