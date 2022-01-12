@@ -62,6 +62,21 @@ class GitHookTasksTest : AbstractPluginTest() {
         }
     }
 
+    @DisplayName("Running install git hook when hooks dir doesn't exist check task should create pre-commit hook")
+    @CommonTest
+    fun installPreCommitHookWithoutHooksDirCheck(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            val gitDir = projectPath.initGitWithoutHooksDir()
+
+            build(":$INSTALL_GIT_HOOK_CHECK_TASK") {
+                assertThat(task(":$INSTALL_GIT_HOOK_CHECK_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(gitDir.preCommitGitHook()).exists()
+                assertThat(gitDir.preCommitGitHook().canExecute()).isTrue
+                assertThat(gitDir.preCommitGitHook().readText()).contains(CHECK_PARENT_TASK_NAME)
+            }
+        }
+    }
+
     @DisplayName("Running install git hook format task should create pre-commit hook")
     @CommonTest
     fun installPreCommitHookFormat(gradleVersion: GradleVersion) {
