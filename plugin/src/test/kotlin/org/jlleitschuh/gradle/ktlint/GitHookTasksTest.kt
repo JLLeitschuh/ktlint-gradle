@@ -178,9 +178,10 @@ class GitHookTasksTest : AbstractPluginTest() {
 
             build(":$INSTALL_GIT_HOOK_CHECK_TASK") {
                 assertThat(task(":$INSTALL_GIT_HOOK_CHECK_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-                assertThat(gitDir.preCommitGitHook().readText()).doesNotContain("set -e")
-                assertThat(gitDir.preCommitGitHook().readText()).contains("gradleCommandExitCode=\$?")
-                assertThat(gitDir.preCommitGitHook().readText()).contains("exit \$gradleCommandExitCode")
+                val hookTextLines = gitDir.preCommitGitHook().readLines()
+                assertThat(hookTextLines).doesNotContain("set -e")
+                assertThat(hookTextLines).contains("gradle_command_exit_code=\$?")
+                assertThat(hookTextLines).contains("exit \$gradle_command_exit_code")
             }
         }
     }
@@ -197,9 +198,10 @@ class GitHookTasksTest : AbstractPluginTest() {
 
             build(":$INSTALL_GIT_HOOK_FORMAT_TASK") {
                 assertThat(task(":$INSTALL_GIT_HOOK_FORMAT_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-                assertThat(gitDir.preCommitGitHook().readText()).doesNotContain("set -e")
-                assertThat(gitDir.preCommitGitHook().readText()).contains("gradleCommandExitCode=\$?")
-                assertThat(gitDir.preCommitGitHook().readText()).contains("exit \$gradleCommandExitCode")
+                val hookTextLines = gitDir.preCommitGitHook().readLines()
+                assertThat(hookTextLines).doesNotContain("set -e")
+                assertThat(hookTextLines).contains("gradle_command_exit_code=\$?")
+                assertThat(hookTextLines).contains("exit \$gradle_command_exit_code")
             }
         }
     }
