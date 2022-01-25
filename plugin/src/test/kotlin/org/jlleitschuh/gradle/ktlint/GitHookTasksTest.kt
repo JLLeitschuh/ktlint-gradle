@@ -10,7 +10,6 @@ import org.jlleitschuh.gradle.ktlint.testdsl.buildAndFail
 import org.jlleitschuh.gradle.ktlint.testdsl.project
 import org.junit.jupiter.api.DisplayName
 import java.io.File
-import java.util.regex.Pattern
 
 @GradleTestVersions
 class GitHookTasksTest : AbstractPluginTest() {
@@ -179,9 +178,11 @@ class GitHookTasksTest : AbstractPluginTest() {
 
             build(":$INSTALL_GIT_HOOK_CHECK_TASK") {
                 assertThat(task(":$INSTALL_GIT_HOOK_CHECK_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-                assertThat(gitDir.preCommitGitHook().readText()).doesNotContain("set -e")
-                assertThat(gitDir.preCommitGitHook().readText()).contains("gradleCommandExitCode=\$?")
-                assertThat(gitDir.preCommitGitHook().readText()).contains("exit \$gradleCommandExitCode")
+
+                val hookTextLines = gitDir.preCommitGitHook().readLines()
+                assertThat(hookTextLines).doesNotContain("set -e")
+                assertThat(hookTextLines).contains("gradle_command_exit_code=\$?")
+                assertThat(hookTextLines).contains("exit \$gradle_command_exit_code")
             }
         }
     }
@@ -198,9 +199,11 @@ class GitHookTasksTest : AbstractPluginTest() {
 
             build(":$INSTALL_GIT_HOOK_FORMAT_TASK") {
                 assertThat(task(":$INSTALL_GIT_HOOK_FORMAT_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-                assertThat(gitDir.preCommitGitHook().readText()).doesNotContain("set -e")
-                assertThat(gitDir.preCommitGitHook().readText()).containsPattern(Pattern.compile("^[ ]+gradleCommandExitCode=\\\$\\?\$", Pattern.MULTILINE))
-                assertThat(gitDir.preCommitGitHook().readText()).containsPattern(Pattern.compile("^[ ]+exit \\\$gradleCommandExitCode\$", Pattern.MULTILINE))
+
+                val hookTextLines = gitDir.preCommitGitHook().readLines()
+                assertThat(hookTextLines).doesNotContain("set -e")
+                assertThat(hookTextLines).contains("gradle_command_exit_code=\$?")
+                assertThat(hookTextLines).contains("exit \$gradle_command_exit_code")
             }
         }
     }
