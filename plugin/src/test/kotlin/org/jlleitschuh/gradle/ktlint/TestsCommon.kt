@@ -32,7 +32,7 @@ fun File.kotlinPluginProjectSetup(
     buildFile().writeText(
         """
             ${pluginsBlockWithMainPluginAndKotlinPlugin(kotlinPluginId, kotlinPluginVersion)}
-            
+
             repositories {
                 gradlePluginPortal()
             }
@@ -43,5 +43,12 @@ fun File.kotlinPluginProjectSetup(
 internal fun File.initGit(): File {
     val repo = RepositoryBuilder().setWorkTree(this).setMustExist(false).build()
     repo.create()
+    return repo.directory
+}
+
+internal fun File.initGitWithoutHooksDir(): File {
+    val repo = RepositoryBuilder().setWorkTree(this).setMustExist(false).build()
+    repo.create()
+    assert(repo.directory.resolve("hooks").delete())
     return repo.directory
 }
