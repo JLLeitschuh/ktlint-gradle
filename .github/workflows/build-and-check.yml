@@ -120,3 +120,33 @@ jobs:
             ${{ runner.os }}-gradle-wrapper-
       - name: Check ktlint-plugin on samples
         run: ./gradlew ktlintCheck --no-daemon -x :sample:android-app:ktlintCheck :sample:kotlin-mpp-android:ktlintCheck
+
+  check_android_samples:
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest ]
+    runs-on: ${{ matrix.os }}
+    needs: build
+    steps:
+      - uses: actions/checkout@v2
+      - name: set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: 11
+          distribution: 'zulu'
+      - name: Restore Gradle caches
+        uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-cache-${{ hashFiles('**/*.gradle.kts') }}-${{ hashFiles('**/gradle.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-cache-
+      - name: Restore Gradle wrapper
+        uses: actions/cache@v2
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradlew') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-wrapper-
+      - name: Check ktlint-plugin on samples
+        run: ./gradlew --no-daemon :sample:android-app:ktlintCheck :sample:kotlin-mpp-android:ktlintCheck
