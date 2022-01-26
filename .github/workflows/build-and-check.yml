@@ -88,8 +88,10 @@ jobs:
           key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradlew') }}
           restore-keys: |
             ${{ runner.os }}-gradle-wrapper-
+      - name: Add hook
+        run: ./gradlew addKtlintCheckGitPreCommitHook --no-daemon
       - name: Check git bashisms
-        run: ./gradlew addKtlintCheckGitPreCommitHook --no-daemon && checkbashisms .git/hooks/pre-commit
+        run: checkbashisms .git/hooks/pre-commit
 
   check_samples:
     strategy:
