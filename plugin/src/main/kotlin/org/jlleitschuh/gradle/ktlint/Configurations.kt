@@ -27,6 +27,10 @@ internal fun createKtlintConfiguration(target: Project, extension: KtlintExtensi
 
         description = KTLINT_CONFIGURATION_DESCRIPTION
 
+        isCanBeResolved = true
+        isCanBeConsumed = false
+        isVisible = false
+
         // Starting from KtLint 0.41.0 version published artifact has two variants: "external" and "shadowed"
         attributes {
             it.attribute(Bundling.BUNDLING_ATTRIBUTE, target.objects.named(Bundling::class.java, Bundling.EXTERNAL))
@@ -51,6 +55,11 @@ internal fun createKtlintRulesetConfiguration(
 ): Configuration = target
     .configurations.maybeCreate(KTLINT_RULESET_CONFIGURATION_NAME).apply {
         description = KTLINT_RULESET_CONFIGURATION_DESCRIPTION
+
+        isCanBeResolved = true
+        isCanBeConsumed = false
+        isVisible = false
+
         ensureConsistencyWith(target, ktLintConfiguration)
     }
 
@@ -63,6 +72,11 @@ internal fun createKtLintReporterConfiguration(
     .maybeCreate(KTLINT_REPORTER_CONFIGURATION_NAME)
     .apply {
         description = KTLINT_REPORTER_CONFIGURATION_DESCRIPTION
+
+        isCanBeResolved = true
+        isCanBeConsumed = false
+        isVisible = false
+
         ensureConsistencyWith(target, ktLintConfiguration)
 
         withDependencies {
@@ -92,6 +106,11 @@ internal fun createKtLintBaselineReporterConfiguration(
     .maybeCreate(KTLINT_BASELINE_REPORTER_CONFIGURATION_NAME)
     .apply {
         description = KTLINT_BASELINE_REPORTER_CONFIGURATION_DESCRIPTION
+
+        isCanBeResolved = true
+        isCanBeConsumed = false
+        isVisible = false
+
         ensureConsistencyWith(target, ktLintConfiguration)
 
         withDependencies {
