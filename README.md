@@ -197,6 +197,8 @@ Plugin supports KtLint baseline with following limitations:
 - Format tasks ignore baseline. See [#1072](https://github.com/pinterest/ktlint/issues/1072) KtLint issue for more details.
 - One baseline file is generated per one Gradle project (module).
 
+Run task `ktlintGenerateBaseline` to generate a new baseline.
+  
 #### Testing KtLint snapshots
 
 To test KtLint snapshots add following configuration into project build script (latest KtLint snapshot version name
