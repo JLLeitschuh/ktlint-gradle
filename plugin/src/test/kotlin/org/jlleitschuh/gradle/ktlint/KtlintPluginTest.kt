@@ -508,6 +508,9 @@ class KtlintPluginTest : AbstractPluginTest() {
         }
     }
 
+    /**
+     * See: https://github.com/JLLeitschuh/ktlint-gradle/issues/523#issuecomment-1022522032
+     */
     @DisplayName("Should not leak KtLint as a variant into consuming projects")
     @CommonTest
     fun noLeakIntoConsumingProjects(gradleVersion: GradleVersion) {
