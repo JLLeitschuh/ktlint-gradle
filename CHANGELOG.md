@@ -5,9 +5,51 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [10.1.0-SNAPSHOT] Unreleased
+## [10.3.0-SNAPSHOT] - Unreleased
 ### Added
   - Added git hook update notifier ([#474](https://github.com/JLLeitschuh/ktlint-gradle/pull/474))
+  - ?
+
+### Changed
+  - ?
+
+### Fixed
+  - Fix install hook action when git `hooks` folder doesn't exist [issue: #557](https://github.com/JLLeitschuh/ktlint-gradle/issues/557), [#563](https://github.com/JLLeitschuh/ktlint-gradle/pull/563)
+  - Fix some resolution issues when a project using the plugin in some specific setups is depended upon by another project [issue: #523](https://github.com/JLLeitschuh/ktlint-gradle/issues/523), [#571](https://github.com/JLLeitschuh/ktlint-gradle/pull/571)
+
+### Removed
+  - ?
+
+## [10.2.1] - 2021.12.27
+### Fixed
+  - Deleted file causes file not found exception ([issue: #539](https://github.com/JLLeitschuh/ktlint-gradle/issues/539), [#548](https://github.com/JLLeitschuh/ktlint-gradle/pull/548))
+  - Use Gradle command exit code as hook exit code to ensure un-staged changes are always re-applied to the working directory [#551](https://github.com/JLLeitschuh/ktlint-gradle/pull/551)
+
+## [10.2.0] - 2021.09.08
+### Added
+  - sarif reporter to provided reporters ([#516](https://github.com/JLLeitschuh/ktlint-gradle/pull/516))
+
+### Changed
+  - Update Gradle to `7.1.1` version
+  - Update Shadow plugin to `7.0.0` version
+  - Update Kotlin to `1.5.21` version
+  - Set default KtLint version to `0.42.1`
+  - Rethink format task approach ([issue: #306](https://github.com/JLLeitschuh/ktlint-gradle/issues/306))
+
+### Fixed
+  - Pre-commit hook causing conflicts ([issue: #443](https://github.com/JLLeitschuh/ktlint-gradle/issues/443)) ([#502](https://github.com/JLLeitschuh/ktlint-gradle/pull/502))
+  - `ktlintFormat` create empty directories in `src/` dir ([issue: #423](https://github.com/JLLeitschuh/ktlint-gradle/issues/423))
+  - Add Git hook task breaks configuration cache ([issue: #505](https://github.com/JLLeitschuh/ktlint-gradle/issues/505))
+  - Plugin failed to apply on eager tasks creation ([issue: #495](https://github.com/JLLeitschuh/ktlint-gradle/issues/495))
+
+## [10.1.0] - 2021.06.02
+### Added
+  - Baseline support ([#414](https://github.com/JLLeitschuh/ktlint-gradle/issues/414))
+
+    Limitations:
+    - Format tasks ignore baseline
+    - One baseline file per-Gradle project (module)
+
 ### Changed
   - Updated Gradle to `6.8.3` version
   - Updated default KtLint version to `0.41.0`
@@ -16,8 +58,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   - Pre-commit hook adds entire file to commit when only part of the file was indexed ([#470](https://github.com/JLLeitschuh/ktlint-gradle/pull/470))
   - Pre-commit hook doesn't format files that have been renamed ([#471](https://github.com/JLLeitschuh/ktlint-gradle/pull/471))
   - Reset KtLint internal caches on any `.editorconfig` files changes ([#456](https://github.com/JLLeitschuh/ktlint-gradle/issues/456))
-### Removed
-  - ?
+  - On KtLint parse error print path to file ([#476](https://github.com/JLLeitschuh/ktlint-gradle/issues/476))
+  - Add workaround for format tasks showing deprecation messages in Gradle 7.0 ([#480](https://github.com/JLLeitschuh/ktlint-gradle/pull/480))
 
 ## [10.0.0] - 2021.02.09
 ### Changed
@@ -30,7 +72,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
     **Breaking** - removed build variants meta tasks. Minimum supported AGP version is `4.0.0`.
   - Updated shadow plugin to `6.1.0` version.
-  - Set default ktlint version to `0.40.0` 
+  - Set default ktlint version to `0.40.0`
   - Updated Gradle to `6.8.1` version
   - Set minimal supported Gradle version to `6.0`
   - Set minimal supported KtLint version to `0.34.0`
@@ -72,7 +114,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   - Set default ktlint version to `0.37.2`
   - Executing ktlint uses now uses the [Gradle worker API](https://guides.gradle.org/using-the-worker-api/) when supported.
   - `ktlintFormat` and `ktlintCheck` tasks now support the [configuration cache](https://docs.gradle.org/nightly/userguide/configuration_cache.html) [#364](https://github.com/JLLeitschuh/ktlint-gradle/issues/364)
-  -  Make pre-commit hook working with Windows path separator [#359] (https://github.com/JLLeitschuh/ktlint-gradle/pull/359) 
+  -  Make pre-commit hook working with Windows path separator [#359] (https://github.com/JLLeitschuh/ktlint-gradle/pull/359)
 
 ## [9.2.1] - 2020-02-12
 ### Fixed
@@ -145,7 +187,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Changed
   - Update Kotlin to `1.3.30` version
   - Deprecated providing 3rd party ktlint rules via extension (#71)
-  - Breaking: Change tasks inheritance - now `KtlintFormat` and `KtlintCheck` extend `BaseKtlintCheckTask` (#225) 
+  - Breaking: Change tasks inheritance - now `KtlintFormat` and `KtlintCheck` extend `BaseKtlintCheckTask` (#225)
   - Update Android Gradle plugin to `3.4.0` version
 ### Fixed
   - Proper lazy adding ktlint dependency (#219)
@@ -155,7 +197,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Added
  - Support different ktlint group/package name after pinterest ownership of ktlint project (#228)
 ### Changed
- - Default ktlint version to `0.32.0`. 
+ - Default ktlint version to `0.32.0`.
 
 ## [7.3.0] - 2019-04-10
 ### Added
@@ -168,7 +210,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Changed
   - Default ktlint version is set to `0.31.0`
 ### Fixed
-  - Failed task verification on Gradle `5.2.1` (#217) 
+  - Failed task verification on Gradle `5.2.1` (#217)
 
 ## [7.2.0] - 2019-03-13
 ### Added

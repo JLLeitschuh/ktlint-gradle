@@ -4,6 +4,7 @@ import groovy.lang.Closure
 import org.gradle.api.Action
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.file.ConfigurableFileTree
+import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
@@ -21,6 +22,7 @@ import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 open class KtlintExtension
 internal constructor(
     objectFactory: ObjectFactory,
+    projectLayout: ProjectLayout,
     customReportersContainer: NamedDomainObjectContainer<CustomReporter>,
     private val filterTargetApplier: FilterApplier,
     kotlinScriptAdditionalPathApplier: KotlinScriptAdditionalPathApplier
@@ -33,7 +35,7 @@ internal constructor(
     /**
      * The version of KtLint to use.
      */
-    val version: Property<String> = objectFactory.property { set("0.41.0") }
+    val version: Property<String> = objectFactory.property { set("0.42.1") }
 
     /**
      * Enable verbose mode.
@@ -103,6 +105,18 @@ internal constructor(
         set(emptySet())
     }
 
+    /**
+     * Baseline file location.
+     *
+     * Default location is `<projectDir>/config/ktlint/baseline.xml`.
+     *
+     * @since KtLint `0.41.0`
+     */
+    val baseline: RegularFileProperty = objectFactory.fileProperty()
+        .convention(
+            projectLayout.projectDirectory.dir("config").dir("ktlint").file("baseline.xml")
+        )
+
     private val kscriptExtension = KScriptExtension(kotlinScriptAdditionalPathApplier)
 
     /**
@@ -146,7 +160,7 @@ internal constructor(
          *
          * _By default_ `plain` type is enabled if no reporter is explicitly specified.
          *
-         * @param reporterType one of `plain`, `plain_group_by_file`, `checkstyle`, `json`.
+         * @param reporterType one of `plain`, `plain_group_by_file`, `checkstyle`, `json`, `sarif`.
          */
         fun reporter(reporterType: ReporterType) {
             reporters.add(reporterType)

@@ -22,9 +22,14 @@ import java.nio.file.Path
 
 internal inline fun <reified T : Task> Project.registerTask(
     name: String,
+    vararg constructorArguments: Any = emptyArray(),
     noinline configuration: T.() -> Unit
 ): TaskProvider<T> {
-    return this.tasks.register(name, T::class.java, configuration)
+    return tasks
+        .register(name, T::class.java, *constructorArguments)
+        .apply {
+            configure { configuration(it) }
+        }
 }
 
 internal const val EDITOR_CONFIG_FILE_NAME = ".editorconfig"
@@ -90,13 +95,13 @@ internal val INTERMEDIATE_RESULTS_PATH = "intermediates${File.separator}ktLint${
 
 internal inline fun <reified T> ObjectFactory.property(
     configuration: Property<T>.() -> Unit = {}
-) = property(T::class.java).apply(configuration)
+): Property<T> = property(T::class.java).apply(configuration)
 
 internal inline fun <reified T> ObjectFactory.setProperty(
     configuration: SetProperty<T>.() -> Unit = {}
-) = setProperty(T::class.java).apply(configuration)
+): SetProperty<T> = setProperty(T::class.java).apply(configuration)
 
-internal fun Project.isConsolePlain() = gradle.startParameter.consoleOutput == ConsoleOutput.Plain
+internal fun Project.isConsolePlain(): Boolean = gradle.startParameter.consoleOutput == ConsoleOutput.Plain
 
 /**
  * Get file path where tasks could put their intermediate results, that could be consumed by other plugin tasks.

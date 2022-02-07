@@ -16,13 +16,20 @@ internal const val KTLINT_RULESET_CONFIGURATION_NAME = "ktlintRuleset"
 internal const val KTLINT_RULESET_CONFIGURATION_DESCRIPTION = "All ktlint rulesets dependencies"
 internal const val KTLINT_REPORTER_CONFIGURATION_NAME = "ktlintReporter"
 internal const val KTLINT_REPORTER_CONFIGURATION_DESCRIPTION = "All ktlint custom reporters dependencies"
+internal const val KTLINT_BASELINE_REPORTER_CONFIGURATION_NAME = "ktlintBaselineReporter"
+internal const val KTLINT_BASELINE_REPORTER_CONFIGURATION_DESCRIPTION =
+    "Provides KtLint baseline reporter required to generate baseline file"
 
-internal fun createKtlintConfiguration(target: Project, extension: KtlintExtension) =
+internal fun createKtlintConfiguration(target: Project, extension: KtlintExtension): Configuration =
     target.configurations.maybeCreate(KTLINT_CONFIGURATION_NAME).apply {
         // Configurations in resolved state are not allowed to modify dependencies
         if (state != Configuration.State.UNRESOLVED) return@apply
 
         description = KTLINT_CONFIGURATION_DESCRIPTION
+
+        isCanBeResolved = true
+        isCanBeConsumed = false
+        isVisible = false
 
         // Starting from KtLint 0.41.0 version published artifact has two variants: "external" and "shadowed"
         attributes {
@@ -45,9 +52,14 @@ private fun resolveGroup(ktlintVersion: String) = when {
 internal fun createKtlintRulesetConfiguration(
     target: Project,
     ktLintConfiguration: Configuration
-) =
-    target.configurations.maybeCreate(KTLINT_RULESET_CONFIGURATION_NAME).apply {
+): Configuration = target
+    .configurations.maybeCreate(KTLINT_RULESET_CONFIGURATION_NAME).apply {
         description = KTLINT_RULESET_CONFIGURATION_DESCRIPTION
+
+        isCanBeResolved = true
+        isCanBeConsumed = false
+        isVisible = false
+
         ensureConsistencyWith(target, ktLintConfiguration)
     }
 
@@ -55,11 +67,16 @@ internal fun createKtLintReporterConfiguration(
     target: Project,
     extension: KtlintExtension,
     ktLintConfiguration: Configuration
-) = target
+): Configuration = target
     .configurations
     .maybeCreate(KTLINT_REPORTER_CONFIGURATION_NAME)
     .apply {
         description = KTLINT_REPORTER_CONFIGURATION_DESCRIPTION
+
+        isCanBeResolved = true
+        isCanBeConsumed = false
+        isVisible = false
+
         ensureConsistencyWith(target, ktLintConfiguration)
 
         withDependencies {
@@ -77,6 +94,43 @@ internal fun createKtLintReporterConfiguration(
                         }
                     )
                 }
+        }
+    }
+
+internal fun createKtLintBaselineReporterConfiguration(
+    target: Project,
+    extension: KtlintExtension,
+    ktLintConfiguration: Configuration
+): Configuration = target
+    .configurations
+    .maybeCreate(KTLINT_BASELINE_REPORTER_CONFIGURATION_NAME)
+    .apply {
+        description = KTLINT_BASELINE_REPORTER_CONFIGURATION_DESCRIPTION
+
+        isCanBeResolved = true
+        isCanBeConsumed = false
+        isVisible = false
+
+        ensureConsistencyWith(target, ktLintConfiguration)
+
+        withDependencies {
+            dependencies.addLater(
+                target.provider {
+                    val ktlintVersion = extension.version.get()
+                    // Baseline reporter is only available starting 0.41.0 release
+                    if (SemVer.parse(ktlintVersion) >= SemVer(0, 41, 0)) {
+                        target.dependencies.create(
+                            "com.pinterest.ktlint:ktlint-reporter-baseline:${extension.version.get()}"
+                        )
+                    } else {
+                        // Adding fake plain reporter as addLater() does not accept `null` value
+                        // Generate baseline tasks anyway will not run on KtLint versions < 0.41.0
+                        target.dependencies.create(
+                            "com.pinterest.ktlint:ktlint-reporter-plain:${extension.version.get()}"
+                        )
+                    }
+                }
+            )
         }
     }
 

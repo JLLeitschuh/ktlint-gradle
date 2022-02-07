@@ -2,7 +2,7 @@
 
 **Provides a convenient wrapper plugin over the [ktlint](https://github.com/pinterest/ktlint) project.**
 
-Latest plugin version: [10.0.0](/CHANGELOG.md#1000---20210209)
+Latest plugin version: [10.2.1](/CHANGELOG.md#1021---20211227)
 
 [![Join the chat at https://kotlinlang.slack.com](https://img.shields.io/badge/slack-@kotlinlang/ktlint-yellow.svg?logo=slack)](https://kotlinlang.slack.com/messages/CKS3XG0LS)
 [![Build Status](https://travis-ci.org/JLLeitschuh/ktlint-gradle.svg?branch=master)](https://travis-ci.org/JLLeitschuh/ktlint-gradle)
@@ -19,15 +19,16 @@ The assumption being that you would not want to lint code you weren't compiling.
 ## Table of content
 - [Supported Kotlin plugins](#supported-kotlin-plugins)
 - [How to use](#how-to-use)
-  - [Minimal support versions](#minimal_supported_versions)
+  - [Minimal support versions](#minimal-supported-versions)
   - [Ktlint plugin](#ktlint-plugin)
     - [Simple setup](#simple-setup)
-    - [Using new plugin API](#using-new-plugin-api)
+    - [Using legacy apply method](#using-legacy-apply-method)
     - [How to apply to all subprojects](#applying-to-subprojects)
+    - [Baseline support](#baseline-support)
     - [Testing KtLint snapshots](#testing-ktlint-snapshots)
   - [Intellij IDEA plugin](#intellij-idea-only-plugin)
     - [Simple setup](#idea-plugin-simple-setup)
-    - [Using new plugin API](#idea-plugin-setup-using-new-plugin-api)
+    - [Using legacy apply method](#idea-plugin-setup-using-legacy-apply-method)
   - [Plugin configuration](#configuration)
     - [Setting reports output directory](#setting-reports-output-directory)
     - [Customer reporters](#custom-reporters)
@@ -61,7 +62,7 @@ open a [new issue](https://github.com/JLLeitschuh/ktlint-gradle/issues/new).
 This plugin was written using the new API available for the Gradle script Kotlin builds.
 This API is available in new versions of Gradle.
 
-Minimal supported [Gradle](www.gradle.org) version: `6.0`
+Minimal supported [Gradle](https://www.gradle.org) version: `6.0`
 
 Minimal supported [ktlint](https://github.com/pinterest/ktlint) version: `0.34.0`
 (additionally excluding `0.37.0` on Windows OS and `0.38.0` on all OS types)
@@ -69,6 +70,38 @@ Minimal supported [ktlint](https://github.com/pinterest/ktlint) version: `0.34.0
 ### Ktlint plugin
 
 #### Simple setup
+
+Build script snippet for new plugin mechanism introduced in Gradle 2.1:
+<details>
+<summary>Groovy</summary>
+
+```groovy
+plugins {
+  id "org.jlleitschuh.gradle.ktlint" version "<current_version>"
+}
+
+repositories {
+  // Required to download KtLint
+  mavenCentral()
+}
+```
+</details>
+<details open>
+<summary>Kotlin</summary>
+
+```kotlin
+plugins {
+  id("org.jlleitschuh.gradle.ktlint") version "<current_version>"
+}
+
+repositories {
+  // Required to download KtLint
+  mavenCentral()
+}
+```
+</details>
+
+#### Using legacy apply method
 
 Build script snippet for use in all Gradle versions:
 <details>
@@ -94,7 +127,7 @@ repositories {
 apply plugin: "org.jlleitschuh.gradle.ktlint"
 ```
 </details>
-<details open>
+<details>
 <summary>Kotlin</summary>
 
 ```kotlin
@@ -115,21 +148,6 @@ repositories {
 apply(plugin = "org.jlleitschuh.gradle.ktlint")
 ```
 </details>
-
-#### Using new plugin API
-
-Build script snippet for new, incubating, plugin mechanism introduced in Gradle 2.1:
-```groovy
-plugins {
-  id "org.jlleitschuh.gradle.ktlint" version "<current_version>"
-}
-
-repositories {
-  // Required to download KtLint
-  mavenCentral()
-}
-```
-
 
 #### Applying to subprojects
 
@@ -164,7 +182,7 @@ subprojects {
         // Required to download KtLint
         mavenCentral()
     }
-    
+
     // Optionally configure plugin
     configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
         debug.set(true)
@@ -173,6 +191,14 @@ subprojects {
 ```
 </details>
 
+#### Baseline support
+
+Plugin supports KtLint baseline with following limitations:
+- Format tasks ignore baseline. See [#1072](https://github.com/pinterest/ktlint/issues/1072) KtLint issue for more details.
+- One baseline file is generated per one Gradle project (module).
+
+Run task `ktlintGenerateBaseline` to generate a new baseline.
+  
 #### Testing KtLint snapshots
 
 To test KtLint snapshots add following configuration into project build script (latest KtLint snapshot version name
@@ -198,9 +224,7 @@ ktlint {
 
 ```kotlin
 repositories {
-    maven {
-        setUrl("https://oss.sonatype.org/content/repositories/snapshots")
-    }
+    maven("https://oss.sonatype.org/content/repositories/snapshots")
 }
 
 ktlint {
@@ -218,21 +242,21 @@ rules using ktlint.
 
 #### Idea plugin simple setup
 
+Build script snippet for new plugin mechanism introduced in Gradle 2.1:
+```kotlin
+plugins {
+  id("org.jlleitschuh.gradle.ktlint-idea") version "<current_version>"
+}
+```
+
+#### Idea plugin setup using legacy apply method
+
 For all Gradle versions:
 
 Use the same `buildscript` logic as [above](#simple-setup), but with this instead of the above suggested `apply` line. If you also want the GIT pre-commit gradle tasks, keep both `apply` variations.
 
 ```groovy
 apply plugin: "org.jlleitschuh.gradle.ktlint-idea"
-```
-
-#### Idea plugin setup using new plugin API
-
-Build script snippet for new, incubating, plugin mechanism introduced in Gradle 2.1:
-```kotlin
-plugins {
-  id("org.jlleitschuh.gradle.ktlint-idea") version "<current_version>"
-}
 ```
 
 ### Configuration
@@ -261,10 +285,12 @@ ktlint {
     enableExperimentalRules = true
     additionalEditorconfigFile = file("/some/additional/.editorconfig")
     disabledRules = ["final-newline"]
+    baseline = file("my-project-ktlint-baseline.xml")
     reporters {
         reporter "plain"
         reporter "checkstyle"
-        
+        reporter "sarif"
+
         customReporters {
             "csv" {
                 fileExtension = "csv"
@@ -288,7 +314,7 @@ ktlint {
 dependencies {
     ktlintRuleset "com.github.username:rulseset:master-SNAPSHOT"
     ktlintRuleset files("/path/to/custom/rulseset.jar")
-    ktlintRuleset project(":chore:project-ruleset") 
+    ktlintRuleset project(":chore:project-ruleset")
 }
 ```
 </details>
@@ -311,10 +337,11 @@ configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
     enableExperimentalRules.set(true)
     additionalEditorconfigFile.set(file("/some/additional/.editorconfig"))
     disabledRules.set(setOf("final-newline"))
+    baseline.set(file("my-project-ktlint-baseline.xml"))
     reporters {
         reporter(ReporterType.PLAIN)
         reporter(ReporterType.CHECKSTYLE)
-        
+
         customReporters {
             register("csv") {
                 fileExtension = "csv"
@@ -338,7 +365,7 @@ configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
 dependencies {
     ktlintRuleset("com.github.username:rulseset:master-SNAPSHOT")
     ktlintRuleset(files("/path/to/custom/rulseset.jar"))
-    ktlintRuleset(project(":chore:project-ruleset")) 
+    ktlintRuleset(project(":chore:project-ruleset"))
 }
 ```
 </details>
@@ -361,7 +388,7 @@ tasks.withType(org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask) {
 <summary>Kotlin script</summary>
 
 ```kotlin
-tasks.withType<org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask>() {
+tasks.withType<org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask> {
     reportsOutputDirectory.set(
         project.layout.buildDirectory.dir("other/location/$name")
     )
@@ -388,7 +415,7 @@ that task will always be not "UP_TO_DATE" and caching will not work.
 
 #### Changing workers memory usage
 
-By default, KtLint Gradle workers will use at most 256mb of heap size. For some projects it may be not enough, 
+By default, KtLint Gradle workers will use at most 256mb of heap size. For some projects it may be not enough,
 but it is possible to change:
 
 <details>
@@ -396,7 +423,7 @@ but it is possible to change:
 
 ```groovy
 tasks.withType(org.jlleitschuh.gradle.ktlint.tasks.BaseKtLintCheckTask).configureEach {
-    it.workerMaxHeapSize.set("512mb")
+    it.workerMaxHeapSize.set("512m")
 }
 ```
 </details>
@@ -405,8 +432,8 @@ tasks.withType(org.jlleitschuh.gradle.ktlint.tasks.BaseKtLintCheckTask).configur
 <summary>Kotlin script</summary>
 
 ```kotlin
-tasks.withType<org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask>().configureEach {
-    it.workerMaxHeapSize.set("512mb")
+tasks.withType<org.jlleitschuh.gradle.ktlint.tasks.BaseKtLintCheckTask> {
+    workerMaxHeapSize.set("512m")
 }
 ```
 </details>
@@ -418,11 +445,10 @@ This repository provides the following examples of how to set up this plugin:
 - [kotlin-gradle](/samples/kotlin-gradle) - applies plugin to plain Kotlin project that uses groovy in `build.gradle` files
 - [kotlin-js](/samples/kotlin-js) - applies plugin to kotlin js project
 - [kotlin-ks](/samples/kotlin-ks) - applies plugin to plain Kotlin project that uses Kotlin DSL in `build.gradle.kts` files
-- [kotlin-multiplatform-common](/samples/kotlin-multiplatform-common) - applies plugin to Kotlin common multiplatform module
-- [kotlin-multiplatform-js](/samples/kotlin-multiplatform-js) - applies plugin to Kotlin JavaScript multiplatform module
-- [kotlin-multiplatform-jvm](/samples/kotlin-multiplatform-jvm) - applies plugin to Kotlin JVM multiplatform module
-- [kotlin-rulesets-using](/samples/kotlin-rulesets-using) - adds custom [example](/samples/kotlin-ruleset-creating) ruleset
-- [kotlin-reporter-using](/samples/kotlin-reporter-using) - adds custom [example](/samples/kotlin-reporter-creating) reporter 
+- [kotlin-multiplatform](/samples/kotlin-mpp) - applies plugin to Kotlin common multiplatform module
+- [kotlin-multiplatform-android](/samples/kotlin-mpp-android) - applies plugin to Kotlin android multiplatform module
+- [kotlin-rulesets-using](/samples/kotlin-rulesets-using) - adds custom [example](/samples/kotlin-rulesets-creating) ruleset
+- [kotlin-reporter-using](/samples/kotlin-reporter-using) - adds custom [example](/samples/kotlin-reporter-creating) reporter
 
 ## Tasks Added
 
@@ -455,9 +481,9 @@ Following additional  tasks are added:
 - `ktlintApplyToIdeaGlobally` - The task generates IntelliJ IDEA (or Android Studio) Kotlin
                                 style files in the user home IDEA
                                 (or Android Studio) settings folder. **Note** that this task will overwrite the existing style file.
-- `addKtlintCheckGitPreCommitHook` - adds [Git](https://www.git-scm.com/) `pre-commit` hook, 
+- `addKtlintCheckGitPreCommitHook` - adds [Git](https://www.git-scm.com/) `pre-commit` hook,
 that runs ktlint check over staged files.
-- `addKtlintFormatGitPreCommitHook` - adds [Git](https://www.git-scm.com/) `pre-commit` hook, 
+- `addKtlintFormatGitPreCommitHook` - adds [Git](https://www.git-scm.com/) `pre-commit` hook,
 that runs ktlint format over staged files and adds fixed files back to commit.
 
 All these additional tasks are always added **only** to the root project.
@@ -472,7 +498,7 @@ $ ./gradlew --continue ktlintCheck
 ```
 
 - Can I mix old plugin and new plugin API setup in my project
-(see [simple-setup](#simple-setup) and [using new plugin API setup](#using-new-plugin-api))?
+(see [simple-setup](#simple-setup) and [using legacy apply method](#using-legacy-apply-method))?
 
 No. These approaches are not equivalent to how they work. The problem that
 the plugin may not find some of the kotlin plugins if both approaches are used
@@ -535,7 +561,7 @@ On how to run the current plugin snapshot check on sample projects: `./gradlew k
 
 ### Running tests from [IDEA IDE](https://www.jetbrains.com/idea/)
 
-To run tests in [IDEA IDE](https://www.jetbrains.com/idea/), 
+To run tests in [IDEA IDE](https://www.jetbrains.com/idea/),
 firstly you need to run following gradle task (or after any dependency change):
 
 ```bash

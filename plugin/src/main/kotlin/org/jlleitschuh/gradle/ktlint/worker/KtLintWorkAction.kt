@@ -2,9 +2,12 @@ package org.jlleitschuh.gradle.ktlint.worker
 
 import com.pinterest.ktlint.core.KtLint
 import com.pinterest.ktlint.core.LintError
+import com.pinterest.ktlint.core.ParseException
 import com.pinterest.ktlint.core.RuleSet
 import com.pinterest.ktlint.core.RuleSetProvider
 import net.swiftzer.semver.SemVer
+import org.apache.commons.io.input.MessageDigestCalculatingInputStream
+import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.Logging
@@ -12,6 +15,11 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
+import org.jlleitschuh.gradle.ktlint.worker.KtLintWorkAction.FormatTaskSnapshot.Companion.contentHash
+import java.io.File
+import java.io.ObjectInputStream
+import java.io.ObjectOutputStream
+import java.io.Serializable
 import java.util.ServiceLoader
 
 @Suppress("UnstableApiUsage")
@@ -37,6 +45,7 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
         resetEditorconfigCache()
 
         val result = mutableListOf<LintErrorResult>()
+        val formattedFiles = mutableMapOf<File, ByteArray>()
 
         parameters.filesToLint.files.forEach {
             val errors = mutableListOf<Pair<LintError, Boolean>>()
@@ -53,16 +62,25 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
                 }
             )
 
-            if (formatSource) {
-                val currentFileContent = it.readText()
-                val updatedFileContent = KtLint.format(ktLintParameters)
+            try {
+                if (formatSource) {
+                    val currentFileContent = it.readText()
+                    val updatedFileContent = KtLint.format(ktLintParameters)
 
-                if (updatedFileContent != currentFileContent) {
-                    it.writeText(updatedFileContent)
+                    if (updatedFileContent != currentFileContent) {
+                        formattedFiles[it] = contentHash(it)
+                        it.writeText(updatedFileContent)
+                    }
+                } else {
+                    KtLint.lint(ktLintParameters)
                 }
-            } else {
-                KtLint.lint(ktLintParameters)
+            } catch (e: ParseException) {
+                throw GradleException(
+                    "KtLint failed to parse file: ${it.absolutePath}",
+                    e
+                )
             }
+
             result.add(
                 LintErrorResult(
                     lintedFile = it,
@@ -79,6 +97,13 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
                 result,
                 parameters.discoveredErrorsFile.asFile.get()
             )
+
+        if (formattedFiles.isNotEmpty()) {
+            val snapshotFile = parameters.formatSnapshot.get().asFile
+                .also { if (!it.exists()) it.createNewFile() }
+            val snapshot = FormatTaskSnapshot(formattedFiles)
+            FormatTaskSnapshot.writeIntoFile(snapshotFile, snapshot)
+        }
     }
 
     private fun resetEditorconfigCache() {
@@ -131,5 +156,38 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
         val discoveredErrorsFile: RegularFileProperty
         val ktLintVersion: Property<String>
         val editorconfigFilesWereChanged: Property<Boolean>
+        val formatSnapshot: RegularFileProperty
+    }
+
+    /**
+     * Represents pre-formatted files snapshot (file + it contents hash).
+     */
+    internal class FormatTaskSnapshot(
+        val formattedSources: Map<File, ByteArray>
+    ) : Serializable {
+        companion object {
+            private const val serialVersionUID = 1L
+
+            fun readFromFile(snapshotFile: File) =
+                ObjectInputStream(snapshotFile.inputStream().buffered())
+                    .use {
+                        it.readObject() as FormatTaskSnapshot
+                    }
+
+            fun writeIntoFile(
+                snapshotFile: File,
+                formatSnapshot: FormatTaskSnapshot
+            ) = ObjectOutputStream(snapshotFile.outputStream().buffered())
+                .use {
+                    it.writeObject(formatSnapshot)
+                }
+
+            fun contentHash(file: File): ByteArray {
+                return MessageDigestCalculatingInputStream(file.inputStream().buffered()).use {
+                    it.readBytes()
+                    it.messageDigest.digest()
+                }
+            }
+        }
     }
 }

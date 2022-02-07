@@ -1,244 +1,281 @@
 package org.jlleitschuh.gradle.ktlint
 
 import org.assertj.core.api.Assertions.assertThat
-import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
-import org.jlleitschuh.gradle.ktlint.KtlintBasePlugin.Companion.LOWEST_SUPPORTED_GRADLE_VERSION
+import org.gradle.util.GradleVersion
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import java.io.File
+import org.jlleitschuh.gradle.ktlint.testdsl.CommonTest
+import org.jlleitschuh.gradle.ktlint.testdsl.GradleTestVersions
+import org.jlleitschuh.gradle.ktlint.testdsl.TestProject
+import org.jlleitschuh.gradle.ktlint.testdsl.build
+import org.jlleitschuh.gradle.ktlint.testdsl.buildAndFail
+import org.jlleitschuh.gradle.ktlint.testdsl.project
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.condition.DisabledOnOs
+import org.junit.jupiter.api.condition.OS
 
-/**
- * Runs [ReportersTest] with the current version of Gradle.
- */
-class GradleCurrentReportersTests : ReportersTest()
+@GradleTestVersions
+class ReportersTest : AbstractPluginTest() {
 
-/**
- * Runs [ReportersTest] with lowest supported Gradle version.
- */
-@Suppress("ClassName")
-class GradleLowestSupportedReportersTest : ReportersTest() {
-    override fun gradleRunnerFor(
-        vararg arguments: String,
-        projectRoot: File
-    ): GradleRunner =
-        super.gradleRunnerFor(*arguments, projectRoot = projectRoot)
-            .withGradleVersion(LOWEST_SUPPORTED_GRADLE_VERSION)
-}
-
-abstract class ReportersTest : AbstractPluginTest() {
-    @BeforeEach
-    fun setupBuild() {
-        projectRoot.defaultProjectSetup()
-    }
-
-    @Test
-    fun `Should create multiple reports`() {
-        projectRoot.withFailingSources()
-
-        projectRoot.buildFile().appendText(
-            """
-
-            ktlint.reporters {
-                reporter "checkstyle"
-                reporter "json"
-            }
-            """.trimIndent()
-        )
-
-        buildAndFail(CHECK_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
-            assertThat(output).contains("Unnecessary space(s)")
-            assertReportNotCreated(ReporterType.PLAIN.fileExtension, mainSourceSetCheckTaskName)
-            assertReportCreated(ReporterType.CHECKSTYLE.fileExtension, mainSourceSetCheckTaskName)
-            assertReportCreated(ReporterType.JSON.fileExtension, mainSourceSetCheckTaskName)
-        }
-    }
-
-    @Test
-    internal fun `Should create 3rd party report`() {
-        projectRoot.withFailingSources()
-
-        // https://github.com/mcassiano/ktlint-html-reporter/releases
-        projectRoot.buildFile().appendText(
-            """
-            
-            ktlint.reporters {
-                reporter "checkstyle"
-                customReporters {
-                    "html" {
-                        fileExtension = "html"
-                        dependency = "me.cassiano:ktlint-html-reporter:0.2.3"
-                    }
+    @DisplayName("Should create multiple reports")
+    @CommonTest
+    fun multipleReports(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            //language=Groovy
+            buildGradle.appendText(
+                """
+                        
+                ktlint.reporters {
+                    reporter "checkstyle"
+                    reporter "json"
                 }
-            }
-            """.trimIndent()
-        )
+                """.trimIndent()
+            )
+            withFailingSources()
 
-        buildAndFail(CHECK_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
-            assertThat(output).contains("Unnecessary space(s)")
-            assertReportCreated(ReporterType.CHECKSTYLE.fileExtension, mainSourceSetCheckTaskName)
-            assertReportNotCreated(ReporterType.PLAIN.fileExtension, mainSourceSetCheckTaskName)
-            assertReportNotCreated(ReporterType.JSON.fileExtension, mainSourceSetCheckTaskName)
-            assertReportCreated("html", mainSourceSetCheckTaskName)
+            buildAndFail(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
+                assertThat(output).contains("Unnecessary space(s)")
+                assertReportNotCreated(ReporterType.PLAIN.fileExtension, mainSourceSetCheckTaskName)
+                assertReportCreated(ReporterType.CHECKSTYLE.fileExtension, mainSourceSetCheckTaskName)
+                assertReportCreated(ReporterType.JSON.fileExtension, mainSourceSetCheckTaskName)
+            }
         }
     }
 
-    @Test
-    fun `Is out of date when different report is enabled`() {
-        projectRoot.withCleanSources()
+    @DisplayName("Should create 3rd party report")
+    @CommonTest
+    internal fun thirdPartyReport(gradleVersion: GradleVersion) {
+        // TODO: switch to some 3rd party reporter that is published to Maven Central
+        project(gradleVersion) {
+            // https://github.com/mcassiano/ktlint-html-reporter/releases
+            //language=Groovy
+            buildGradle.appendText(
+                """
 
-        projectRoot.buildFile().appendText(
-            """
+                repositories {
+                    jcenter()
+                }
+                
+                ktlint.reporters {
+                    reporter "checkstyle"
+                    customReporters {
+                        "html" {
+                            fileExtension = "html"
+                            dependency = "me.cassiano:ktlint-html-reporter:0.2.3"
+                        }
+                    }
+                }  
+                """.trimIndent()
+            )
+            withFailingSources()
 
-            ktlint.reporters {
-                reporter "json"
-                reporter "plain"
+            buildAndFail(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
+                assertThat(output).contains("Unnecessary space(s)")
+                assertReportCreated(ReporterType.CHECKSTYLE.fileExtension, mainSourceSetCheckTaskName)
+                assertReportNotCreated(ReporterType.PLAIN.fileExtension, mainSourceSetCheckTaskName)
+                assertReportNotCreated(ReporterType.JSON.fileExtension, mainSourceSetCheckTaskName)
+                assertReportCreated("html", mainSourceSetCheckTaskName)
             }
-            """.trimIndent()
-        )
-
-        build(CHECK_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertReportCreated(ReporterType.PLAIN.fileExtension, mainSourceSetCheckTaskName)
-            assertReportCreated(ReporterType.JSON.fileExtension, mainSourceSetCheckTaskName)
-        }
-
-        build(CHECK_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
-            assertReportCreated(ReporterType.PLAIN.fileExtension, mainSourceSetCheckTaskName)
-            assertReportCreated(ReporterType.JSON.fileExtension, mainSourceSetCheckTaskName)
-            assertReportNotCreated(ReporterType.CHECKSTYLE.fileExtension, mainSourceSetCheckTaskName)
-        }
-
-        projectRoot.buildFile().appendText(
-            """
-
-            ktlint.reporters {
-                reporter "json"
-                reporter "plain_group_by_file"
-            }
-            """.trimIndent()
-        )
-
-        build(CHECK_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertReportCreated(ReporterType.PLAIN_GROUP_BY_FILE.fileExtension, mainSourceSetCheckTaskName)
-            assertReportCreated(ReporterType.JSON.fileExtension, mainSourceSetCheckTaskName)
-            assertReportNotCreated(ReporterType.CHECKSTYLE.fileExtension, mainSourceSetCheckTaskName)
-        }
-
-        projectRoot.buildFile().appendText(
-            """
-
-            ktlint.reporters {
-                reporter "json"
-                reporter "checkstyle"
-            }
-            """.trimIndent()
-        )
-
-        build(CHECK_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertReportCreated(ReporterType.JSON.fileExtension, mainSourceSetCheckTaskName)
-            assertReportCreated(ReporterType.CHECKSTYLE.fileExtension, mainSourceSetCheckTaskName)
-            // TODO: Stale reports are not cleaned up
-            assertReportCreated(ReporterType.PLAIN.fileExtension, mainSourceSetCheckTaskName)
         }
     }
 
-    @Test
-    internal fun `Should use plain reporter if no reporters were defined`() {
-        projectRoot.withFailingSources()
+    @DisplayName("Task is not UP-TO-DATE when another reporter was enabled in the build script")
+    @CommonTest
+    fun anotherReporterNotUpToDate(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
+            //language=Groovy
+            buildGradle.appendText(
+                """
+                    
+                ktlint.reporters {
+                    reporter "json"
+                    reporter "plain"
+                }                    
+                """.trimIndent()
+            )
 
-        buildAndFail(CHECK_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
-            assertReportCreated(ReporterType.PLAIN.fileExtension, mainSourceSetCheckTaskName)
-            assertReportNotCreated(ReporterType.CHECKSTYLE.fileExtension, mainSourceSetCheckTaskName)
-            assertReportNotCreated(ReporterType.JSON.fileExtension, mainSourceSetCheckTaskName)
-        }
-    }
-
-    @Test
-    internal fun `Should generate html report`() {
-        projectRoot.withCleanSources()
-
-        projectRoot.buildFile().appendText(
-            """
-
-            ktlint.reporters {
-                reporter "html"
+            build(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertReportCreated(ReporterType.PLAIN.fileExtension, mainSourceSetCheckTaskName)
+                assertReportCreated(ReporterType.JSON.fileExtension, mainSourceSetCheckTaskName)
             }
-            """.trimIndent()
-        )
 
-        build(CHECK_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertReportCreated(ReporterType.HTML.fileExtension, mainSourceSetCheckTaskName)
-        }
-    }
-
-    @Test
-    internal fun `Should ignore html reporter on ktlint version less then 0_36_0`() {
-        projectRoot.withCleanSources()
-
-        projectRoot.buildFile().appendText(
-            """
-
-            ktlint.version = "0.35.0"
-            ktlint.reporters {
-                reporter "html"
+            build(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+                assertReportCreated(ReporterType.PLAIN.fileExtension, mainSourceSetCheckTaskName)
+                assertReportCreated(ReporterType.JSON.fileExtension, mainSourceSetCheckTaskName)
+                assertReportNotCreated(ReporterType.CHECKSTYLE.fileExtension, mainSourceSetCheckTaskName)
             }
-            """.trimIndent()
-        )
 
-        build(CHECK_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertReportNotCreated(ReporterType.HTML.fileExtension, mainSourceSetCheckTaskName)
+            //language=Groovy
+            buildGradle.appendText(
+                """
+
+                ktlint.reporters {
+                    reporter "json"
+                    reporter "plain_group_by_file"
+                }                    
+                """.trimIndent()
+            )
+
+            build(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertReportCreated(ReporterType.PLAIN_GROUP_BY_FILE.fileExtension, mainSourceSetCheckTaskName)
+                assertReportCreated(ReporterType.JSON.fileExtension, mainSourceSetCheckTaskName)
+                assertReportNotCreated(ReporterType.CHECKSTYLE.fileExtension, mainSourceSetCheckTaskName)
+            }
+
+            //language=Groovy
+            buildGradle.appendText(
+                """
+                
+                ktlint.reporters {
+                    reporter "json"
+                    reporter "checkstyle"
+                }
+                """.trimIndent()
+            )
+
+            build(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertReportCreated(ReporterType.JSON.fileExtension, mainSourceSetCheckTaskName)
+                assertReportCreated(ReporterType.CHECKSTYLE.fileExtension, mainSourceSetCheckTaskName)
+                // TODO: Stale reports are not cleaned up
+                assertReportCreated(ReporterType.PLAIN.fileExtension, mainSourceSetCheckTaskName)
+            }
         }
     }
 
-    @Test
-    internal fun `Should create reports in modified reports output dir`() {
-        projectRoot.withFailingSources()
-        val newLocation = "other/location"
+    @DisplayName("Should use plain reporter if no reporters are defined")
+    @CommonTest
+    fun defaultReporter(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withFailingSources()
 
-        projectRoot.buildFile().appendText(
-            """
+            buildAndFail(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
+                assertReportCreated(ReporterType.PLAIN.fileExtension, mainSourceSetCheckTaskName)
+                assertReportNotCreated(ReporterType.CHECKSTYLE.fileExtension, mainSourceSetCheckTaskName)
+                assertReportNotCreated(ReporterType.JSON.fileExtension, mainSourceSetCheckTaskName)
+            }
+        }
+    }
+
+    @DisplayName("Should generate html report")
+    @CommonTest
+    internal fun htmlReport(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
+            //language=Groovy
+            buildGradle.appendText(
+                """
+
+                ktlint.reporters {
+                    reporter "html"
+                }
+                """.trimIndent()
+            )
+
+            build(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertReportCreated(ReporterType.HTML.fileExtension, mainSourceSetCheckTaskName)
+            }
+        }
+    }
+
+    @DisplayName("Should generate sarif report")
+    @CommonTest
+    internal fun sarifReport(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
+            //language=Groovy
+            buildGradle.appendText(
+                """
+
+                ktlint.reporters {
+                    reporter "sarif"
+                }
+                """.trimIndent()
+            )
+
+            build(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertReportCreated(ReporterType.SARIF.fileExtension, mainSourceSetCheckTaskName)
+            }
+        }
+    }
+
+    @DisplayName("Should ignore html reporter on KtLint versions less then 0.36.0")
+    @CommonTest
+    @DisabledOnOs(OS.WINDOWS)
+    internal fun ignoreHtmlOnOldVersions(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
+
+            //language=Groovy
+            buildGradle.appendText(
+                """
+
+                ktlint.version = "0.35.0"
+                ktlint.reporters {
+                    reporter "html"
+                }
+                """.trimIndent()
+            )
+
+            build(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertReportNotCreated(ReporterType.HTML.fileExtension, mainSourceSetCheckTaskName)
+            }
+        }
+    }
+
+    @DisplayName("Should allow to set custom location for generated reports")
+    @CommonTest
+    internal fun customReportsLocation(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withFailingSources()
+
+            val newLocation = "other/location"
+            //language=Groovy
+            buildGradle.appendText(
+                """
             
-            ktlint.reporters {
-                reporter "checkstyle"
-                reporter "json"
-            }
-
-            tasks.withType(org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask.class) {
-                reportsOutputDirectory.set(project.layout.buildDirectory.dir("$newLocation/${'$'}name"))
-            }
-            """.trimIndent()
-        )
-
-        buildAndFail(CHECK_PARENT_TASK_NAME).apply {
-            assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
-
-            assertReportNotCreated(ReporterType.CHECKSTYLE.fileExtension, mainSourceSetCheckTaskName)
-            assertReportCreated(
-                ReporterType.CHECKSTYLE.fileExtension,
-                mainSourceSetCheckTaskName,
-                "build/$newLocation/$mainSourceSetCheckTaskName"
+                ktlint.reporters {
+                    reporter "checkstyle"
+                    reporter "json"
+                }
+                
+                tasks.withType(org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask.class) {
+                    reportsOutputDirectory.set(project.layout.buildDirectory.dir("$newLocation/${'$'}name"))
+                }
+                """.trimIndent()
             )
 
-            assertReportNotCreated(ReporterType.JSON.fileExtension, mainSourceSetCheckTaskName)
-            assertReportCreated(
-                ReporterType.JSON.fileExtension,
-                mainSourceSetCheckTaskName,
-                "build/$newLocation/$mainSourceSetCheckTaskName"
-            )
+            buildAndFail(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
+
+                assertReportNotCreated(ReporterType.CHECKSTYLE.fileExtension, mainSourceSetCheckTaskName)
+                assertReportCreated(
+                    ReporterType.CHECKSTYLE.fileExtension,
+                    mainSourceSetCheckTaskName,
+                    "build/$newLocation/$mainSourceSetCheckTaskName"
+                )
+
+                assertReportNotCreated(ReporterType.JSON.fileExtension, mainSourceSetCheckTaskName)
+                assertReportCreated(
+                    ReporterType.JSON.fileExtension,
+                    mainSourceSetCheckTaskName,
+                    "build/$newLocation/$mainSourceSetCheckTaskName"
+                )
+            }
         }
     }
 
-    private fun assertReportCreated(
+    private fun TestProject.assertReportCreated(
         reportFileExtension: String,
         taskName: String,
         baseLocation: String = "build/reports/ktlint/$taskName"
@@ -248,7 +285,7 @@ abstract class ReportersTest : AbstractPluginTest() {
         ).isTrue
     }
 
-    private fun assertReportNotCreated(
+    private fun TestProject.assertReportNotCreated(
         reportFileExtension: String,
         taskName: String,
         baseLocation: String = "build/reports/ktlint/$taskName"
@@ -258,11 +295,11 @@ abstract class ReportersTest : AbstractPluginTest() {
         ).isFalse
     }
 
-    private fun reportLocation(
+    private fun TestProject.reportLocation(
         reportsLocation: String,
         taskName: String,
         reportFileExtension: String
-    ) = projectRoot.resolve(
+    ) = projectPath.resolve(
         "$reportsLocation/$taskName.$reportFileExtension"
     )
 }

@@ -12,8 +12,6 @@ import org.gradle.workers.WorkParameters
 import org.jlleitschuh.gradle.ktlint.logKtLintDebugMessage
 import org.jlleitschuh.gradle.ktlint.reporter.CustomReporter
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
-import java.io.BufferedOutputStream
-import java.io.FileOutputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
 import java.util.ServiceLoader
@@ -36,11 +34,7 @@ internal abstract class LoadReportersWorkAction : WorkAction<LoadReportersWorkAc
         )
 
         ObjectOutputStream(
-            BufferedOutputStream(
-                FileOutputStream(
-                    parameters.loadedReporters.asFile.get()
-                )
-            )
+            parameters.loadedReporters.asFile.get().outputStream().buffered()
         ).use { oos ->
             oos.writeObject(
                 loadedReporters.map { it.first }

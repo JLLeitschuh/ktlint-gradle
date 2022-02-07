@@ -1,17 +1,36 @@
 import java.util.Properties
 
 pluginManagement {
+    includeBuild("./plugin")
+
+    plugins {
+        id("org.jetbrains.kotlin.jvm") version "1.5.21"
+        id("org.jetbrains.kotlin.js") version "1.5.21"
+    }
+
     repositories {
         gradlePluginPortal()
         google()
         maven("https://dl.bintray.com/jetbrains/kotlin-native-dependencies")
     }
+
     resolutionStrategy {
         eachPlugin {
             when (requested.id.id) {
                 "com.android.application" ->
-                    useModule("com.android.tools.build:gradle:${requested.version}")
+                    useModule("com.android.tools.build:gradle:4.1.0")
             }
+        }
+    }
+}
+
+enableFeaturePreview("VERSION_CATALOGS")
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
+dependencyResolutionManagement {
+    versionCatalogs {
+        create("pluginLibs") {
+            from(files("plugin/gradle/libs.versions.toml"))
         }
     }
 }
@@ -59,5 +78,3 @@ include("samples:kotlin-mpp")
 if (isAndroidSdkAvailable()) {
     include("samples:kotlin-mpp-android")
 }
-
-includeBuild("./plugin")

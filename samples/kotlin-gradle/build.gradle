@@ -6,10 +6,6 @@ plugins {
 
 mainClassName = "org.jlleitschuh.gradle.ktlint.sample.gradle.MainKt"
 
-dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib"
-}
-
 ktlint {
     debug = true
     verbose = true
@@ -20,7 +16,7 @@ ktlint {
         customReporters {
             "html" {
                 fileExtension = "csv"
-                dependency = project(":samples:kotlin-reporter-creating")
+                dependency = projects.samples.kotlinReporterCreating
             }
         }
     }

@@ -1,9 +1,13 @@
 package org.jlleitschuh.gradle.ktlint
 
+import org.gradle.api.Project
 import org.gradle.api.file.FileTree
+import org.gradle.api.tasks.TaskCollection
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.api.tasks.util.PatternSet
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jlleitschuh.gradle.ktlint.tasks.BaseKtLintCheckTask
+import org.jlleitschuh.gradle.ktlint.tasks.GenerateBaselineTask
 import org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
@@ -28,8 +32,21 @@ internal fun createFormatTask(
 ): TaskProvider<KtLintFormatTask> = pluginHolder
     .target
     .registerTask(
-        KtLintFormatTask.buildTaskNameForSourceSet(sourceSetName)
+        KtLintFormatTask.buildTaskNameForSourceSet(sourceSetName),
+        PatternSet()
     ) {
+        mustRunAfter(project.tasks.named(KtLintFormatTask.KOTLIN_SCRIPT_TASK_NAME))
+
+        val rootProjectName = project.rootProject.name
+        var parentProject: Project? = project.parent
+        while (parentProject != null && parentProject.name != rootProjectName) {
+            val parentProjectPath = parentProject.path
+            parentProject.plugins.withId("org.jlleitschuh.gradle.ktlint") {
+                mustRunAfter("$parentProjectPath:${KtLintFormatTask.KOTLIN_SCRIPT_TASK_NAME}")
+            }
+            parentProject = parentProject.parent
+        }
+
         description = KtLintFormatTask.buildDescription(".kt")
         configureBaseCheckTask(pluginHolder) {
             setSource(kotlinSourceDirectories)
@@ -43,7 +60,8 @@ internal fun createCheckTask(
 ): TaskProvider<KtLintCheckTask> = pluginHolder
     .target
     .registerTask(
-        KtLintCheckTask.buildTaskNameForSourceSet(sourceSetName)
+        KtLintCheckTask.buildTaskNameForSourceSet(sourceSetName),
+        PatternSet()
     ) {
         description = KtLintCheckTask.buildDescription(".kt")
         configureBaseCheckTask(pluginHolder) {
@@ -56,10 +74,13 @@ internal fun createKotlinScriptCheckTask(
     projectScriptFiles: FileTree
 ): TaskProvider<KtLintCheckTask> = pluginHolder
     .target
-    .registerTask(KtLintCheckTask.KOTLIN_SCRIPT_TASK_NAME) {
+    .registerTask(
+        KtLintCheckTask.KOTLIN_SCRIPT_TASK_NAME,
+        PatternSet()
+    ) {
         description = KtLintCheckTask.buildDescription(".kts")
         configureBaseCheckTask(pluginHolder) {
-            source = projectScriptFiles
+            setSource(projectScriptFiles)
         }
     }
 
@@ -68,10 +89,13 @@ internal fun createKotlinScriptFormatTask(
     projectScriptFiles: FileTree
 ): TaskProvider<KtLintFormatTask> = pluginHolder
     .target
-    .registerTask(KtLintFormatTask.KOTLIN_SCRIPT_TASK_NAME) {
+    .registerTask(
+        KtLintFormatTask.KOTLIN_SCRIPT_TASK_NAME,
+        PatternSet()
+    ) {
         description = KtLintFormatTask.buildDescription(".kts")
         configureBaseCheckTask(pluginHolder) {
-            source = projectScriptFiles
+            setSource(projectScriptFiles)
         }
     }
 
@@ -125,6 +149,7 @@ internal fun <T : BaseKtLintCheckTask> createGenerateReportsTask(
 ): TaskProvider<GenerateReportsTask> = pluginHolder.target.registerTask(
     GenerateReportsTask.generateNameForSourceSets(sourceSetName, lintType)
 ) {
+    mustRunAfter(project.tasks.named(KtLintFormatTask.KOTLIN_SCRIPT_TASK_NAME))
     reportsName.set(GenerateReportsTask.generateNameForSourceSets(sourceSetName, lintType))
     commonConfiguration(pluginHolder, lintTask)
 }
@@ -159,4 +184,33 @@ private fun <T : BaseKtLintCheckTask> GenerateReportsTask.commonConfiguration(
     ignoreFailures.set(pluginHolder.extension.ignoreFailures)
     verbose.set(pluginHolder.extension.verbose)
     ktLintVersion.set(pluginHolder.extension.version)
+    @Suppress("UnstableApiUsage")
+    baseline.set(
+        pluginHolder.extension.baseline
+            .flatMap {
+                if (it.asFile.exists()) {
+                    pluginHolder.target.objects.fileProperty().apply { set(it.asFile) }
+                } else {
+                    pluginHolder.target.objects.fileProperty()
+                }
+            }
+    )
+}
+
+internal fun createGenerateBaselineTask(
+    pluginHolder: KtlintPlugin.PluginHolder,
+    lintTasks: TaskCollection<out BaseKtLintCheckTask>
+): TaskProvider<GenerateBaselineTask> = pluginHolder.target.registerTask(
+    GenerateBaselineTask.NAME
+) {
+    description = GenerateBaselineTask.DESCRIPTION
+    group = HELP_GROUP
+
+    dependsOn(lintTasks)
+
+    ktLintClasspath.setFrom(pluginHolder.ktlintConfiguration)
+    baselineReporterClasspath.setFrom(pluginHolder.ktlintBaselineReporterConfiguration)
+    discoveredErrors.from(lintTasks.map { it.discoveredErrors })
+    ktLintVersion.set(pluginHolder.extension.version)
+    baselineFile.set(pluginHolder.extension.baseline)
 }

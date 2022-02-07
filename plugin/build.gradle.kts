@@ -4,18 +4,18 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.util.prefixIfNot
 
 plugins {
-    kotlin("jvm") version PluginVersions.kotlin
-    id("com.gradle.plugin-publish") version PluginVersions.gradlePublishPlugin
+    kotlin("jvm")
+    id("com.gradle.plugin-publish")
     `java-gradle-plugin`
     `maven-publish`
-    id("org.jlleitschuh.gradle.ktlint") version PluginVersions.ktlintPlugin
-    id("com.github.johnrengelman.shadow") version PluginVersions.shadow
-    id("com.github.breadmoirai.github-release") version PluginVersions.githubRelease
+    id("org.jlleitschuh.gradle.ktlint")
+    id("com.github.johnrengelman.shadow")
+    id("com.github.breadmoirai.github-release")
 }
 
 val pluginGroup = "org.jlleitschuh.gradle"
 group = pluginGroup
-version = "10.1.0-SNAPSHOT"
+version = "10.3.0-SNAPSHOT"
 
 repositories {
     google()
@@ -43,14 +43,15 @@ configurations["testImplementation"].extendsFrom(shadowImplementation)
 
 dependencies {
     compileOnly(gradleApi())
-    compileOnly("com.pinterest.ktlint:ktlint-core:${PluginVersions.ktlint}")
-    compileOnly(kotlin("gradle-plugin", PluginVersions.kotlin))
-    compileOnly("com.android.tools.build:gradle:${PluginVersions.androidPlugin}")
-    shadowImplementation("net.swiftzer.semver:semver:${PluginVersions.semver}")
-    shadowImplementation("org.eclipse.jgit:org.eclipse.jgit:${PluginVersions.jgit}")
-    shadowImplementation("commons-io:commons-io:${PluginVersions.commonsIo}")
+    compileOnly(libs.ktlint.core)
+    compileOnly(libs.kotlin.gradle.plugin)
+    compileOnly(libs.android.gradle.plugin)
+    compileOnly(kotlin("stdlib-jdk8"))
+    shadowImplementation(libs.semver)
+    shadowImplementation(libs.jgit)
+    shadowImplementation(libs.commons.io)
     // Explicitly added for shadow plugin to relocate implementation as well
-    shadowImplementation("org.slf4j:slf4j-nop:${PluginVersions.sl4f}")
+    shadowImplementation(libs.slf4j.nop)
 
     /*
      * Do not depend upon the gradle script kotlin plugin API. IE: gradleScriptKotlinApi()
@@ -59,11 +60,16 @@ dependencies {
      */
 
     testImplementation(gradleTestKit())
-    testImplementation("org.junit.jupiter:junit-jupiter:${PluginVersions.junit5}")
-    testImplementation("org.assertj:assertj-core:${PluginVersions.assertJ}")
-    testImplementation(kotlin("reflect"))
-    testImplementation("com.pinterest.ktlint:ktlint-core:${PluginVersions.ktlint}")
-    testImplementation("com.tngtech.archunit:archunit-junit5:${PluginVersions.archUnit}")
+    testImplementation(libs.junit.jupiter)
+    testImplementation(libs.assertj.core)
+    testImplementation(libs.kotlin.reflect)
+    testImplementation(libs.ktlint.core)
+    testImplementation(libs.archunit.junit5)
+}
+
+// Test tasks loods plugin from local maven repository
+tasks.named("test").configure {
+    dependsOn("publishToMavenLocal")
 }
 
 tasks.withType<Test>().configureEach {
@@ -71,23 +77,26 @@ tasks.withType<Test>().configureEach {
     maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
 }
 
-val shadowJarTask = tasks.named("shadowJar", ShadowJar::class.java)
-// Enable package relocation in resulting shadow jar
-val relocateShadowJar = tasks.register("relocateShadowJar", ConfigureShadowRelocation::class.java) {
-    prefix = "$pluginGroup.shadow"
-    target = shadowJarTask.get()
-}
+val relocateShadowJar = tasks.register<ConfigureShadowRelocation>("relocateShadowJar")
+val shadowJarTask = tasks.named<ShadowJar>("shadowJar") {
+    // Enable package relocation in resulting shadow jar
+    relocateShadowJar.get().apply {
+        prefix = "$pluginGroup.shadow"
+        target = this@named
+    }
 
-shadowJarTask.configure {
     dependsOn(relocateShadowJar)
     minimize()
     archiveClassifier.set("")
     configurations = listOf(shadowImplementation)
 }
 
-// Required for plugin substitution to work in samples project
-artifacts {
-    add("runtimeOnly", shadowJarTask)
+// Add shadow jar to the Gradle module metadata api and runtime configurations
+configurations {
+    artifacts {
+        runtimeElements(shadowJarTask)
+        apiElements(shadowJarTask)
+    }
 }
 
 tasks.whenTaskAdded {
@@ -114,8 +123,8 @@ val ensureDependenciesAreInlined by tasks.registering {
                 if (!path.startsWith("META-INF") &&
                     path.lastName.endsWith(".class") &&
                     !path.pathString.startsWith(
-                        pluginGroup.replace(".", "/")
-                    )
+                            pluginGroup.replace(".", "/")
+                        )
                 ) {
                     nonInlinedDependencies.add(path.pathString)
                 }
@@ -193,7 +202,7 @@ gradlePlugin {
 afterEvaluate {
     publishing {
         publications {
-            withType(MavenPublication::class.java) {
+            withType<MavenPublication> {
                 // Special workaround to publish shadow jar instead of normal one. Name to override peeked here:
                 // https://github.com/gradle/gradle/blob/master/subprojects/plugin-development/src/main/java/org/gradle/plugin/devel/plugins/MavenPluginPublishPlugin.java#L73
                 if (name == "pluginMaven") {
@@ -238,8 +247,8 @@ githubRelease {
     }
 }
 
-tasks.withType(Wrapper::class.java).configureEach {
-    gradleVersion = PluginVersions.gradleWrapper
-    distributionSha256Sum = PluginVersions.gradleWrapperSha
+tasks.withType<Wrapper>().configureEach {
+    gradleVersion = libs.versions.gradleWrapper.get()
+    distributionSha256Sum = libs.versions.gradleWrapperSha.get()
     distributionType = Wrapper.DistributionType.BIN
 }
