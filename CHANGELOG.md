@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Fixed
   - Fix install hook action when git `hooks` folder doesn't exist [issue: #557](https://github.com/JLLeitschuh/ktlint-gradle/issues/557), [#563](https://github.com/JLLeitschuh/ktlint-gradle/pull/563)
   - Fix pre-commit hook command not found error [issue: #562](https://github.com/JLLeitschuh/ktlint-gradle/issues/562), [#564](https://github.com/JLLeitschuh/ktlint-gradle/pull/564)
+  - Fix some resolution issues when a project using the plugin in some specific setups is depended upon by another project [issue: #523](https://github.com/JLLeitschuh/ktlint-gradle/issues/523), [#571](https://github.com/JLLeitschuh/ktlint-gradle/pull/571)
 
 ### Removed
   - ?

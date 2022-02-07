@@ -508,6 +508,54 @@ class KtlintPluginTest : AbstractPluginTest() {
         }
     }
 
+    /**
+     * See: https://github.com/JLLeitschuh/ktlint-gradle/issues/523#issuecomment-1022522032
+     */
+    @DisplayName("Should not leak KtLint as a variant into consuming projects")
+    @CommonTest
+    fun noLeakIntoConsumingProjects(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            val producerDir = projectPath.resolve("producer").also { it.mkdirs() }
+            val consumerDir = projectPath.resolve("consumer").also { it.mkdirs() }
+            settingsGradle.appendText(
+                """
+
+                include ":producer"
+                include ":consumer"
+                """.trimIndent()
+            )
+
+            //language=Groovy
+            producerDir.buildFile().writeText(
+                """
+                plugins {
+                    id "org.jlleitschuh.gradle.ktlint"
+                }
+                configurations.create('default')
+                artifacts {
+                    add('default', buildFile)
+                }
+                """.trimIndent()
+            )
+
+            //language=Groovy
+            consumerDir.buildFile().writeText(
+                """
+                plugins {
+                    id 'java'
+                }
+                dependencies {
+                    implementation project(':producer')
+                }
+                """.trimIndent()
+            )
+
+            build(":consumer:dependencies") {
+                assertThat(output).doesNotContain("com.pinterest:ktlint")
+            }
+        }
+    }
+
     @DisplayName("Should print paths to the generated reports on code style violations")
     @CommonTest
     fun printReportsPaths(gradleVersion: GradleVersion) {
