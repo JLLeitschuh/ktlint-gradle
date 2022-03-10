@@ -2,7 +2,7 @@
 
 **Provides a convenient wrapper plugin over the [ktlint](https://github.com/pinterest/ktlint) project.**
 
-<!-- Note: if changing the line below, the `sed` command in the prepare-release.yaml needs to be updated too -->
+<!-- Note: if changing the line below, the `sed` command in the perform-release.yaml needs to be updated too -->
 Latest plugin version: [10.2.1](/CHANGELOG.md#1021---20211227)
 
 [![Join the chat at https://kotlinlang.slack.com](https://img.shields.io/badge/slack-@kotlinlang/ktlint-yellow.svg?logo=slack)](https://kotlinlang.slack.com/messages/CKS3XG0LS)
