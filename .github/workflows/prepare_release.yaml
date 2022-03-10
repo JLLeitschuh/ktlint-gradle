@@ -14,7 +14,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Update Changelog
-        uses: thomaseizinger/keep-a-changelog-new-release@v1
+        uses: thomaseizinger/keep-a-changelog-new-release@8e44c5b49483b4102a8c6794306c5ccf16437cde
         with:
           tag: ${{ github.event.inputs.tag }}
       - uses: actions/upload-artifact@v3
