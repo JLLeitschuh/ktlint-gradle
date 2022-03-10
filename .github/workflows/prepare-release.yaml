@@ -9,7 +9,7 @@ on:
          type: string
 
 jobs:
-  prepare-changelog:
+  prepare-for-release:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -23,9 +23,9 @@ jobs:
         run: |
           stripped_version=$(echo "${{ github.event.inputs.new_version }}" | sed -e 's/\.//g')
           formatted_date=$(date "+%Y%m%d")
-          sed 's|\(Latest plugin version: \[\).*\(\](/CHANGELOG.md#\).*---.*)|\1'"$stripped_version"'\21031---'"$formatted_date"')|' README.md
+          sed -i 's|\(Latest plugin version: \[\).*\(\](/CHANGELOG.md#\).*---.*)|\1'"$stripped_version"'\21031---'"$formatted_date"')|' README.md
       - name: Update VERSION_CURRENT
-        run: echo "${{ github.event.inputs.new_version }}\n" > plugin/VERSION_CURRENT.txt
+        run: printf "${{ github.event.inputs.new_version }}\n" > plugin/VERSION_CURRENT.txt
       - uses: actions/upload-artifact@v3
         with:
           name: changed_files
