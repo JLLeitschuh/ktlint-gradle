@@ -1,0 +1,36 @@
+name: "Prepare for Release"
+on:
+  workflow_dispatch:
+    inputs:
+       new_version:
+
+         description: "Release Version (no 'v')"
+         required: true
+         type: string
+
+jobs:
+  prepare-changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Update Changelog
+        uses: thomaseizinger/keep-a-changelog-new-release@1.3.0
+        with:
+          tag: v${{ github.event.inputs.new_version }}
+          version: ${{ github.event.inputs.new_version }}
+      - name: Update README
+        run: |
+          stripped_version=$(echo "${{ github.event.inputs.new_version }}" | sed -e 's/\.//g')
+          formatted_date=$(date "+%Y%m%d")
+          sed 's|\(Latest plugin version: \[\).*\(\](/CHANGELOG.md#\).*---.*)|\1'"$stripped_version"'\21031---'"$formatted_date"')|' README.md
+      - name: Update VERSION_CURRENT
+        run: echo "${{ github.event.inputs.new_version }}\n" > plugin/VERSION_CURRENT.txt
+      - uses: actions/upload-artifact@v3
+        with:
+          name: changed_files
+          path: |
+            CHANGELOG.md
+            README.md
+            plugin/VERSION_CURRENT.txt
+            plugin/VERSION_LATEST_RELEASE.txt
