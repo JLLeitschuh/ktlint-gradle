@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+### Added
+  - `relative` option to generate reports with paths relative to the root project ([#573](https://github.com/JLLeitschuh/ktlint-gradle/pull/573))
+
 ### Fixed
   - Fix install hook action when git `hooks` folder doesn't exist [issue: #557](https://github.com/JLLeitschuh/ktlint-gradle/issues/557), [#563](https://github.com/JLLeitschuh/ktlint-gradle/pull/563)
   - Fix pre-commit hook command not found error [issue: #562](https://github.com/JLLeitschuh/ktlint-gradle/issues/562), [#564](https://github.com/JLLeitschuh/ktlint-gradle/pull/564)
