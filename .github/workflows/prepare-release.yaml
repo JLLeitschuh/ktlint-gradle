@@ -27,11 +27,7 @@ jobs:
           sed -i 's|\(Latest plugin version: \[\).*\(\](/CHANGELOG.md#\).*---.*)|\1'"$new_version"'\2'"$stripped_version"'---'"$formatted_date"')|' README.md
       - name: Update VERSION_CURRENT
         run: printf "${{ github.event.inputs.new_version }}\n" > plugin/VERSION_CURRENT.txt
-      - uses: actions/upload-artifact@v3
+      - uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          name: changed_files
-          path: |
-            CHANGELOG.md
-            README.md
-            plugin/VERSION_CURRENT.txt
-            plugin/VERSION_LATEST_RELEASE.txt
+          commit_message: Release version ${{ github.event.inputs.new_version }}
+          tagging_message: 'v${{ github.event.inputs.new_version }}'
