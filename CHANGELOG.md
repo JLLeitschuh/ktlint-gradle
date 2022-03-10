@@ -410,3 +410,18 @@ then 0.20.0 (#83)
  - Renamed tasks with names `ktlint[source set name]` to `ktlint[source set name]Check` (#3)
 
 [Unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v10.2.1..HEAD
+[10.2.1]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v10.2.0..v10.2.1
+[10.2.0]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v10.1.0..v10.2.0
+[10.1.0]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v10.0.0..v10.1.0
+[10.0.0]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v9.4.1..v10.0.0
+[9.4.1]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v9.4.0..v9.4.1
+[9.4.0]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v9.3.0..v9.4.0
+[9.3.0]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v9.2.1..v9.3.0
+[9.2.1]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v9.2.0..v9.2.1
+[9.2.0]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v9.1.1..v9.2.0
+[9.1.1]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v9.1.0..v9.1.1
+[9.1.0]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v9.0.0..v9.1.0
+[9.0.0]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v8.2.0..v9.0.0
+[8.2.0]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v8.1.0..v8.2.0
+[8.1.0]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v8.0.0..v8.1.0
+[8.0.0]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v7.4.0..v8.0.0
