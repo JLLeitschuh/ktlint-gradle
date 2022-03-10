@@ -82,6 +82,9 @@ abstract class GenerateReportsTask @Inject constructor(
     @get:Input
     internal abstract val ktLintVersion: Property<String>
 
+    @get:Input
+    internal abstract val relative: Property<Boolean>
+
     @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:InputFile
     @get:Optional
@@ -138,6 +141,9 @@ abstract class GenerateReportsTask @Inject constructor(
                 param.ktLintVersion.set(ktLintVersion)
                 param.baseline.set(baseline)
                 param.projectDirectory.set(projectLayout.projectDirectory)
+                if (relative.get()) {
+                    param.filePathsRelativeTo.set(project.rootDir)
+                }
             }
         }
 
