@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [10.3.0-SNAPSHOT] - Unreleased
+## [Unreleased]
 ### Added
   - ?
 
@@ -417,3 +417,5 @@ then 0.20.0 (#83)
 ### Changed
  - Renamed task with name `ktlint` to `ktlintCheck` (#3)
  - Renamed tasks with names `ktlint[source set name]` to `ktlint[source set name]Check` (#3)
+
+[Unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v10.2.1..HEAD
