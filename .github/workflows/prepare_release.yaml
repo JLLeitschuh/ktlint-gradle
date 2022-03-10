@@ -17,3 +17,7 @@ jobs:
         uses: thomaseizinger/keep-a-changelog-new-release@v1
         with:
           tag: ${{ github.event.inputs.tag }}
+      - uses: actions/upload-artifact@v3
+        with:
+          name: release_notes
+          path: RELEASE_NOTES.md
