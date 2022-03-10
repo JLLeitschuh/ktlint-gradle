@@ -21,9 +21,10 @@ jobs:
           version: ${{ github.event.inputs.new_version }}
       - name: Update README
         run: |
-          stripped_version=$(echo "${{ github.event.inputs.new_version }}" | sed -e 's/\.//g')
+          new_version=$(echo "${{ github.event.inputs.new_version }}")
+          stripped_version=$($new_version | sed -e 's/\.//g')
           formatted_date=$(date "+%Y%m%d")
-          sed -i 's|\(Latest plugin version: \[\).*\(\](/CHANGELOG.md#\).*---.*)|\1'"$stripped_version"'\21031---'"$formatted_date"')|' README.md
+          sed -i 's|\(Latest plugin version: \[\).*\(\](/CHANGELOG.md#\).*---.*)|\1'"$new_version"'\2'"$stripped_version"'---'"$formatted_date"')|' README.md
       - name: Update VERSION_CURRENT
         run: printf "${{ github.event.inputs.new_version }}\n" > plugin/VERSION_CURRENT.txt
       - uses: actions/upload-artifact@v3
