@@ -1,0 +1,19 @@
+name: "Prepare for Release"
+on:
+  workflow_dispatch:
+    inputs:
+       tag:
+         description: 'Release Tag Version'
+         required: true
+         type: string
+
+jobs:
+  prepare-changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Update Changelog
+        uses: thomaseizinger/keep-a-changelog-new-release@v1
+        with:
+          tag: ${{ github.event.inputs.tag }}
