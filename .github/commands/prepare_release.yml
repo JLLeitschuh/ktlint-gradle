@@ -1,0 +1,11 @@
+# Learn more about the syntax here:
+# https://docs.github.com/en/early-access/github/save-time-with-slash-commands/syntax-for-user-defined-slash-commands
+---
+trigger: release_prepare # <-- 👋 pick a trigger
+title: Prepare for release   # <-- 👋 pick a title
+description: Prepares the repository for a release
+
+# Each command has one or more steps. You can add up to 25 steps.
+steps:
+  - type: repository_dispatch
+    event_type: release_prepare
