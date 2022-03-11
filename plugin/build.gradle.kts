@@ -15,7 +15,7 @@ plugins {
 
 val pluginGroup = "org.jlleitschuh.gradle"
 group = pluginGroup
-version = "10.3.0-SNAPSHOT"
+version = projectDir.resolve("VERSION_CURRENT.txt").readText().trim()
 
 repositories {
     google()
@@ -241,9 +241,10 @@ githubRelease {
     body {
         projectDir.resolve("../CHANGELOG.md")
             .readText()
-            .substringAfter("## ")
+            .substringAfter("## [")
+            .substringAfter("## [")
             .substringBefore("## [")
-            .prefixIfNot("## ")
+            .prefixIfNot("## [")
     }
 }
 

@@ -2,6 +2,7 @@
 
 **Provides a convenient wrapper plugin over the [ktlint](https://github.com/pinterest/ktlint) project.**
 
+<!-- Note: if changing the line below, the `sed` command in the perform-release.yaml needs to be updated too -->
 Latest plugin version: [10.2.1](/CHANGELOG.md#1021---20211227)
 
 [![Join the chat at https://kotlinlang.slack.com](https://img.shields.io/badge/slack-@kotlinlang/ktlint-yellow.svg?logo=slack)](https://kotlinlang.slack.com/messages/CKS3XG0LS)
@@ -198,7 +199,7 @@ Plugin supports KtLint baseline with following limitations:
 - One baseline file is generated per one Gradle project (module).
 
 Run task `ktlintGenerateBaseline` to generate a new baseline.
-  
+
 #### Testing KtLint snapshots
 
 To test KtLint snapshots add following configuration into project build script (latest KtLint snapshot version name

@@ -1,0 +1,35 @@
+name: "Perform Release"
+on:
+  workflow_dispatch:
+    inputs:
+       new_version:
+
+         description: "Release Version (no 'v')"
+         required: true
+         type: string
+
+jobs:
+  perform-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Update Changelog
+        uses: thomaseizinger/keep-a-changelog-new-release@1.3.0
+        with:
+          tag: v${{ github.event.inputs.new_version }}
+          version: ${{ github.event.inputs.new_version }}
+      - name: Update README
+        run: |
+          new_version=$(echo "${{ github.event.inputs.new_version }}")
+          stripped_version=$($new_version | sed -e 's/\.//g')
+          formatted_date=$(date "+%Y%m%d")
+          sed -i 's|\(Latest plugin version: \[\).*\(\](/CHANGELOG.md#\).*---.*)|\1'"$new_version"'\2'"$stripped_version"'---'"$formatted_date"')|' README.md
+      - name: Update VERSION_CURRENT
+        run: printf "${{ github.event.inputs.new_version }}\n" > plugin/VERSION_CURRENT.txt
+      - name: Perform Release Tagging and Push
+        # This will trigger the new release job that will take the tag and push the release to the plugin portal
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Release version ${{ github.event.inputs.new_version }}
+          tagging_message: 'v${{ github.event.inputs.new_version }}'
