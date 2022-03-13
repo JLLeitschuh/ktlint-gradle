@@ -54,12 +54,13 @@ private fun postCheck(
             git add ${'$'}file
         fi
     done
-    """
+    """.trimIndent()
 } else {
     ""
 }
 
 internal const val NF = "\$NF"
+internal const val gradleCommandExitCode = "\$gradleCommandExitCode"
 
 @Language("Sh")
 internal fun generateGitHook(
@@ -86,7 +87,7 @@ internal fun generateGitHook(
     fi
 
     ${generateGradleCommand(taskName, gradleRootDirPrefix)}
-    gradle_command_exit_code=${'$'}?
+    $gradleCommandExitCode=${'$'}?
 
     echo "Completed ktlint run."
     ${postCheck(shouldUpdateCommit)}
@@ -98,7 +99,7 @@ internal fun generateGitHook(
     unset diff
 
     echo "Completed ktlint hook."
-    exit ${'$'}gradle_command_exit_code
+    exit $gradleCommandExitCode
 
     """.trimIndent()
 
