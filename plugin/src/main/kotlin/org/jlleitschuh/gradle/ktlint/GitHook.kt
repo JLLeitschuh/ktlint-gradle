@@ -87,7 +87,7 @@ internal fun generateGitHook(
     fi
 
     ${generateGradleCommand(taskName, gradleRootDirPrefix)}
-    $gradleCommandExitCode=${'$'}?
+    $gradleCommandExitCode=$?
 
     echo "Completed ktlint run."
     ${postCheck(shouldUpdateCommit)}
