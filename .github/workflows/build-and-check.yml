@@ -53,12 +53,20 @@ jobs:
             ${{ runner.os }}-gradle-wrapper-
       - name: Build plugin
         run: ./plugin/gradlew -p ./plugin assemble ensureDependenciesAreInlined test --no-daemon
-      - name: Save test results
+      - name: Upload test results
         uses: actions/upload-artifact@v2
         if: failure()
         with:
-          name: test-results
+          name: test-results-${{ runner.os }}
           path: plugin/build/reports/tests/test/
+      - name: Upload Memory Dump
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: memory-dump-${{ runner.os }}
+          path: |
+            hs_err_pid*
+            plugin/hs_err_pid*
       - name: Check plugin codestyle
         run: ./plugin/gradlew -p ./plugin ktlintCheck --no-daemon
 

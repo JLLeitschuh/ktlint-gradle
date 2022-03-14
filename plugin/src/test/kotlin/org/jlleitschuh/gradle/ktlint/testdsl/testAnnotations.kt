@@ -6,13 +6,14 @@ import org.jlleitschuh.gradle.ktlint.KtlintBasePlugin
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.ArgumentsProvider
+import java.io.File
 import java.util.stream.Stream
 import kotlin.streams.asStream
 
 object TestVersions {
     const val minSupportedGradleVersion = KtlintBasePlugin.LOWEST_SUPPORTED_GRADLE_VERSION
     const val maxSupportedGradleVersion = "7.1.1"
-    const val pluginVersion = "10.3.0-SNAPSHOT"
+    val pluginVersion = File("VERSION_CURRENT.txt").readText().trim()
     const val minSupportedKotlinPluginVersion = "1.4.32"
     const val maxSupportedKotlinPluginVersion = "1.5.21"
 }
