@@ -88,7 +88,7 @@ tasks.withType<Test>().configureEach {
             TestLogEvent.SKIPPED
         )
         exceptionFormat = TestExceptionFormat.FULL
-        showExceptions =  true
+        showExceptions = true
         showCauses = true
         showStackTraces = true
     }
