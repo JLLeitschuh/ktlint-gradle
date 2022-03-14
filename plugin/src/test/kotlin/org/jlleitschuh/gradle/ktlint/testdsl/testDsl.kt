@@ -4,6 +4,7 @@ import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.util.GradleVersion
 import org.jlleitschuh.gradle.ktlint.AbstractPluginTest
+import org.junit.jupiter.api.condition.OS
 import java.io.File
 
 fun AbstractPluginTest.project(
@@ -43,7 +44,7 @@ class TestProject(
             CLEAN_SOURCES_FILE,
             """
             val foo = "bar"
-            
+
             """.trimIndent()
         )
     }
@@ -53,7 +54,7 @@ class TestProject(
             FAIL_SOURCE_FILE,
             """
             val  foo    =     "bar"
-            
+
             """.trimIndent()
         )
     }
@@ -63,7 +64,7 @@ class TestProject(
             "kotlin-script.kts",
             """
             println("zzz")
-            
+
             """.trimIndent()
         )
     }
@@ -72,8 +73,8 @@ class TestProject(
         createSourceFile(
             "kotlin-script-fail.kts",
             """
-            println("zzz") 
-            
+            println("zzz")
+
             """.trimIndent()
         )
     }
@@ -108,8 +109,9 @@ fun TestProject.build(
     vararg buildArguments: String,
     assertions: BuildResult.() -> Unit = {}
 ) {
+    val daemonFlag = if (OS.WINDOWS.isCurrentOs) listOf("--no-daemon") else emptyList()
     gradleRunner
-        .withArguments(buildArguments.toList() + "--stacktrace")
+        .withArguments(buildArguments.toList() + "--stacktrace" + daemonFlag)
         .build()
         .run { assertions() }
 }
@@ -146,11 +148,11 @@ fun projectSetup(
             id 'org.jetbrains.kotlin.$kotlinPluginType'
             id 'org.jlleitschuh.gradle.ktlint'
         }
-        
+
         repositories {
             mavenCentral()
         }
-        
+
         """.trimIndent()
     )
 
@@ -162,13 +164,13 @@ fun projectSetup(
                 mavenLocal()
                 gradlePluginPortal()
             }
-            
+
             plugins {
                  id 'org.jetbrains.kotlin.$kotlinPluginType' version '$kotlinPluginVersion'
                  id 'org.jlleitschuh.gradle.ktlint' version '${TestVersions.pluginVersion}'
             }
         }
-        
+
         """.trimIndent()
     )
 }
