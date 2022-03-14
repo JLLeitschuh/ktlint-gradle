@@ -43,9 +43,9 @@ class TestProject(
         createSourceFile(
             CLEAN_SOURCES_FILE,
             """
-            val foo = "bar"
-
-            """.trimIndent()
+            |val foo = "bar"
+            |
+            """.trimMargin()
         )
     }
 
@@ -53,29 +53,32 @@ class TestProject(
         createSourceFile(
             FAIL_SOURCE_FILE,
             """
-            val  foo    =     "bar"
-
-            """.trimIndent()
+            |val  foo    =     "bar"
+            |
+            """.trimMargin()
         )
     }
 
     fun withCleanKotlinScript() {
+        //@formatter:off
         createSourceFile(
             "kotlin-script.kts",
             """
-            println("zzz")
-
-            """.trimIndent()
+            |println("zzz")
+            |
+            """.trimMargin()
         )
+        //@formatter:on
     }
 
     fun withFailingKotlinScript() {
         createSourceFile(
             "kotlin-script-fail.kts",
             """
-            println("zzz")
-
-            """.trimIndent()
+            |println("zzz")@
+            |
+            """.trimMargin()
+                .replace('@', ' ')
         )
     }
 
@@ -144,34 +147,34 @@ fun projectSetup(
     //language=Groovy
     it.resolve("build.gradle").writeText(
         """
-        plugins {
-            id 'org.jetbrains.kotlin.$kotlinPluginType'
-            id 'org.jlleitschuh.gradle.ktlint'
-        }
+plugins {
+    id 'org.jetbrains.kotlin.$kotlinPluginType'
+    id 'org.jlleitschuh.gradle.ktlint'
+}
 
-        repositories {
-            mavenCentral()
-        }
+repositories {
+    mavenCentral()
+}
 
-        """.trimIndent()
+""".trimIndent()
     )
 
     //language=Groovy
     it.resolve("settings.gradle").writeText(
         """
-        pluginManagement {
-            repositories {
-                mavenLocal()
-                gradlePluginPortal()
-            }
+pluginManagement {
+    repositories {
+        mavenLocal()
+        gradlePluginPortal()
+    }
 
-            plugins {
-                 id 'org.jetbrains.kotlin.$kotlinPluginType' version '$kotlinPluginVersion'
-                 id 'org.jlleitschuh.gradle.ktlint' version '${TestVersions.pluginVersion}'
-            }
-        }
+    plugins {
+         id 'org.jetbrains.kotlin.$kotlinPluginType' version '$kotlinPluginVersion'
+         id 'org.jlleitschuh.gradle.ktlint' version '${TestVersions.pluginVersion}'
+    }
+}
 
-        """.trimIndent()
+""".trimIndent()
     )
 }
 
