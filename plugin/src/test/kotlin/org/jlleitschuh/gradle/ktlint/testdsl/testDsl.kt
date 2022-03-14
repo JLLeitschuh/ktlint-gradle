@@ -60,7 +60,6 @@ class TestProject(
     }
 
     fun withCleanKotlinScript() {
-        //@formatter:off
         createSourceFile(
             "kotlin-script.kts",
             """
@@ -68,7 +67,6 @@ class TestProject(
             |
             """.trimMargin()
         )
-        //@formatter:on
     }
 
     fun withFailingKotlinScript() {
@@ -147,34 +145,34 @@ fun projectSetup(
     //language=Groovy
     it.resolve("build.gradle").writeText(
         """
-plugins {
-    id 'org.jetbrains.kotlin.$kotlinPluginType'
-    id 'org.jlleitschuh.gradle.ktlint'
-}
-
-repositories {
-    mavenCentral()
-}
-
-""".trimIndent()
+        |plugins {
+        |    id 'org.jetbrains.kotlin.$kotlinPluginType'
+        |    id 'org.jlleitschuh.gradle.ktlint'
+        |}
+        |
+        |repositories {
+        |    mavenCentral()
+        |}
+        |
+        """.trimMargin()
     )
 
     //language=Groovy
     it.resolve("settings.gradle").writeText(
         """
-pluginManagement {
-    repositories {
-        mavenLocal()
-        gradlePluginPortal()
-    }
-
-    plugins {
-         id 'org.jetbrains.kotlin.$kotlinPluginType' version '$kotlinPluginVersion'
-         id 'org.jlleitschuh.gradle.ktlint' version '${TestVersions.pluginVersion}'
-    }
-}
-
-""".trimIndent()
+        |pluginManagement {
+        |    repositories {
+        |        mavenLocal()
+        |        gradlePluginPortal()
+        |    }
+        |
+        |    plugins {
+        |         id 'org.jetbrains.kotlin.$kotlinPluginType' version '$kotlinPluginVersion'
+        |         id 'org.jlleitschuh.gradle.ktlint' version '${TestVersions.pluginVersion}'
+        |    }
+        |}
+        |
+        """.trimMargin()
     )
 }
 
