@@ -4,7 +4,6 @@ import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.util.GradleVersion
 import org.jlleitschuh.gradle.ktlint.AbstractPluginTest
-import org.junit.jupiter.api.condition.OS
 import java.io.File
 
 fun AbstractPluginTest.project(
@@ -110,9 +109,8 @@ fun TestProject.build(
     vararg buildArguments: String,
     assertions: BuildResult.() -> Unit = {}
 ) {
-    val daemonFlag = if (OS.WINDOWS.isCurrentOs) listOf("--no-daemon") else emptyList()
     gradleRunner
-        .withArguments(buildArguments.toList() + "--stacktrace" + daemonFlag)
+        .withArguments(buildArguments.toList() + "--stacktrace")
         .build()
         .run { assertions() }
 }
