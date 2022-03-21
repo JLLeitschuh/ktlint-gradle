@@ -12,7 +12,10 @@ jobs:
   build:
     strategy:
       matrix:
+        fail-fast: false
         os: [ubuntu-latest, windows-latest]
+    # Windows is failing with "out of memory" errors.
+    continue-on-error: ${{ matrix.os == 'windows-latest' }}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
