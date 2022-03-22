@@ -8,6 +8,7 @@ pluginManagement {
         `maven-publish`
         id("com.github.johnrengelman.shadow") version "7.0.0"
         id("com.github.breadmoirai.github-release") version "2.2.10"
+        id("org.gradle.test-retry") version "1.3.1"
     }
 }
 

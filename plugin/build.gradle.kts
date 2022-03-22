@@ -13,6 +13,7 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint")
     id("com.github.johnrengelman.shadow")
     id("com.github.breadmoirai.github-release")
+    id("org.gradle.test-retry")
 }
 
 val pluginGroup = "org.jlleitschuh.gradle"
@@ -91,6 +92,14 @@ tasks.withType<Test>().configureEach {
         showExceptions = true
         showCauses = true
         showStackTraces = true
+    }
+
+    retry {
+        val isCiServer = System.getenv().containsKey("CI")
+        if (isCiServer) {
+            maxRetries.set(2)
+            maxFailures.set(10)
+        }
     }
 }
 
