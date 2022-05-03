@@ -45,7 +45,7 @@ internal abstract class GenerateReportsWorkAction : WorkAction<GenerateReportsWo
 
             reporter.beforeAll()
             discoveredErrors.forEach { lintErrorResult ->
-                val filePath = lintErrorResult.lintedFile.absolutePath
+                val filePath = filePathForReport(lintErrorResult.lintedFile)
                 val baselineLintErrors = baselineRules?.get(
                     lintErrorResult.lintedFile.toRelativeString(projectDir).replace(File.separatorChar, '/')
                 )
@@ -61,6 +61,15 @@ internal abstract class GenerateReportsWorkAction : WorkAction<GenerateReportsWo
         }
     }
 
+    private fun filePathForReport(file: File): String {
+        val rootDir = parameters.filePathsRelativeTo.orNull
+        if (rootDir != null) {
+            return file.toRelativeString(rootDir)
+        }
+
+        return file.absolutePath
+    }
+
     internal interface GenerateReportsParameters : WorkParameters {
         val discoveredErrorsFile: RegularFileProperty
         val loadedReporterProviders: RegularFileProperty
@@ -70,5 +79,6 @@ internal abstract class GenerateReportsWorkAction : WorkAction<GenerateReportsWo
         val ktLintVersion: Property<String>
         val baseline: RegularFileProperty
         val projectDirectory: DirectoryProperty
+        val filePathsRelativeTo: Property<File>
     }
 }

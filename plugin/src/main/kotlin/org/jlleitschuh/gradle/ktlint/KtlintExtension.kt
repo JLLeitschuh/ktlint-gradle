@@ -38,6 +38,11 @@ internal constructor(
     val version: Property<String> = objectFactory.property { set("0.42.1") }
 
     /**
+     * Enable relative paths in reports
+     */
+    val relative: Property<Boolean> = objectFactory.property { set(false) }
+
+    /**
      * Enable verbose mode.
      */
     val verbose: Property<Boolean> = objectFactory.property { set(false) }
