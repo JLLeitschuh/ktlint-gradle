@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- Set default KtLint version to `0.46.1`
+
 ## [10.3.0] - 2022-05-03
 
 ### Added
