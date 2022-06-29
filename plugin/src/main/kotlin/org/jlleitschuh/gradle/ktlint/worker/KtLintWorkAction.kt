@@ -49,14 +49,13 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
 
         parameters.filesToLint.files.forEach {
             val errors = mutableListOf<Pair<LintError, Boolean>>()
-            val ktLintParameters = KtLint.Params(
+            val ktLintParameters = KtLint.ExperimentalParams(
                 fileName = it.absolutePath,
                 text = it.readText(),
                 ruleSets = ruleSets,
-                userData = userData,
                 debug = debug,
-                editorConfigPath = additionalEditorConfig,
                 script = !it.name.endsWith(".kt", ignoreCase = true),
+                editorConfigPath = additionalEditorConfig,
                 cb = { lintError, isCorrected ->
                     errors.add(lintError to isCorrected)
                 }
