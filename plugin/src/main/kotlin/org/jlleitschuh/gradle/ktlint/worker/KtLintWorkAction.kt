@@ -112,18 +112,6 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
         }
     }
 
-    private fun generateUserData(): Map<String, String> {
-        val userData = mutableMapOf(
-            "android" to parameters.android.get().toString()
-        )
-        val disabledRules = parameters.disabledRules.get()
-        if (disabledRules.isNotEmpty()) {
-            userData["disabled_rules"] = disabledRules.joinToString(separator = ",")
-        }
-
-        return userData.toMap()
-    }
-
     private fun loadRuleSetsAndFilterThem(
         enableExperimental: Boolean,
         disabledRules: Set<String>
