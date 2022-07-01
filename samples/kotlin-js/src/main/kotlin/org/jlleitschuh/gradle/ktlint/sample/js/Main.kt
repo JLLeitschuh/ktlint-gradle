@@ -8,7 +8,6 @@ val secondDiv: dynamic = document.createElement("div").apply {
 }
 
 fun main() {
-
     val firstDiv = document.createElement("div").apply { innerHTML = "<h1>Hello!</h1>" }
     document.body?.appendChild(firstDiv)
 
