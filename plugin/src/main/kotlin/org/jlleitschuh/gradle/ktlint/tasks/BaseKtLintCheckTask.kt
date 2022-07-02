@@ -1,9 +1,7 @@
 package org.jlleitschuh.gradle.ktlint.tasks
 
 import groovy.lang.Closure
-import net.swiftzer.semver.SemVer
 import org.gradle.api.DefaultTask
-import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTreeElement
@@ -181,8 +179,6 @@ abstract class BaseKtLintCheckTask @Inject constructor(
     protected fun runLint(
         inputChanges: InputChanges
     ) {
-        checkDisabledRulesSupportedKtLintVersion()
-
         val editorConfigUpdated = wasEditorConfigFilesUpdated(inputChanges)
         val filesToCheck = if (editorConfigUpdated) {
             source.files
@@ -200,8 +196,6 @@ abstract class BaseKtLintCheckTask @Inject constructor(
         inputChanges: InputChanges,
         formatSnapshot: File
     ) {
-        checkDisabledRulesSupportedKtLintVersion()
-
         val editorConfigUpdated = wasEditorConfigFilesUpdated(inputChanges)
         val filesToCheck = if (editorConfigUpdated) {
             source.files
@@ -289,12 +283,4 @@ abstract class BaseKtLintCheckTask @Inject constructor(
         }
         .map { it.file }
         .toSet()
-
-    private fun checkDisabledRulesSupportedKtLintVersion() {
-        if (disabledRules.get().isNotEmpty() &&
-            SemVer.parse(ktLintVersion.get()) < SemVer(0, 34, 2)
-        ) {
-            throw GradleException("Rules disabling is supported since 0.34.2 ktlint version.")
-        }
-    }
 }

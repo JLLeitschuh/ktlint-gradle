@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+-   **Breaking**: minimal supported Ktlint version is now `0.45.2` ([#595](https://github.com/JLLeitschuh/ktlint-gradle/pull/595))
+
 ## [11.0.0] - 2022-08-24
 
 ### Changed

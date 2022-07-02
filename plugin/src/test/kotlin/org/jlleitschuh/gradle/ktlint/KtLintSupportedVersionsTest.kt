@@ -10,7 +10,6 @@ import org.jlleitschuh.gradle.ktlint.testdsl.build
 import org.jlleitschuh.gradle.ktlint.testdsl.buildAndFail
 import org.jlleitschuh.gradle.ktlint.testdsl.project
 import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.condition.OS
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -96,7 +95,9 @@ class KtLintSupportedVersionsTest : AbstractPluginTest() {
 
     class SupportedKtlintVersionsProvider : GradleArgumentsProvider() {
         private val supportedKtlintVersions = mutableListOf(
-            "0.45.2"
+            "0.45.2",
+            // "0.46.0" has been compiled with the K2 compiler expecting us to do the same
+            "0.46.1"
         )
 
         override fun provideArguments(
