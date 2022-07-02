@@ -31,7 +31,7 @@ class KtlintBaselineSupportTest : AbstractPluginTest() {
                     <?xml version="1.0" encoding="utf-8"?>
                     <baseline version="1.0">
                     </baseline>
-                    
+
                     """.trimIndent()
                 )
             }
@@ -49,20 +49,19 @@ class KtlintBaselineSupportTest : AbstractPluginTest() {
                 assertThat(task(":${GenerateBaselineTask.NAME}")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
                 val baselineFile = projectPath.defaultBaselineFile
                 assertThat(baselineFile).exists()
-                // WARN: baseline uses tabs for indentation!
                 //language=xml
                 assertThat(baselineFile.readText()).isEqualToNormalizingNewlines(
                     """
                     |<?xml version="1.0" encoding="utf-8"?>
                     |<baseline version="1.0">
-                    |	<file name="kotlin-script-fail.kts">
-                    |		<error line="1" column="15" source="no-trailing-spaces" />
-                    |	</file>
-                    |	<file name="src/main/kotlin/fail-source.kt">
-                    |		<error line="1" column="5" source="no-multi-spaces" />
-                    |		<error line="1" column="10" source="no-multi-spaces" />
-                    |		<error line="1" column="15" source="no-multi-spaces" />
-                    |	</file>
+                    |    <file name="kotlin-script-fail.kts">
+                    |        <error line="1" column="15" source="no-trailing-spaces" />
+                    |    </file>
+                    |    <file name="src/main/kotlin/fail-source.kt">
+                    |        <error line="1" column="5" source="no-multi-spaces" />
+                    |        <error line="1" column="10" source="no-multi-spaces" />
+                    |        <error line="1" column="15" source="no-multi-spaces" />
+                    |    </file>
                     |</baseline>
                     |
                     """.trimMargin()
@@ -90,7 +89,7 @@ class KtlintBaselineSupportTest : AbstractPluginTest() {
                     <?xml version="1.0" encoding="utf-8"?>
                     <baseline version="1.0">
                     </baseline>
-                    
+
                     """.trimIndent()
                 )
             }
@@ -106,7 +105,7 @@ class KtlintBaselineSupportTest : AbstractPluginTest() {
             //language=Groovy
             buildGradle.appendText(
                 """
-                
+
                 ktlint {
                     version.set("0.40.0")
                 }
@@ -157,7 +156,7 @@ class KtlintBaselineSupportTest : AbstractPluginTest() {
             //language=Groovy
             buildGradle.appendText(
                 """
-                
+
                 ktlint {
                     version.set("0.40.0")
                 }
@@ -171,7 +170,8 @@ class KtlintBaselineSupportTest : AbstractPluginTest() {
         }
     }
 
-    private val File.defaultBaselineFile get() = resolve("config")
-        .resolve("ktlint")
-        .resolve("baseline.xml")
+    private val File.defaultBaselineFile
+        get() = resolve("config")
+            .resolve("ktlint")
+            .resolve("baseline.xml")
 }

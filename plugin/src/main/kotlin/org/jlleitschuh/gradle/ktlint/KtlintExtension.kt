@@ -35,7 +35,7 @@ internal constructor(
     /**
      * The version of KtLint to use.
      */
-    val version: Property<String> = objectFactory.property { set("0.43.2") }
+    val version: Property<String> = objectFactory.property { set("0.44.0") }
 
     /**
      * Enable relative paths in reports
