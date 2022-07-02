@@ -28,7 +28,7 @@ class KtlintPluginTest : AbstractPluginTest() {
 
             buildAndFail(CHECK_PARENT_TASK_NAME) {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
-                assertThat(output).contains("Unnecessary space(s)")
+                assertThat(output).contains("Unnecessary long whitespace")
             }
         }
     }
@@ -133,7 +133,7 @@ class KtlintPluginTest : AbstractPluginTest() {
             buildGradle.appendText(
                 """
 
-                ktlint.filter { exclude("**/fail-source.kt") }
+                ktlint.filter { exclude("**/FailSource.kt") }
                 """.trimIndent()
             )
 
@@ -230,14 +230,14 @@ class KtlintPluginTest : AbstractPluginTest() {
             buildGradle.appendText(
                 """
 
-                ktlint.version = "0.35.0"
+                ktlint.version = "0.45.2"
                 """.trimIndent()
             )
 
             build(":dependencies") {
                 assertThat(output).contains(
                     "$KTLINT_CONFIGURATION_NAME - $KTLINT_CONFIGURATION_DESCRIPTION${System.lineSeparator()}" +
-                        "\\--- com.pinterest:ktlint:0.35.0${System.lineSeparator()}"
+                        "\\--- com.pinterest:ktlint:0.45.2${System.lineSeparator()}"
                 )
             }
         }
@@ -313,7 +313,7 @@ class KtlintPluginTest : AbstractPluginTest() {
 
             build(
                 ":$CHECK_PARENT_TASK_NAME",
-                "-P$FILTER_INCLUDE_PROPERTY_NAME=src/main/kotlin/clean-source.kt"
+                "-P$FILTER_INCLUDE_PROPERTY_NAME=src/main/kotlin/CleanSource.kt"
             ) {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             }
@@ -330,7 +330,7 @@ class KtlintPluginTest : AbstractPluginTest() {
 
             build(
                 ":$CHECK_PARENT_TASK_NAME",
-                "-P$FILTER_INCLUDE_PROPERTY_NAME=src\\main\\kotlin\\clean-source.kt"
+                "-P$FILTER_INCLUDE_PROPERTY_NAME=src\\main\\kotlin\\CleanSource.kt"
             ) {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             }
@@ -346,13 +346,13 @@ class KtlintPluginTest : AbstractPluginTest() {
             buildGradle.appendText(
                 """
 
-                ktlint.filter { exclude("**/fail-source.kt") }
+                ktlint.filter { exclude("**/FailSource.kt") }
                 """.trimIndent()
             )
 
             build(
                 ":$CHECK_PARENT_TASK_NAME",
-                "-P$FILTER_INCLUDE_PROPERTY_NAME=src/main/kotlin/fail-source.kt"
+                "-P$FILTER_INCLUDE_PROPERTY_NAME=src/main/kotlin/FailSource.kt"
             ) {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SKIPPED)
             }
@@ -367,7 +367,7 @@ class KtlintPluginTest : AbstractPluginTest() {
 
             build(
                 ":$CHECK_PARENT_TASK_NAME",
-                "-P$FILTER_INCLUDE_PROPERTY_NAME=src/main/kotlin/failing-sources.kt"
+                "-P$FILTER_INCLUDE_PROPERTY_NAME=src/main/kotlin/FailingSources.kt"
             ) {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SKIPPED)
             }
@@ -398,7 +398,7 @@ class KtlintPluginTest : AbstractPluginTest() {
                 """
 
                 ktlint.enableExperimentalRules = true
-                ktlint.version = "0.34.0"
+                ktlint.version = "0.45.2"
                 """.trimIndent()
             )
 
@@ -412,7 +412,7 @@ class KtlintPluginTest : AbstractPluginTest() {
     @CommonTest
     fun checkIsIncremental(gradleVersion: GradleVersion) {
         project(gradleVersion) {
-            val initialSourceFile = "src/main/kotlin/initial.kt"
+            val initialSourceFile = "src/main/kotlin/Initial.kt"
             createSourceFile(
                 initialSourceFile,
                 """
@@ -425,7 +425,7 @@ class KtlintPluginTest : AbstractPluginTest() {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             }
 
-            val additionalSourceFile = "src/main/kotlin/another-file.kt"
+            val additionalSourceFile = "src/main/kotlin/AnotherFile.kt"
             createSourceFile(
                 additionalSourceFile,
                 """
@@ -441,7 +441,7 @@ class KtlintPluginTest : AbstractPluginTest() {
         }
     }
 
-    @DisplayName("Should check files which path conatins whitespace")
+    @DisplayName("Should check files which path containing whitespace")
     @CommonTest
     fun pathsWithWhitespace(gradleVersion: GradleVersion) {
         project(gradleVersion) {
@@ -474,13 +474,13 @@ class KtlintPluginTest : AbstractPluginTest() {
 
                 """.trimIndent()
 
-            val initialSourceFile = "src/main/kotlin/initial.kt"
+            val initialSourceFile = "src/main/kotlin/Initial.kt"
             createSourceFile(initialSourceFile, passingContents)
 
-            val additionalSourceFile = "src/main/kotlin/another-file.kt"
+            val additionalSourceFile = "src/main/kotlin/AnotherFile.kt"
             createSourceFile(additionalSourceFile, passingContents)
 
-            val testSourceFile = "src/test/kotlin/another-file.kt"
+            val testSourceFile = "src/test/kotlin/AnotherFile.kt"
             createSourceFile(testSourceFile, failingContents)
 
             build(mainSourceSetCheckTaskName) {
@@ -582,13 +582,13 @@ class KtlintPluginTest : AbstractPluginTest() {
                 """
 
                 dependencies {
-                    $KTLINT_RULESET_CONFIGURATION_NAME "com.pinterest.ktlint:ktlint-core:0.34.2"
+                    $KTLINT_RULESET_CONFIGURATION_NAME "com.pinterest.ktlint:ktlint-core:0.45.2"
                 }
                 """.trimIndent()
             )
 
             build(":dependencies", "--configuration", KTLINT_RULESET_CONFIGURATION_NAME) {
-                assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.44.0")
+                assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.45.2")
             }
         }
     }
@@ -604,13 +604,13 @@ class KtlintPluginTest : AbstractPluginTest() {
                 """
 
                 dependencies {
-                    $KTLINT_REPORTER_CONFIGURATION_NAME "com.pinterest.ktlint:ktlint-core:0.34.2"
+                    $KTLINT_REPORTER_CONFIGURATION_NAME "com.pinterest.ktlint:ktlint-core:0.45.2"
                 }
                 """.trimIndent()
             )
 
             build(":dependencies", "--configuration", KTLINT_REPORTER_CONFIGURATION_NAME) {
-                assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.44.0")
+                assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.45.2")
             }
         }
     }
@@ -632,7 +632,7 @@ class KtlintPluginTest : AbstractPluginTest() {
                 val  foo    =    "bar"
             """
             )
-            val destinationFile = projectPath.resolve("src/main/kotlin/renamed-file.kt")
+            val destinationFile = projectPath.resolve("src/main/kotlin/RenamedFile.kt")
             sourceFile.renameTo(destinationFile)
 
             build(FORMAT_PARENT_TASK_NAME) {

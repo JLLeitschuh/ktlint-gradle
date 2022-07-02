@@ -20,13 +20,13 @@ internal interface KtLintClassesSerializer {
     ): List<LintErrorResult>
 
     fun saveReporterProviders(
-        reporterProviders: List<ReporterProvider>,
+        reporterProviders: List<ReporterProvider<*>>,
         serializedReporterProviders: File
     )
 
     fun loadReporterProviders(
         serializedReporterProviders: File
-    ): List<ReporterProvider>
+    ): List<ReporterProvider<*>>
 
     companion object {
         fun create(ktLintVersion: SemVer): KtLintClassesSerializer =
@@ -66,7 +66,7 @@ private class CurrentKtLintClassesSerializer : KtLintClassesSerializer {
     }
 
     override fun saveReporterProviders(
-        reporterProviders: List<ReporterProvider>,
+        reporterProviders: List<ReporterProvider<*>>,
         serializedReporterProviders: File
     ) = ObjectOutputStream(
         serializedReporterProviders.outputStream().buffered()
@@ -78,11 +78,11 @@ private class CurrentKtLintClassesSerializer : KtLintClassesSerializer {
 
     override fun loadReporterProviders(
         serializedReporterProviders: File
-    ): List<ReporterProvider> = ObjectInputStream(
+    ): List<ReporterProvider<*>> = ObjectInputStream(
         serializedReporterProviders.inputStream().buffered()
     ).use {
         @Suppress("UNCHECKED_CAST")
-        it.readObject() as List<ReporterProvider>
+        it.readObject() as List<ReporterProvider<*>>
     }
 }
 
@@ -118,7 +118,7 @@ private class OldKtLintClassesSerializer : KtLintClassesSerializer {
     }
 
     override fun saveReporterProviders(
-        reporterProviders: List<ReporterProvider>,
+        reporterProviders: List<ReporterProvider<*>>,
         serializedReporterProviders: File
     ) = ObjectOutputStream(
         serializedReporterProviders.outputStream().buffered()
@@ -130,7 +130,7 @@ private class OldKtLintClassesSerializer : KtLintClassesSerializer {
 
     override fun loadReporterProviders(
         serializedReporterProviders: File
-    ): List<ReporterProvider> = ValidatingObjectInputStream(
+    ): List<ReporterProvider<*>> = ValidatingObjectInputStream(
         serializedReporterProviders.inputStream().buffered()
     ).use {
         it.accept(

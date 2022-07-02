@@ -96,27 +96,8 @@ class KtLintSupportedVersionsTest : AbstractPluginTest() {
 
     class SupportedKtlintVersionsProvider : GradleArgumentsProvider() {
         private val supportedKtlintVersions = mutableListOf(
-            "0.34.0",
-            "0.34.2",
-            "0.35.0",
-            "0.36.0",
-            "0.37.1",
-            "0.37.2",
-            // "0.38.0" has been compiled with Kotlin apiLevel 1.4 and not supported by Gradle plugins
-            "0.38.1",
-            "0.39.0",
-            "0.40.0",
-            "0.41.0",
-            "0.42.0",
-            "0.42.1",
-            // "0.43.0" does not work on JDK1.8
-            // "0.43.1" asked not to use it
-            "0.43.2",
-            "0.44.0"
-        ).also {
-            // "0.37.0" is failing on Windows machines that is fixed in the next version
-            if (!OS.WINDOWS.isCurrentOs) it.add("0.37.0")
-        }
+            "0.45.2"
+        )
 
         override fun provideArguments(
             context: ExtensionContext

@@ -28,12 +28,12 @@ class KtlintPluginVersionTest : AbstractPluginTest() {
         )
     }
 
-    @DisplayName("Should allow to use KtLint version 0.34.0")
+    @DisplayName("Should allow to use KtLint version 0.45.2")
     @CommonTest
     fun allowSupportedMinimalKtLintVersion(gradleVersion: GradleVersion) {
         project(gradleVersion) {
             withCleanSources()
-            buildGradle.useKtlintVersion("0.34.0")
+            buildGradle.useKtlintVersion("0.45.2")
 
             build(CHECK_PARENT_TASK_NAME) {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
@@ -41,12 +41,12 @@ class KtlintPluginVersionTest : AbstractPluginTest() {
         }
     }
 
-    @DisplayName("Should fail the build on using KtLint version <0.34.0")
+    @DisplayName("Should fail the build on using KtLint version <0.45.2")
     @CommonTest
     fun failOnUnsupportedOldKtLintVersion(gradleVersion: GradleVersion) {
         project(gradleVersion) {
             withCleanSources()
-            buildGradle.useKtlintVersion("0.33.0")
+            buildGradle.useKtlintVersion("0.45.1")
             buildAndFail(CHECK_PARENT_TASK_NAME) {
                 assertThat(task(":${LoadReportersTask.TASK_NAME}")?.outcome).isEqualTo(TaskOutcome.FAILED)
             }
