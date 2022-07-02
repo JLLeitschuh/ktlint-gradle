@@ -15,7 +15,7 @@ object TestVersions {
     const val maxSupportedGradleVersion = "7.3.3"
     val pluginVersion = File("VERSION_CURRENT.txt").readText().trim()
     const val minSupportedKotlinPluginVersion = "1.4.32"
-    const val maxSupportedKotlinPluginVersion = "1.5.31"
+    const val maxSupportedKotlinPluginVersion = "1.6.21"
 }
 
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
