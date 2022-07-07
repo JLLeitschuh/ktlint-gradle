@@ -10,7 +10,7 @@ import org.jlleitschuh.gradle.ktlint.testdsl.build
 import org.jlleitschuh.gradle.ktlint.testdsl.project
 import org.junit.jupiter.api.DisplayName
 
-@GradleTestVersions(minVersion = "6.6.1")
+@GradleTestVersions(minVersion = "7.1.1")
 class ConfigurationCacheTest : AbstractPluginTest() {
     private val configurationCacheFlag = "--configuration-cache"
     private val configurationCacheWarnFlag = "--configuration-cache-problems=warn"

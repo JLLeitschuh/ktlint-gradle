@@ -2,13 +2,13 @@ pluginManagement {
     val latestRelease = file("VERSION_LATEST_RELEASE.txt").readText().trim()
     plugins {
         id("org.jlleitschuh.gradle.ktlint") version latestRelease
-        id("org.jetbrains.kotlin.jvm") version "1.6.21"
+        id("org.jetbrains.kotlin.jvm") version "1.7.0"
         id("com.gradle.plugin-publish") version "0.15.0"
         `java-gradle-plugin`
         `maven-publish`
         id("com.github.johnrengelman.shadow") version "7.0.0"
         id("com.github.breadmoirai.github-release") version "2.3.7"
-        id("org.gradle.test-retry") version "1.3.1"
+        id("org.gradle.test-retry") version "1.4.0"
     }
 }
 

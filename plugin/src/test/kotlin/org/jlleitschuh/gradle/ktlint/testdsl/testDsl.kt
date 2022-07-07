@@ -128,18 +128,11 @@ fun TestProject.buildAndFail(
 fun defaultProjectSetup(gradleVersion: GradleVersion): (File) -> Unit =
     projectSetup("jvm", gradleVersion)
 
-private val GradleVersion.supportedKotlinVersion
-    get() = if (this <= GradleVersion.version("6.1.1")) {
-        TestVersions.minSupportedKotlinPluginVersion
-    } else {
-        TestVersions.maxSupportedKotlinPluginVersion
-    }
-
 fun projectSetup(
     kotlinPluginType: String,
     gradleVersion: GradleVersion,
 ): (File) -> Unit = {
-    val kotlinPluginVersion = gradleVersion.supportedKotlinVersion
+    val kotlinPluginVersion = "1.7.0"
     //language=Groovy
     it.resolve("build.gradle").writeText(
         """

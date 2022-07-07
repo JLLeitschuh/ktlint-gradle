@@ -63,6 +63,6 @@ open class KtlintBasePlugin : Plugin<Project> {
     }
 
     companion object {
-        const val LOWEST_SUPPORTED_GRADLE_VERSION = "6.0"
+        const val LOWEST_SUPPORTED_GRADLE_VERSION = "7.1.1"
     }
 }
