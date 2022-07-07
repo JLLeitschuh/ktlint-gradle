@@ -10,21 +10,10 @@ import org.jlleitschuh.gradle.ktlint.testdsl.build
 import org.jlleitschuh.gradle.ktlint.testdsl.project
 import org.junit.jupiter.api.DisplayName
 
-@GradleTestVersions(minVersion = "6.6.1")
+@GradleTestVersions
 class ConfigurationCacheTest : AbstractPluginTest() {
     private val configurationCacheFlag = "--configuration-cache"
     private val configurationCacheWarnFlag = "--configuration-cache-problems=warn"
-
-    /**
-     * 2 warnings are still reported by the Kotlin plugin. We can't fix them.
-     * But make sure we aren't creating more issues.
-     * ```
-     * 2 problems were found storing the configuration cache, 1 of which seems unique.
-     * plugin 'org.jetbrains.kotlin.jvm': registration of listener on 'Gradle.addBuildListener' is unsupported
-     * See https://docs.gradle.org/6.6-milestone-3/userguide/configuration_cache.html#config_cache:requirements:build_listeners
-     * ```
-     */
-    private val maxProblemsFlag = "-Dorg.gradle.unsafe.configuration-cache.max-problems=2"
 
     @DisplayName("Should support configuration cache without errors on running linting")
     @CommonTest
@@ -34,14 +23,13 @@ class ConfigurationCacheTest : AbstractPluginTest() {
                 "src/main/kotlin/clean-source.kt",
                 """
                 val foo = "bar"
-                
+
                 """.trimIndent()
             )
 
             build(
                 configurationCacheFlag,
                 configurationCacheWarnFlag,
-                maxProblemsFlag,
                 CHECK_PARENT_TASK_NAME
             ) {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
@@ -50,7 +38,6 @@ class ConfigurationCacheTest : AbstractPluginTest() {
             build(
                 configurationCacheFlag,
                 configurationCacheWarnFlag,
-                maxProblemsFlag,
                 CHECK_PARENT_TASK_NAME
             ) {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
@@ -74,7 +61,6 @@ class ConfigurationCacheTest : AbstractPluginTest() {
             build(
                 configurationCacheFlag,
                 configurationCacheWarnFlag,
-                maxProblemsFlag,
                 FORMAT_PARENT_TASK_NAME
             ) {
                 assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
@@ -84,7 +70,6 @@ class ConfigurationCacheTest : AbstractPluginTest() {
             build(
                 configurationCacheFlag,
                 configurationCacheWarnFlag,
-                maxProblemsFlag,
                 FORMAT_PARENT_TASK_NAME
             ) {
                 assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
