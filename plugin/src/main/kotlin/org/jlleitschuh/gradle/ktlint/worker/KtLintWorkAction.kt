@@ -5,8 +5,12 @@ import com.pinterest.ktlint.core.LintError
 import com.pinterest.ktlint.core.ParseException
 import com.pinterest.ktlint.core.RuleSet
 import com.pinterest.ktlint.core.RuleSetProvider
+import com.pinterest.ktlint.core.api.DefaultEditorConfigProperties
+import com.pinterest.ktlint.core.api.EditorConfigOverride
+import com.pinterest.ktlint.core.api.UsesEditorConfigProperties
 import net.swiftzer.semver.SemVer
 import org.apache.commons.io.input.MessageDigestCalculatingInputStream
+import org.ec4j.core.model.PropertyType
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
@@ -55,6 +59,7 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
                 debug = debug,
                 script = !it.name.endsWith(".kt", ignoreCase = true),
                 editorConfigPath = additionalEditorConfig,
+                editorConfigOverride = generateEditorConfigOverride(),
                 cb = { lintError, isCorrected ->
                     errors.add(lintError to isCorrected)
                 }
@@ -102,6 +107,23 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
             val snapshot = FormatTaskSnapshot(formattedFiles)
             FormatTaskSnapshot.writeIntoFile(snapshotFile, snapshot)
         }
+    }
+
+    private fun generateEditorConfigOverride(): EditorConfigOverride {
+        val androidProperty = UsesEditorConfigProperties.EditorConfigProperty(
+            type = PropertyType.LowerCasingPropertyType(
+                "android",
+                "A boolean value indicating that the project is an Android one.",
+                PropertyType.PropertyValueParser.IDENTITY_VALUE_PARSER,
+                emptySet()
+            ),
+            defaultValue = "false"
+        )
+
+        return EditorConfigOverride.from(
+            androidProperty to parameters.android.get().toString(),
+            DefaultEditorConfigProperties.disabledRulesProperty to parameters.disabledRules.get().joinToString(separator = ",")
+        )
     }
 
     private fun resetEditorconfigCache() {
