@@ -28,7 +28,9 @@ class KtlintPluginTest : AbstractPluginTest() {
 
             buildAndFail(CHECK_PARENT_TASK_NAME) {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
-                assertThat(output).contains("Unnecessary space(s)")
+                assertThat(output).contains("FailSource.kt:1:5 Unnecessary long whitespace")
+                assertThat(output).contains("FailSource.kt:1:10 Unnecessary long whitespace")
+                assertThat(output).contains("FailSource.kt:1:15 Unnecessary long whitespace")
             }
         }
     }
@@ -133,7 +135,7 @@ class KtlintPluginTest : AbstractPluginTest() {
             buildGradle.appendText(
                 """
 
-                ktlint.filter { exclude("**/fail-source.kt") }
+                ktlint.filter { exclude("**/FailSource.kt") }
                 """.trimIndent()
             )
 
@@ -346,13 +348,13 @@ class KtlintPluginTest : AbstractPluginTest() {
             buildGradle.appendText(
                 """
 
-                ktlint.filter { exclude("**/fail-source.kt") }
+                ktlint.filter { exclude("**/FailSource.kt") }
                 """.trimIndent()
             )
 
             build(
                 ":$CHECK_PARENT_TASK_NAME",
-                "-P$FILTER_INCLUDE_PROPERTY_NAME=src/main/kotlin/fail-source.kt"
+                "-P$FILTER_INCLUDE_PROPERTY_NAME=src/main/kotlin/FailSource.kt"
             ) {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SKIPPED)
             }
@@ -412,7 +414,7 @@ class KtlintPluginTest : AbstractPluginTest() {
     @CommonTest
     fun checkIsIncremental(gradleVersion: GradleVersion) {
         project(gradleVersion) {
-            val initialSourceFile = "src/main/kotlin/initial.kt"
+            val initialSourceFile = "src/main/kotlin/Initial.kt"
             createSourceFile(
                 initialSourceFile,
                 """
@@ -425,7 +427,7 @@ class KtlintPluginTest : AbstractPluginTest() {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             }
 
-            val additionalSourceFile = "src/main/kotlin/another-file.kt"
+            val additionalSourceFile = "src/main/kotlin/AnotherFile.kt"
             createSourceFile(
                 additionalSourceFile,
                 """
@@ -474,13 +476,13 @@ class KtlintPluginTest : AbstractPluginTest() {
 
                 """.trimIndent()
 
-            val initialSourceFile = "src/main/kotlin/initial.kt"
+            val initialSourceFile = "src/main/kotlin/Initial.kt"
             createSourceFile(initialSourceFile, passingContents)
 
-            val additionalSourceFile = "src/main/kotlin/another-file.kt"
+            val additionalSourceFile = "src/main/kotlin/AnotherFile.kt"
             createSourceFile(additionalSourceFile, passingContents)
 
-            val testSourceFile = "src/test/kotlin/another-file.kt"
+            val testSourceFile = "src/test/kotlin/AnotherFile.kt"
             createSourceFile(testSourceFile, failingContents)
 
             build(mainSourceSetCheckTaskName) {
@@ -588,7 +590,7 @@ class KtlintPluginTest : AbstractPluginTest() {
             )
 
             build(":dependencies", "--configuration", KTLINT_RULESET_CONFIGURATION_NAME) {
-                assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.42.1")
+                assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.46.1")
             }
         }
     }
@@ -610,7 +612,7 @@ class KtlintPluginTest : AbstractPluginTest() {
             )
 
             build(":dependencies", "--configuration", KTLINT_REPORTER_CONFIGURATION_NAME) {
-                assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.42.1")
+                assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.46.1")
             }
         }
     }
@@ -632,7 +634,7 @@ class KtlintPluginTest : AbstractPluginTest() {
                 val  foo    =    "bar"
             """
             )
-            val destinationFile = projectPath.resolve("src/main/kotlin/renamed-file.kt")
+            val destinationFile = projectPath.resolve("src/main/kotlin/RenamedFile.kt")
             sourceFile.renameTo(destinationFile)
 
             build(FORMAT_PARENT_TASK_NAME) {

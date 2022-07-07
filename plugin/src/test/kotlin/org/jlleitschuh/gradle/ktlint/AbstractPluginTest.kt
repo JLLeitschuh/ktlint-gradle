@@ -30,10 +30,10 @@ abstract class AbstractPluginTest {
 
     protected
     fun File.withCleanSources() = createSourceFile(
-        "src/main/kotlin/clean-source.kt",
+        "src/main/kotlin/CleanSource.kt",
         """
             val foo = "bar"
-            
+
         """.trimIndent()
     )
 
@@ -41,21 +41,21 @@ abstract class AbstractPluginTest {
         "kotlin-script.kts",
         """
             println("zzz")
-            
+
         """.trimIndent()
     )
 
     protected fun File.withFailingKotlinScript() = createSourceFile(
         "kotlin-script-fail.kts",
         """
-            println("zzz") 
-            
+            println("zzz")
+
         """.trimIndent()
     )
 
     protected
     fun File.withAlternativeFailingSources(baseDir: String) =
-        createSourceFile("$baseDir/fail-source.kt", """val  foo    =     "bar"""")
+        createSourceFile("$baseDir/FailSource.kt", """val  foo    =     "bar"""")
 
     protected
     fun File.createSourceFile(sourceFilePath: String, contents: String) {

@@ -14,8 +14,7 @@ object TestVersions {
     const val minSupportedGradleVersion = KtlintBasePlugin.LOWEST_SUPPORTED_GRADLE_VERSION
     const val maxSupportedGradleVersion = "7.1.1"
     val pluginVersion = File("VERSION_CURRENT.txt").readText().trim()
-    const val minSupportedKotlinPluginVersion = "1.4.32"
-    const val maxSupportedKotlinPluginVersion = "1.5.21"
+    const val supportKotlinPluginVersion = "1.7.0"
 }
 
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
@@ -59,6 +58,6 @@ open class GradleArgumentsProvider : ArgumentsProvider {
             }
         }
 
-        return sequenceOf(minGradleVersion, *additionalGradleVersions.toTypedArray(), maxGradleVersion)
+        return setOf(minGradleVersion, *additionalGradleVersions.toTypedArray(), maxGradleVersion).asSequence()
     }
 }
