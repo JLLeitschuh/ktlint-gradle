@@ -95,28 +95,4 @@ class DisabledRulesTest : AbstractPluginTest() {
             }
         }
     }
-
-    @DisplayName("Should fail if KtLint version is lower then 0.34.2 and disabled rules configuration is set")
-    @CommonTest
-    fun lintShouldFailOnUnsupportedVersion(gradleVersion: GradleVersion) {
-        project(gradleVersion) {
-            //language=Groovy
-            buildGradle.appendText(
-                """
-    
-                ktlint.version = "0.34.0"
-                ktlint.disabledRules = ["final-newline"]
-                """.trimIndent()
-            )
-
-            withCleanSources()
-
-            buildAndFail(CHECK_PARENT_TASK_NAME) {
-                assertThat(
-                    task(":${KtLintCheckTask.buildTaskNameForSourceSet("main")}")?.outcome
-                ).isEqualTo(TaskOutcome.FAILED)
-                assertThat(output).contains("Rules disabling is supported since 0.34.2 ktlint version.")
-            }
-        }
-    }
 }

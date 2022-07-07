@@ -208,31 +208,6 @@ class ReportersTest : AbstractPluginTest() {
         }
     }
 
-    @DisplayName("Should ignore html reporter on KtLint versions less then 0.36.0")
-    @CommonTest
-    @DisabledOnOs(OS.WINDOWS)
-    internal fun ignoreHtmlOnOldVersions(gradleVersion: GradleVersion) {
-        project(gradleVersion) {
-            withCleanSources()
-
-            //language=Groovy
-            buildGradle.appendText(
-                """
-
-                ktlint.version = "0.35.0"
-                ktlint.reporters {
-                    reporter "html"
-                }
-                """.trimIndent()
-            )
-
-            build(CHECK_PARENT_TASK_NAME) {
-                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-                assertReportNotCreated(ReporterType.HTML.fileExtension, mainSourceSetCheckTaskName)
-            }
-        }
-    }
-
     @DisplayName("Should allow to set custom location for generated reports")
     @CommonTest
     internal fun customReportsLocation(gradleVersion: GradleVersion) {

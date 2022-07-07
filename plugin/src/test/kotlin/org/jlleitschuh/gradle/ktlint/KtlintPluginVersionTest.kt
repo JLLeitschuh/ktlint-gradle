@@ -6,7 +6,6 @@ import org.gradle.util.GradleVersion
 import org.jlleitschuh.gradle.ktlint.tasks.LoadReportersTask
 import org.jlleitschuh.gradle.ktlint.testdsl.CommonTest
 import org.jlleitschuh.gradle.ktlint.testdsl.GradleTestVersions
-import org.jlleitschuh.gradle.ktlint.testdsl.build
 import org.jlleitschuh.gradle.ktlint.testdsl.buildAndFail
 import org.jlleitschuh.gradle.ktlint.testdsl.project
 import org.junit.jupiter.api.DisplayName
@@ -26,19 +25,6 @@ class KtlintPluginVersionTest : AbstractPluginTest() {
             }
             """.trimIndent()
         )
-    }
-
-    @DisplayName("Should allow to use KtLint version 0.34.0")
-    @CommonTest
-    fun allowSupportedMinimalKtLintVersion(gradleVersion: GradleVersion) {
-        project(gradleVersion) {
-            withCleanSources()
-            buildGradle.useKtlintVersion("0.34.0")
-
-            build(CHECK_PARENT_TASK_NAME) {
-                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            }
-        }
     }
 
     @DisplayName("Should fail the build on using KtLint version <0.34.0")

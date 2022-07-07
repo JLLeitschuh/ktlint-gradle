@@ -10,7 +10,6 @@ import org.jlleitschuh.gradle.ktlint.testdsl.build
 import org.jlleitschuh.gradle.ktlint.testdsl.buildAndFail
 import org.jlleitschuh.gradle.ktlint.testdsl.project
 import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.condition.OS
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -32,7 +31,7 @@ class KtLintSupportedVersionsTest : AbstractPluginTest() {
             //language=Groovy
             buildGradle.appendText(
                 """
-                    
+
                 ktlint.version = "$ktLintVersion"
                 """.trimIndent()
             )
@@ -56,9 +55,9 @@ class KtLintSupportedVersionsTest : AbstractPluginTest() {
             //language=Groovy
             buildGradle.appendText(
                 """
-                
+
                 ktlint.version = "$ktLintVersion"
-                
+
                 """.trimIndent()
             )
 
@@ -82,7 +81,7 @@ class KtLintSupportedVersionsTest : AbstractPluginTest() {
             buildGradle.appendText(
                 """
                 ktlint.version = "$ktLintVersion"
-                
+
                 """.trimIndent()
             )
 
@@ -96,23 +95,8 @@ class KtLintSupportedVersionsTest : AbstractPluginTest() {
 
     class SupportedKtlintVersionsProvider : GradleArgumentsProvider() {
         private val supportedKtlintVersions = mutableListOf(
-            "0.34.0",
-            "0.34.2",
-            "0.35.0",
-            "0.36.0",
-            "0.37.1",
-            "0.37.2",
-            // "0.38.0" has been compiled with Kotlin apiLevel 1.4 and not supported by Gradle plugins
-            "0.38.1",
-            "0.39.0",
-            "0.40.0",
-            "0.41.0",
-            "0.42.0",
-            "0.42.1"
-        ).also {
-            // "0.37.0" is failing on Windows machines that is fixed in the next version
-            if (!OS.WINDOWS.isCurrentOs) it.add("0.37.0")
-        }
+            "0.46.1"
+        )
 
         override fun provideArguments(
             context: ExtensionContext
