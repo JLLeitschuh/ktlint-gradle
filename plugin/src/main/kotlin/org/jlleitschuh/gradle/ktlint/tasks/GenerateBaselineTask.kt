@@ -1,6 +1,5 @@
 package org.jlleitschuh.gradle.ktlint.tasks
 
-import net.swiftzer.semver.SemVer
 import org.gradle.api.DefaultTask
 import org.gradle.api.Task
 import org.gradle.api.file.ConfigurableFileCollection
@@ -48,14 +47,6 @@ abstract class GenerateBaselineTask @Inject constructor(
 
     final override fun onlyIf(spec: Spec<in Task>) {
         super.onlyIf(spec)
-    }
-
-    init {
-        onlyIf {
-            val isEnabled = SemVer.parse(ktLintVersion.get()) >= SemVer(0, 41, 0)
-            if (!isEnabled) logger.warn("Generate baseline only works starting from KtLint 0.41.0 version")
-            isEnabled
-        }
     }
 
     @Suppress("UnstableApiUsage")

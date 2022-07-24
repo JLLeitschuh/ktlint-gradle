@@ -1,8 +1,6 @@
 package org.jlleitschuh.gradle.ktlint.tasks
 
-import net.swiftzer.semver.SemVer
 import org.gradle.api.DefaultTask
-import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.ProjectLayout
@@ -118,8 +116,6 @@ abstract class GenerateReportsTask @Inject constructor(
     @Suppress("UnstableApiUsage")
     @TaskAction
     fun generateReports() {
-        checkBaselineSupportedKtLintVersion()
-
         // Classloader isolation is enough here as we just want to use some classes from KtLint classpath
         // to get errors and generate files/console reports. No KtLint main object is initialized/used in this case.
         val queue = workerExecutor.classLoaderIsolation { spec ->
@@ -181,12 +177,6 @@ abstract class GenerateReportsTask @Inject constructor(
         }
         options.putAll(loadedReporter.reporterOptions)
         return options.toMap()
-    }
-
-    private fun checkBaselineSupportedKtLintVersion() {
-        if (baseline.isPresent && SemVer.parse(ktLintVersion.get()) < SemVer(0, 41, 0)) {
-            throw GradleException("Baseline support is only enabled for KtLint versions 0.41.0+.")
-        }
     }
 
     internal enum class LintType(

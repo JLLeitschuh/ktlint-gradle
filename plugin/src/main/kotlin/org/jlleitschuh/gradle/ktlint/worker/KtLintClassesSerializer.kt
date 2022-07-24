@@ -29,12 +29,7 @@ internal interface KtLintClassesSerializer {
     ): List<ReporterProvider<*>>
 
     companion object {
-        fun create(ktLintVersion: SemVer): KtLintClassesSerializer =
-            if (ktLintVersion >= SemVer(0, 41, 0)) {
-                CurrentKtLintClassesSerializer()
-            } else {
-                OldKtLintClassesSerializer()
-            }
+        fun create(ktLintVersion: SemVer): KtLintClassesSerializer = CurrentKtLintClassesSerializer()
     }
 }
 

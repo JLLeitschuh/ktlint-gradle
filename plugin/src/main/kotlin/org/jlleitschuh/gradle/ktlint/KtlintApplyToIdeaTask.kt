@@ -1,6 +1,5 @@
 package org.jlleitschuh.gradle.ktlint
 
-import net.swiftzer.semver.SemVer
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.model.ObjectFactory
@@ -42,9 +41,9 @@ open class KtlintApplyToIdeaTask @Inject constructor(
 
             // Subcommand
             if (globally.get()) {
-                it.args(getApplyToIdeaCommand())
+                it.args("applyToIDEA")
             } else {
-                it.args(getApplyToProjectCommand())
+                it.args("applyToIDEAProject")
             }
 
             // Subcommand parameters
@@ -52,18 +51,4 @@ open class KtlintApplyToIdeaTask @Inject constructor(
             it.args("-y")
         }
     }
-
-    private fun getApplyToIdeaCommand() =
-        if (SemVer.parse(ktlintVersion.get()) >= SemVer(0, 35, 0)) {
-            "applyToIDEA"
-        } else {
-            "--apply-to-idea"
-        }
-
-    private fun getApplyToProjectCommand() =
-        if (SemVer.parse(ktlintVersion.get()) >= SemVer(0, 35, 0)) {
-            "applyToIDEAProject"
-        } else {
-            "--apply-to-idea-project"
-        }
 }

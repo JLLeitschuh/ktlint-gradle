@@ -1,6 +1,5 @@
 package org.jlleitschuh.gradle.ktlint
 
-import net.swiftzer.semver.SemVer
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
@@ -30,24 +29,17 @@ internal fun createKtlintConfiguration(target: Project, extension: KtlintExtensi
         isCanBeResolved = true
         isCanBeConsumed = false
         isVisible = false
-
         // Starting from KtLint 0.41.0 version published artifact has two variants: "external" and "shadowed"
         attributes {
             it.attribute(Bundling.BUNDLING_ATTRIBUTE, target.objects.named(Bundling::class.java, Bundling.EXTERNAL))
         }
-
         val dependencyProvider = target.provider {
             val ktlintVersion = extension.version.get()
             target.logger.info("Add dependency: ktlint version $ktlintVersion")
-            target.dependencies.create("${resolveGroup(ktlintVersion)}:ktlint:$ktlintVersion")
+            target.dependencies.create("com.pinterest:ktlint:$ktlintVersion")
         }
         dependencies.addLater(dependencyProvider)
     }
-
-private fun resolveGroup(ktlintVersion: String) = when {
-    SemVer.parse(ktlintVersion) < SemVer(0, 32, 0) -> "com.github.shyiko"
-    else -> "com.pinterest"
-}
 
 internal fun createKtlintRulesetConfiguration(
     target: Project,
@@ -116,19 +108,7 @@ internal fun createKtLintBaselineReporterConfiguration(
         withDependencies {
             dependencies.addLater(
                 target.provider {
-                    val ktlintVersion = extension.version.get()
-                    // Baseline reporter is only available starting 0.41.0 release
-                    if (SemVer.parse(ktlintVersion) >= SemVer(0, 41, 0)) {
-                        target.dependencies.create(
-                            "com.pinterest.ktlint:ktlint-reporter-baseline:${extension.version.get()}"
-                        )
-                    } else {
-                        // Adding fake plain reporter as addLater() does not accept `null` value
-                        // Generate baseline tasks anyway will not run on KtLint versions < 0.41.0
-                        target.dependencies.create(
-                            "com.pinterest.ktlint:ktlint-reporter-plain:${extension.version.get()}"
-                        )
-                    }
+                    target.dependencies.create("com.pinterest.ktlint:ktlint-reporter-baseline:${extension.version.get()}")
                 }
             )
         }

@@ -11,8 +11,6 @@ import org.jlleitschuh.gradle.ktlint.testdsl.build
 import org.jlleitschuh.gradle.ktlint.testdsl.buildAndFail
 import org.jlleitschuh.gradle.ktlint.testdsl.project
 import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.condition.DisabledOnOs
-import org.junit.jupiter.api.condition.OS
 
 @GradleTestVersions
 class ReportersTest : AbstractPluginTest() {
