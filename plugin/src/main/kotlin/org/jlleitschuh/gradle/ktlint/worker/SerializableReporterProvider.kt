@@ -29,7 +29,7 @@ internal class SerializableReporterProvider(
         val reporterProviderClassName = oin.readUTF()
         val classLoader = this.javaClass.classLoader
         val reporterProviderClass = classLoader.loadClass(reporterProviderClassName)
-        reporterProvider = reporterProviderClass.newInstance() as ReporterProvider
+        reporterProvider = reporterProviderClass.getDeclaredConstructor().newInstance() as ReporterProvider
     }
 
     companion object {
