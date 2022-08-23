@@ -32,7 +32,7 @@ class KtLintSupportedVersionsTest : AbstractPluginTest() {
             //language=Groovy
             buildGradle.appendText(
                 """
-                    
+
                 ktlint.version = "$ktLintVersion"
                 """.trimIndent()
             )
@@ -56,9 +56,9 @@ class KtLintSupportedVersionsTest : AbstractPluginTest() {
             //language=Groovy
             buildGradle.appendText(
                 """
-                
+
                 ktlint.version = "$ktLintVersion"
-                
+
                 """.trimIndent()
             )
 
@@ -82,7 +82,7 @@ class KtLintSupportedVersionsTest : AbstractPluginTest() {
             buildGradle.appendText(
                 """
                 ktlint.version = "$ktLintVersion"
-                
+
                 """.trimIndent()
             )
 
@@ -108,7 +108,10 @@ class KtLintSupportedVersionsTest : AbstractPluginTest() {
             "0.40.0",
             "0.41.0",
             "0.42.0",
-            "0.42.1"
+            "0.42.1",
+            // "0.43.0" does not work on JDK1.8
+            // "0.43.1" asked not to use it
+            "0.43.2",
         ).also {
             // "0.37.0" is failing on Windows machines that is fixed in the next version
             if (!OS.WINDOWS.isCurrentOs) it.add("0.37.0")

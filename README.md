@@ -63,10 +63,10 @@ open a [new issue](https://github.com/JLLeitschuh/ktlint-gradle/issues/new).
 This plugin was written using the new API available for the Gradle script Kotlin builds.
 This API is available in new versions of Gradle.
 
-Minimal supported [Gradle](https://www.gradle.org) version: `6.0`
+Minimal supported [Gradle](https://www.gradle.org) version: `6.8`
 
 Minimal supported [ktlint](https://github.com/pinterest/ktlint) version: `0.34.0`
-(additionally excluding `0.37.0` on Windows OS and `0.38.0` on all OS types)
+(additionally excluding `0.37.0` on Windows OS and `0.38.0`, `0.43.0`, `0.43.1` on all OS types)
 
 ### Ktlint plugin
 
@@ -566,7 +566,7 @@ To run tests in [IDEA IDE](https://www.jetbrains.com/idea/),
 firstly you need to run following gradle task (or after any dependency change):
 
 ```bash
-$ ./plugin/gradlew pluginUnderTestMetadata
+$ ./plugin/gradlew -p ./plugin pluginUnderTestMetadata
 ```
 
 Optionally you can add this step test run configuration.

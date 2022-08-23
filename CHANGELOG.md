@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+-   **Breaking**: minimal supported Gradle version is `6.8` ([#597](https://github.com/JLLeitschuh/ktlint-gradle/pull/597))
+-   Update Kotlin to `1.5.31` version ([#597](https://github.com/JLLeitschuh/ktlint-gradle/pull/597))
+-   Set default KtLint version to `0.43.2` ([#597](https://github.com/JLLeitschuh/ktlint-gradle/pull/597))
+
 ## [10.3.0] - 2022-05-03
 
 ### Added
