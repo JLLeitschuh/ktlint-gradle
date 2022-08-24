@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 -   **Breaking**: minimal supported Gradle version is `6.8` ([#597](https://github.com/JLLeitschuh/ktlint-gradle/pull/597))
 -   Update Kotlin to `1.5.31` version ([#597](https://github.com/JLLeitschuh/ktlint-gradle/pull/597))
 -   Set default KtLint version to `0.43.2` ([#597](https://github.com/JLLeitschuh/ktlint-gradle/pull/597))
+-   Update Gradle to `7.2` version ([#601](https://github.com/JLLeitschuh/ktlint-gradle/pull/601))
+-   Update Shadow plugin to `7.1.0` version ([#601](https://github.com/JLLeitschuh/ktlint-gradle/pull/601))
 
 ## [10.3.0] - 2022-05-03
 
