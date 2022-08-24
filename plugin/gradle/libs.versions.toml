@@ -11,6 +11,10 @@ junit5 = "5.5.2"
 assertJ = "3.11.1"
 commonsIo = "2.8.0"
 archUnit = "0.16.0"
+pluginPublish = "0.15.0"
+shadow = "7.0.0"
+githubRelease = "2.2.10"
+testRetry = "1.3.1"
 
 [libraries]
 android-gradle = { module = "com.android.tools.build:gradle", version.ref = "androidPlugin" }
@@ -25,3 +29,11 @@ kotlin-script-runtime = { module = "org.jetbrains.kotlin:kotlin-script-runtime",
 ktlint-core = { module = "com.pinterest.ktlint:ktlint-core", version.ref = "ktlint" }
 semver = { module = "net.swiftzer.semver:semver", version.ref = "semver" }
 slf4j-nop = { module = "org.slf4j:slf4j-nop", version.ref = "sl4fj" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-js = { id = "org.jetbrains.kotlin.js", version.ref = "kotlin" }
+plugin-publish = { id = "com.gradle.plugin-publish", version.ref = "pluginPublish" }
+shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
+github-release = { id = "com.github.breadmoirai.github-release", version.ref = "githubRelease" }
+test-retry = { id = "org.gradle.test-retry", version.ref = "testRetry" }

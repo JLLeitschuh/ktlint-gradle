@@ -3,11 +3,6 @@ import java.util.Properties
 pluginManagement {
     includeBuild("./plugin")
 
-    plugins {
-        id("org.jetbrains.kotlin.jvm") version "1.5.31"
-        id("org.jetbrains.kotlin.js") version "1.5.31"
-    }
-
     repositories {
         gradlePluginPortal()
         google()

@@ -6,9 +6,9 @@ buildscript {
 }
 
 plugins {
-    kotlin("jvm") apply false
+    alias(pluginLibs.plugins.kotlin.jvm) apply false
+    alias(pluginLibs.plugins.kotlin.js) apply false
     id("com.android.application") apply false
-    kotlin("js") apply false
     id("org.jlleitschuh.gradle.ktlint")
 }
 

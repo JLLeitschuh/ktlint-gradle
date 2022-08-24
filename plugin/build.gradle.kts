@@ -6,14 +6,14 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.util.prefixIfNot
 
 plugins {
-    kotlin("jvm")
-    id("com.gradle.plugin-publish")
+    id("org.jlleitschuh.gradle.ktlint")
+    alias(libs.plugins.kotlin.jvm)
     `java-gradle-plugin`
     `maven-publish`
-    id("org.jlleitschuh.gradle.ktlint")
-    id("com.github.johnrengelman.shadow")
-    id("com.github.breadmoirai.github-release")
-    id("org.gradle.test-retry")
+    alias(libs.plugins.plugin.publish)
+    alias(libs.plugins.shadow)
+    alias(libs.plugins.github.release)
+    alias(libs.plugins.test.retry)
 }
 
 val pluginGroup = "org.jlleitschuh.gradle"
