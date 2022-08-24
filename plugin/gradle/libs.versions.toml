@@ -12,7 +12,7 @@ assertJ = "3.11.1"
 commonsIo = "2.8.0"
 archUnit = "0.16.0"
 pluginPublish = "0.15.0"
-shadow = "7.0.0"
+shadow = "7.1.0"
 githubRelease = "2.2.10"
 testRetry = "1.3.1"
 
