@@ -79,7 +79,9 @@ internal fun generateGitHook(
     echo "Running ktlint over these files:"
     echo "${'$'}CHANGED_FILES"
 
-    diff=.git/unstaged-ktlint-git-hook.diff
+    GITDIR=$(git rev-parse --git-dir)
+    diff=$GITDIR/unstaged-ktlint-git-hook.diff
+
     git diff --color=never > ${'$'}diff
     if [ -s ${'$'}diff ]; then
       git apply -R ${'$'}diff
