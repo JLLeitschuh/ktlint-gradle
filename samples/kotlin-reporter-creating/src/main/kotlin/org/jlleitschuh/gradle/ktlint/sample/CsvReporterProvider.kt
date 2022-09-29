@@ -4,11 +4,11 @@ import com.pinterest.ktlint.core.Reporter
 import com.pinterest.ktlint.core.ReporterProvider
 import java.io.PrintStream
 
-class CsvReporterProvider : ReporterProvider {
+class CsvReporterProvider : ReporterProvider<CsvReporter> {
     override val id: String = "csv"
 
     override fun get(
         out: PrintStream,
         opt: Map<String, String>
-    ): Reporter = CsvReporter(out)
+    ) = CsvReporter(out)
 }

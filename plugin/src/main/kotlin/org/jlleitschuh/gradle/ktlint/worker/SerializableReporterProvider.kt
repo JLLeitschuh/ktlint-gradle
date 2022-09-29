@@ -1,5 +1,6 @@
 package org.jlleitschuh.gradle.ktlint.worker
 
+import com.pinterest.ktlint.core.Reporter
 import com.pinterest.ktlint.core.ReporterProvider
 import java.io.IOException
 import java.io.ObjectInputStream
@@ -13,10 +14,10 @@ import kotlin.reflect.jvm.jvmName
  * Should be removed once KtLint will add interface implementation into [ReporterProvider].
  */
 internal class SerializableReporterProvider(
-    reporterProvider: ReporterProvider
+    reporterProvider: ReporterProvider<*>
 ) : Serializable {
     @Transient
-    var reporterProvider: ReporterProvider = reporterProvider
+    var reporterProvider: ReporterProvider<*> = reporterProvider
         private set
 
     @Throws(IOException::class)
@@ -29,7 +30,7 @@ internal class SerializableReporterProvider(
         val reporterProviderClassName = oin.readUTF()
         val classLoader = this.javaClass.classLoader
         val reporterProviderClass = classLoader.loadClass(reporterProviderClassName)
-        reporterProvider = reporterProviderClass.newInstance() as ReporterProvider
+        reporterProvider = reporterProviderClass.newInstance() as ReporterProvider<*>
     }
 
     companion object {

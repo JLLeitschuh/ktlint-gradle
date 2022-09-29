@@ -3,11 +3,9 @@ package org.jlleitschuh.gradle.ktlint
 import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testkit.runner.TaskOutcome
 import org.gradle.util.GradleVersion
-import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
 import org.jlleitschuh.gradle.ktlint.testdsl.CommonTest
 import org.jlleitschuh.gradle.ktlint.testdsl.GradleTestVersions
 import org.jlleitschuh.gradle.ktlint.testdsl.build
-import org.jlleitschuh.gradle.ktlint.testdsl.buildAndFail
 import org.jlleitschuh.gradle.ktlint.testdsl.project
 import org.junit.jupiter.api.DisplayName
 
@@ -21,13 +19,13 @@ class DisabledRulesTest : AbstractPluginTest() {
             //language=Groovy
             buildGradle.appendText(
                 """
-    
+
                 ktlint.disabledRules = ["final-newline"]
                 """.trimIndent()
             )
 
             createSourceFile(
-                "src/main/kotlin/clean-source.kt",
+                "src/main/kotlin/CleanSource.kt",
                 """
                 val foo = "bar"
                 """.trimIndent()
@@ -46,20 +44,20 @@ class DisabledRulesTest : AbstractPluginTest() {
             //language=Groovy
             buildGradle.appendText(
                 """
-    
-                ktlint.disabledRules = ["final-newline", "no-consecutive-blank-lines"]
+
+                ktlint.disabledRules = ["final-newline", "no-consecutive-blank-lines", "no-empty-first-line-in-method-block"]
                 """.trimIndent()
             )
 
             createSourceFile(
-                "src/main/kotlin/clean-source.kt",
+                "src/main/kotlin/CleanSource.kt",
                 """
                 fun some() {
-    
-    
+
+
                     print("Woohoo!")
                 }
-                
+
                 val foo = "bar"
                 """.trimIndent()
             )
@@ -75,47 +73,25 @@ class DisabledRulesTest : AbstractPluginTest() {
     fun lintRuleDisabledInTheCode(gradleVersion: GradleVersion) {
         project(gradleVersion) {
             createSourceFile(
-                "src/main/kotlin/clean-source.kt",
+                "src/main/kotlin/CleanSource.kt",
                 """
                 /* ktlint-disable no-consecutive-blank-lines */
+                /* ktlint-disable no-empty-first-line-in-method-block */
                 fun some() {
-    
-    
+
+
                     print("Woohoo!")
                 }
+                /* ktlint-enable no-empty-first-line-in-method-block */
                 /* ktlint-enable no-consecutive-blank-lines */
-                
+
                 val foo = "bar"
-                
+
                 """.trimIndent()
             )
 
             build(CHECK_PARENT_TASK_NAME) {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            }
-        }
-    }
-
-    @DisplayName("Should fail if KtLint version is lower then 0.34.2 and disabled rules configuration is set")
-    @CommonTest
-    fun lintShouldFailOnUnsupportedVersion(gradleVersion: GradleVersion) {
-        project(gradleVersion) {
-            //language=Groovy
-            buildGradle.appendText(
-                """
-    
-                ktlint.version = "0.34.0"
-                ktlint.disabledRules = ["final-newline"]
-                """.trimIndent()
-            )
-
-            withCleanSources()
-
-            buildAndFail(CHECK_PARENT_TASK_NAME) {
-                assertThat(
-                    task(":${KtLintCheckTask.buildTaskNameForSourceSet("main")}")?.outcome
-                ).isEqualTo(TaskOutcome.FAILED)
-                assertThat(output).contains("Rules disabling is supported since 0.34.2 ktlint version.")
             }
         }
     }

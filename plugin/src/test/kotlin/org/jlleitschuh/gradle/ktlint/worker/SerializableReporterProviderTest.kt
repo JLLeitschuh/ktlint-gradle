@@ -1,5 +1,6 @@
 package org.jlleitschuh.gradle.ktlint.worker
 
+import com.pinterest.ktlint.core.LintError
 import com.pinterest.ktlint.core.Reporter
 import com.pinterest.ktlint.core.ReporterProvider
 import org.assertj.core.api.Assertions.assertThat
@@ -32,13 +33,19 @@ internal class SerializableReporterProviderTest {
         }
     }
 
-    private class TestReporterProvider : ReporterProvider {
+    private class TestReporterProvider : ReporterProvider<TestReporter> {
         override val id: String = "test-reporter-provider"
 
         override fun get(
             out: PrintStream,
             opt: Map<String, String>
-        ): Reporter {
+        ): TestReporter {
+            TODO("Not yet implemented")
+        }
+    }
+
+    private class TestReporter : Reporter {
+        override fun onLintError(file: String, err: LintError, corrected: Boolean) {
             TODO("Not yet implemented")
         }
     }

@@ -12,10 +12,10 @@ import kotlin.streams.asStream
 
 object TestVersions {
     const val minSupportedGradleVersion = KtlintBasePlugin.LOWEST_SUPPORTED_GRADLE_VERSION
-    const val maxSupportedGradleVersion = "7.1.1"
+    const val maxSupportedGradleVersion = "7.5.1"
     val pluginVersion = File("VERSION_CURRENT.txt").readText().trim()
-    const val minSupportedKotlinPluginVersion = "1.4.32"
-    const val maxSupportedKotlinPluginVersion = "1.5.31"
+    const val minSupportedKotlinPluginVersion = "1.7.10"
+    const val maxSupportedKotlinPluginVersion = "1.7.10"
 }
 
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)

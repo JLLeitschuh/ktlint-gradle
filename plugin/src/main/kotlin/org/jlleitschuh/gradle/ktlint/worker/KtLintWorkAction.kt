@@ -3,10 +3,14 @@ package org.jlleitschuh.gradle.ktlint.worker
 import com.pinterest.ktlint.core.KtLint
 import com.pinterest.ktlint.core.LintError
 import com.pinterest.ktlint.core.ParseException
-import com.pinterest.ktlint.core.RuleSet
-import com.pinterest.ktlint.core.RuleSetProvider
+import com.pinterest.ktlint.core.RuleProvider
+import com.pinterest.ktlint.core.RuleSetProviderV2
+import com.pinterest.ktlint.core.api.DefaultEditorConfigProperties
+import com.pinterest.ktlint.core.api.EditorConfigOverride
+import com.pinterest.ktlint.core.api.UsesEditorConfigProperties
 import net.swiftzer.semver.SemVer
 import org.apache.commons.io.input.MessageDigestCalculatingInputStream
+import org.ec4j.core.model.PropertyType
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
@@ -28,17 +32,18 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
     private val logger = Logging.getLogger("ktlint-worker")
 
     override fun execute() {
-        val ruleSets = loadRuleSetsAndFilterThem(
+        val ruleProviders = loadRuleProvidersAndFilterThem(
             parameters.enableExperimental.getOrElse(false),
             parameters.disabledRules.getOrElse(emptySet())
         )
+
+        println(ruleProviders.size)
 
         val additionalEditorConfig = parameters
             .additionalEditorconfigFile
             .orNull
             ?.asFile
             ?.absolutePath
-        val userData = generateUserData()
         val debug = parameters.debug.get()
         val formatSource = parameters.formatSource.getOrElse(false)
 
@@ -49,14 +54,14 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
 
         parameters.filesToLint.files.forEach {
             val errors = mutableListOf<Pair<LintError, Boolean>>()
-            val ktLintParameters = KtLint.Params(
+            val ktLintParameters = KtLint.ExperimentalParams(
                 fileName = it.absolutePath,
                 text = it.readText(),
-                ruleSets = ruleSets,
-                userData = userData,
+                ruleProviders = ruleProviders,
                 debug = debug,
-                editorConfigPath = additionalEditorConfig,
                 script = !it.name.endsWith(".kt", ignoreCase = true),
+                editorConfigPath = additionalEditorConfig,
+                editorConfigOverride = generateEditorConfigOverride(),
                 cb = { lintError, isCorrected ->
                     errors.add(lintError to isCorrected)
                 }
@@ -106,6 +111,23 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
         }
     }
 
+    private fun generateEditorConfigOverride(): EditorConfigOverride {
+        val androidProperty = UsesEditorConfigProperties.EditorConfigProperty(
+            type = PropertyType.LowerCasingPropertyType(
+                "android",
+                "A boolean value indicating that the project is an Android one.",
+                PropertyType.PropertyValueParser.IDENTITY_VALUE_PARSER,
+                emptySet()
+            ),
+            defaultValue = "false"
+        )
+
+        return EditorConfigOverride.from(
+            androidProperty to parameters.android.get().toString(),
+            DefaultEditorConfigProperties.ktlintDisabledRulesProperty to parameters.disabledRules.get().joinToString(separator = ",")
+        )
+    }
+
     private fun resetEditorconfigCache() {
         if (parameters.editorconfigFilesWereChanged.get()) {
             logger.info("Resetting KtLint caches")
@@ -114,33 +136,20 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
         }
     }
 
-    private fun generateUserData(): Map<String, String> {
-        val userData = mutableMapOf(
-            "android" to parameters.android.get().toString()
-        )
-        val disabledRules = parameters.disabledRules.get()
-        if (disabledRules.isNotEmpty()) {
-            userData["disabled_rules"] = disabledRules.joinToString(separator = ",")
-        }
-
-        return userData.toMap()
-    }
-
-    private fun loadRuleSetsAndFilterThem(
+    private fun loadRuleProvidersAndFilterThem(
         enableExperimental: Boolean,
         disabledRules: Set<String>
-    ): Set<RuleSet> = loadRuleSetsFromClasspath()
+    ): Set<RuleProvider> = loadRuleSetsFromClasspath()
         .filterKeys { enableExperimental || it != "experimental" }
         .filterKeys { !(disabledRules.contains("standard") && it == "\u0000standard") }
         .toSortedMap()
-        .mapValues { it.value.get() }
-        .values
+        .flatMap { it.value.getRuleProviders().toList() }
         .toSet()
 
-    private fun loadRuleSetsFromClasspath(): Map<String, RuleSetProvider> = ServiceLoader
-        .load(RuleSetProvider::class.java)
+    private fun loadRuleSetsFromClasspath(): Map<String, RuleSetProviderV2> = ServiceLoader
+        .load(RuleSetProviderV2::class.java)
         .associateBy {
-            val key = it.get().id
+            val key = it.id
             // Adapted from KtLint CLI module
             if (key == "standard") "\u0000$key" else key
         }

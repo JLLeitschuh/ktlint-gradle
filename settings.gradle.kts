@@ -4,8 +4,8 @@ pluginManagement {
     includeBuild("./plugin")
 
     plugins {
-        id("org.jetbrains.kotlin.jvm") version "1.5.31"
-        id("org.jetbrains.kotlin.js") version "1.5.31"
+        id("org.jetbrains.kotlin.jvm") version "1.7.10"
+        id("org.jetbrains.kotlin.js") version "1.7.10"
     }
 
     repositories {
@@ -18,7 +18,7 @@ pluginManagement {
         eachPlugin {
             when (requested.id.id) {
                 "com.android.application" ->
-                    useModule("com.android.tools.build:gradle:4.1.0")
+                    useModule("com.android.tools.build:gradle:7.3.0")
             }
         }
     }

@@ -20,9 +20,6 @@ open class KtlintPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         val holder = PluginHolder(target)
-        // Apply the idea plugin
-        target.plugins.apply(KtlintIdeaPlugin::class.java)
-
         holder.addKotlinScriptTasks()
         holder.addKtLintTasksToKotlinPlugin()
         holder.addGenerateBaselineTask()

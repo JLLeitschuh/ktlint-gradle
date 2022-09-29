@@ -35,6 +35,7 @@ fun File.kotlinPluginProjectSetup(
 
             repositories {
                 gradlePluginPortal()
+                google()
             }
         """.trimIndent()
     )

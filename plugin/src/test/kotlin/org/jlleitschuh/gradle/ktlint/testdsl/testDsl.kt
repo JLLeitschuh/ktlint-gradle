@@ -100,8 +100,8 @@ class TestProject(
     }
 
     companion object {
-        const val CLEAN_SOURCES_FILE = "src/main/kotlin/clean-source.kt"
-        const val FAIL_SOURCE_FILE = "src/main/kotlin/fail-source.kt"
+        const val CLEAN_SOURCES_FILE = "src/main/kotlin/CleanSource.kt"
+        const val FAIL_SOURCE_FILE = "src/main/kotlin/FailSource.kt"
     }
 }
 
@@ -129,11 +129,7 @@ fun defaultProjectSetup(gradleVersion: GradleVersion): (File) -> Unit =
     projectSetup("jvm", gradleVersion)
 
 private val GradleVersion.supportedKotlinVersion
-    get() = if (this <= GradleVersion.version("6.1.1")) {
-        TestVersions.minSupportedKotlinPluginVersion
-    } else {
-        TestVersions.maxSupportedKotlinPluginVersion
-    }
+    get() = TestVersions.maxSupportedKotlinPluginVersion
 
 fun projectSetup(
     kotlinPluginType: String,
@@ -162,6 +158,7 @@ fun projectSetup(
         |    repositories {
         |        mavenLocal()
         |        gradlePluginPortal()
+        |        google()
         |    }
         |
         |    plugins {

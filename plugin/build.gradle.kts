@@ -5,6 +5,12 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.util.prefixIfNot
 
+buildscript {
+    repositories {
+        google()
+    }
+}
+
 plugins {
     kotlin("jvm")
     id("com.gradle.plugin-publish")
@@ -27,8 +33,7 @@ repositories {
 
 tasks.withType<KotlinCompile>() {
     kotlinOptions {
-        apiVersion = "1.3"
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
 }
 
@@ -42,6 +47,7 @@ tasks.withType<PluginUnderTestMetadata>().configureEach {
  */
 val shadowImplementation by configurations.creating
 configurations["compileOnly"].extendsFrom(shadowImplementation)
+configurations["compileOnly"].isCanBeResolved = true
 configurations["testImplementation"].extendsFrom(shadowImplementation)
 
 dependencies {
@@ -49,7 +55,6 @@ dependencies {
     compileOnly(libs.ktlint.core)
     compileOnly(libs.kotlin.gradle.plugin)
     compileOnly(libs.android.gradle.plugin)
-    compileOnly(kotlin("stdlib-jdk8"))
     shadowImplementation(libs.semver)
     shadowImplementation(libs.jgit)
     shadowImplementation(libs.commons.io)

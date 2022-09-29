@@ -28,7 +28,9 @@ class KtlintPluginTest : AbstractPluginTest() {
 
             buildAndFail(CHECK_PARENT_TASK_NAME) {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
-                assertThat(output).contains("Unnecessary space(s)")
+                assertThat(output).contains("FailSource.kt:1:5 Unnecessary long whitespace")
+                assertThat(output).contains("FailSource.kt:1:10 Unnecessary long whitespace")
+                assertThat(output).contains("FailSource.kt:1:15 Unnecessary long whitespace")
             }
         }
     }
@@ -45,33 +47,6 @@ class KtlintPluginTest : AbstractPluginTest() {
         }
     }
 
-    @DisplayName("Should generate code style files in project")
-    @CommonTest
-    fun generateIdeaCodeStyle(gradleVersion: GradleVersion) {
-        project(gradleVersion) {
-            withCleanSources()
-            val ideaRootDir = projectPath.resolve(".idea").apply { mkdir() }
-
-            build(APPLY_TO_IDEA_TASK_NAME) {
-                assertThat(task(":$APPLY_TO_IDEA_TASK_NAME")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-                assertThat(ideaRootDir.listFiles()?.isNullOrEmpty()).isFalse()
-            }
-        }
-    }
-
-    @DisplayName("Should generate code style file globally")
-    @CommonTest
-    fun generateIdeaCodeStyleGlobally(gradleVersion: GradleVersion) {
-        project(gradleVersion) {
-            val ideaRootDir = projectPath.resolve(".idea").apply { mkdir() }
-
-            build(APPLY_TO_IDEA_GLOBALLY_TASK_NAME) {
-                assertThat(task(":$APPLY_TO_IDEA_GLOBALLY_TASK_NAME")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-                assertThat(ideaRootDir.listFiles()?.isNullOrEmpty()).isFalse()
-            }
-        }
-    }
-
     @DisplayName("Should show only plugin meta tasks in task output")
     @CommonTest
     fun showOnlyMetaTasks(gradleVersion: GradleVersion) {
@@ -84,11 +59,9 @@ class KtlintPluginTest : AbstractPluginTest() {
                     .filter { it.startsWith("ktlint", ignoreCase = true) }
                     .toList()
 
-                assertThat(ktlintTasks).hasSize(5)
+                assertThat(ktlintTasks).hasSize(3)
                 assertThat(ktlintTasks).anyMatch { it.startsWith(CHECK_PARENT_TASK_NAME) }
                 assertThat(ktlintTasks).anyMatch { it.startsWith(FORMAT_PARENT_TASK_NAME) }
-                assertThat(ktlintTasks).anyMatch { it.startsWith(APPLY_TO_IDEA_TASK_NAME) }
-                assertThat(ktlintTasks).anyMatch { it.startsWith(APPLY_TO_IDEA_GLOBALLY_TASK_NAME) }
                 assertThat(ktlintTasks).anyMatch { it.startsWith(GenerateBaselineTask.NAME) }
             }
         }
@@ -106,11 +79,9 @@ class KtlintPluginTest : AbstractPluginTest() {
 
                 // Plus for main and test sources format and check tasks
                 // Plus two kotlin script tasks
-                assertThat(ktlintTasks).hasSize(11)
+                assertThat(ktlintTasks).hasSize(9)
                 assertThat(ktlintTasks).anyMatch { it.startsWith(CHECK_PARENT_TASK_NAME) }
                 assertThat(ktlintTasks).anyMatch { it.startsWith(FORMAT_PARENT_TASK_NAME) }
-                assertThat(ktlintTasks).anyMatch { it.startsWith(APPLY_TO_IDEA_TASK_NAME) }
-                assertThat(ktlintTasks).anyMatch { it.startsWith(APPLY_TO_IDEA_GLOBALLY_TASK_NAME) }
                 assertThat(ktlintTasks).anyMatch { it.startsWith(kotlinScriptCheckTaskName) }
                 assertThat(ktlintTasks).anyMatch {
                     it.startsWith(
@@ -133,7 +104,7 @@ class KtlintPluginTest : AbstractPluginTest() {
             buildGradle.appendText(
                 """
 
-                ktlint.filter { exclude("**/fail-source.kt") }
+                ktlint.filter { exclude("**/FailSource.kt") }
                 """.trimIndent()
             )
 
@@ -313,7 +284,7 @@ class KtlintPluginTest : AbstractPluginTest() {
 
             build(
                 ":$CHECK_PARENT_TASK_NAME",
-                "-P$FILTER_INCLUDE_PROPERTY_NAME=src/main/kotlin/clean-source.kt"
+                "-P$FILTER_INCLUDE_PROPERTY_NAME=src/main/kotlin/CleanSource.kt"
             ) {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             }
@@ -330,7 +301,7 @@ class KtlintPluginTest : AbstractPluginTest() {
 
             build(
                 ":$CHECK_PARENT_TASK_NAME",
-                "-P$FILTER_INCLUDE_PROPERTY_NAME=src\\main\\kotlin\\clean-source.kt"
+                "-P$FILTER_INCLUDE_PROPERTY_NAME=src\\main\\kotlin\\CleanSource.kt"
             ) {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             }
@@ -346,13 +317,13 @@ class KtlintPluginTest : AbstractPluginTest() {
             buildGradle.appendText(
                 """
 
-                ktlint.filter { exclude("**/fail-source.kt") }
+                ktlint.filter { exclude("**/FailSource.kt") }
                 """.trimIndent()
             )
 
             build(
                 ":$CHECK_PARENT_TASK_NAME",
-                "-P$FILTER_INCLUDE_PROPERTY_NAME=src/main/kotlin/fail-source.kt"
+                "-P$FILTER_INCLUDE_PROPERTY_NAME=src/main/kotlin/FailSource.kt"
             ) {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SKIPPED)
             }
@@ -398,7 +369,7 @@ class KtlintPluginTest : AbstractPluginTest() {
                 """
 
                 ktlint.enableExperimentalRules = true
-                ktlint.version = "0.34.0"
+                ktlint.version = "0.47.1"
                 """.trimIndent()
             )
 
@@ -412,7 +383,7 @@ class KtlintPluginTest : AbstractPluginTest() {
     @CommonTest
     fun checkIsIncremental(gradleVersion: GradleVersion) {
         project(gradleVersion) {
-            val initialSourceFile = "src/main/kotlin/initial.kt"
+            val initialSourceFile = "src/main/kotlin/Initial.kt"
             createSourceFile(
                 initialSourceFile,
                 """
@@ -425,7 +396,7 @@ class KtlintPluginTest : AbstractPluginTest() {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             }
 
-            val additionalSourceFile = "src/main/kotlin/another-file.kt"
+            val additionalSourceFile = "src/main/kotlin/AnotherFile.kt"
             createSourceFile(
                 additionalSourceFile,
                 """
@@ -474,13 +445,13 @@ class KtlintPluginTest : AbstractPluginTest() {
 
                 """.trimIndent()
 
-            val initialSourceFile = "src/main/kotlin/initial.kt"
+            val initialSourceFile = "src/main/kotlin/Initial.kt"
             createSourceFile(initialSourceFile, passingContents)
 
-            val additionalSourceFile = "src/main/kotlin/another-file.kt"
+            val additionalSourceFile = "src/main/kotlin/AnotherFile.kt"
             createSourceFile(additionalSourceFile, passingContents)
 
-            val testSourceFile = "src/test/kotlin/another-file.kt"
+            val testSourceFile = "src/test/kotlin/AnotherFile.kt"
             createSourceFile(testSourceFile, failingContents)
 
             build(mainSourceSetCheckTaskName) {
@@ -571,50 +542,6 @@ class KtlintPluginTest : AbstractPluginTest() {
         }
     }
 
-    @DisplayName("Should force dependencies versions from KtLint configuration for ruleset configuration")
-    @CommonTest
-    fun forceDependenciesRuleSetConfiguration(gradleVersion: GradleVersion) {
-        project(gradleVersion) {
-            withCleanSources()
-
-            //language=Groovy
-            buildGradle.appendText(
-                """
-
-                dependencies {
-                    $KTLINT_RULESET_CONFIGURATION_NAME "com.pinterest.ktlint:ktlint-core:0.34.2"
-                }
-                """.trimIndent()
-            )
-
-            build(":dependencies", "--configuration", KTLINT_RULESET_CONFIGURATION_NAME) {
-                assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.43.2")
-            }
-        }
-    }
-
-    @DisplayName("Should force dependencies versions from KtLint configuration for reporters configuration")
-    @CommonTest
-    fun forceDependenciesReportersConfiguration(gradleVersion: GradleVersion) {
-        project(gradleVersion) {
-            withCleanSources()
-
-            //language=Groovy
-            buildGradle.appendText(
-                """
-
-                dependencies {
-                    $KTLINT_REPORTER_CONFIGURATION_NAME "com.pinterest.ktlint:ktlint-core:0.34.2"
-                }
-                """.trimIndent()
-            )
-
-            build(":dependencies", "--configuration", KTLINT_REPORTER_CONFIGURATION_NAME) {
-                assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.43.2")
-            }
-        }
-    }
-
     @DisplayName("Format task should succeed on renamed file")
     @CommonTest
     fun formatShouldSucceedOnRenamedFile(gradleVersion: GradleVersion) {
@@ -632,7 +559,7 @@ class KtlintPluginTest : AbstractPluginTest() {
                 val  foo    =    "bar"
             """
             )
-            val destinationFile = projectPath.resolve("src/main/kotlin/renamed-file.kt")
+            val destinationFile = projectPath.resolve("src/main/kotlin/RenamedFile.kt")
             sourceFile.renameTo(destinationFile)
 
             build(FORMAT_PARENT_TASK_NAME) {
