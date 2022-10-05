@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+-   git `pre-commit` hook should now work in all worktrees [#605](https://github.com/JLLeitschuh/ktlint-gradle/pull/605)
+
 ## [11.0.0] - 2022-08-24
 
 ### Changed
