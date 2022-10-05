@@ -245,6 +245,8 @@ class GitHookTasksTest : AbstractPluginTest() {
                 assertThat(hookText).contains("git apply -R \$diff")
                 assertThat(hookText).contains("git apply --ignore-whitespace \$diff")
                 assertThat(hookText).contains("rm \$diff")
+                assertThat(hookText).contains("GITDIR=\$(git rev-parse --git-dir)")
+                assertThat(hookText).contains("diff=\$GITDIR/unstaged-ktlint-git-hook.diff")
             }
         }
     }
