@@ -21,13 +21,13 @@ class DisabledRulesTest : AbstractPluginTest() {
             //language=Groovy
             buildGradle.appendText(
                 """
-    
+
                 ktlint.disabledRules = ["final-newline"]
                 """.trimIndent()
             )
 
             createSourceFile(
-                "src/main/kotlin/clean-source.kt",
+                "src/main/kotlin/CleanSource.kt",
                 """
                 val foo = "bar"
                 """.trimIndent()
@@ -46,20 +46,20 @@ class DisabledRulesTest : AbstractPluginTest() {
             //language=Groovy
             buildGradle.appendText(
                 """
-    
+
                 ktlint.disabledRules = ["final-newline", "no-consecutive-blank-lines"]
                 """.trimIndent()
             )
 
             createSourceFile(
-                "src/main/kotlin/clean-source.kt",
+                "src/main/kotlin/CleanSource.kt",
                 """
                 fun some() {
-    
-    
+
+
                     print("Woohoo!")
                 }
-                
+
                 val foo = "bar"
                 """.trimIndent()
             )
@@ -75,18 +75,18 @@ class DisabledRulesTest : AbstractPluginTest() {
     fun lintRuleDisabledInTheCode(gradleVersion: GradleVersion) {
         project(gradleVersion) {
             createSourceFile(
-                "src/main/kotlin/clean-source.kt",
+                "src/main/kotlin/CleanSource.kt",
                 """
                 /* ktlint-disable no-consecutive-blank-lines */
                 fun some() {
-    
-    
+
+
                     print("Woohoo!")
                 }
                 /* ktlint-enable no-consecutive-blank-lines */
-                
+
                 val foo = "bar"
-                
+
                 """.trimIndent()
             )
 
@@ -103,7 +103,7 @@ class DisabledRulesTest : AbstractPluginTest() {
             //language=Groovy
             buildGradle.appendText(
                 """
-    
+
                 ktlint.version = "0.34.0"
                 ktlint.disabledRules = ["final-newline"]
                 """.trimIndent()

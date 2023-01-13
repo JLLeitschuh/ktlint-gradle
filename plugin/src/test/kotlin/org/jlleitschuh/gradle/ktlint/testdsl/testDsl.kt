@@ -100,8 +100,8 @@ class TestProject(
     }
 
     companion object {
-        const val CLEAN_SOURCES_FILE = "src/main/kotlin/clean-source.kt"
-        const val FAIL_SOURCE_FILE = "src/main/kotlin/fail-source.kt"
+        const val CLEAN_SOURCES_FILE = "src/main/kotlin/CleanSource.kt"
+        const val FAIL_SOURCE_FILE = "src/main/kotlin/FailSource.kt"
     }
 }
 

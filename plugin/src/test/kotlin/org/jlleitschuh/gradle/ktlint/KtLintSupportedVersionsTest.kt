@@ -102,7 +102,7 @@ class KtLintSupportedVersionsTest : AbstractPluginTest() {
             "0.36.0",
             "0.37.1",
             "0.37.2",
-            // "0.38.0" has been compiled with Kotlin apiLevel 1.4 and not supported by Gradle plugins
+            "0.38.0",
             "0.38.1",
             "0.39.0",
             "0.40.0",
@@ -112,6 +112,12 @@ class KtLintSupportedVersionsTest : AbstractPluginTest() {
             // "0.43.0" does not work on JDK1.8
             // "0.43.1" asked not to use it
             "0.43.2",
+            "0.44.0",
+            "0.45.2",
+            "0.46.1",
+            "0.47.1",
+            "0.48.0",
+            "0.48.1"
         ).also {
             // "0.37.0" is failing on Windows machines that is fixed in the next version
             if (!OS.WINDOWS.isCurrentOs) it.add("0.37.0")
