@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [11.1.0] - 2023-01-27
+
 ### Added
 
 -   The plugin will now work with ktlint `0.46.1` - `0.48.1` [#620](https://github.com/JLLeitschuh/ktlint-gradle/pull/620)
@@ -609,7 +611,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 -   Renamed task with name `ktlint` to `ktlintCheck` (#3)
 -   Renamed tasks with names `ktlint[source set name]` to `ktlint[source set name]Check` (#3)
 
-[Unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.0.0...HEAD
+[Unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.1.0...HEAD
+
+[11.1.0]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.0.0...v11.1.0
 
 [11.0.0]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v10.3.0...v11.0.0
 
