@@ -6,7 +6,7 @@
 Latest plugin version: [11.1.0](/CHANGELOG.md#---20230127)
 
 [![Join the chat at https://kotlinlang.slack.com](https://img.shields.io/badge/slack-@kotlinlang/ktlint-yellow.svg?logo=slack)](https://kotlinlang.slack.com/messages/CKS3XG0LS)
-[![Build Status](https://travis-ci.org/JLLeitschuh/ktlint-gradle.svg?branch=master)](https://travis-ci.org/JLLeitschuh/ktlint-gradle)
+[![Build Status](https://travis-ci.org/JLLeitschuh/ktlint-gradle.svg?branch=main)](https://travis-ci.org/JLLeitschuh/ktlint-gradle)
 [![ktlint](https://img.shields.io/badge/code%20style-%E2%9D%A4-FF4081.svg)](https://ktlint.github.io/)
 [![Gradle Plugin Portal](https://img.shields.io/maven-metadata/v/https/plugins.gradle.org/m2/org/jlleitschuh/gradle/ktlint/org.jlleitschuh.gradle.ktlint.gradle.plugin/maven-metadata.xml.svg?colorB=007ec6&label=gradlePluginPortal)](https://plugins.gradle.org/plugin/org.jlleitschuh.gradle.ktlint)
 
@@ -313,7 +313,7 @@ ktlint {
 }
 
 dependencies {
-    ktlintRuleset "com.github.username:rulseset:master-SNAPSHOT"
+    ktlintRuleset "com.github.username:rulseset:main-SNAPSHOT"
     ktlintRuleset files("/path/to/custom/rulseset.jar")
     ktlintRuleset project(":chore:project-ruleset")
 }
@@ -364,7 +364,7 @@ configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
 }
 
 dependencies {
-    ktlintRuleset("com.github.username:rulseset:master-SNAPSHOT")
+    ktlintRuleset("com.github.username:rulseset:main-SNAPSHOT")
     ktlintRuleset(files("/path/to/custom/rulseset.jar"))
     ktlintRuleset(project(":chore:project-ruleset"))
 }
