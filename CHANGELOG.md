@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+-   The plugin will now work with ktlint `0.46.1` - `0.48.1` [#620](https://github.com/JLLeitschuh/ktlint-gradle/pull/620)
+
 ## [11.0.0] - 2022-08-24
 
 ### Changed

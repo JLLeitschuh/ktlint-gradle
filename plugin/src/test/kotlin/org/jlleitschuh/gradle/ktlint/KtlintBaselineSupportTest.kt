@@ -31,7 +31,7 @@ class KtlintBaselineSupportTest : AbstractPluginTest() {
                     <?xml version="1.0" encoding="utf-8"?>
                     <baseline version="1.0">
                     </baseline>
-                    
+
                     """.trimIndent()
                 )
             }
@@ -58,7 +58,7 @@ class KtlintBaselineSupportTest : AbstractPluginTest() {
                     |	<file name="kotlin-script-fail.kts">
                     |		<error line="1" column="15" source="no-trailing-spaces" />
                     |	</file>
-                    |	<file name="src/main/kotlin/fail-source.kt">
+                    |	<file name="src/main/kotlin/FailSource.kt">
                     |		<error line="1" column="5" source="no-multi-spaces" />
                     |		<error line="1" column="10" source="no-multi-spaces" />
                     |		<error line="1" column="15" source="no-multi-spaces" />
@@ -90,7 +90,7 @@ class KtlintBaselineSupportTest : AbstractPluginTest() {
                     <?xml version="1.0" encoding="utf-8"?>
                     <baseline version="1.0">
                     </baseline>
-                    
+
                     """.trimIndent()
                 )
             }
@@ -106,7 +106,7 @@ class KtlintBaselineSupportTest : AbstractPluginTest() {
             //language=Groovy
             buildGradle.appendText(
                 """
-                
+
                 ktlint {
                     version.set("0.40.0")
                 }
@@ -157,7 +157,7 @@ class KtlintBaselineSupportTest : AbstractPluginTest() {
             //language=Groovy
             buildGradle.appendText(
                 """
-                
+
                 ktlint {
                     version.set("0.40.0")
                 }

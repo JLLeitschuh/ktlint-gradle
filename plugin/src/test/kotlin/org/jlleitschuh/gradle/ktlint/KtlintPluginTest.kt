@@ -133,7 +133,7 @@ class KtlintPluginTest : AbstractPluginTest() {
             buildGradle.appendText(
                 """
 
-                ktlint.filter { exclude("**/fail-source.kt") }
+                ktlint.filter { exclude("**/FailSource.kt") }
                 """.trimIndent()
             )
 
@@ -313,7 +313,7 @@ class KtlintPluginTest : AbstractPluginTest() {
 
             build(
                 ":$CHECK_PARENT_TASK_NAME",
-                "-P$FILTER_INCLUDE_PROPERTY_NAME=src/main/kotlin/clean-source.kt"
+                "-P$FILTER_INCLUDE_PROPERTY_NAME=src/main/kotlin/CleanSource.kt"
             ) {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             }
@@ -330,7 +330,7 @@ class KtlintPluginTest : AbstractPluginTest() {
 
             build(
                 ":$CHECK_PARENT_TASK_NAME",
-                "-P$FILTER_INCLUDE_PROPERTY_NAME=src\\main\\kotlin\\clean-source.kt"
+                "-P$FILTER_INCLUDE_PROPERTY_NAME=src\\main\\kotlin\\CleanSource.kt"
             ) {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             }
@@ -346,13 +346,13 @@ class KtlintPluginTest : AbstractPluginTest() {
             buildGradle.appendText(
                 """
 
-                ktlint.filter { exclude("**/fail-source.kt") }
+                ktlint.filter { exclude("**/FailSource.kt") }
                 """.trimIndent()
             )
 
             build(
                 ":$CHECK_PARENT_TASK_NAME",
-                "-P$FILTER_INCLUDE_PROPERTY_NAME=src/main/kotlin/fail-source.kt"
+                "-P$FILTER_INCLUDE_PROPERTY_NAME=src/main/kotlin/FailSource.kt"
             ) {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SKIPPED)
             }
