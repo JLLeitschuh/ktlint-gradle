@@ -50,14 +50,12 @@ class ConfigurationCacheTest : AbstractPluginTest() {
     @CommonTest
     fun configurationCacheForFormatTasks(gradleVersion: GradleVersion) {
         project(gradleVersion) {
+            val sourceFile = "\nval foo = \"bar\"\n"
             createSourceFile(
                 "src/main/kotlin/CleanSource.kt",
-                """
-                val foo = "bar"
-                """.trimIndent()
+                sourceFile
             )
             val formatTaskName = KtLintFormatTask.buildTaskNameForSourceSet("main")
-
             build(
                 configurationCacheFlag,
                 configurationCacheWarnFlag,
@@ -66,13 +64,12 @@ class ConfigurationCacheTest : AbstractPluginTest() {
                 assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
                 assertThat(task(":$mainSourceSetFormatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             }
-
             build(
                 configurationCacheFlag,
                 configurationCacheWarnFlag,
-                FORMAT_PARENT_TASK_NAME
+                FORMAT_PARENT_TASK_NAME, "--debug"
             ) {
-                assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
                 assertThat(task(":$mainSourceSetFormatTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
                 assertThat(output).contains("Reusing configuration cache.")
             }

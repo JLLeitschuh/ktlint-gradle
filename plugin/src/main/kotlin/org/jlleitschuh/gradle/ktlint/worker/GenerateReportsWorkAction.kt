@@ -1,7 +1,6 @@
 package org.jlleitschuh.gradle.ktlint.worker
 
-import com.pinterest.ktlint.core.internal.containsLintError
-import com.pinterest.ktlint.core.internal.loadBaseline
+import com.pinterest.ktlint.core.LintError
 import net.swiftzer.semver.SemVer
 import org.gradle.api.GradleException
 import org.gradle.api.file.DirectoryProperty
@@ -31,8 +30,8 @@ internal abstract class GenerateReportsWorkAction : WorkAction<GenerateReportsWo
             .find { it.id == currentReporterId }
             ?: throw GradleException("Could not find ReporterProvider \"$currentReporterId\"")
 
-        val baselineRules = parameters.baseline.orNull?.asFile?.absolutePath
-            ?.let { loadBaseline(it).baselineRules }
+        val baselineRules: Map<String, List<LintError>>? = parameters.baseline.orNull?.asFile?.absolutePath
+            ?.let { loadBaselineRules(it) }
         val projectDir = parameters.projectDirectory.asFile.get()
 
         PrintStream(

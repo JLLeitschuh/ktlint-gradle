@@ -28,7 +28,7 @@ class KtlintPluginTest : AbstractPluginTest() {
 
             buildAndFail(CHECK_PARENT_TASK_NAME) {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
-                assertThat(output).contains("Unnecessary space(s)")
+                assertThat(output).contains("Unnecessary long whitespace")
             }
         }
     }
@@ -45,10 +45,16 @@ class KtlintPluginTest : AbstractPluginTest() {
         }
     }
 
-    @DisplayName("Should generate code style files in project")
+    @DisplayName("Should generate code style files in project < 0.47.0")
     @CommonTest
     fun generateIdeaCodeStyle(gradleVersion: GradleVersion) {
         project(gradleVersion) {
+            buildGradle.appendText(
+                """
+                ktlint.version = "0.46.1"
+
+                """.trimIndent()
+            )
             withCleanSources()
             val ideaRootDir = projectPath.resolve(".idea").apply { mkdir() }
 
@@ -59,15 +65,62 @@ class KtlintPluginTest : AbstractPluginTest() {
         }
     }
 
-    @DisplayName("Should generate code style file globally")
+    @DisplayName("Should not generate code style files in project >= 0.47.0")
     @CommonTest
-    fun generateIdeaCodeStyleGlobally(gradleVersion: GradleVersion) {
+    fun generateIdeaCodeStyleNew(gradleVersion: GradleVersion) {
         project(gradleVersion) {
+            buildGradle.appendText(
+                """
+                ktlint.version = "0.47.1"
+
+                """.trimIndent()
+            )
+            withCleanSources()
+            val ideaRootDir = projectPath.resolve(".idea").apply { mkdir() }
+
+            build(APPLY_TO_IDEA_TASK_NAME) {
+                assertThat(task(":$APPLY_TO_IDEA_TASK_NAME")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(output).contains("Skipping ktlintApplyToIdea. The applyToIDEA functionality was removed from ktlint in 0.47.0.")
+                assertThat(ideaRootDir.listFiles()?.isNullOrEmpty()).isTrue()
+            }
+        }
+    }
+
+    @DisplayName("Should generate code style file globally < 0.47.0")
+    @CommonTest
+    fun generateIdeaCodeStyleGloballyOld(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            buildGradle.appendText(
+                """
+                ktlint.version = "0.46.1"
+
+                """.trimIndent()
+            )
             val ideaRootDir = projectPath.resolve(".idea").apply { mkdir() }
 
             build(APPLY_TO_IDEA_GLOBALLY_TASK_NAME) {
                 assertThat(task(":$APPLY_TO_IDEA_GLOBALLY_TASK_NAME")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
                 assertThat(ideaRootDir.listFiles()?.isNullOrEmpty()).isFalse()
+            }
+        }
+    }
+
+    @DisplayName("Should not generate code style file globally >= 0.47.0")
+    @CommonTest
+    fun generateIdeaCodeStyleGloballyNew(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            buildGradle.appendText(
+                """
+                ktlint.version = "0.47.1"
+
+                """.trimIndent()
+            )
+            val ideaRootDir = projectPath.resolve(".idea").apply { mkdir() }
+
+            build(APPLY_TO_IDEA_GLOBALLY_TASK_NAME) {
+                assertThat(task(":$APPLY_TO_IDEA_GLOBALLY_TASK_NAME")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(output).contains("Skipping ktlintApplyToIdeaGlobally. The applyToIDEA functionality was removed from ktlint in 0.47.0.")
+                assertThat(ideaRootDir.listFiles()?.isNullOrEmpty()).isTrue()
             }
         }
     }
@@ -412,7 +465,7 @@ class KtlintPluginTest : AbstractPluginTest() {
     @CommonTest
     fun checkIsIncremental(gradleVersion: GradleVersion) {
         project(gradleVersion) {
-            val initialSourceFile = "src/main/kotlin/initial.kt"
+            val initialSourceFile = "src/main/kotlin/Initial.kt"
             createSourceFile(
                 initialSourceFile,
                 """
@@ -425,7 +478,7 @@ class KtlintPluginTest : AbstractPluginTest() {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             }
 
-            val additionalSourceFile = "src/main/kotlin/another-file.kt"
+            val additionalSourceFile = "src/main/kotlin/AnotherFile.kt"
             createSourceFile(
                 additionalSourceFile,
                 """
@@ -474,13 +527,13 @@ class KtlintPluginTest : AbstractPluginTest() {
 
                 """.trimIndent()
 
-            val initialSourceFile = "src/main/kotlin/initial.kt"
+            val initialSourceFile = "src/main/kotlin/Initial.kt"
             createSourceFile(initialSourceFile, passingContents)
 
-            val additionalSourceFile = "src/main/kotlin/another-file.kt"
+            val additionalSourceFile = "src/main/kotlin/AnotherFile.kt"
             createSourceFile(additionalSourceFile, passingContents)
 
-            val testSourceFile = "src/test/kotlin/another-file.kt"
+            val testSourceFile = "src/test/kotlin/AnotherFile.kt"
             createSourceFile(testSourceFile, failingContents)
 
             build(mainSourceSetCheckTaskName) {
@@ -588,7 +641,7 @@ class KtlintPluginTest : AbstractPluginTest() {
             )
 
             build(":dependencies", "--configuration", KTLINT_RULESET_CONFIGURATION_NAME) {
-                assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.43.2")
+                assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.47.1")
             }
         }
     }
@@ -610,7 +663,7 @@ class KtlintPluginTest : AbstractPluginTest() {
             )
 
             build(":dependencies", "--configuration", KTLINT_REPORTER_CONFIGURATION_NAME) {
-                assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.43.2")
+                assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.47.1")
             }
         }
     }
@@ -632,7 +685,7 @@ class KtlintPluginTest : AbstractPluginTest() {
                 val  foo    =    "bar"
             """
             )
-            val destinationFile = projectPath.resolve("src/main/kotlin/renamed-file.kt")
+            val destinationFile = projectPath.resolve("src/main/kotlin/RenamedFile.kt")
             sourceFile.renameTo(destinationFile)
 
             build(FORMAT_PARENT_TASK_NAME) {

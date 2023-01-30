@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- change compile target to 0.45.2
+- change default ktlint version applied by plugin to 0.47.1 [#624](https://github.com/JLLeitschuh/ktlint-gradle/pull/624)
+
+### Fixed
+
+- Fixed ktlint API compatibility issue around baselines in 0.46 and 0.47+
+
 ## [11.1.0] - 2023-01-27
 
 ### Added

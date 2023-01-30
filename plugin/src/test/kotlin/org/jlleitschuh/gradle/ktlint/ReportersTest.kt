@@ -24,7 +24,7 @@ class ReportersTest : AbstractPluginTest() {
             //language=Groovy
             buildGradle.appendText(
                 """
-                        
+
                 ktlint.reporters {
                     reporter "checkstyle"
                     reporter "json"
@@ -35,7 +35,7 @@ class ReportersTest : AbstractPluginTest() {
 
             buildAndFail(CHECK_PARENT_TASK_NAME) {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
-                assertThat(output).contains("Unnecessary space(s)")
+                assertThat(output).contains("Unnecessary long whitespace")
                 assertReportNotCreated(ReporterType.PLAIN.fileExtension, mainSourceSetCheckTaskName)
                 assertReportCreated(ReporterType.CHECKSTYLE.fileExtension, mainSourceSetCheckTaskName)
                 assertReportCreated(ReporterType.JSON.fileExtension, mainSourceSetCheckTaskName)
@@ -56,7 +56,7 @@ class ReportersTest : AbstractPluginTest() {
                 repositories {
                     jcenter()
                 }
-                
+
                 ktlint.reporters {
                     reporter "checkstyle"
                     customReporters {
@@ -65,14 +65,14 @@ class ReportersTest : AbstractPluginTest() {
                             dependency = "me.cassiano:ktlint-html-reporter:0.2.3"
                         }
                     }
-                }  
+                }
                 """.trimIndent()
             )
             withFailingSources()
 
             buildAndFail(CHECK_PARENT_TASK_NAME) {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
-                assertThat(output).contains("Unnecessary space(s)")
+                assertThat(output).contains("Unnecessary long whitespace")
                 assertReportCreated(ReporterType.CHECKSTYLE.fileExtension, mainSourceSetCheckTaskName)
                 assertReportNotCreated(ReporterType.PLAIN.fileExtension, mainSourceSetCheckTaskName)
                 assertReportNotCreated(ReporterType.JSON.fileExtension, mainSourceSetCheckTaskName)
@@ -89,11 +89,11 @@ class ReportersTest : AbstractPluginTest() {
             //language=Groovy
             buildGradle.appendText(
                 """
-                    
+
                 ktlint.reporters {
                     reporter "json"
                     reporter "plain"
-                }                    
+                }
                 """.trimIndent()
             )
 
@@ -117,7 +117,7 @@ class ReportersTest : AbstractPluginTest() {
                 ktlint.reporters {
                     reporter "json"
                     reporter "plain_group_by_file"
-                }                    
+                }
                 """.trimIndent()
             )
 
@@ -131,7 +131,7 @@ class ReportersTest : AbstractPluginTest() {
             //language=Groovy
             buildGradle.appendText(
                 """
-                
+
                 ktlint.reporters {
                     reporter "json"
                     reporter "checkstyle"
@@ -243,12 +243,12 @@ class ReportersTest : AbstractPluginTest() {
             //language=Groovy
             buildGradle.appendText(
                 """
-            
+
                 ktlint.reporters {
                     reporter "checkstyle"
                     reporter "json"
                 }
-                
+
                 tasks.withType(org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask.class) {
                     reportsOutputDirectory.set(project.layout.buildDirectory.dir("$newLocation/${'$'}name"))
                 }

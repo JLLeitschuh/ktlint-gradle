@@ -25,6 +25,12 @@ repositories {
     mavenCentral()
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(8))
+    }
+}
+
 tasks.withType<KotlinCompile>() {
     kotlinOptions {
         apiVersion = "1.3"

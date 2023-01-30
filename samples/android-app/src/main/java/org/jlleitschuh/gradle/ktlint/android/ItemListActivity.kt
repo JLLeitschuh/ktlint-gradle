@@ -46,7 +46,7 @@ class ItemListActivity : AppCompatActivity() {
     }
 
     class SimpleItemRecyclerViewAdapter(
-        private val mValues: List<DummyContent.DummyItem>,
+        private val mValues: List<DummyContent.DummyItem>
     ) : RecyclerView.Adapter<ViewHolder>() {
 
         private val mOnClickListener: View.OnClickListener

@@ -55,10 +55,9 @@ class DisabledRulesTest : AbstractPluginTest() {
                 "src/main/kotlin/CleanSource.kt",
                 """
                 fun some() {
-
-
                     print("Woohoo!")
                 }
+
 
                 val foo = "bar"
                 """.trimIndent()
@@ -79,10 +78,10 @@ class DisabledRulesTest : AbstractPluginTest() {
                 """
                 /* ktlint-disable no-consecutive-blank-lines */
                 fun some() {
-
-
                     print("Woohoo!")
                 }
+
+
                 /* ktlint-enable no-consecutive-blank-lines */
 
                 val foo = "bar"

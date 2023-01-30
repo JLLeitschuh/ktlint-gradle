@@ -49,7 +49,7 @@ internal abstract class LoadReportersWorkAction : WorkAction<LoadReportersWorkAc
             if (isEmpty()) setOf(ReporterType.PLAIN) else this
         }
 
-    private fun loadAllReporterProviders(): List<ReporterProvider> = ServiceLoader
+    private fun loadAllReporterProviders(): List<ReporterProvider<*>> = ServiceLoader
         .load(ReporterProvider::class.java)
         .toList()
         .also { reporterProviders ->
@@ -61,8 +61,8 @@ internal abstract class LoadReportersWorkAction : WorkAction<LoadReportersWorkAc
         }
 
     private fun filterEnabledBuiltInProviders(
-        allProviders: List<ReporterProvider>
-    ): List<Pair<LoadedReporter, ReporterProvider>> {
+        allProviders: List<ReporterProvider<*>>
+    ): List<Pair<LoadedReporter, ReporterProvider<*>>> {
         val enabledReporters = getEnabledReporters()
 
         val enabledProviders = allProviders
@@ -89,8 +89,8 @@ internal abstract class LoadReportersWorkAction : WorkAction<LoadReportersWorkAc
     }
 
     private fun filterCustomProviders(
-        allProviders: List<ReporterProvider>
-    ): List<Pair<LoadedReporter, ReporterProvider>> {
+        allProviders: List<ReporterProvider<*>>
+    ): List<Pair<LoadedReporter, ReporterProvider<*>>> {
         val customReporters = parameters.customReporters.get()
         val customProviders = allProviders
             .filter { reporterProvider ->

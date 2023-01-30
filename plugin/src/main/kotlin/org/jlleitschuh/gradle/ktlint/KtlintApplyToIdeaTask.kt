@@ -29,27 +29,34 @@ open class KtlintApplyToIdeaTask @Inject constructor(
 
     @TaskAction
     fun generate() {
-        project.javaexec {
-            it.classpath = classpath
-            it.main = "com.pinterest.ktlint.Main"
+        // this option was removed and will cause errors in ktlint >= 0.47.0
+        if (SemVer.parse(ktlintVersion.get()) < SemVer(0, 47, 0)) {
+            project.javaexec {
+                it.classpath = classpath
+                it.main = "com.pinterest.ktlint.Main"
 
-            // Global flags
-            if (android.get()) {
-                it.args(
-                    "--android"
-                )
+                // Global flags
+                if (android.get()) {
+                    it.args(
+                        "--android"
+                    )
+                }
+
+                // Subcommand
+                if (globally.get()) {
+                    it.args(getApplyToIdeaCommand())
+                } else {
+                    it.args(getApplyToProjectCommand())
+                }
+
+                // Subcommand parameters
+                // -y here to auto-overwrite existing IDEA code style.
+                it.args("-y")
             }
-
-            // Subcommand
-            if (globally.get()) {
-                it.args(getApplyToIdeaCommand())
-            } else {
-                it.args(getApplyToProjectCommand())
-            }
-
-            // Subcommand parameters
-            // -y here to auto-overwrite existing IDEA code style
-            it.args("-y")
+        } else {
+            project.logger.warn(
+                "Skipping ${this.name}. The applyToIDEA functionality was removed from ktlint in 0.47.0. Use .editorconfig to synchronize formatting rules between IDEA and ktlint."
+            )
         }
     }
 
