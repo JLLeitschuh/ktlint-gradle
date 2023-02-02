@@ -13,10 +13,10 @@ import kotlin.reflect.jvm.jvmName
  * Should be removed once KtLint will add interface implementation into [ReporterProvider].
  */
 internal class SerializableReporterProvider(
-    reporterProvider: ReporterProvider
+    reporterProvider: ReporterProvider<*>
 ) : Serializable {
     @Transient
-    var reporterProvider: ReporterProvider = reporterProvider
+    var reporterProvider: ReporterProvider<*> = reporterProvider
         private set
 
     @Throws(IOException::class)
@@ -29,7 +29,7 @@ internal class SerializableReporterProvider(
         val reporterProviderClassName = oin.readUTF()
         val classLoader = this.javaClass.classLoader
         val reporterProviderClass = classLoader.loadClass(reporterProviderClassName)
-        reporterProvider = reporterProviderClass.newInstance() as ReporterProvider
+        reporterProvider = reporterProviderClass.newInstance() as ReporterProvider<*>
     }
 
     companion object {

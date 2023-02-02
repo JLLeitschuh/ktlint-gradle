@@ -1,5 +1,6 @@
 package org.jlleitschuh.gradle.ktlint
 
+import net.swiftzer.semver.SemVer
 import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testkit.runner.TaskOutcome
 import org.gradle.util.GradleVersion
@@ -11,6 +12,8 @@ import org.jlleitschuh.gradle.ktlint.testdsl.build
 import org.jlleitschuh.gradle.ktlint.testdsl.buildAndFail
 import org.jlleitschuh.gradle.ktlint.testdsl.project
 import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ArgumentsSource
 import java.io.File
 
 @GradleTestVersions
@@ -51,12 +54,13 @@ class KtlintBaselineSupportTest : AbstractPluginTest() {
                 assertThat(baselineFile).exists()
                 // WARN: baseline uses tabs for indentation!
                 //language=xml
-                assertThat(baselineFile.readText()).isEqualToNormalizingNewlines(
+                assertThat(baselineFile.readText()).isEqualToIgnoringWhitespace(
                     """
                     |<?xml version="1.0" encoding="utf-8"?>
                     |<baseline version="1.0">
                     |	<file name="kotlin-script-fail.kts">
                     |		<error line="1" column="15" source="no-trailing-spaces" />
+                    |		<error line="1" column="16" source="no-multi-spaces" />
                     |	</file>
                     |	<file name="src/main/kotlin/FailSource.kt">
                     |		<error line="1" column="5" source="no-multi-spaces" />
@@ -121,14 +125,24 @@ class KtlintBaselineSupportTest : AbstractPluginTest() {
     }
 
     @DisplayName("Should consider existing issues in baseline")
-    @CommonTest
-    fun existingIssueFilteredByBaseline(gradleVersion: GradleVersion) {
-        project(gradleVersion) {
-            withFailingSources()
+    @ParameterizedTest(name = "{0} with KtLint {1}: {displayName}")
+    @ArgumentsSource(KtLintSupportedVersionsTest.SupportedKtlintVersionsProvider::class)
+    fun existingIssueFilteredByBaseline(gradleVersion: GradleVersion, ktLintVersion: String) {
+        if (SemVer.parse(ktLintVersion) >= SemVer(0, 41, 0)) {
+            // baseline support was added in 0.41.0
+            project(gradleVersion) {
+                //language=Groovy
+                buildGradle.appendText(
+                    """
+                    ktlint.version = "$ktLintVersion"
+                    """.trimIndent()
+                )
+                withFailingSources()
 
-            build(GenerateBaselineTask.NAME)
-            build(CHECK_PARENT_TASK_NAME) {
-                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                build(GenerateBaselineTask.NAME)
+                build(CHECK_PARENT_TASK_NAME) {
+                    assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                }
             }
         }
     }

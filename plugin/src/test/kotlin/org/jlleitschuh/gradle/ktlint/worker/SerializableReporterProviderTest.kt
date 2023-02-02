@@ -32,7 +32,7 @@ internal class SerializableReporterProviderTest {
         }
     }
 
-    private class TestReporterProvider : ReporterProvider {
+    private class TestReporterProvider : ReporterProvider<Reporter> {
         override val id: String = "test-reporter-provider"
 
         override fun get(
