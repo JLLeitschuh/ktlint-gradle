@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Fixed
 
 - Fixed ktlint API compatibility issue around baselines in 0.46 and 0.47+
+- Fixed disabled_rules warning when using new editorconfig syntax in ktlint 0.48+ [#625](https://github.com/JLLeitschuh/ktlint-gradle/pull/625)
 
 ## [11.1.0] - 2023-01-27
 
