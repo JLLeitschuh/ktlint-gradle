@@ -37,6 +37,7 @@ class TestProject(
 ) {
     val buildGradle get() = projectPath.resolve("build.gradle")
     val settingsGradle get() = projectPath.resolve("settings.gradle")
+    val editorConfig get() = projectPath.resolve(".editorconfig")
 
     fun withCleanSources() {
         createSourceFile(

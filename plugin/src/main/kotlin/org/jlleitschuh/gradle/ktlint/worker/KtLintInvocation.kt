@@ -161,17 +161,19 @@ private fun userDataToEditorConfigOverride(userData: Map<String, String>): Any {
     val codeStyle = getCodeStyle(if (userData["android"]?.toBoolean() == true) "android" else "official")
     val editorConfigOverrideClass = Class.forName("com.pinterest.ktlint.core.api.EditorConfigOverride")
     val editorConfigOverride = editorConfigOverrideClass.kotlin.primaryConstructor!!.call()
-    val addMethod = editorConfigOverrideClass.getDeclaredMethod("add", getEditorConfigPropertyClass(), Any::class.java)
-    addMethod.isAccessible = true
-    val disabledRulesProperty =
-        defaultEditorConfigPropertiesClass.kotlin.memberProperties.firstOrNull { it.name == "ktlintDisabledRulesProperty" }
-            ?: defaultEditorConfigPropertiesClass.kotlin.memberProperties.first { it.name == "disabledRulesProperty" }
-    val codeStyleSetProperty =
-        defaultEditorConfigPropertiesClass.kotlin.memberProperties.first { it.name == "codeStyleSetProperty" }
-    addMethod.invoke(
-        editorConfigOverride, disabledRulesProperty.getter.call(defaultEditorConfigProperties),
-        userData["disabled_rules"]
-    )
+    val addMethod = editorConfigOverrideClass.getDeclaredMethod("add", getEditorConfigPropertyClass(), Any::class.java).apply {
+        isAccessible = true
+    }
+    val codeStyleSetProperty = defaultEditorConfigPropertiesClass.kotlin.memberProperties.first { it.name == "codeStyleSetProperty" }
+    if (!userData["disabled_rules"].isNullOrBlank()) {
+        val disabledRulesProperty =
+            defaultEditorConfigPropertiesClass.kotlin.memberProperties.firstOrNull { it.name == "ktlintDisabledRulesProperty" }
+                ?: defaultEditorConfigPropertiesClass.kotlin.memberProperties.first { it.name == "disabledRulesProperty" }
+        addMethod.invoke(
+            editorConfigOverride, disabledRulesProperty.getter.call(defaultEditorConfigProperties),
+            userData["disabled_rules"]
+        )
+    }
     addMethod.invoke(editorConfigOverride, codeStyleSetProperty.getter.call(defaultEditorConfigProperties), codeStyle)
     return editorConfigOverride
 }
