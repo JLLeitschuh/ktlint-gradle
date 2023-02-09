@@ -63,17 +63,38 @@ class DisabledRulesTest : AbstractPluginTest() {
     @ParameterizedTest(name = "{0} with KtLint {1}: {displayName}")
     @ArgumentsSource(KtLintSupportedVersionsTest.SupportedKtlintVersionsProvider::class)
     fun lintDisabledRuleFinalNewlineEditorconfig(gradleVersion: GradleVersion, ktLintVersion: String) {
-        if (SemVer.parse(ktLintVersion) >= SemVer.parse("0.48.0")) {
-            // new way of disabling rules introduced in 0.48
+        if (SemVer.parse(ktLintVersion) >= SemVer.parse("0.34.2")) {
+            // Rules disabling is supported since 0.34.2 ktlint version
             project(gradleVersion) {
-                editorConfig.appendText(
-                    """
-                    root = true
+                if (SemVer.parse(ktLintVersion) >= SemVer.parse("0.48.0")) {
+                    // new way of disabling rules introduced in 0.48
+                    editorConfig.appendText(
+                        """
+                        root = true
 
-                    [*.kt]
-                    ktlint_standard_final-newline = disabled
-                    """.trimIndent()
-                )
+                        [*.kt]
+                        ktlint_standard_final-newline = disabled
+                        """.trimIndent()
+                    )
+                } else if (SemVer.parse(ktLintVersion) >= SemVer.parse("0.47.0")) {
+                    // disabled rules property renamed in 0.47 (disabled_rules is still honored, but will print a warning)
+                    editorConfig.appendText(
+                        """
+                        root = true
+                        [*.kt]
+                        ktlint_disabled_rules = final-newline
+                        """.trimIndent()
+                    )
+                } else {
+                    editorConfig.appendText(
+                        """
+                        root = true
+
+                        [*.kt]
+                        disabled_rules = final-newline
+                        """.trimIndent()
+                    )
+                }
                 //language=Groovy
                 buildGradle.appendText(
                     """
@@ -89,6 +110,7 @@ class DisabledRulesTest : AbstractPluginTest() {
                 build(CHECK_PARENT_TASK_NAME) {
                     assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
                     assertThat(output).doesNotContain("Property 'ktlint_disabled_rules' is deprecated")
+                    assertThat(output).doesNotContain("Property 'disabled_rules' is deprecated")
                 }
             }
         }
