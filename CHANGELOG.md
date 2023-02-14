@@ -7,16 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [11.2.0] - 2023-02-14
+
 ### Changed
 
-- change compile target to 0.45.2
-- change default ktlint version applied by plugin to 0.47.1 [#624](https://github.com/JLLeitschuh/ktlint-gradle/pull/624)
+-   change compile target to 0.45.2
+-   change default ktlint version applied by plugin to 0.47.1 [#624](https://github.com/JLLeitschuh/ktlint-gradle/pull/624)
 
 ### Fixed
 
-- Fixed ktlint API compatibility issue around baselines in 0.46 and 0.47+
-- Fixed disabled_rules warning when using new editorconfig syntax in ktlint 0.48+ [#625](https://github.com/JLLeitschuh/ktlint-gradle/pull/625)
-- Fixed disabled_rules set only in editorconfig in ktlint 0.46+ [#628](https://github.com/JLLeitschuh/ktlint-gradle/pull/628)
+-   Fixed ktlint API compatibility issue around baselines in 0.46 and 0.47+
+-   Fixed disabled_rules warning when using new editorconfig syntax in ktlint 0.48+ [#625](https://github.com/JLLeitschuh/ktlint-gradle/pull/625)
+-   Fixed disabled_rules set only in editorconfig in ktlint 0.46+ [#628](https://github.com/JLLeitschuh/ktlint-gradle/pull/628)
 
 ## [11.1.0] - 2023-01-27
 
@@ -622,7 +624,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 -   Renamed task with name `ktlint` to `ktlintCheck` (#3)
 -   Renamed tasks with names `ktlint[source set name]` to `ktlint[source set name]Check` (#3)
 
-[Unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.1.0...HEAD
+[Unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.2.0...HEAD
+
+[11.2.0]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.1.0...v11.2.0
 
 [11.1.0]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.0.0...v11.1.0
 
