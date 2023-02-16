@@ -38,10 +38,10 @@ class GitHookTasksTest : AbstractPluginTest() {
             )
 
             buildAndFail(":some-module:$INSTALL_GIT_HOOK_CHECK_TASK") {
-                assertThat(output).contains("Task '$INSTALL_GIT_HOOK_CHECK_TASK' not found in project")
+                assertThat(output).containsIgnoringCase("Task '$INSTALL_GIT_HOOK_CHECK_TASK' not found in project")
             }
             buildAndFail(":some-module:$INSTALL_GIT_HOOK_FORMAT_TASK") {
-                assertThat(output).contains("Task '$INSTALL_GIT_HOOK_FORMAT_TASK' not found in project")
+                assertThat(output).containsIgnoringCase("Task '$INSTALL_GIT_HOOK_FORMAT_TASK' not found in project")
             }
         }
     }
