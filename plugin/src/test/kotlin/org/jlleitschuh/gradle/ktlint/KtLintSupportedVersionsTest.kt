@@ -117,7 +117,8 @@ class KtLintSupportedVersionsTest : AbstractPluginTest() {
             "0.46.1",
             "0.47.1",
             "0.48.0",
-            "0.48.1"
+            "0.48.1",
+            "0.48.2"
         ).also {
             // "0.37.0" is failing on Windows machines that is fixed in the next version
             if (!OS.WINDOWS.isCurrentOs) it.add("0.37.0")
