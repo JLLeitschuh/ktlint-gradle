@@ -8,8 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Changed
-- add ktlint version 0.48.2 to testing [#632](https://github.com/JLLeitschuh/ktlint-gradle/pull/632)
-- update latest gradle version for testing to 7.6 [#632](https://github.com/JLLeitschuh/ktlint-gradle/pull/632)
+-   add ktlint version 0.48.2 to testing [#632](https://github.com/JLLeitschuh/ktlint-gradle/pull/632)
+-   update latest gradle version for testing to 7.6 [#632](https://github.com/JLLeitschuh/ktlint-gradle/pull/632)
+-   improve release process to update VERSION_LATEST_RELEASE automatically [#631](https://github.com/JLLeitschuh/ktlint-gradle/pull/631)
 
 ## [11.2.0] - 2023-02-14
 
