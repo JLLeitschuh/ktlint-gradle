@@ -99,6 +99,7 @@ internal constructor(
     /**
      * Provide additional `.editorconfig` file, that are not in the project or project parent folders.
      */
+    @Deprecated("not supported with ktlint 0.47+")
     val additionalEditorconfigFile: RegularFileProperty = objectFactory.fileProperty()
 
     /**
@@ -106,6 +107,7 @@ internal constructor(
      *
      * @since ktlint `0.34.2`
      */
+    @Deprecated("not supported with ktlint 0.48+")
     val disabledRules: SetProperty<String> = objectFactory.setProperty {
         set(emptySet())
     }
