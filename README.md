@@ -284,7 +284,6 @@ ktlint {
     outputColorName = "RED"
     ignoreFailures = true
     enableExperimentalRules = true
-    additionalEditorconfigFile = file("/some/additional/.editorconfig")
     disabledRules = ["final-newline"]
     baseline = file("my-project-ktlint-baseline.xml")
     reporters {
@@ -336,7 +335,6 @@ configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
     outputColorName.set("RED")
     ignoreFailures.set(true)
     enableExperimentalRules.set(true)
-    additionalEditorconfigFile.set(file("/some/additional/.editorconfig"))
     disabledRules.set(setOf("final-newline"))
     baseline.set(file("my-project-ktlint-baseline.xml"))
     reporters {
