@@ -4,6 +4,7 @@ import groovy.lang.Closure
 import net.swiftzer.semver.SemVer
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.JavaVersion
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTreeElement
@@ -254,6 +255,12 @@ abstract class BaseKtLintCheckTask @Inject constructor(
             spec.classpath.from(ktLintClasspath, ruleSetsClasspath)
             spec.forkOptions { options ->
                 options.maxHeapSize = workerMaxHeapSize.get()
+
+                // Work around ktlint triggering reflective access errors from the embedded Kotlin
+                // compiler. See https://youtrack.jetbrains.com/issue/KT-43704 for details.
+                if (JavaVersion.current() >= JavaVersion.VERSION_16) {
+                    options.jvmArgs("--add-opens", "java.base/java.lang=ALL-UNNAMED")
+                }
             }
         }
 
