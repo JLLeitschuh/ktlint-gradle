@@ -71,30 +71,6 @@ class EditorConfigTests : AbstractPluginTest() {
         }
     }
 
-    @DisplayName("Check task should rerun if additional '.editorconfig' file content has changed")
-    @CommonTest
-    fun checkRerunOnAdditionalEditorconfigFileChange(gradleVersion: GradleVersion) {
-        project(gradleVersion) {
-            val additionalConfigPath = temporaryFolder.resolve("some/additional/folder").toString()
-            withCleanSources()
-            createEditorconfigFile(filePath = additionalConfigPath)
-
-            build(CHECK_PARENT_TASK_NAME) {
-                assertThat(task(":$lintTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            }
-
-            modifyEditorconfigFile(
-                maxLineLength = 10,
-                filePath = additionalConfigPath
-            )
-
-            buildAndFail(CHECK_PARENT_TASK_NAME) {
-                assertThat(task(":$lintTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
-            }
-        }
-    }
-
     @DisplayName("Check task should rerun if root '.editorconfig' file content has changed")
     @CommonTest
     fun checkRerunOnRootFileContentChange(gradleVersion: GradleVersion) {
@@ -105,7 +81,7 @@ class EditorConfigTests : AbstractPluginTest() {
             //language=Groovy
             settingsGradle.appendText(
                 """
-                    
+
                 include ":test:module1"
                 """.trimIndent()
             )
@@ -113,7 +89,7 @@ class EditorConfigTests : AbstractPluginTest() {
             //language=Groovy
             buildGradle.appendText(
                 """
-    
+
                 allprojects {
                     repositories {
                         mavenCentral()

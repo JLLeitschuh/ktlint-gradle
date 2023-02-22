@@ -24,11 +24,6 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
     private val logger = Logging.getLogger("ktlint-worker")
 
     override fun execute() {
-        val additionalEditorConfig = parameters
-            .additionalEditorconfigFile
-            .orNull
-            ?.asFile
-            ?.absolutePath
         val userData = generateUserData()
         val debug = parameters.debug.get()
         val formatSource = parameters.formatSource.getOrElse(false)
@@ -41,7 +36,7 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
         val ktlintInvoker: KtLintInvocation = when (val ktlintInvokerFactory = selectInvocation()) {
             is LegacyParamsInvocation.Factory -> {
                 ktlintInvokerFactory.initialize(
-                    editorConfigPath = additionalEditorConfig,
+                    editorConfigPath = null,
                     ruleSets = loadRuleSetsFromClasspathWithRuleSetProvider().filterRules(
                         parameters.enableExperimental.getOrElse(false),
                         parameters.disabledRules.getOrElse(emptySet())
@@ -53,7 +48,7 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
 
             is ExperimentalParamsInvocation.Factory -> {
                 ktlintInvokerFactory.initialize(
-                    editorConfigPath = additionalEditorConfig,
+                    editorConfigPath = null,
                     ruleSets = loadRuleSetsFromClasspathWithRuleSetProvider().filterRules(
                         parameters.enableExperimental.getOrElse(false),
                         parameters.disabledRules.getOrElse(emptySet())
@@ -65,7 +60,7 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
 
             is ExperimentalParamsProviderInvocation.Factory -> {
                 ktlintInvokerFactory.initialize(
-                    editorConfigPath = additionalEditorConfig,
+                    editorConfigPath = null,
                     ruleProviders = loadRuleSetsFromClasspathWithRuleSetProviderV2().filterRules(
                         parameters.enableExperimental.getOrElse(false),
                         parameters.disabledRules.getOrElse(emptySet())
@@ -175,7 +170,6 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
         val disabledRules: SetProperty<String>
         val enableExperimental: Property<Boolean>
         val debug: Property<Boolean>
-        val additionalEditorconfigFile: RegularFileProperty
         val formatSource: Property<Boolean>
         val discoveredErrorsFile: RegularFileProperty
         val ktLintVersion: Property<String>

@@ -34,21 +34,12 @@ internal inline fun <reified T : Task> Project.registerTask(
 
 internal const val EDITOR_CONFIG_FILE_NAME = ".editorconfig"
 
-internal fun getEditorConfigFiles(
-    currentProjectDir: Path,
-    additionalEditorconfigFile: RegularFileProperty
-): Set<Path> {
+internal fun getEditorConfigFiles(currentProjectDir: Path): Set<Path> {
     val result = mutableSetOf<Path>()
     searchEditorConfigFiles(
         currentProjectDir,
         result
     )
-
-    if (additionalEditorconfigFile.isPresent) {
-        result.add(
-            additionalEditorconfigFile.asFile.get().toPath()
-        )
-    }
 
     return result
 }

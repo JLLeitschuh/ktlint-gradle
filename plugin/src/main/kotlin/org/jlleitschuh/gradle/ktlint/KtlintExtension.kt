@@ -97,11 +97,6 @@ internal constructor(
     }
 
     /**
-     * Provide additional `.editorconfig` file, that are not in the project or project parent folders.
-     */
-    val additionalEditorconfigFile: RegularFileProperty = objectFactory.fileProperty()
-
-    /**
      * Disable particular rules, by default enabled in ktlint, using rule id.
      *
      * @since ktlint `0.34.2`

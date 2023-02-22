@@ -51,18 +51,12 @@ abstract class BaseKtLintCheckTask @Inject constructor(
     @get:Classpath
     internal abstract val ktLintClasspath: ConfigurableFileCollection
 
-    @get:Internal
-    internal abstract val additionalEditorconfigFile: RegularFileProperty
-
     @get:Incremental
     @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:InputFiles
     internal val editorConfigFiles: FileCollection = objectFactory.fileCollection().from(
         {
-            getEditorConfigFiles(
-                projectLayout.projectDirectory.asFile.toPath(),
-                additionalEditorconfigFile
-            )
+            getEditorConfigFiles(projectLayout.projectDirectory.asFile.toPath())
         }
     )
 
@@ -263,7 +257,6 @@ abstract class BaseKtLintCheckTask @Inject constructor(
             params.android.set(android)
             params.disabledRules.set(disabledRules)
             params.debug.set(debug)
-            params.additionalEditorconfigFile.set(additionalEditorconfigFile)
             params.formatSource.set(formatSources)
             params.discoveredErrorsFile.set(discoveredErrors)
             params.ktLintVersion.set(ktLintVersion)
