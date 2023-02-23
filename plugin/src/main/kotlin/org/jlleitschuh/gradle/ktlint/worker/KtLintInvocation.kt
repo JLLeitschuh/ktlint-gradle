@@ -2,6 +2,7 @@ package org.jlleitschuh.gradle.ktlint.worker
 
 import com.pinterest.ktlint.core.LintError
 import com.pinterest.ktlint.core.api.FeatureInAlphaState
+import org.ec4j.core.model.PropertyType
 import java.io.File
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
@@ -103,7 +104,7 @@ internal class ExperimentalParamsInvocation(
     private val editorConfigPathParam: KParameter by lazy { ctor.findParameterByName("editorConfigPath")!! }
     private val debugParam: KParameter by lazy { ctor.findParameterByName("debug")!! }
     private val editorConfigOverrideParam: KParameter by lazy { ctor.findParameterByName("editorConfigOverride")!! }
-    private val editorConfigOverride: Any by lazy { userDataToEditorConfigOverride(userData) }
+    private val editorConfigOverride: Any by lazy { experimentalUserDataToEditorConfigOverride(userData) }
 
     private fun buildParams(
         file: File,
@@ -154,7 +155,7 @@ private fun getEditorConfigPropertyClass(): Class<*> {
 
 @Suppress("UnnecessaryOptInAnnotation")
 @OptIn(FeatureInAlphaState::class)
-private fun userDataToEditorConfigOverride(userData: Map<String, String>): Any {
+private fun experimentalUserDataToEditorConfigOverride(userData: Map<String, String>): Any {
     val defaultEditorConfigPropertiesClass =
         Class.forName("com.pinterest.ktlint.core.api.DefaultEditorConfigProperties")
     val defaultEditorConfigProperties = defaultEditorConfigPropertiesClass.kotlin.objectInstance
@@ -175,6 +176,59 @@ private fun userDataToEditorConfigOverride(userData: Map<String, String>): Any {
         )
     }
     addMethod.invoke(editorConfigOverride, codeStyleSetProperty.getter.call(defaultEditorConfigProperties), codeStyle)
+    return editorConfigOverride
+}
+
+private fun <T> createEditorConfigProperty(
+    name: String,
+    @Suppress("SameParameterValue") value: T,
+): Any {
+    val editorConfigClass = getEditorConfigPropertyClass()
+    val type = PropertyType.LowerCasingPropertyType(
+        name,
+        "",
+        PropertyType.PropertyValueParser.IDENTITY_VALUE_PARSER,
+        emptySet(),
+    )
+    val propertyWriter: (T) -> String = { it.toString() }
+    return editorConfigClass.kotlin.primaryConstructor!!.call(
+        type,
+        value,
+        value,
+        null,
+        propertyWriter,
+        null,
+        null,
+        name
+    )
+}
+
+@Suppress("UnnecessaryOptInAnnotation")
+@OptIn(FeatureInAlphaState::class)
+private fun userDataToEditorConfigOverride(userData: Map<String, String>): Any {
+    val editorConfigOverrideClass = Class.forName("com.pinterest.ktlint.core.api.EditorConfigOverride")
+    val editorConfigOverride = editorConfigOverrideClass.kotlin.primaryConstructor!!.call()
+    val addMethod = editorConfigOverrideClass.getDeclaredMethod("add", getEditorConfigPropertyClass(), Any::class.java).apply {
+        isAccessible = true
+    }
+    val codeStyle = getCodeStyle(if (userData["android"]?.toBoolean() == true) "android" else "official")
+
+    userData.keys
+        .filter { it.startsWith("ktlint_standard_") }
+        .forEach {
+            addMethod.invoke(
+                editorConfigOverride,
+                createEditorConfigProperty(it, "disabled"),
+                userData[it]
+            )
+        }
+
+    val codeStyleSetProperty = Class.forName("com.pinterest.ktlint.core.api.editorconfig.CodeStyleEditorConfigPropertyKt").declaredMethods
+        .first { it.name == "getCODE_STYLE_PROPERTY" }
+        .apply { isAccessible = true }
+        .invoke(null)
+    addMethod.invoke(editorConfigOverride, codeStyleSetProperty, codeStyle)
+
     return editorConfigOverride
 }
 
@@ -209,7 +263,7 @@ internal class ExperimentalParamsProviderInvocation(
     private val editorConfigPathParam: KParameter by lazy { ctor.findParameterByName("editorConfigPath")!! }
     private val debugParam: KParameter by lazy { ctor.findParameterByName("debug")!! }
     private val editorConfigOverrideParam: KParameter by lazy { ctor.findParameterByName("editorConfigOverride")!! }
-    private val editorConfigOverride: Any by lazy { userDataToEditorConfigOverride(userData) }
+    private val editorConfigOverride: Any by lazy { experimentalUserDataToEditorConfigOverride(userData) }
 
     private fun buildParams(
         file: File,

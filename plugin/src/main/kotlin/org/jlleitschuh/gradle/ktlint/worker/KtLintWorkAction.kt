@@ -156,6 +156,15 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
         if (disabledRules.isNotEmpty()) {
             userData["disabled_rules"] = disabledRules.joinToString(separator = ",")
         }
+        if (SemVer.parse(parameters.ktLintVersion.get()) < SemVer(0, 48, 0)) {
+            if (disabledRules.isNotEmpty()) {
+                userData["disabled_rules"] = disabledRules.joinToString(separator = ",")
+            }
+        } else {
+            disabledRules.forEach {
+                userData["ktlint_standard_$it"] = "disabled"
+            }
+        }
 
         return userData.toMap()
     }

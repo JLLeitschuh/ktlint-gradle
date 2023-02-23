@@ -53,7 +53,7 @@ class DisabledRulesTest : AbstractPluginTest() {
                     assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
                     assertThat(output)
                         .`as`("old disabled_rules list is deprecated in 0.48, slated for removal in 0.49")
-                        .contains("Property 'ktlint_disabled_rules' is deprecated")
+                        .doesNotContain("Property 'ktlint_disabled_rules' is deprecated")
                 }
             }
         }
