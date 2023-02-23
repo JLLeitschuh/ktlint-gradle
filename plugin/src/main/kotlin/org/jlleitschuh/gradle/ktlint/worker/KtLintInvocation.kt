@@ -181,7 +181,7 @@ private fun experimentalUserDataToEditorConfigOverride(userData: Map<String, Str
 
 private fun <T> createEditorConfigProperty(
     name: String,
-    @Suppress("SameParameterValue") value: T,
+    value: T,
 ): Any {
     val editorConfigClass = getEditorConfigPropertyClass()
     val type = PropertyType.LowerCasingPropertyType(
@@ -218,7 +218,7 @@ private fun userDataToEditorConfigOverride(userData: Map<String, String>): Any {
         .forEach {
             addMethod.invoke(
                 editorConfigOverride,
-                createEditorConfigProperty(it, "disabled"),
+                createEditorConfigProperty(it, userData[it]),
                 userData[it]
             )
         }
