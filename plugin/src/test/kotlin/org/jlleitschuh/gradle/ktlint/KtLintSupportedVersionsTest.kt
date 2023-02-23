@@ -1,10 +1,12 @@
 package org.jlleitschuh.gradle.ktlint
 
+import net.swiftzer.semver.SemVer
 import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testkit.runner.TaskOutcome
 import org.gradle.util.GradleVersion
 import org.jlleitschuh.gradle.ktlint.testdsl.GradleArgumentsProvider
 import org.jlleitschuh.gradle.ktlint.testdsl.GradleTestVersions
+import org.jlleitschuh.gradle.ktlint.testdsl.TestProject
 import org.jlleitschuh.gradle.ktlint.testdsl.TestVersions
 import org.jlleitschuh.gradle.ktlint.testdsl.build
 import org.jlleitschuh.gradle.ktlint.testdsl.buildAndFail
@@ -66,6 +68,37 @@ class KtLintSupportedVersionsTest : AbstractPluginTest() {
 
             buildAndFail(CHECK_PARENT_TASK_NAME) {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            }
+        }
+    }
+
+    @DisplayName("Lint should use editorconfig override")
+    @ParameterizedTest(name = "{0} with KtLint {1}: {displayName}")
+    @ArgumentsSource(SupportedKtlintVersionsProvider::class)
+    internal fun `Lint should use editorconfig override`(
+        gradleVersion: GradleVersion,
+        ktLintVersion: String
+    ) {
+        project(gradleVersion) {
+            //language=Groovy
+            buildGradle.appendText(
+                """
+
+                ktlint.version = "$ktLintVersion"
+                ktlint.additionalEditorconfigFile = project.file("${TestProject.ADDITIONAL_EDITOR_CONFIG}/.editorconfig")
+                """.trimIndent()
+            )
+            withAdditionalEditorConfig()
+            withFailingSources()
+            if (SemVer.parse(ktLintVersion) >= SemVer(0, 47)) {
+                buildAndFail(CHECK_PARENT_TASK_NAME) {
+                    assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
+                    assertThat(output.contains("additionalEditorconfigFile no longer supported in ktlint 0.47+"))
+                }
+            } else {
+                build(CHECK_PARENT_TASK_NAME) {
+                    assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                }
             }
         }
     }

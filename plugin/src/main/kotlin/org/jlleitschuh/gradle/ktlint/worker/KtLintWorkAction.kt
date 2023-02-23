@@ -37,7 +37,11 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
 
         val result = mutableListOf<LintErrorResult>()
         val formattedFiles = mutableMapOf<File, ByteArray>()
-
+        if (parameters.additionalEditorconfigFile.isPresent &&
+            parameters.ktLintVersion.map { SemVer.parse(it) }.get() >= SemVer(0, 47)
+        ) {
+            logger.warn("additionalEditorconfigFile no longer supported in ktlint 0.47+")
+        }
         val ktlintInvoker: KtLintInvocation = when (val ktlintInvokerFactory = selectInvocation()) {
             is LegacyParamsInvocation.Factory -> {
                 ktlintInvokerFactory.initialize(

@@ -59,6 +59,18 @@ class TestProject(
         )
     }
 
+    fun withAdditionalEditorConfig() {
+        createSourceFile(
+            ADDITIONAL_EDITOR_CONFIG + "/.editorconfig",
+            """
+            |[*.kt]
+            |disabled_rules = no-multi-spaces
+            |ktlint_disabled_rules = no-multi-spaces
+            |ktlint_standard_no-multi-spaces = disabled
+            """.trimMargin()
+        )
+    }
+
     fun withCleanKotlinScript() {
         createSourceFile(
             "kotlin-script.kts",
@@ -103,6 +115,7 @@ class TestProject(
     companion object {
         const val CLEAN_SOURCES_FILE = "src/main/kotlin/CleanSource.kt"
         const val FAIL_SOURCE_FILE = "src/main/kotlin/FailSource.kt"
+        const val ADDITIONAL_EDITOR_CONFIG = "AdditionalEditorConfig"
     }
 }
 
