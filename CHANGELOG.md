@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Changed
 
 -   warn when additionalEditorconfigFile is used in 0.47+ [#637](https://github.com/JLLeitschuh/ktlint-gradle/pull/637)
+-   work around reflection error on Gradle 8/JDK 16+ [#634](https://github.com/JLLeitschuh/ktlint-gradle/pull/634)
 -   add ktlint version 0.48.2 to testing [#632](https://github.com/JLLeitschuh/ktlint-gradle/pull/632)
 -   update latest gradle version for testing to 7.6 [#632](https://github.com/JLLeitschuh/ktlint-gradle/pull/632)
 -   improve release process to update VERSION_LATEST_RELEASE automatically [#631](https://github.com/JLLeitschuh/ktlint-gradle/pull/631)
