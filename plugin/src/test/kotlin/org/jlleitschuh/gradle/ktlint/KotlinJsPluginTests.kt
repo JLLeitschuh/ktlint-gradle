@@ -26,7 +26,7 @@ class KotlinJsPluginTests : AbstractPluginTest() {
             """
             
             kotlin {
-                js {
+                js(IR) {
                     nodejs()
                 }
             }
