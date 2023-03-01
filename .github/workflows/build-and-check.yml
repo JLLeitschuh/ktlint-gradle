@@ -9,20 +9,36 @@ on:
       - main
 
 jobs:
+  build-jvm-matrix:
+    runs-on: ubuntu-latest
+    steps: # https://michaelheap.com/dynamic-matrix-generation-github-actions/
+      - id: set-matrix
+        run: echo "::set-output name=version_matrix::$(curl https://endoflife.date/api/java.json | jq -c '[.[] | select(.eol > (now | strftime("%Y-%m-%d"))) | .cycle]' | sed 's/ //g')"
+      - name: verify-matrix
+        run: echo "The selected java versions are ${{ steps.set-matrix.outputs.version_matrix }}"
+    outputs:
+      version_matrix: ${{ steps.set-matrix.outputs.version_matrix }}
   build:
+    needs: build-jvm-matrix
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
-    # Windows is failing with "out of memory" errors.
-    continue-on-error: ${{ matrix.os == 'windows-latest' }}
+        java_version: ${{ fromJson(needs.build-jvm-matrix.outputs.version_matrix) }}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
-      - name: set up JDK 1.8
+      - name: configure windows pagefile
+        if: ${{ matrix.os  == 'windows-latest' }}
+        uses: al-cheb/configure-pagefile-action@v1.2
+        with:
+          minimum-size: 8GB
+          maximum-size: 8GB
+          disk-root: "D:"
+      - name: set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: 8
+          java-version: ${{ matrix.java_version }}
           distribution: 'zulu'
       - name: Restore Gradle caches
         uses: actions/cache@v2
