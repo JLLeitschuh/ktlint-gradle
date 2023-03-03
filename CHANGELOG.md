@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
-## [11.3.0] - 2023-03-03
+### Fixed
+
+- Fixed release github actions [#650](https://github.com/JLLeitschuh/ktlint-gradle/pull/650)
 
 ### Changed
 

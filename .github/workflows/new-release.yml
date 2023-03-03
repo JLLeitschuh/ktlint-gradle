@@ -41,3 +41,9 @@ jobs:
           GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
           GITHUB_KEY: ${{ secrets.GITHUB_TOKEN }}
         run: ./plugin/gradlew -p ./plugin githubRelease --no-daemon
+      - name: Update VERSION_LATEST_RELEASE to new published version
+        run: cp plugin/VERSION_CURRENT.txt > plugin/VERSION_LATEST_RELEASE.txt
+      - name: Update VERSION_LATEST_RELEASE
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Update VERSION_LATEST_RELEASE to ${{ github.event.inputs.new_version }}
