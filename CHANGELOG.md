@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [11.3.0] - 2023-03-03
+
 ### Changed
 
 -   warn when additionalEditorconfigFile is used in 0.47+ [#637](https://github.com/JLLeitschuh/ktlint-gradle/pull/637)
@@ -633,7 +635,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 -   Renamed task with name `ktlint` to `ktlintCheck` (#3)
 -   Renamed tasks with names `ktlint[source set name]` to `ktlint[source set name]Check` (#3)
 
-[Unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.2.0...HEAD
+[Unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.3.0...HEAD
+
+[11.3.0]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.2.0...v11.3.0
 
 [11.2.0]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.1.0...v11.2.0
 
