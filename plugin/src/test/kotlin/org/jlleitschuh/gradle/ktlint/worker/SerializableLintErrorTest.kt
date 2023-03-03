@@ -14,9 +14,7 @@ internal class SerializableLintErrorTest {
 
     @Test
     internal fun `Should correctly serialize and deserialize LintError`() {
-        val lintError = LintError(
-            14, 154, "test-rule", "details about error", false
-        )
+        val lintError = LintError(14, 154, "test-rule", "details about error", false)
         val wrappedLintError = SerializableLintError(lintError)
         val serializeIntoFile = temporaryFolder.resolve("lintError.test")
 

@@ -26,7 +26,7 @@ import javax.inject.Inject
 internal abstract class LoadReportersTask @Inject constructor(
     private val workerExecutor: WorkerExecutor,
     objectFactory: ObjectFactory,
-    projectLayout: ProjectLayout,
+    projectLayout: ProjectLayout
 ) : DefaultTask() {
 
     @get:Classpath

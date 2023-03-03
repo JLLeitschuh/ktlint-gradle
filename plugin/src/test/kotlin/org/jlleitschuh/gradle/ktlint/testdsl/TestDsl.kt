@@ -147,7 +147,7 @@ private val GradleVersion.supportedKotlinVersion
 
 fun projectSetup(
     kotlinPluginType: String,
-    gradleVersion: GradleVersion,
+    gradleVersion: GradleVersion
 ): (File) -> Unit = {
     val kotlinPluginVersion = gradleVersion.supportedKotlinVersion
     //language=Groovy

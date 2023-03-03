@@ -46,26 +46,32 @@ internal constructor(
      * Enable verbose mode.
      */
     val verbose: Property<Boolean> = objectFactory.property { set(false) }
+
     /**
      * Enable debug mode.
      */
     val debug: Property<Boolean> = objectFactory.property { set(false) }
+
     /**
      * Enable android mode.
      */
     val android: Property<Boolean> = objectFactory.property { set(false) }
+
     /**
      * Enable console output mode.
      */
     val outputToConsole: Property<Boolean> = objectFactory.property { set(true) }
+
     /**
      * Enabled colored output to console.
      */
     val coloredOutput: Property<Boolean> = objectFactory.property { set(true) }
+
     /**
      * Specify the color of the terminal output.
      */
     val outputColorName: Property<String> = objectFactory.property { set("") }
+
     /**
      * Whether or not to allow the build to continue if there are warnings;
      * defaults to {@code false}, as for any other static code analysis tool.
