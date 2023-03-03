@@ -7,7 +7,7 @@ enum class ReporterType(
     val reporterName: String,
     val availableSinceVersion: SemVer,
     val fileExtension: String,
-    val options: List<String>,
+    val options: List<String>
 ) : Serializable {
     PLAIN("plain", SemVer(0, 9, 0), "txt", emptyList()),
     PLAIN_GROUP_BY_FILE("plain", SemVer(0, 9, 0), "txt", listOf("group_by_file")),

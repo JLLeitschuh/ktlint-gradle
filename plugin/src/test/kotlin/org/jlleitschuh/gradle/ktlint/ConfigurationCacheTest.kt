@@ -67,7 +67,8 @@ class ConfigurationCacheTest : AbstractPluginTest() {
             build(
                 configurationCacheFlag,
                 configurationCacheWarnFlag,
-                FORMAT_PARENT_TASK_NAME, "--debug"
+                FORMAT_PARENT_TASK_NAME,
+                "--debug"
             ) {
                 assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
                 assertThat(task(":$mainSourceSetFormatTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)

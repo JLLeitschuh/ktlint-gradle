@@ -146,6 +146,7 @@ abstract class BaseKtLintCheckTask @Inject constructor(
 
     @Internal
     override fun getIncludes(): MutableSet<String> = patternFilterable.includes
+
     @Internal
     override fun getExcludes(): MutableSet<String> = patternFilterable.excludes
 
@@ -225,7 +226,7 @@ abstract class BaseKtLintCheckTask @Inject constructor(
 
     private fun logTaskExecutionState(
         inputChanges: InputChanges,
-        editorConfigUpdated: Boolean,
+        editorConfigUpdated: Boolean
     ) {
         logger.info("Executing ${if (inputChanges.isIncremental) "incrementally" else "non-incrementally"}")
         logger.info("Editorconfig files were changed: $editorConfigUpdated")

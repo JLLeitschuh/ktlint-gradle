@@ -25,13 +25,10 @@ class BuildCacheTest : AbstractPluginTest() {
             "test",
             GenerateReportsTask.LintType.CHECK
         )
-
         project(gradleVersion, projectPath = originalRoot) {
             configureDefaultProject()
 
-            build(
-                CHECK_PARENT_TASK_NAME, "--build-cache"
-            ) {
+            build(CHECK_PARENT_TASK_NAME, "--build-cache") {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
                 assertThat(task(":$testSourceCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             }
@@ -73,7 +70,7 @@ class BuildCacheTest : AbstractPluginTest() {
         .appendText(
             //language=Groovy
             """
-                
+
             repositories {
                 jcenter()
             }
@@ -94,7 +91,7 @@ class BuildCacheTest : AbstractPluginTest() {
     private fun File.addBuildCacheSettings() = appendText(
         //language=Groovy
         """
-                
+
         buildCache {
             local {
                 directory = '${localBuildCache.toURI()}'
@@ -111,7 +108,7 @@ class BuildCacheTest : AbstractPluginTest() {
             "src/test/kotlin/Test.kt",
             """
                 class Test
-            
+
             """.trimIndent()
         )
     }

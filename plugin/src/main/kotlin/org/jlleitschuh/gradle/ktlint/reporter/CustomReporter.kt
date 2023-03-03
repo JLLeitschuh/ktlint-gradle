@@ -18,7 +18,7 @@ data class CustomReporter(
     val name: String,
     val reporterId: String = name,
     var fileExtension: String = reporterId,
-    @Transient var dependency: Any? = null,
+    @Transient var dependency: Any? = null
 ) : Serializable {
     companion object {
         private const val serialVersionUID: Long = 2012775L

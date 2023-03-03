@@ -170,7 +170,8 @@ private fun userDataToEditorConfigOverride(userData: Map<String, String>): Any {
             defaultEditorConfigPropertiesClass.kotlin.memberProperties.firstOrNull { it.name == "ktlintDisabledRulesProperty" }
                 ?: defaultEditorConfigPropertiesClass.kotlin.memberProperties.first { it.name == "disabledRulesProperty" }
         addMethod.invoke(
-            editorConfigOverride, disabledRulesProperty.getter.call(defaultEditorConfigProperties),
+            editorConfigOverride,
+            disabledRulesProperty.getter.call(defaultEditorConfigProperties),
             userData["disabled_rules"]
         )
     }
@@ -186,7 +187,7 @@ internal class ExperimentalParamsProviderInvocation(
     private val editorConfigPath: String?,
     private val ruleProviders: Set<Any>,
     private val userData: Map<String, String>,
-    private val debug: Boolean,
+    private val debug: Boolean
 ) : KtLintInvocation {
     companion object Factory : KtLintInvocationFactory {
         fun initialize(
