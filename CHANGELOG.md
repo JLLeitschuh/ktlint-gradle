@@ -7,9 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [11.3.1] - 2023-03-03
+
 ### Fixed
 
-- Fixed release github actions [#650](https://github.com/JLLeitschuh/ktlint-gradle/pull/650)
+-   Fixed release github actions [#650](https://github.com/JLLeitschuh/ktlint-gradle/pull/650)
 
 ### Changed
 
@@ -637,7 +639,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 -   Renamed task with name `ktlint` to `ktlintCheck` (#3)
 -   Renamed tasks with names `ktlint[source set name]` to `ktlint[source set name]Check` (#3)
 
-[Unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.3.0...HEAD
+[Unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.3.1...HEAD
+
+[11.3.1]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.3.0...v11.3.1
 
 [11.3.0]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.2.0...v11.3.0
 
