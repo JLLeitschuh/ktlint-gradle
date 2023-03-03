@@ -24,9 +24,9 @@ class KtlintIdeaPluginTest : AbstractPluginTest() {
                             mavenLocal()
                             gradlePluginPortal()
                         }
-                        
+
                         plugins {
-                            id 'org.jetbrains.kotlin.jvm' version '${TestVersions.maxSupportedKotlinPluginVersion}'
+                            id 'org.jetbrains.kotlin.jvm' version '${TestVersions.maxSupportedKotlinPluginVersion()}'
                             id 'org.jlleitschuh.gradle.ktlint-idea' version '${TestVersions.pluginVersion}'
                         }
                     }
