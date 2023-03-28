@@ -4,10 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testkit.runner.TaskOutcome
 import org.gradle.util.GradleVersion
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
-import org.jlleitschuh.gradle.ktlint.testdsl.CommonTest
-import org.jlleitschuh.gradle.ktlint.testdsl.GradleTestVersions
-import org.jlleitschuh.gradle.ktlint.testdsl.build
-import org.jlleitschuh.gradle.ktlint.testdsl.project
+import org.jlleitschuh.gradle.ktlint.testdsl.*
 import org.junit.jupiter.api.DisplayName
 
 @GradleTestVersions
@@ -18,19 +15,23 @@ class ConfigurationCacheTest : AbstractPluginTest() {
     @DisplayName("Should support configuration cache without errors on running linting")
     @CommonTest
     internal fun configurationCacheForCheckTask(gradleVersion: GradleVersion) {
-        project(gradleVersion) {
-            createSourceFile(
-                "src/main/kotlin/CleanSource.kt",
+        project(gradleVersion = gradleVersion,
+            projectSetup= ktsProjectSetup(gradleVersion)) {
+            withFailingSources()
+            withCleanSources()
+            this.projectPath.resolve("build.gradle.kts").appendText(
                 """
-                val foo = "bar"
-
-                """.trimIndent()
+                |ktlint {
+                |    filter { exclude("**/FailSource.kt") }
+                |}
+                |
+                """.trimMargin()
             )
-
             build(
                 configurationCacheFlag,
                 configurationCacheWarnFlag,
-                CHECK_PARENT_TASK_NAME
+                CHECK_PARENT_TASK_NAME,
+                "--info"
             ) {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             }
@@ -38,7 +39,8 @@ class ConfigurationCacheTest : AbstractPluginTest() {
             build(
                 configurationCacheFlag,
                 configurationCacheWarnFlag,
-                CHECK_PARENT_TASK_NAME
+                CHECK_PARENT_TASK_NAME,
+                "--info"
             ) {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
                 assertThat(output).contains("Reusing configuration cache.")
@@ -50,16 +52,21 @@ class ConfigurationCacheTest : AbstractPluginTest() {
     @CommonTest
     fun configurationCacheForFormatTasks(gradleVersion: GradleVersion) {
         project(gradleVersion) {
-            val sourceFile = "\nval foo = \"bar\"\n"
-            createSourceFile(
-                "src/main/kotlin/CleanSource.kt",
-                sourceFile
-            )
+            withFailingSources()
+            withCleanSources()
             val formatTaskName = KtLintFormatTask.buildTaskNameForSourceSet("main")
+            //language=Groovy
+            buildGradle.appendText(
+                """
+
+                ktlint.filter { exclude("**/FailSource.kt") }
+                """.trimIndent()
+            )
             build(
                 configurationCacheFlag,
                 configurationCacheWarnFlag,
-                FORMAT_PARENT_TASK_NAME
+                FORMAT_PARENT_TASK_NAME,
+                "--info"
             ) {
                 assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
                 assertThat(task(":$mainSourceSetFormatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
@@ -68,7 +75,7 @@ class ConfigurationCacheTest : AbstractPluginTest() {
                 configurationCacheFlag,
                 configurationCacheWarnFlag,
                 FORMAT_PARENT_TASK_NAME,
-                "--debug"
+                "--info"
             ) {
                 assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
                 assertThat(task(":$mainSourceSetFormatTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)

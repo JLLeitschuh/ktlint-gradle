@@ -142,6 +142,9 @@ fun TestProject.buildAndFail(
 fun defaultProjectSetup(gradleVersion: GradleVersion): (File) -> Unit =
     projectSetup("jvm", gradleVersion)
 
+fun ktsProjectSetup(gradleVersion: GradleVersion): (File) -> Unit =
+    ktsProject("jvm", gradleVersion)
+
 private val GradleVersion.supportedKotlinVersion
     get() = TestVersions.maxSupportedKotlinPluginVersion(this)
 
@@ -183,7 +186,44 @@ fun projectSetup(
         """.trimMargin()
     )
 }
+fun ktsProject(
+    kotlinPluginType: String,
+    gradleVersion: GradleVersion
+): (File) -> Unit = {
+    val kotlinPluginVersion = gradleVersion.supportedKotlinVersion
+    //language=Groovy
+    it.resolve("build.gradle.kts").writeText(
+        """
+        |plugins {
+        |    id("org.jetbrains.kotlin.$kotlinPluginType")
+        |    id("org.jlleitschuh.gradle.ktlint")
+        |}
+        |
+        |repositories {
+        |    mavenCentral()
+        |}
+        |
+        """.trimMargin()
+    )
 
+    //language=Groovy
+    it.resolve("settings.gradle").writeText(
+        """
+        |pluginManagement {
+        |    repositories {
+        |        mavenLocal()
+        |        gradlePluginPortal()
+        |    }
+        |
+        |    plugins {
+        |         id 'org.jetbrains.kotlin.$kotlinPluginType' version '$kotlinPluginVersion'
+        |         id 'org.jlleitschuh.gradle.ktlint' version '${TestVersions.pluginVersion}'
+        |    }
+        |}
+        |
+        """.trimMargin()
+    )
+}
 private val sharedTestKitDir = File(".")
     .resolve(".gradle-test-kit")
     .absoluteFile
