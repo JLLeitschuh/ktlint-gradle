@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 -   fix syntax bug in release logic for VERSION_LATEST_RELEASE.txt [#651](https://github.com/JLLeitschuh/ktlint-gradle/pull/651)
 -   fix the pre-commit hook to cope with unstaged binary files [#603](https://github.com/JLLeitschuh/ktlint-gradle/pull/603)
 
+### Changed
+
+-   Update build to use Gradle 7.3.3 to support testing with Java 17 [#658](https://github.com/JLLeitschuh/ktlint-gradle/pull/658)
+
 ## [11.3.1] - 2023-03-03
 
 ### Fixed
