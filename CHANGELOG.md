@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 -   fix new ktlint errors that come from our new default version of ktlint [#651](https://github.com/JLLeitschuh/ktlint-gradle/pull/651)
 -   fix syntax bug in release logic for VERSION_LATEST_RELEASE.txt [#651](https://github.com/JLLeitschuh/ktlint-gradle/pull/651)
+-   fix the pre-commit hook to cope with unstaged binary files [#603](https://github.com/JLLeitschuh/ktlint-gradle/pull/603)
 
 ## [11.3.1] - 2023-03-03
 
