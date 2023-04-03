@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Changed
 
 -   Update build to use Gradle 7.3.3 to support testing with Java 17 [#658](https://github.com/JLLeitschuh/ktlint-gradle/pull/658)
+-   Update build to use Gradle 7.6.1 to support testing with Java 19 [#660](https://github.com/JLLeitschuh/ktlint-gradle/pull/660)
 
 ## [11.3.1] - 2023-03-03
 

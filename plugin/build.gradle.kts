@@ -282,6 +282,6 @@ githubRelease {
 
 tasks.withType<Wrapper>().configureEach {
     gradleVersion = libs.versions.gradleWrapper.get()
-    distributionSha256Sum = libs.versions.gradleWrapperSha.get()
+    distributionSha256Sum = libs.versions.gradleDistributionSha.get()
     distributionType = Wrapper.DistributionType.BIN
 }
