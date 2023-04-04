@@ -186,7 +186,7 @@ class KtlintPluginTest : AbstractPluginTest() {
             buildGradle.appendText(
                 """
 
-                ktlint.filter { exclude("**/FailSource.kt") }
+                ktlint.filter { exclude("**/src/**/Fail*.kt") }
                 """.trimIndent()
             )
 
