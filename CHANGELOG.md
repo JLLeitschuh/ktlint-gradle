@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 -   fix new ktlint errors that come from our new default version of ktlint [#651](https://github.com/JLLeitschuh/ktlint-gradle/pull/651)
 -   fix syntax bug in release logic for VERSION_LATEST_RELEASE.txt [#651](https://github.com/JLLeitschuh/ktlint-gradle/pull/651)
+-   fix isRootEditorConfig [#664](https://github.com/JLLeitschuh/ktlint-gradle/pull/664)
 
 ### Changed
 
