@@ -70,9 +70,9 @@ private tailrec fun searchEditorConfigFiles(
     }
 }
 
-private val editorConfigRootRegex = "^root\\s?=\\s?true\\R".toRegex()
+private val editorConfigRootRegex = "^root\\s?=\\s?true".toRegex()
 
-private fun Path.isRootEditorConfig(): Boolean {
+internal fun Path.isRootEditorConfig(): Boolean {
     if (!Files.exists(this) || !Files.isReadable(this)) return false
 
     toFile().useLines { lines ->
