@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [11.3.2] - 2023-04-25
+
 ### Fixed
 
 -   fix new ktlint errors that come from our new default version of ktlint [#651](https://github.com/JLLeitschuh/ktlint-gradle/pull/651)
@@ -649,7 +651,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 -   Renamed task with name `ktlint` to `ktlintCheck` (#3)
 -   Renamed tasks with names `ktlint[source set name]` to `ktlint[source set name]Check` (#3)
 
-[Unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.3.1...HEAD
+[Unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.3.2...HEAD
+
+[11.3.2]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.3.1...v11.3.2
 
 [11.3.1]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.3.0...v11.3.1
 
