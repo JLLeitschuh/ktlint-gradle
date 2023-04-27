@@ -47,12 +47,14 @@ class KtLintInvocation48(
             }
         return newCode to LintErrorResult(file, errors)
     }
+
+    override fun trimMemory() {
+        engine.trimMemory()
+    }
 }
 
 internal fun LintError.toSerializable(): SerializableLintError {
-    return SerializableLintError(
-        line, col, ruleId, detail, canBeAutoCorrected
-    )
+    return SerializableLintError(line, col, ruleId, detail, canBeAutoCorrected)
 }
 
 private fun userDataToEditorConfigOverride(userData: Map<String, String>): EditorConfigOverride {

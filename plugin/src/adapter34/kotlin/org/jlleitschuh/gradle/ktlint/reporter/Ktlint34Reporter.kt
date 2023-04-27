@@ -8,9 +8,6 @@ import org.jlleitschuh.gradle.ktlint.worker.toCore
  * implementation of GenericReporter for the Reporter ktlint class
  */
 class Ktlint34Reporter(val reporter: Reporter) : GenericReporter<Reporter> {
-    companion object Factory : ReporterFactory {
-        fun initialize(reporter: Reporter): Ktlint34Reporter = Ktlint34Reporter(reporter)
-    }
     override fun beforeAll() {
         reporter.beforeAll()
     }
@@ -30,5 +27,4 @@ class Ktlint34Reporter(val reporter: Reporter) : GenericReporter<Reporter> {
     override fun afterAll() {
         reporter.afterAll()
     }
-
 }

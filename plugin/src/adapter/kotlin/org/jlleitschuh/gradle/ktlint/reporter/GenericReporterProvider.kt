@@ -1,6 +1,5 @@
 package org.jlleitschuh.gradle.ktlint.reporter
 
-import com.pinterest.ktlint.core.Reporter
 import java.io.PrintStream
 
 /**
@@ -9,7 +8,7 @@ import java.io.PrintStream
 interface GenericReporterProvider<T : GenericReporter<*>> {
     val id: String
     fun get(
-        out: PrintStream,
-        opt: Map<String, String>,
+        outputStream: PrintStream,
+        opt: Map<String, String>
     ): T
 }

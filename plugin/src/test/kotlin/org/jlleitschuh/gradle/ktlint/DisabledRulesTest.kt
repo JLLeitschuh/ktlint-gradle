@@ -2,6 +2,7 @@ package org.jlleitschuh.gradle.ktlint
 
 import net.swiftzer.semver.SemVer
 import org.assertj.core.api.Assertions.assertThat
+import org.gradle.api.logging.Logging
 import org.gradle.testkit.runner.TaskOutcome
 import org.gradle.util.GradleVersion
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
@@ -16,46 +17,51 @@ import org.junit.jupiter.params.provider.ArgumentsSource
 
 @GradleTestVersions
 class DisabledRulesTest : AbstractPluginTest() {
+    private val logger = Logging.getLogger(DisabledRulesTest::class.java)
 
     @DisplayName("Should lint without errors when 'final-newline' rule is disabled")
     @ParameterizedTest(name = "{0} with KtLint {1}: {displayName}")
     @ArgumentsSource(KtLintSupportedVersionsTest.SupportedKtlintVersionsProvider::class)
     fun lintDisabledRuleFinalNewline(gradleVersion: GradleVersion, ktLintVersion: String) {
-        project(gradleVersion) {
-            //language=Groovy
-            buildGradle.appendText(
-                """
-                ktlint {
-                    version = "$ktLintVersion"
-                    disabledRules = ["final-newline"]
-                }
-                """.trimIndent()
-            )
+        if (SemVer.parse(ktLintVersion) < SemVer.parse("0.49.0")) {
+            project(gradleVersion) {
+                //language=Groovy
+                buildGradle.appendText(
+                    """
+                    ktlint {
+                        version = "$ktLintVersion"
+                        disabledRules = ["final-newline"]
+                    }
+                    """.trimIndent()
+                )
 
-            createSourceFile(
-                "src/main/kotlin/CleanSource.kt",
-                "val foo = \"bar\""
-            )
+                createSourceFile(
+                    "src/main/kotlin/CleanSource.kt",
+                    "val foo = \"bar\""
+                )
 
-            if (SemVer.parse(ktLintVersion) < SemVer.parse("0.34.2")) {
-                buildAndFail(CHECK_PARENT_TASK_NAME) {
-                    assertThat(task(":runKtlintCheckOverMainSourceSet")?.outcome)
-                        .`as`("Rules disabling is supported since 0.34.2 ktlint version")
-                        .isEqualTo(TaskOutcome.FAILED)
-                }
-            } else if (SemVer.parse(ktLintVersion) < SemVer.parse("0.48.0")) {
-                build(CHECK_PARENT_TASK_NAME) {
-                    assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-                    assertThat(output).doesNotContain("Property 'ktlint_disabled_rules' is deprecated")
-                }
-            } else {
-                build(CHECK_PARENT_TASK_NAME) {
-                    assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-                    assertThat(output)
-                        .`as`("old disabled_rules list is deprecated in 0.48, slated for removal in 0.49")
-                        .contains("Property 'ktlint_disabled_rules' is deprecated")
+                if (SemVer.parse(ktLintVersion) < SemVer.parse("0.34.2")) {
+                    buildAndFail(CHECK_PARENT_TASK_NAME) {
+                        assertThat(task(":runKtlintCheckOverMainSourceSet")?.outcome)
+                            .`as`("Rules disabling is supported since 0.34.2 ktlint version")
+                            .isEqualTo(TaskOutcome.FAILED)
+                    }
+                } else if (SemVer.parse(ktLintVersion) < SemVer.parse("0.48.0")) {
+                    build(CHECK_PARENT_TASK_NAME) {
+                        assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                        assertThat(output).doesNotContain("Property 'ktlint_disabled_rules' is deprecated")
+                    }
+                } else {
+                    build(CHECK_PARENT_TASK_NAME) {
+                        assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                        assertThat(output)
+                            .`as`("old disabled_rules list is deprecated in 0.48, slated for removal in 0.49")
+                            .contains("Property 'ktlint_disabled_rules' is deprecated")
+                    }
                 }
             }
+        } else {
+            logger.info("ktlint $ktLintVersion only supports disabling rules via .editorconfig")
         }
     }
 

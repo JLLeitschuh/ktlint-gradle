@@ -152,6 +152,7 @@ class KtLintSupportedVersionsTest : AbstractPluginTest() {
             "0.48.0",
             "0.48.1",
             "0.48.2",
+            // "0.49.0" did not expose needed baseline classes
             "0.49.1"
         ).also {
             // "0.37.0" is failing on Windows machines that is fixed in the next version

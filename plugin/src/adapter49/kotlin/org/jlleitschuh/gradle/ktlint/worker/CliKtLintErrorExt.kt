@@ -3,9 +3,7 @@ package org.jlleitschuh.gradle.ktlint.worker
 import com.pinterest.ktlint.cli.reporter.core.api.KtlintCliError
 
 fun KtlintCliError.toSerializable(): SerializableLintError {
-    return SerializableLintError(
-        line, col, ruleId, detail, status.toBoolean()
-    )
+    return SerializableLintError(line, col, ruleId, detail, status.toBoolean())
 }
 
 fun KtlintCliError.Status.toBoolean(): Boolean {

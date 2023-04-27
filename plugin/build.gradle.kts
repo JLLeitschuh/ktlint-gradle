@@ -61,6 +61,10 @@ sourceSets {
     val adapter34 by creating {
         compileClasspath += adapter.output
     }
+    val adapter34Test by creating {
+        compileClasspath += adapter.output + adapter34.output
+        runtimeClasspath += adapter.output + adapter34.output
+    }
     val adapter41 by creating {
         compileClasspath += adapter.output
     }
@@ -107,10 +111,18 @@ tasks.named<Jar>("shadowJar") {
     this.from(adapterSources.map { sourceSet -> sourceSet.map { it.output.classesDirs } })
 }
 
+val test34Task = tasks.register<Test>("test34") {
+    classpath = sourceSets.named("adapter34Test").get().runtimeClasspath
+    testClassesDirs = sourceSets.named("adapter34Test").get().output.classesDirs
+}
+tasks.named("test") {
+    dependsOn(test34Task)
+}
+
 dependencies {
     compileOnly(gradleApi())
-    compileOnly(libs.ktlint.core)
-    add("adapterCompileOnly", libs.ktlint.core)
+    add("adapterCompileOnly", "com.pinterest.ktlint:ktlint-core:0.34.0")
+    add("adapterImplementation", libs.commons.io)
     add("adapterImplementation", libs.semver)
     add("adapter34Implementation", kotlin("reflect"))
     add("adapter34CompileOnly", "com.pinterest.ktlint:ktlint-core:0.34.0")
@@ -119,12 +131,11 @@ dependencies {
     add("adapter46CompileOnly", "com.pinterest.ktlint:ktlint-core:0.46.1")
     add("adapter47CompileOnly", "com.pinterest.ktlint:ktlint-core:0.47.1")
     add("adapter48CompileOnly", "com.pinterest.ktlint:ktlint-core:0.48.2")
-  //  add("adapter49CompileOnly", "com.pinterest.ktlint:ktlint-rule-engine-core:0.49.0")
     add("adapter49CompileOnly", "com.pinterest.ktlint:ktlint-core:0.49.1")
     add("adapter49CompileOnly", "com.pinterest.ktlint:ktlint-cli-reporter:0.49.1")
     add("adapter49CompileOnly", "com.pinterest.ktlint:ktlint-rule-engine:0.49.1")
     add("adapter49CompileOnly", "com.pinterest.ktlint:ktlint-ruleset-standard:0.49.1")
-    add("adapter49CompileOnly","com.pinterest.ktlint:ktlint-reporter-baseline:0.49.1")
+    add("adapter49CompileOnly", "com.pinterest.ktlint:ktlint-reporter-baseline:0.49.1")
     compileOnly(libs.kotlin.gradle.plugin)
     compileOnly(libs.android.gradle.plugin)
     compileOnly(kotlin("stdlib-jdk8"))
@@ -146,6 +157,25 @@ dependencies {
     testImplementation(libs.kotlin.reflect)
     testImplementation(libs.ktlint.core)
     testImplementation(libs.archunit.junit5)
+
+    add("adapter34TestImplementation", "com.pinterest.ktlint:ktlint-core:0.34.0")
+    add("adapter34TestImplementation", libs.commons.io)
+    add("adapter34TestImplementation", gradleTestKit())
+    add("adapter34TestImplementation", libs.junit.jupiter)
+    add("adapter34TestImplementation", libs.assertj.core)
+    add("adapter34TestImplementation", libs.kotlin.reflect)
+}
+
+kotlin {
+    // set up friend paths so that we can use internal classes across source sets
+    target.compilations.forEach {
+        if (it.name.startsWith("adapter")) {
+            if (it.name != "adapter") {
+                it.associateWith(target.compilations.getByName("adapter"))
+            }
+            target.compilations.getByName("main").associateWith(it)
+        }
+    }
 }
 
 // Test tasks loods plugin from local maven repository

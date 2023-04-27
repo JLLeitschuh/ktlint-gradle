@@ -8,4 +8,6 @@ import java.io.File
 interface KtLintInvocation {
     fun invokeLint(file: File): LintErrorResult
     fun invokeFormat(file: File): Pair<String, LintErrorResult>
+
+    fun trimMemory()
 }

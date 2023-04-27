@@ -1,13 +1,11 @@
 package org.jlleitschuh.gradle.ktlint.worker
 
-import net.swiftzer.semver.SemVer
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.Logging
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
-import org.jlleitschuh.gradle.ktlint.logKtLintDebugMessage
 import org.jlleitschuh.gradle.ktlint.reporter.CustomReporter
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import org.jlleitschuh.gradle.ktlint.selectReportersLoaderAdapter
@@ -19,11 +17,12 @@ internal abstract class LoadReportersWorkAction : WorkAction<LoadReportersWorkAc
 
     override fun execute() {
         val reportersLoaderAdapter = selectReportersLoaderAdapter(parameters.ktLintVersion.get())
-        val loadedReporters = reportersLoaderAdapter.allEnabledProviders(getEnabledReporters(),parameters.customReporters.get())
-
-        val ktLintClassesSerializer = KtLintClassesSerializer.create(
-            SemVer.parse(parameters.ktLintVersion.get())
+        val loadedReporters = reportersLoaderAdapter.allEnabledProviders(
+            getEnabledReporters(),
+            parameters.customReporters.get()
         )
+
+        val ktLintClassesSerializer = KtLintClassesSerializer.create()
         ktLintClassesSerializer.saveReporterProviders(
             loadedReporters.map { it.second },
             parameters.loadedReporterProviders.asFile.get()

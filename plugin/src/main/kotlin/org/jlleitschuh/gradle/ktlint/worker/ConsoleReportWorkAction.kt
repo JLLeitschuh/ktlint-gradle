@@ -1,7 +1,5 @@
 package org.jlleitschuh.gradle.ktlint.worker
 
-import com.pinterest.ktlint.core.LintError
-import net.swiftzer.semver.SemVer
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
@@ -22,9 +20,7 @@ internal abstract class ConsoleReportWorkAction : WorkAction<ConsoleReportWorkAc
     override fun execute() {
         val baselineLoader = selectBaselineLoader(parameters.ktLintVersion.get())
         val errors = KtLintClassesSerializer
-            .create(
-                SemVer.parse(parameters.ktLintVersion.get())
-            )
+            .create()
             .loadErrors(
                 parameters.discoveredErrors.asFile.get()
             )

@@ -2,23 +2,28 @@ package org.jlleitschuh.gradle.ktlint.worker
 
 import com.pinterest.ktlint.core.KtLint
 import com.pinterest.ktlint.core.LintError
+import com.pinterest.ktlint.core.RuleSet
+import com.pinterest.ktlint.core.RuleSetProvider
 import java.io.File
+import java.util.ServiceLoader
 
 class KtLintInvocation45(
     private val editorConfigPath: String?,
-    private val ruleSets: Set<com.pinterest.ktlint.core.RuleSet>,
+    private val ruleSets: Set<RuleSet>,
     private val userData: Map<String, String>,
     private val debug: Boolean
 ) : KtLintInvocation {
     companion object Factory : KtLintInvocationFactory {
         fun initialize(
             editorConfigPath: String?,
-            ruleSets: Set<com.pinterest.ktlint.core.RuleSet>,
+            enableExperimental: Boolean,
+            disabledRules: Set<String>,
             userData: Map<String, String>,
             debug: Boolean
         ): KtLintInvocation = KtLintInvocation45(
             editorConfigPath = editorConfigPath,
-            ruleSets = ruleSets,
+            ruleSets = loadRuleSetsFromClasspathWithRuleSetProvider()
+                .filterRules(enableExperimental, disabledRules),
             userData = userData,
             debug = debug
         )
@@ -50,9 +55,26 @@ class KtLintInvocation45(
 
     override fun invokeFormat(file: File): Pair<String, LintErrorResult> {
         val errors = mutableListOf<Pair<SerializableLintError, Boolean>>()
-        val newCode = KtLint.format(buildParams(file) { le, boolean ->
-            errors.add(le.toSerializable() to boolean)
-        })
+        val newCode = KtLint.format(
+            buildParams(file) { le, boolean ->
+                errors.add(le.toSerializable() to boolean)
+            }
+        )
         return newCode to LintErrorResult(file, errors)
     }
+
+    override fun trimMemory() {
+        KtLint.trimMemory()
+    }
+}
+
+private fun loadRuleSetsFromClasspathWithRuleSetProvider(): Map<String, RuleSet> {
+    return ServiceLoader
+        .load(RuleSetProvider::class.java)
+        .associateBy {
+            val key = it.get().id
+            // Adapted from KtLint CLI module
+            if (key == "standard") "\u0000$key" else key
+        }
+        .mapValues { it.value.get() }
 }

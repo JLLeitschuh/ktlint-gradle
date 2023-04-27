@@ -1,22 +1,27 @@
 package org.jlleitschuh.gradle.ktlint.reporter
 
+import com.pinterest.ktlint.core.Reporter
 import com.pinterest.ktlint.core.ReporterProvider
-import org.jlleitschuh.gradle.ktlint.reporter.CustomReporter
-import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import java.io.File
 import java.io.ObjectInputStream
-import java.lang.RuntimeException
 import java.util.ServiceLoader
 
-class ReportersProviderLoader : ReportersLoaderAdapter<ReporterProvider> {
+class ReportersProviderLoader :
+    ReportersLoaderAdapter<Reporter, ReporterProvider, Ktlint41Reporter, Ktlint41ReporterProvider> {
     override fun loadAllReporterProviders(): List<ReporterProviderWrapper<ReporterProvider>> = ServiceLoader
         .load(ReporterProvider::class.java)
         .toList().map {
             ReporterProviderWrapper(it.id, it)
         }
 
-    override fun loadReporterProviders(serializedReporterProviders: File): List<GenericReporterProvider<*>> {
-       return ObjectInputStream(
+    override fun loadAllGenericReporterProviders(): List<Ktlint41ReporterProvider> = ServiceLoader
+        .load(ReporterProvider::class.java)
+        .toList().map {
+            Ktlint41ReporterProvider(it)
+        }
+
+    override fun loadReporterProviders(serializedReporterProviders: File): List<Ktlint41ReporterProvider> {
+        return ObjectInputStream(
             serializedReporterProviders.inputStream().buffered()
         ).use {
             @Suppress("UNCHECKED_CAST")

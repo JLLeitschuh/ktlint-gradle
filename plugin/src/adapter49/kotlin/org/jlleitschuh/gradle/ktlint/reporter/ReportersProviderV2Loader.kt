@@ -2,19 +2,19 @@ package org.jlleitschuh.gradle.ktlint.reporter
 
 import com.pinterest.ktlint.cli.reporter.core.api.ReporterProviderV2
 import com.pinterest.ktlint.cli.reporter.core.api.ReporterV2
-import com.pinterest.ktlint.core.ReporterProvider
 import java.io.File
 import java.io.ObjectInputStream
-import java.lang.RuntimeException
 import java.util.ServiceLoader
 
-class ReportersProviderV2Loader : ReportersLoaderAdapter<ReporterProviderV2<*>> {
+class ReportersProviderV2Loader :
+    ReportersLoaderAdapter<ReporterV2, ReporterProviderV2<*>, ReporterV2Reporter, ReporterProviderV2ReporterProvider> {
     override fun loadAllReporterProviders(): List<ReporterProviderWrapper<ReporterProviderV2<*>>> = ServiceLoader
         .load(ReporterProviderV2::class.java)
         .toList().map {
             ReporterProviderWrapper(it.id, it)
         }
-    override fun loadReporterProviders(serializedReporterProviders: File): List<GenericReporterProvider<*>> {
+
+    override fun loadReporterProviders(serializedReporterProviders: File): List<ReporterProviderV2ReporterProvider> {
         return ObjectInputStream(
             serializedReporterProviders.inputStream().buffered()
         ).use {
@@ -22,6 +22,13 @@ class ReportersProviderV2Loader : ReportersLoaderAdapter<ReporterProviderV2<*>> 
             it.readObject() as List<ReporterProviderV2<ReporterV2>>
         }.map { ReporterProviderV2ReporterProvider(it) }
     }
+
+    override fun loadAllGenericReporterProviders(): List<ReporterProviderV2ReporterProvider> = ServiceLoader
+        .load(ReporterProviderV2::class.java)
+        .toList().map {
+            ReporterProviderV2ReporterProvider(it)
+        }
+
     override fun filterCustomProviders(
         customReporters: Set<CustomReporter>,
         allProviders: List<ReporterProviderV2<*>>

@@ -1,6 +1,5 @@
 package org.jlleitschuh.gradle.ktlint.reporter
 
-import com.pinterest.ktlint.core.Reporter
 import org.jlleitschuh.gradle.ktlint.worker.SerializableLintError
 
 /**
@@ -22,7 +21,7 @@ interface GenericReporter<T> {
 
     /**
      * Called once, after all the files (if any) have been processed.
-     * It's guarantied to be called after all other [Reporter]s methods.
+     * It's guarantied to be called after all other Reporter's methods.
      */
     fun afterAll()
 }

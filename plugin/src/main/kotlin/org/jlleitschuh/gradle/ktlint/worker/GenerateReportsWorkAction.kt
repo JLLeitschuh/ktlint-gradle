@@ -1,6 +1,5 @@
 package org.jlleitschuh.gradle.ktlint.worker
 
-import net.swiftzer.semver.SemVer
 import org.gradle.api.GradleException
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
@@ -19,9 +18,7 @@ internal abstract class GenerateReportsWorkAction : WorkAction<GenerateReportsWo
     override fun execute() {
         val baselineLoader = selectBaselineLoader(parameters.ktLintVersion.get())
         val ktLintClassesSerializer = KtLintClassesSerializer
-            .create(
-                SemVer.parse(parameters.ktLintVersion.get())
-            )
+            .create()
 
         val discoveredErrors = ktLintClassesSerializer.loadErrors(parameters.discoveredErrorsFile.get().asFile)
         val currentReporterId = parameters.reporterId.get()

@@ -1,6 +1,5 @@
 package org.jlleitschuh.gradle.ktlint.worker
 
-import com.pinterest.ktlint.core.KtLint
 import net.swiftzer.semver.SemVer
 import org.apache.commons.io.input.MessageDigestCalculatingInputStream
 import org.gradle.api.GradleException
@@ -32,9 +31,6 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
         val userData = generateUserData()
         val debug = parameters.debug.get()
         val formatSource = parameters.formatSource.getOrElse(false)
-
-        resetEditorconfigCache()
-
         val results = mutableListOf<LintErrorResult>()
         val formattedFiles = mutableMapOf<File, ByteArray>()
         if (parameters.additionalEditorconfigFile.isPresent &&
@@ -48,10 +44,10 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
             is KtLintInvocation45.Factory -> {
                 ktlintInvokerFactory.initialize(
                     editorConfigPath = additionalEditorConfig,
-                    ruleSets = loadRuleSetsFromClasspathWithRuleSetProvider().filterRules(
-                        parameters.enableExperimental.getOrElse(false),
-                        parameters.disabledRules.getOrElse(emptySet())
-                    ),
+
+                    parameters.enableExperimental.getOrElse(false),
+                    parameters.disabledRules.getOrElse(emptySet()),
+
                     userData = userData,
                     debug = debug
                 )
@@ -60,10 +56,8 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
             is KtLintInvocation46.Factory -> {
                 ktlintInvokerFactory.initialize(
                     editorConfigPath = additionalEditorConfig,
-                    ruleSets = loadRuleSetsFromClasspathWithRuleSetProvider().filterRules(
-                        parameters.enableExperimental.getOrElse(false),
-                        parameters.disabledRules.getOrElse(emptySet())
-                    ),
+                    enableExperimental = parameters.enableExperimental.getOrElse(false),
+                    disabledRules = parameters.disabledRules.getOrElse(emptySet()),
                     userData = userData,
                     debug = debug
                 )
@@ -88,17 +82,15 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
             }
 
             is KtLintInvocation49.Factory -> {
-                ktlintInvokerFactory.initialize(
-                    userData,
-                    parameters.enableExperimental.getOrElse(false),
-                    parameters.disabledRules.getOrElse(emptySet())
-                )
+                ktlintInvokerFactory.initialize()
             }
 
             else -> {
                 throw GradleException("Incompatible ktlint version ${parameters.ktLintVersion}")
             }
         }
+
+        resetEditorconfigCache(ktlintInvoker)
 
         parameters.filesToLint.files.forEach {
             try {
@@ -113,7 +105,7 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
                         it.writeText(updatedFileContent)
                     }
                 } else {
-                    val result =   ktlintInvoker.invokeLint(it)
+                    val result = ktlintInvoker.invokeLint(it)
                     results.add(result)
                 }
             } catch (e: RuntimeException) {
@@ -125,9 +117,7 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
         }
 
         KtLintClassesSerializer
-            .create(
-                SemVer.parse(parameters.ktLintVersion.get())
-            )
+            .create()
             .saveErrors(
                 results,
                 parameters.discoveredErrorsFile.asFile.get()
@@ -141,11 +131,11 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
         }
     }
 
-    private fun resetEditorconfigCache() {
+    private fun resetEditorconfigCache(ktLintInvocation: KtLintInvocation) {
         if (parameters.editorconfigFilesWereChanged.get()) {
             logger.info("Resetting KtLint caches")
             // Calling trimMemory() will also reset internal loaded `.editorconfig` cache
-            KtLint.trimMemory()
+            ktLintInvocation.trimMemory()
         }
     }
 
@@ -159,15 +149,6 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
         }
 
         return userData.toMap()
-    }
-
-    /**
-     * Apply filter logic in a generic way that works with old and new rule loading APIs
-     */
-    private fun <T> Map<String, T>.filterRules(enableExperimental: Boolean, disabledRules: Set<String>): Set<T> {
-        return this.filterKeys { enableExperimental || it != "experimental" }
-            .filterKeys { !(disabledRules.contains("standard") && it == "\u0000standard") }
-            .toSortedMap().mapValues { it.value }.values.toSet()
     }
 
     interface KtLintWorkParameters : WorkParameters {
@@ -216,5 +197,3 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
         }
     }
 }
-
-

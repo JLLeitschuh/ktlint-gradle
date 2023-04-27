@@ -186,7 +186,8 @@ class KtlintBaselineSupportTest : AbstractPluginTest() {
         }
     }
 
-    private val File.defaultBaselineFile get() = resolve("config")
-        .resolve("ktlint")
-        .resolve("baseline.xml")
+    private val File.defaultBaselineFile
+        get() = resolve("config")
+            .resolve("ktlint")
+            .resolve("baseline.xml")
 }

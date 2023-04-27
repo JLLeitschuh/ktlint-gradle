@@ -54,25 +54,31 @@ class KtLintInvocation47(
 
     override fun invokeLint(file: File): LintErrorResult {
         val errors = mutableListOf<Pair<SerializableLintError, Boolean>>()
-        KtLint.lint(buildParams(file) { le, boolean ->
-            errors.add(le.toSerializable() to boolean)
-        })
+        KtLint.lint(
+            buildParams(file) { le, boolean ->
+                errors.add(le.toSerializable() to boolean)
+            }
+        )
         return LintErrorResult(file, errors)
     }
 
     override fun invokeFormat(file: File): Pair<String, LintErrorResult> {
         val errors = mutableListOf<Pair<SerializableLintError, Boolean>>()
-        val newCode = KtLint.format(buildParams(file) { le, boolean ->
-            errors.add(le.toSerializable() to boolean)
-        })
+        val newCode = KtLint.format(
+            buildParams(file) { le, boolean ->
+                errors.add(le.toSerializable() to boolean)
+            }
+        )
         return newCode to LintErrorResult(file, errors)
+    }
+
+    override fun trimMemory() {
+        KtLint.trimMemory()
     }
 }
 
 internal fun LintError.toSerializable(): SerializableLintError {
-    return SerializableLintError(
-        line, col, ruleId, detail, canBeAutoCorrected
-    )
+    return SerializableLintError(line, col, ruleId, detail, canBeAutoCorrected)
 }
 
 private fun userDataToEditorConfigOverride(userData: Map<String, String>): EditorConfigOverride {

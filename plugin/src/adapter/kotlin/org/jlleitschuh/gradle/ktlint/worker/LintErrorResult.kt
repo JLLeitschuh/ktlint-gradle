@@ -1,6 +1,5 @@
 package org.jlleitschuh.gradle.ktlint.worker
 
-import com.pinterest.ktlint.core.LintError
 import java.io.File
 import java.io.Serializable
 

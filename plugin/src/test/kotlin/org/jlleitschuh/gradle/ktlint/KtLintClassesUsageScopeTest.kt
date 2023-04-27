@@ -14,7 +14,6 @@ internal class KtLintClassesUsageScopeTest {
         .resideInAnyPackage(
             "org.jlleitschuh.gradle.ktlint",
             "org.jlleitschuh.gradle.ktlint.android",
-            "org.jlleitschuh.gradle.ktlint.reporter",
             "org.jlleitschuh.gradle.ktlint.tasks"
         )
         .should()

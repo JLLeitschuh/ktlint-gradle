@@ -1,15 +1,10 @@
 package org.jlleitschuh.gradle.ktlint.reporter
 
 import com.pinterest.ktlint.cli.reporter.core.api.ReporterV2
-import org.jlleitschuh.gradle.ktlint.worker.KtLintInvocation
-import org.jlleitschuh.gradle.ktlint.worker.KtLintInvocationFactory
 import org.jlleitschuh.gradle.ktlint.worker.SerializableLintError
 import org.jlleitschuh.gradle.ktlint.worker.toCliError
 
 class ReporterV2Reporter(val reporter: ReporterV2) : GenericReporter<ReporterV2> {
-    companion object Factory : ReporterFactory {
-        fun initialize(reporter: ReporterV2): ReporterV2Reporter = ReporterV2Reporter(reporter)
-    }
     override fun beforeAll() {
         reporter.beforeAll()
     }

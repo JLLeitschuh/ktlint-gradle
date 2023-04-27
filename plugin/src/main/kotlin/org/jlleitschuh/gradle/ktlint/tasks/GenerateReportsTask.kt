@@ -24,7 +24,6 @@ import org.jlleitschuh.gradle.ktlint.reporter.LoadedReporter
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import org.jlleitschuh.gradle.ktlint.worker.ConsoleReportWorkAction
 import org.jlleitschuh.gradle.ktlint.worker.GenerateReportsWorkAction
-import org.jlleitschuh.gradle.ktlint.worker.LoadReportersWorkAction
 import java.io.File
 import java.io.FileInputStream
 import java.io.ObjectInputStream
