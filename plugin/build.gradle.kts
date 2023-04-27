@@ -31,7 +31,7 @@ java {
     }
 }
 
-tasks.withType<KotlinCompile>() {
+tasks.withType<KotlinCompile> {
     kotlinOptions {
         apiVersion = "1.3"
         jvmTarget = "1.8"
@@ -47,12 +47,84 @@ tasks.withType<PluginUnderTestMetadata>().configureEach {
  * metadata files.
  */
 val shadowImplementation by configurations.creating
+configurations {
+    val compileOnly by getting {
+        extendsFrom(shadowImplementation)
+        isCanBeResolved = true
+    }
+}
 configurations["compileOnly"].extendsFrom(shadowImplementation)
 configurations["testImplementation"].extendsFrom(shadowImplementation)
+sourceSets {
+    val adapter by creating {
+    }
+    val adapter34 by creating {
+        compileClasspath += adapter.output
+    }
+    val adapter41 by creating {
+        compileClasspath += adapter.output
+    }
+    val adapter45 by creating {
+        compileClasspath += adapter.output
+    }
+    val adapter46 by creating {
+        compileClasspath += adapter.output
+    }
+    val adapter47 by creating {
+        compileClasspath += adapter.output
+    }
+    val adapter48 by creating {
+        compileClasspath += adapter.output
+    }
+    val adapter49 by creating {
+        compileClasspath += adapter.output
+    }
+    val adapters = listOf(adapter, adapter34, adapter41, adapter45, adapter46, adapter47, adapter48, adapter49)
+    val main by getting {
+        kotlin {
+            compileClasspath = adapters.map { it.output }.fold(compileClasspath) { a, b -> a + b }
+            runtimeClasspath = adapters.map { it.output }.fold(runtimeClasspath) { a, b -> a + b }
+        }
+    }
+    val test by getting {
+        kotlin {
+            compileClasspath = adapters.map { it.output }.fold(compileClasspath) { a, b -> a + b }
+            runtimeClasspath = adapters.map { it.output }.fold(runtimeClasspath) { a, b -> a + b }
+        }
+    }
+}
+val adapterSources = listOf(
+    sourceSets.named("adapter"),
+    sourceSets.named("adapter34"),
+    sourceSets.named("adapter41"),
+    sourceSets.named("adapter45"),
+    sourceSets.named("adapter46"),
+    sourceSets.named("adapter47"),
+    sourceSets.named("adapter48"),
+    sourceSets.named("adapter49")
+)
+tasks.named<Jar>("shadowJar") {
+    this.from(adapterSources.map { sourceSet -> sourceSet.map { it.output.classesDirs } })
+}
 
 dependencies {
     compileOnly(gradleApi())
     compileOnly(libs.ktlint.core)
+    add("adapterCompileOnly", libs.ktlint.core)
+    add("adapterImplementation", libs.semver)
+    add("adapter34Implementation", kotlin("reflect"))
+    add("adapter34CompileOnly", "com.pinterest.ktlint:ktlint-core:0.34.0")
+    add("adapter41CompileOnly", "com.pinterest.ktlint:ktlint-core:0.41.0")
+    add("adapter45CompileOnly", "com.pinterest.ktlint:ktlint-core:0.45.2")
+    add("adapter46CompileOnly", "com.pinterest.ktlint:ktlint-core:0.46.1")
+    add("adapter47CompileOnly", "com.pinterest.ktlint:ktlint-core:0.47.1")
+    add("adapter48CompileOnly", "com.pinterest.ktlint:ktlint-core:0.48.2")
+  //  add("adapter49CompileOnly", "com.pinterest.ktlint:ktlint-rule-engine-core:0.49.0")
+    add("adapter49CompileOnly", "com.pinterest.ktlint:ktlint-core:0.49.1")
+    add("adapter49CompileOnly", "com.pinterest.ktlint:ktlint-cli-reporter:0.49.1")
+    add("adapter49CompileOnly", "com.pinterest.ktlint:ktlint-rule-engine:0.49.1")
+    add("adapter49CompileOnly", "com.pinterest.ktlint:ktlint-ruleset-standard:0.49.1")
+    add("adapter49CompileOnly","com.pinterest.ktlint:ktlint-reporter-baseline:0.49.1")
     compileOnly(libs.kotlin.gradle.plugin)
     compileOnly(libs.android.gradle.plugin)
     compileOnly(kotlin("stdlib-jdk8"))
@@ -154,9 +226,7 @@ val ensureDependenciesAreInlined by tasks.registering {
                 val path = relativePath
                 if (!path.startsWith("META-INF") &&
                     path.lastName.endsWith(".class") &&
-                    !path.pathString.startsWith(
-                            pluginGroup.replace(".", "/")
-                        )
+                    !path.pathString.startsWith(pluginGroup.replace(".", "/"))
                 ) {
                     nonInlinedDependencies.add(path.pathString)
                 }

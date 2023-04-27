@@ -3,6 +3,7 @@ package org.jlleitschuh.gradle.ktlint.worker
 import com.pinterest.ktlint.core.Reporter
 import com.pinterest.ktlint.core.ReporterProvider
 import net.swiftzer.semver.SemVer
+import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
@@ -11,6 +12,7 @@ import org.gradle.api.logging.Logging
 import org.gradle.api.provider.Property
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
+import org.jlleitschuh.gradle.ktlint.selectBaselineReporterFactory
 import java.io.File
 import java.io.PrintStream
 import java.util.ServiceLoader
@@ -22,6 +24,7 @@ internal abstract class GenerateBaselineWorkAction :
     private val logger = Logging.getLogger("ktlint-generate-baseline-worker")
 
     override fun execute() {
+        val baselineReporterAdapterFactory = selectBaselineReporterFactory(parameters.ktLintVersion.get())
         val ktLintClassesSerializer = KtLintClassesSerializer.create(
             SemVer.parse(parameters.ktLintVersion.get())
         )
@@ -39,6 +42,11 @@ internal abstract class GenerateBaselineWorkAction :
 
         PrintStream(baselineFile.outputStream()).use { file ->
             val baselineReporter = loadBaselineReporter(file)
+            val baselineReporterAdapter = when (baselineReporterAdapterFactory) {
+                is BaselineReporterAdapter45.Factory -> baselineReporterAdapterFactory.initialize(baselineReporter)
+                else -> throw GradleException("Incompatible ktlint version ${parameters.ktLintVersion}")
+            }
+
             baselineReporter.beforeAll()
             errors.forEach { lintErrorResult ->
                 val filePath = lintErrorResult
@@ -48,7 +56,7 @@ internal abstract class GenerateBaselineWorkAction :
 
                 baselineReporter.before(filePath)
                 lintErrorResult.lintErrors.forEach {
-                    baselineReporter.onLintError(filePath, it.first, it.second)
+                    baselineReporterAdapter.onLintError(filePath, it.first, it.second)
                 }
                 baselineReporter.after(filePath)
             }

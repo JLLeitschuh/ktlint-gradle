@@ -20,6 +20,7 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.workers.WorkerExecutor
+import org.jlleitschuh.gradle.ktlint.reporter.LoadedReporter
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import org.jlleitschuh.gradle.ktlint.worker.ConsoleReportWorkAction
 import org.jlleitschuh.gradle.ktlint.worker.GenerateReportsWorkAction
@@ -163,11 +164,11 @@ abstract class GenerateReportsTask @Inject constructor(
         FileInputStream(loadedReporters.asFile.get())
     ).use {
         @Suppress("UNCHECKED_CAST")
-        it.readObject() as List<LoadReportersWorkAction.LoadedReporter>
+        it.readObject() as List<LoadedReporter>
     }
 
     private fun generateReporterOptions(
-        loadedReporter: LoadReportersWorkAction.LoadedReporter
+        loadedReporter: LoadedReporter
     ): Map<String, String> {
         val options = mutableMapOf(
             "verbose" to verbose.get().toString(),

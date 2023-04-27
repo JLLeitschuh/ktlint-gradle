@@ -11,6 +11,7 @@ import org.gradle.api.provider.Property
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
 import org.jetbrains.kotlin.util.prefixIfNot
+import org.jlleitschuh.gradle.ktlint.selectBaselineLoader
 import java.io.File
 
 @Suppress("UnstableApiUsage")
@@ -19,6 +20,7 @@ internal abstract class ConsoleReportWorkAction : WorkAction<ConsoleReportWorkAc
     private val logger = Logging.getLogger("ktlint-console-report-worker")
 
     override fun execute() {
+        val baselineLoader = selectBaselineLoader(parameters.ktLintVersion.get())
         val errors = KtLintClassesSerializer
             .create(
                 SemVer.parse(parameters.ktLintVersion.get())
@@ -28,7 +30,7 @@ internal abstract class ConsoleReportWorkAction : WorkAction<ConsoleReportWorkAc
             )
 
         val baselineRules = parameters.baseline.orNull?.asFile?.absolutePath
-            ?.let { loadBaselineRules(it) }
+            ?.let { baselineLoader.loadBaselineRules(it) }
         val projectDir = parameters.projectDirectory.asFile.get()
 
         val lintErrors = errors.associate { lintErrorResult ->
@@ -67,7 +69,7 @@ internal abstract class ConsoleReportWorkAction : WorkAction<ConsoleReportWorkAc
         }
     }
 
-    private fun LintError.logError(
+    private fun SerializableLintError.logError(
         filePath: String,
         verbose: Boolean
     ) {

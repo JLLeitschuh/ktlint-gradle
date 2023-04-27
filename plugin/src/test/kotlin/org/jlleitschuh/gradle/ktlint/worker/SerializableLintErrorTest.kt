@@ -14,18 +14,30 @@ internal class SerializableLintErrorTest {
 
     @Test
     internal fun `Should correctly serialize and deserialize LintError`() {
+        val serializableLintError = SerializableLintError(14, 154, "test-rule", "details about error", false)
         val lintError = LintError(14, 154, "test-rule", "details about error", false)
-        val wrappedLintError = SerializableLintError(lintError)
-        val serializeIntoFile = temporaryFolder.resolve("lintError.test")
+        val coreFile = temporaryFolder.resolve("lintError-core.test")
+        val ourFile = temporaryFolder.resolve("lintError-serializable.test")
 
-        ObjectOutputStream(serializeIntoFile.outputStream()).use {
-            it.writeObject(wrappedLintError)
+        ObjectOutputStream(coreFile.outputStream()).use {
+            it.writeObject(lintError)
         }
 
-        ObjectInputStream(serializeIntoFile.inputStream()).use {
-            val restoredWrappedLintError = it.readObject() as SerializableLintError
-            assertThat(restoredWrappedLintError.lintError).isEqualTo(lintError)
-            assertThat(restoredWrappedLintError.lintError.canBeAutoCorrected)
+        ObjectOutputStream(ourFile.outputStream()).use {
+            it.writeObject(serializableLintError)
+        }
+
+        ObjectInputStream(coreFile.inputStream()).use {
+            val restoredLintError = it.readObject() as LintError
+            assertThat(restoredLintError).isEqualTo(lintError)
+            assertThat(restoredLintError.canBeAutoCorrected)
+                .isEqualTo(lintError.canBeAutoCorrected)
+        }
+
+        ObjectInputStream(ourFile.inputStream()).use {
+            val restoredLintError = it.readObject() as SerializableLintError
+            assertThat(restoredLintError).isEqualTo(serializableLintError)
+            assertThat(restoredLintError.canBeAutoCorrected)
                 .isEqualTo(lintError.canBeAutoCorrected)
         }
     }

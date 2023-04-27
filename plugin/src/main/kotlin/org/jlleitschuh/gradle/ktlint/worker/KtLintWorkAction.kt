@@ -1,7 +1,6 @@
 package org.jlleitschuh.gradle.ktlint.worker
 
 import com.pinterest.ktlint.core.KtLint
-import com.pinterest.ktlint.core.LintError
 import net.swiftzer.semver.SemVer
 import org.apache.commons.io.input.MessageDigestCalculatingInputStream
 import org.gradle.api.GradleException
@@ -12,6 +11,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
+import org.jlleitschuh.gradle.ktlint.selectInvocation
 import org.jlleitschuh.gradle.ktlint.worker.KtLintWorkAction.FormatTaskSnapshot.Companion.contentHash
 import java.io.File
 import java.io.ObjectInputStream
@@ -35,15 +35,17 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
 
         resetEditorconfigCache()
 
-        val result = mutableListOf<LintErrorResult>()
+        val results = mutableListOf<LintErrorResult>()
         val formattedFiles = mutableMapOf<File, ByteArray>()
         if (parameters.additionalEditorconfigFile.isPresent &&
             parameters.ktLintVersion.map { SemVer.parse(it) }.get() >= SemVer(0, 47)
         ) {
             logger.warn("additionalEditorconfigFile no longer supported in ktlint 0.47+")
         }
-        val ktlintInvoker: KtLintInvocation = when (val ktlintInvokerFactory = selectInvocation()) {
-            is LegacyParamsInvocation.Factory -> {
+        val ktlintInvoker: KtLintInvocation = when (
+            val ktlintInvokerFactory = selectInvocation(parameters.ktLintVersion.get())
+        ) {
+            is KtLintInvocation45.Factory -> {
                 ktlintInvokerFactory.initialize(
                     editorConfigPath = additionalEditorConfig,
                     ruleSets = loadRuleSetsFromClasspathWithRuleSetProvider().filterRules(
@@ -55,7 +57,7 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
                 )
             }
 
-            is ExperimentalParamsInvocation.Factory -> {
+            is KtLintInvocation46.Factory -> {
                 ktlintInvokerFactory.initialize(
                     editorConfigPath = additionalEditorConfig,
                     ruleSets = loadRuleSetsFromClasspathWithRuleSetProvider().filterRules(
@@ -67,50 +69,52 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
                 )
             }
 
-            is ExperimentalParamsProviderInvocation.Factory -> {
+            is KtLintInvocation47.Factory -> {
                 ktlintInvokerFactory.initialize(
                     editorConfigPath = additionalEditorConfig,
-                    ruleProviders = loadRuleSetsFromClasspathWithRuleSetProviderV2().filterRules(
-                        parameters.enableExperimental.getOrElse(false),
-                        parameters.disabledRules.getOrElse(emptySet())
-                    ).flatten().toSet(),
                     userData = userData,
-                    debug = debug
+                    debug = debug,
+                    parameters.enableExperimental.getOrElse(false),
+                    parameters.disabledRules.getOrElse(emptySet())
                 )
             }
 
-            is RuleEngineInvocation.Factory -> {
+            is KtLintInvocation48.Factory -> {
                 ktlintInvokerFactory.initialize(
-                    loadRuleSetsFromClasspathWithRuleSetProviderV2()
-                        .filterRules(parameters.enableExperimental.getOrElse(false), parameters.disabledRules.getOrElse(emptySet()))
-                        .flatten().toSet(),
-                    userData
+                    userData,
+                    parameters.enableExperimental.getOrElse(false),
+                    parameters.disabledRules.getOrElse(emptySet())
                 )
             }
 
-            null -> {
+            is KtLintInvocation49.Factory -> {
+                ktlintInvokerFactory.initialize(
+                    userData,
+                    parameters.enableExperimental.getOrElse(false),
+                    parameters.disabledRules.getOrElse(emptySet())
+                )
+            }
+
+            else -> {
                 throw GradleException("Incompatible ktlint version ${parameters.ktLintVersion}")
             }
         }
 
         parameters.filesToLint.files.forEach {
-            val errors = mutableListOf<Pair<LintError, Boolean>>()
-
             try {
                 if (formatSource) {
                     val currentFileContent = it.readText()
-                    val updatedFileContent = ktlintInvoker.invokeFormat(it) { lintError, isCorrected ->
-                        errors.add(lintError to isCorrected)
-                    }
+                    val result = ktlintInvoker.invokeFormat(it)
+                    results.add(result.second)
+                    val updatedFileContent = result.first
 
                     if (updatedFileContent != currentFileContent) {
                         formattedFiles[it] = contentHash(it)
                         it.writeText(updatedFileContent)
                     }
                 } else {
-                    ktlintInvoker.invokeLint(it) { lintError, isCorrected ->
-                        errors.add(lintError to isCorrected)
-                    }
+                    val result =   ktlintInvoker.invokeLint(it)
+                    results.add(result)
                 }
             } catch (e: RuntimeException) {
                 throw GradleException(
@@ -118,13 +122,6 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
                     e
                 )
             }
-
-            result.add(
-                LintErrorResult(
-                    lintedFile = it,
-                    lintErrors = errors
-                )
-            )
         }
 
         KtLintClassesSerializer
@@ -132,7 +129,7 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
                 SemVer.parse(parameters.ktLintVersion.get())
             )
             .saveErrors(
-                result,
+                results,
                 parameters.discoveredErrorsFile.asFile.get()
             )
 
@@ -219,3 +216,5 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
         }
     }
 }
+
+

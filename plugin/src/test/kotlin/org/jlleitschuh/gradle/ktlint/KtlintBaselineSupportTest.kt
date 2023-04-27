@@ -135,6 +135,7 @@ class KtlintBaselineSupportTest : AbstractPluginTest() {
                 buildGradle.appendText(
                     """
                     ktlint.version = "$ktLintVersion"
+                    ktlint.debug = true
                     """.trimIndent()
                 )
                 withFailingSources()
