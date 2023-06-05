@@ -494,6 +494,42 @@ class KtlintPluginTest : AbstractPluginTest() {
         }
     }
 
+    @DisplayName("Lint check should run incrementally and repeat errors")
+    @CommonTest
+    fun checkIsIncrementalWithErrors(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            val initialSourceFile = "src/main/kotlin/Initial.kt"
+            createSourceFile(
+                initialSourceFile,
+                """
+                val foo="bar"
+
+                """.trimIndent()
+            )
+
+            buildAndFail(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            }
+
+            val additionalSourceFile = "src/main/kotlin/AnotherFile.kt"
+            createSourceFile(
+                additionalSourceFile,
+                """
+                val bar="foo"
+
+                """.trimIndent()
+            )
+
+            buildAndFail(CHECK_PARENT_TASK_NAME, "--info") {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
+                assertThat(output)
+                    .contains("Executing incrementally")
+                    .contains("Initial.kt")
+                    .contains("AnotherFile.kt")
+            }
+        }
+    }
+
     @DisplayName("Should check files which path conatins whitespace")
     @CommonTest
     fun pathsWithWhitespace(gradleVersion: GradleVersion) {
