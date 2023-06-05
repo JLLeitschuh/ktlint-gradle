@@ -1,4 +1,4 @@
-package org.jlleitschuh.gradle.ktlint.worker
+package org.jlleitschuh.gradle.ktlint.reporter
 
 import com.pinterest.ktlint.core.Reporter
 import com.pinterest.ktlint.core.ReporterProvider
@@ -16,7 +16,7 @@ internal class SerializableReporterProviderTest {
 
     @Test
     internal fun `Should correctly serialize and deserialize ReporterProvider`() {
-        val reporterProvider = TestReporterProvider()
+        val reporterProvider: ReporterProvider = TestReporterProvider()
         val wrappedReporterProvider = SerializableReporterProvider(reporterProvider)
         val serializeIntoFile = temporaryFolder.resolve("reporters.test")
 
@@ -32,7 +32,7 @@ internal class SerializableReporterProviderTest {
         }
     }
 
-    private class TestReporterProvider : ReporterProvider<Reporter> {
+    private class TestReporterProvider : ReporterProvider {
         override val id: String = "test-reporter-provider"
 
         override fun get(

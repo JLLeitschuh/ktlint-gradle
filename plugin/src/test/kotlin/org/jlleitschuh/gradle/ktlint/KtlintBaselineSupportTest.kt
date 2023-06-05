@@ -135,6 +135,7 @@ class KtlintBaselineSupportTest : AbstractPluginTest() {
                 buildGradle.appendText(
                     """
                     ktlint.version = "$ktLintVersion"
+                    ktlint.debug = true
                     """.trimIndent()
                 )
                 withFailingSources()
@@ -185,7 +186,8 @@ class KtlintBaselineSupportTest : AbstractPluginTest() {
         }
     }
 
-    private val File.defaultBaselineFile get() = resolve("config")
-        .resolve("ktlint")
-        .resolve("baseline.xml")
+    private val File.defaultBaselineFile
+        get() = resolve("config")
+            .resolve("ktlint")
+            .resolve("baseline.xml")
 }
