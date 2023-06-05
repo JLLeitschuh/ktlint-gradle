@@ -36,6 +36,7 @@ import org.jlleitschuh.gradle.ktlint.applyGitFilter
 import org.jlleitschuh.gradle.ktlint.getEditorConfigFiles
 import org.jlleitschuh.gradle.ktlint.intermediateResultsBuildDir
 import org.jlleitschuh.gradle.ktlint.property
+import org.jlleitschuh.gradle.ktlint.worker.KtLintClassesSerializer
 import org.jlleitschuh.gradle.ktlint.worker.KtLintWorkAction
 import java.io.File
 import javax.inject.Inject
@@ -195,7 +196,18 @@ abstract class BaseKtLintCheckTask @Inject constructor(
         logTaskExecutionState(inputChanges, editorConfigUpdated)
         if (skipExecution(filesToCheck)) return
 
-        submitKtLintWork(filesToCheck, false, editorConfigUpdated, null)
+        val previousErrors: Set<File> = if (discoveredErrors.asFile.get().exists()) {
+            KtLintClassesSerializer
+                .create()
+                .loadErrors(discoveredErrors.asFile.get())
+                .map { it.lintedFile }
+                .toSet()
+        } else {
+            emptySet()
+        }
+        val allfilesToCheck = filesToCheck + previousErrors
+
+        submitKtLintWork(allfilesToCheck, false, editorConfigUpdated, null)
     }
 
     protected fun runFormat(

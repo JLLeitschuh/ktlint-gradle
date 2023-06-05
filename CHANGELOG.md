@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Add files previously found to have errors to the list of files to check in incremental builds. [#672](https://github.com/JLLeitschuh/ktlint-gradle/pull/672)
 - Added ktlint 0.49.1 support [#667](https://github.com/JLLeitschuh/ktlint-gradle/pull/667)
 - Refactored multi-ktlint support to use multiple source sets with different compileOnly dependencies rather than reflection. [#667](https://github.com/JLLeitschuh/ktlint-gradle/pull/667)
 
