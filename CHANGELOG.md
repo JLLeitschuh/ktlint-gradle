@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- update latest version text file manually [#674](https://github.com/JLLeitschuh/ktlint-gradle/pull/674)
+
 ## [11.4.0] - 2023-06-06
 
 ### Changed
