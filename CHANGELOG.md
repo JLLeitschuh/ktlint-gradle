@@ -7,11 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [11.4.0] - 2023-06-06
+
 ### Changed
 
-- Add files previously found to have errors to the list of files to check in incremental builds. [#672](https://github.com/JLLeitschuh/ktlint-gradle/pull/672)
-- Added ktlint 0.49.1 support [#667](https://github.com/JLLeitschuh/ktlint-gradle/pull/667)
-- Refactored multi-ktlint support to use multiple source sets with different compileOnly dependencies rather than reflection. [#667](https://github.com/JLLeitschuh/ktlint-gradle/pull/667)
+-   Add files previously found to have errors to the list of files to check in incremental builds. [#672](https://github.com/JLLeitschuh/ktlint-gradle/pull/672)
+-   Added ktlint 0.49.1 support [#667](https://github.com/JLLeitschuh/ktlint-gradle/pull/667)
+-   Refactored multi-ktlint support to use multiple source sets with different compileOnly dependencies rather than reflection. [#667](https://github.com/JLLeitschuh/ktlint-gradle/pull/667)
 
 ## [11.3.2] - 2023-04-25
 
@@ -657,7 +659,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 -   Renamed task with name `ktlint` to `ktlintCheck` (#3)
 -   Renamed tasks with names `ktlint[source set name]` to `ktlint[source set name]Check` (#3)
 
-[Unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.3.2...HEAD
+[Unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.4.0...HEAD
+
+[11.4.0]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.3.2...v11.4.0
 
 [11.3.2]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.3.1...v11.3.2
 
