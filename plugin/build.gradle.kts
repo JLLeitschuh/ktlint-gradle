@@ -33,7 +33,9 @@ java {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {
-        apiVersion = "1.3"
+        // target 1.4 as ktlint 0.49 requires it for inline classes
+        languageVersion = "1.4"
+        apiVersion = "1.4"
         jvmTarget = "1.8"
     }
 }
