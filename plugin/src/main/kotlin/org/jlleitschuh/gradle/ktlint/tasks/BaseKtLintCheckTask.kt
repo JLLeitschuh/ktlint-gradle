@@ -201,6 +201,7 @@ abstract class BaseKtLintCheckTask @Inject constructor(
                 .create()
                 .loadErrors(discoveredErrors.asFile.get())
                 .map { it.lintedFile }
+                .filter { it.exists() }
                 .toSet()
         } else {
             emptySet()
