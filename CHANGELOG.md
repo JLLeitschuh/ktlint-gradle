@@ -7,11 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [11.4.1] - 2023-06-21
+
 ### Fixed
 
-- update latest version text file manually [#674](https://github.com/JLLeitschuh/ktlint-gradle/pull/674)
-- decrease plugin build workers to 4 to prevent thrashing [#675](https://github.com/JLLeitschuh/ktlint-gradle/pull/675)
-- exclude deleted files from incremental checks [#681](https://github.com/JLLeitschuh/ktlint-gradle/pull/681)
+-   update latest version text file manually [#674](https://github.com/JLLeitschuh/ktlint-gradle/pull/674)
+-   decrease plugin build workers to 4 to prevent thrashing [#675](https://github.com/JLLeitschuh/ktlint-gradle/pull/675)
+-   exclude deleted files from incremental checks [#681](https://github.com/JLLeitschuh/ktlint-gradle/pull/681)
 
 ## [11.4.0] - 2023-06-06
 
@@ -665,7 +667,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 -   Renamed task with name `ktlint` to `ktlintCheck` (#3)
 -   Renamed tasks with names `ktlint[source set name]` to `ktlint[source set name]Check` (#3)
 
-[Unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.4.0...HEAD
+[Unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.4.1...HEAD
+
+[11.4.1]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.4.0...v11.4.1
 
 [11.4.0]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.3.2...v11.4.0
 
