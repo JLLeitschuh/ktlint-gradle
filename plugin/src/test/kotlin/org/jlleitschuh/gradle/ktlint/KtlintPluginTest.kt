@@ -731,4 +731,46 @@ class KtlintPluginTest : AbstractPluginTest() {
             build(CHECK_PARENT_TASK_NAME)
         }
     }
+
+    @DisplayName("Lint check should pass after file is deleted")
+    @CommonTest
+    fun checkAfterFileDelete(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            val fileOne = "src/main/kotlin/FileOne.kt"
+            createSourceFile(
+                fileOne,
+                """
+                val foo = "bar"
+
+                """.trimIndent()
+            )
+
+            val fileTwo = "src/main/kotlin/FileTwo.kt"
+            createSourceFile(
+                fileTwo,
+                """
+                val bar = "foo"
+
+                """.trimIndent()
+            )
+
+            build(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+
+            removeSourceFile(fileOne)
+            val fileThree = "src/main/kotlin/FileThree.kt"
+            createSourceFile( // Need to add or modify a source to repro file not found error.
+                fileThree,
+                """
+                val bar = "foo"
+
+                """.trimIndent()
+            )
+
+            build(CHECK_PARENT_TASK_NAME, "--info") { // <-- Fails, file one is not found.
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+        }
+    }
 }
