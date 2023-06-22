@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [11.4.2] - 2023-06-22
+
 -   set kotlin version to 1.4 as its the minimum required for ktlint 0.49 [#683](https://github.com/JLLeitschuh/ktlint-gradle/pull/683)
 -   update latest version text file manually [#682](https://github.com/JLLeitschuh/ktlint-gradle/pull/682)
 
@@ -670,7 +672,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 -   Renamed task with name `ktlint` to `ktlintCheck` (#3)
 -   Renamed tasks with names `ktlint[source set name]` to `ktlint[source set name]Check` (#3)
 
-[Unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.4.1...HEAD
+[Unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.4.2...HEAD
+
+[11.4.2]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.4.1...v11.4.2
 
 [11.4.1]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.4.0...v11.4.1
 
