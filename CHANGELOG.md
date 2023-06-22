@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+-   update latest version text file manually [#685](https://github.com/JLLeitschuh/ktlint-gradle/pull/685)
+
 ## [11.4.2] - 2023-06-22
 
 -   set kotlin version to 1.4 as its the minimum required for ktlint 0.49 [#683](https://github.com/JLLeitschuh/ktlint-gradle/pull/683)
