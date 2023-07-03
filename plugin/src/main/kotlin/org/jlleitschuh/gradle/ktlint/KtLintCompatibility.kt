@@ -17,6 +17,7 @@ import org.jlleitschuh.gradle.ktlint.worker.KtLintInvocation46
 import org.jlleitschuh.gradle.ktlint.worker.KtLintInvocation47
 import org.jlleitschuh.gradle.ktlint.worker.KtLintInvocation48
 import org.jlleitschuh.gradle.ktlint.worker.KtLintInvocation49
+import org.jlleitschuh.gradle.ktlint.worker.KtLintInvocation50
 import org.jlleitschuh.gradle.ktlint.worker.KtLintInvocationFactory
 import java.io.Serializable
 
@@ -31,11 +32,13 @@ internal fun selectInvocation(version: String): KtLintInvocationFactory {
             KtLintInvocation47
         } else if (semVer.minor == 48) {
             KtLintInvocation48
-        } else {
+        } else if (semVer.minor == 49) {
             KtLintInvocation49
+        } else {
+            KtLintInvocation50
         }
     } else {
-        KtLintInvocation49
+        KtLintInvocation50
     }
 }
 

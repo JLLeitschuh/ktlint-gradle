@@ -85,6 +85,9 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
                 ktlintInvokerFactory.initialize()
             }
 
+            is KtLintInvocation50.Factory -> {
+                ktlintInvokerFactory.initialize()
+            }
             else -> {
                 throw GradleException("Incompatible ktlint version ${parameters.ktLintVersion}")
             }
