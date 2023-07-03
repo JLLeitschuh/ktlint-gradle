@@ -85,7 +85,20 @@ sourceSets {
     val adapter49 by creating {
         compileClasspath += adapter.output
     }
-    val adapters = listOf(adapter, adapter34, adapter41, adapter45, adapter46, adapter47, adapter48, adapter49)
+    val adapter50 by creating {
+        compileClasspath += adapter.output
+    }
+    val adapters = listOf(
+        adapter,
+        adapter34,
+        adapter41,
+        adapter45,
+        adapter46,
+        adapter47,
+        adapter48,
+        adapter49,
+        adapter50
+    )
     val main by getting {
         kotlin {
             compileClasspath = adapters.map { it.output }.fold(compileClasspath) { a, b -> a + b }
@@ -107,7 +120,8 @@ val adapterSources = listOf(
     sourceSets.named("adapter46"),
     sourceSets.named("adapter47"),
     sourceSets.named("adapter48"),
-    sourceSets.named("adapter49")
+    sourceSets.named("adapter49"),
+    sourceSets.named("adapter50")
 )
 tasks.named<Jar>("shadowJar") {
     this.from(adapterSources.map { sourceSet -> sourceSet.map { it.output.classesDirs } })
@@ -133,11 +147,18 @@ dependencies {
     add("adapter46CompileOnly", "com.pinterest.ktlint:ktlint-core:0.46.1")
     add("adapter47CompileOnly", "com.pinterest.ktlint:ktlint-core:0.47.1")
     add("adapter48CompileOnly", "com.pinterest.ktlint:ktlint-core:0.48.2")
+
     add("adapter49CompileOnly", "com.pinterest.ktlint:ktlint-core:0.49.1")
     add("adapter49CompileOnly", "com.pinterest.ktlint:ktlint-cli-reporter:0.49.1")
     add("adapter49CompileOnly", "com.pinterest.ktlint:ktlint-rule-engine:0.49.1")
     add("adapter49CompileOnly", "com.pinterest.ktlint:ktlint-ruleset-standard:0.49.1")
     add("adapter49CompileOnly", "com.pinterest.ktlint:ktlint-reporter-baseline:0.49.1")
+
+    add("adapter50CompileOnly", "com.pinterest.ktlint:ktlint-cli-reporter:0.50.0")
+    add("adapter50CompileOnly", "com.pinterest.ktlint:ktlint-rule-engine:0.50.0")
+    add("adapter50CompileOnly", "com.pinterest.ktlint:ktlint-ruleset-standard:0.50.0")
+    add("adapter50CompileOnly", "com.pinterest.ktlint:ktlint-reporter-baseline:0.50.0")
+
     compileOnly(libs.kotlin.gradle.plugin)
     compileOnly(libs.android.gradle.plugin)
     compileOnly(kotlin("stdlib-jdk8"))
