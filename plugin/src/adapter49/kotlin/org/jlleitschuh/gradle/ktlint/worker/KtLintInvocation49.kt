@@ -1,10 +1,12 @@
 package org.jlleitschuh.gradle.ktlint.worker
 
+import com.pinterest.ktlint.cli.ruleset.core.api.RuleSetProviderV3
 import com.pinterest.ktlint.rule.engine.api.Code
 import com.pinterest.ktlint.rule.engine.api.KtLintRuleEngine
 import com.pinterest.ktlint.rule.engine.api.LintError
-import com.pinterest.ktlint.ruleset.standard.StandardRuleSetProvider
+import com.pinterest.ktlint.rule.engine.core.api.RuleProvider
 import java.io.File
+import java.util.ServiceLoader
 
 class KtLintInvocation49(
     private val engine: KtLintRuleEngine
@@ -12,9 +14,16 @@ class KtLintInvocation49(
     companion object Factory : KtLintInvocationFactory {
         fun initialize(): KtLintInvocation {
             val engine = KtLintRuleEngine(
-                ruleProviders = StandardRuleSetProvider().getRuleProviders()
+                ruleProviders = loadRuleSetsFromClasspathWithRuleSetProviderV3()
             )
             return KtLintInvocation49(engine)
+        }
+
+        private fun loadRuleSetsFromClasspathWithRuleSetProviderV3(): Set<RuleProvider> {
+            return ServiceLoader
+                .load(RuleSetProviderV3::class.java)
+                .flatMap { it.getRuleProviders() }
+                .toSet()
         }
     }
 

@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+-   Fix custom rulesets not loading from classpath [#698](https://github.com/JLLeitschuh/ktlint-gradle/pull/698)
 -   update latest version text file manually [#688](https://github.com/JLLeitschuh/ktlint-gradle/pull/688)
 
 ## [11.5.0] - 2023-07-03
