@@ -1,14 +1,10 @@
 package org.jlleitschuh.gradle.ktlint.android
 
-import com.android.build.api.dsl.AndroidSourceSet
 import com.android.build.api.dsl.BuildFeatures
 import com.android.build.api.dsl.BuildType
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.api.dsl.DefaultConfig
 import com.android.build.api.dsl.ProductFlavor
-import com.android.build.api.dsl.SigningConfig
-import com.android.build.api.variant.Variant
-import com.android.build.api.variant.VariantProperties
 import com.android.build.gradle.internal.api.DefaultAndroidSourceDirectorySet
 import org.gradle.api.Plugin
 import org.gradle.api.file.FileCollection
@@ -43,17 +39,8 @@ internal fun KtlintPlugin.PluginHolder.applyKtLintToAndroid(): (Plugin<in Any>) 
     }
 }
 
-@Suppress("UnstableApiUsage")
-private typealias AndroidCommonExtension = CommonExtension<
-    AndroidSourceSet,
-    BuildFeatures,
-    BuildType,
-    DefaultConfig,
-    ProductFlavor,
-    SigningConfig,
-    Variant<VariantProperties>,
-    VariantProperties
-    >
+private typealias AndroidCommonExtension =
+    CommonExtension<BuildFeatures, BuildType, DefaultConfig, ProductFlavor>
 
 /*
  * Variant manager returns all sources for variant,
@@ -69,7 +56,7 @@ private fun androidPluginConfigureAction(
 
         androidCommonExtension.sourceSets.all {
             // https://issuetracker.google.com/u/1/issues/170650362
-            val androidSourceSet = java as DefaultAndroidSourceDirectorySet
+            val androidSourceSet = kotlin as DefaultAndroidSourceDirectorySet
             // Passing Callable, so returned FileCollection, will lazy evaluate it
             // only when task will need it.
             // Solves the problem of having additional source dirs in
