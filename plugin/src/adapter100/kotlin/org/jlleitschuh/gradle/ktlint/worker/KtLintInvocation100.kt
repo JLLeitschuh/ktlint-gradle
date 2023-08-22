@@ -3,19 +3,20 @@ package org.jlleitschuh.gradle.ktlint.worker
 import com.pinterest.ktlint.cli.ruleset.core.api.RuleSetProviderV3
 import com.pinterest.ktlint.rule.engine.api.Code
 import com.pinterest.ktlint.rule.engine.api.EditorConfigOverride
+import com.pinterest.ktlint.rule.engine.api.EditorConfigPropertyRegistry
 import com.pinterest.ktlint.rule.engine.api.KtLintRuleEngine
 import com.pinterest.ktlint.rule.engine.api.LintError
 import com.pinterest.ktlint.rule.engine.core.api.RuleProvider
-import com.pinterest.ktlint.rule.engine.core.api.editorconfig.EditorConfigProperty
 import java.io.File
 import java.util.ServiceLoader
 
-class KtLintInvocation49(
+class KtLintInvocation100(
     private val engine: KtLintRuleEngine
 ) : KtLintInvocation {
     companion object Factory : KtLintInvocationFactory {
         fun initialize(editorConfigOverrides: Map<String, String>): KtLintInvocation {
             val ruleProviders = loadRuleSetsFromClasspathWithRuleSetProviderV3()
+            val editorConfigPropertyRegistry = EditorConfigPropertyRegistry(ruleProviders)
             val engine = if (editorConfigOverrides.isEmpty()) {
                 KtLintRuleEngine(ruleProviders = ruleProviders)
             } else {
@@ -23,14 +24,14 @@ class KtLintInvocation49(
                     ruleProviders = ruleProviders,
                     editorConfigOverride = EditorConfigOverride.from(
                         *editorConfigOverrides
-                            .mapKeys { ruleProviders.findEditorConfigProperty(it.key) }
+                            .mapKeys { editorConfigPropertyRegistry.find(it.key) }
                             .entries
                             .map { it.key to it.value }
                             .toTypedArray()
                     )
                 )
             }
-            return KtLintInvocation49(engine)
+            return KtLintInvocation100(engine)
         }
 
         private fun loadRuleSetsFromClasspathWithRuleSetProviderV3(): Set<RuleProvider> {
@@ -65,22 +66,4 @@ class KtLintInvocation49(
 
 internal fun LintError.toSerializable(): SerializableLintError {
     return SerializableLintError(line, col, ruleId.value, detail, canBeAutoCorrected)
-}
-
-private fun Set<RuleProvider>.findEditorConfigProperty(propertyName: String): EditorConfigProperty<*> {
-    val properties =
-        map { it.createNewRuleInstance() }
-            .flatMap { it.usesEditorConfigProperties }
-            .distinct()
-    return properties
-        .find { it.type.name == propertyName }
-        ?: throw RuntimeException(
-            properties
-                .map { it.type.name }
-                .sorted()
-                .joinToString(
-                    prefix = "Property with name '$propertyName' is not found in any of given rules. Available properties:\n\t",
-                    separator = "\n\t"
-                ) { "- $it" }
-        )
 }

@@ -3,6 +3,7 @@ package org.jlleitschuh.gradle.ktlint
 import net.swiftzer.semver.SemVer
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.artifacts.component.ModuleComponentSelector
 import org.gradle.api.artifacts.component.ProjectComponentIdentifier
@@ -36,22 +37,31 @@ internal fun createKtlintConfiguration(target: Project, extension: KtlintExtensi
             it.attribute(Bundling.BUNDLING_ATTRIBUTE, target.objects.named(Bundling::class.java, Bundling.EXTERNAL))
         }
 
-        val dependencyProvider = target.provider {
-            val ktlintVersion = extension.version.get()
-            target.logger.info("Add dependency: ktlint version $ktlintVersion")
-            target.dependencies.create("${resolveGroup(ktlintVersion)}:ktlint:$ktlintVersion")
-        }
-        dependencies.addLater(dependencyProvider)
+        // Workaround for gradle 6 https://github.com/gradle/gradle/issues/13255
+        val oldProp = target.objects.listProperty(Dependency::class.java)
+        dependencies.addAllLater(
+            oldProp.value(
+                extension.version.map {
+                    if (SemVer.parse(it) < SemVer(1, 0, 0)) {
+                        target.logger.info("Add dependency: ktlint version $it")
+                        listOf(target.dependencies.create("com.pinterest:ktlint:$it"))
+                    } else {
+                        target.logger.info("Add dependencies: ktlint version $it")
+                        listOf(
+                            target.dependencies.create("com.pinterest.ktlint:ktlint-cli:$it"),
+                            // this transitive dep was introduced in ktlint 1.0, but for some reason, it is not picked up automatically
+                            target.dependencies.create("io.github.oshai:kotlin-logging:5.1.0")
+                        )
+                    }
+                }
+            )
+        )
     }
-
-private fun resolveGroup(ktlintVersion: String) = when {
-    SemVer.parse(ktlintVersion) < SemVer(0, 32, 0) -> "com.github.shyiko"
-    else -> "com.pinterest"
-}
 
 internal fun createKtlintRulesetConfiguration(
     target: Project,
-    ktLintConfiguration: Configuration
+    ktLintConfiguration: Configuration,
+    extension: KtlintExtension
 ): Configuration = target
     .configurations.maybeCreate(KTLINT_RULESET_CONFIGURATION_NAME).apply {
         description = KTLINT_RULESET_CONFIGURATION_DESCRIPTION
@@ -61,6 +71,12 @@ internal fun createKtlintRulesetConfiguration(
         isVisible = false
 
         ensureConsistencyWith(target, ktLintConfiguration)
+        dependencies.addLater(
+            target.provider {
+                val ktlintVersion = extension.version.get()
+                target.dependencies.create("com.pinterest.ktlint:ktlint-ruleset-standard:$ktlintVersion")
+            }
+        )
     }
 
 internal fun createKtLintReporterConfiguration(
@@ -95,6 +111,21 @@ internal fun createKtLintReporterConfiguration(
                     )
                 }
         }
+
+        // Workaround for gradle 6 https://github.com/gradle/gradle/issues/13255
+        val oldProp = target.objects.listProperty(Dependency::class.java)
+        dependencies.addAllLater(
+            oldProp.value(
+                extension.version.map { version ->
+                    if (SemVer.parse(version) >= SemVer(1, 0, 0)) {
+                        // this transitive dep was introduced in ktlint 1.0, but for some reason, it is not picked up automatically
+                        listOf(target.dependencies.create("io.github.oshai:kotlin-logging:5.1.0"))
+                    } else {
+                        listOf()
+                    }
+                }
+            )
+        )
     }
 
 internal fun createKtLintBaselineReporterConfiguration(
@@ -113,25 +144,33 @@ internal fun createKtLintBaselineReporterConfiguration(
 
         ensureConsistencyWith(target, ktLintConfiguration)
 
-        withDependencies {
-            dependencies.addLater(
-                target.provider {
+        //     withDependencies {
+        // Workaround for gradle 6 https://github.com/gradle/gradle/issues/13255
+        val oldProp = target.objects.listProperty(Dependency::class.java)
+        dependencies.addAllLater(
+            oldProp.value(
+                extension.version.map { version ->
                     val ktlintVersion = extension.version.get()
-                    // Baseline reporter is only available starting 0.41.0 release
-                    if (SemVer.parse(ktlintVersion) >= SemVer(0, 41, 0)) {
-                        target.dependencies.create(
-                            "com.pinterest.ktlint:ktlint-reporter-baseline:${extension.version.get()}"
+                    val ktlintSemver = SemVer.parse(ktlintVersion)
+                    if (ktlintSemver >= SemVer(1, 0, 0)) {
+                        // Baseline reporter maven coordinates changed in 1.0
+                        listOf(
+                            target.dependencies.create("com.pinterest.ktlint:ktlint-cli-reporter-baseline:$version"),
+                            // this transitive dep was introduced in ktlint 1.0, but for some reason, it is not picked up automatically
+                            target.dependencies.create("io.github.oshai:kotlin-logging:5.1.0")
                         )
+                    } else if (SemVer.parse(ktlintVersion) >= SemVer(0, 41, 0)) {
+                        // Baseline reporter is only available starting 0.41.0 release
+                        listOf(target.dependencies.create("com.pinterest.ktlint:ktlint-reporter-baseline:$version"))
                     } else {
                         // Adding fake plain reporter as addLater() does not accept `null` value
                         // Generate baseline tasks anyway will not run on KtLint versions < 0.41.0
-                        target.dependencies.create(
-                            "com.pinterest.ktlint:ktlint-reporter-plain:${extension.version.get()}"
-                        )
+                        listOf(target.dependencies.create("com.pinterest.ktlint:ktlint-reporter-plain:$version"))
                     }
                 }
             )
-        }
+        )
+        //      }
     }
 
 private fun Configuration.ensureConsistencyWith(

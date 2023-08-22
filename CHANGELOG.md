@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+-   ktlint 1.0 support [#708](https://github.com/JLLeitschuh/ktlint-gradle/pull/708)
+-   Allow editorconfig overrides in ktlint 0.49+ [#708](https://github.com/JLLeitschuh/ktlint-gradle/pull/708)
 -   update latest version text file manually [#700](https://github.com/JLLeitschuh/ktlint-gradle/pull/700)
 
 ## [11.5.1] - 2023-08-07

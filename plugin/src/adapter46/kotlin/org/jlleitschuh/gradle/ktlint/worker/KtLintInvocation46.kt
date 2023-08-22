@@ -2,6 +2,7 @@ package org.jlleitschuh.gradle.ktlint.worker
 
 import com.pinterest.ktlint.core.KtLint
 import com.pinterest.ktlint.core.LintError
+import com.pinterest.ktlint.core.RuleSet
 import com.pinterest.ktlint.core.RuleSetProvider
 import com.pinterest.ktlint.core.api.DefaultEditorConfigProperties
 import com.pinterest.ktlint.core.api.EditorConfigOverride
@@ -10,7 +11,7 @@ import java.util.ServiceLoader
 
 class KtLintInvocation46(
     private val editorConfigPath: String?,
-    private val ruleSets: Set<com.pinterest.ktlint.core.RuleSet>,
+    private val ruleSets: Set<RuleSet>,
     private val userData: Map<String, String>,
     private val debug: Boolean
 ) : KtLintInvocation {

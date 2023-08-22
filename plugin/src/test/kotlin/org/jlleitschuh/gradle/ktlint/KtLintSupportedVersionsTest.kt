@@ -72,10 +72,10 @@ class KtLintSupportedVersionsTest : AbstractPluginTest() {
         }
     }
 
-    @DisplayName("Lint should use editorconfig override")
+    @DisplayName("Lint should use editorconfig file override")
     @ParameterizedTest(name = "{0} with KtLint {1}: {displayName}")
     @ArgumentsSource(SupportedKtlintVersionsProvider::class)
-    internal fun `Lint should use editorconfig override`(
+    internal fun `Lint should use editorconfig file override`(
         gradleVersion: GradleVersion,
         ktLintVersion: String
     ) {
@@ -93,11 +93,88 @@ class KtLintSupportedVersionsTest : AbstractPluginTest() {
             if (SemVer.parse(ktLintVersion) >= SemVer(0, 47)) {
                 buildAndFail(CHECK_PARENT_TASK_NAME) {
                     assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
-                    assertThat(output.contains("additionalEditorconfigFile no longer supported in ktlint 0.47+"))
+                    assertThat(output).contains("additionalEditorconfigFile no longer supported in ktlint 0.47+")
                 }
             } else {
                 build(CHECK_PARENT_TASK_NAME) {
                     assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                }
+            }
+        }
+    }
+
+    @DisplayName("Lint should use editorconfig override (standard rule)")
+    @ParameterizedTest(name = "{0} with KtLint {1}: {displayName}")
+    @ArgumentsSource(SupportedKtlintVersionsProvider::class)
+    internal fun `Lint should use editorconfig override standard rule`(
+        gradleVersion: GradleVersion,
+        ktLintVersion: String
+    ) {
+        project(gradleVersion) {
+            //language=Groovy
+            buildGradle.appendText(
+                """
+                ktlint.version = "$ktLintVersion"
+                ktlint.additionalEditorconfig = [
+                            "ktlint_standard_no-multi-spaces": "disabled"
+                ]
+                """.trimIndent()
+            )
+            withFailingSources()
+            if (SemVer.parse(ktLintVersion) < SemVer(0, 49, 0)) {
+                buildAndFail(CHECK_PARENT_TASK_NAME) {
+                    assertThat(task(":$mainSourceSetCheckTaskName")?.outcome)
+                        .`as`("additionalEditorconfig not supported until ktlint 0.49")
+                        .isEqualTo(TaskOutcome.FAILED)
+                    assertThat(output).contains("additionalEditorconfig not supported until ktlint 0.49")
+                }
+            } else if (SemVer.parse(ktLintVersion) < SemVer(1, 0)) {
+                buildAndFail(CHECK_PARENT_TASK_NAME) {
+                    assertThat(task(":runKtlintCheckOverMainSourceSet")?.outcome)
+                        .`as`("standard rules not supported by additionalEditorconfig until 1.0")
+                        .isEqualTo(TaskOutcome.FAILED)
+                    assertThat(output)
+                        .contains("Property with name 'ktlint_standard_no-multi-spaces' is not found")
+                }
+            } else {
+                build(CHECK_PARENT_TASK_NAME) {
+                    assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                }
+            }
+        }
+    }
+
+    @DisplayName("Lint should use editorconfig override")
+    @ParameterizedTest(name = "{0} with KtLint {1}: {displayName}")
+    @ArgumentsSource(SupportedKtlintVersionsProvider::class)
+    internal fun `Lint should use editorconfig override`(
+        gradleVersion: GradleVersion,
+        ktLintVersion: String
+    ) {
+        project(gradleVersion) {
+            //language=Groovy
+            buildGradle.appendText(
+                """
+
+                ktlint.version = "$ktLintVersion"
+                ktlint.additionalEditorconfig = [
+                            "max_line_length": "20"
+                ]
+                """.trimIndent()
+            )
+            withFailingMaxLineSources()
+            if (SemVer.parse(ktLintVersion) < SemVer(0, 49)) {
+                build(CHECK_PARENT_TASK_NAME) {
+                    assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                    assertThat(output).contains("additionalEditorconfig not supported until ktlint 0.49")
+                }
+            } else {
+                buildAndFail(CHECK_PARENT_TASK_NAME) {
+                    assertThat(task(":$mainSourceSetCheckTaskName")?.outcome)
+                        .`as`("additionalEditorconfig takes effect")
+                        .isEqualTo(TaskOutcome.FAILED)
+                    assertThat(output).doesNotContain("additionalEditorconfig not supported until ktlint 0.49")
+                    assertThat(output).contains("Exceeded max line length (20) (cannot be auto-corrected)")
                 }
             }
         }
@@ -154,7 +231,8 @@ class KtLintSupportedVersionsTest : AbstractPluginTest() {
             "0.48.2",
             // "0.49.0" did not expose needed baseline classes
             "0.49.1",
-            "0.50.0"
+            "0.50.0",
+            "1.0.0"
         ).also {
             // "0.37.0" is failing on Windows machines that is fixed in the next version
             if (!OS.WINDOWS.isCurrentOs) it.add("0.37.0")

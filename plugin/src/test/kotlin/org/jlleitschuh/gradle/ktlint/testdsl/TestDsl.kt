@@ -59,6 +59,18 @@ class TestProject(
         )
     }
 
+    fun withFailingMaxLineSources() {
+        createSourceFile(
+            FAIL_SOURCE_FILE,
+            buildString {
+                append("val nameOfVariable =")
+                append("\n")
+                append("    listOf(1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 2)")
+                append("\n")
+            }
+        )
+    }
+
     fun withAdditionalEditorConfig() {
         createSourceFile(
             ADDITIONAL_EDITOR_CONFIG + "/.editorconfig",

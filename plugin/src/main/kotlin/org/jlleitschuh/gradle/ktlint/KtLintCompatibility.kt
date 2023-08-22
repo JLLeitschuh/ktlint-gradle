@@ -12,6 +12,7 @@ import org.jlleitschuh.gradle.ktlint.worker.BaselineLoader46
 import org.jlleitschuh.gradle.ktlint.worker.BaselineLoader47
 import org.jlleitschuh.gradle.ktlint.worker.BaselineLoader48
 import org.jlleitschuh.gradle.ktlint.worker.BaselineLoader49
+import org.jlleitschuh.gradle.ktlint.worker.KtLintInvocation100
 import org.jlleitschuh.gradle.ktlint.worker.KtLintInvocation45
 import org.jlleitschuh.gradle.ktlint.worker.KtLintInvocation46
 import org.jlleitschuh.gradle.ktlint.worker.KtLintInvocation47
@@ -38,7 +39,7 @@ internal fun selectInvocation(version: String): KtLintInvocationFactory {
             KtLintInvocation50
         }
     } else {
-        KtLintInvocation50
+        KtLintInvocation100
     }
 }
 

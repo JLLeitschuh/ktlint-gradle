@@ -12,6 +12,7 @@ import org.gradle.api.file.FileType
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.specs.Spec
@@ -55,6 +56,9 @@ abstract class BaseKtLintCheckTask @Inject constructor(
 
     @get:Internal
     internal abstract val additionalEditorconfigFile: RegularFileProperty
+
+    @get:Internal
+    internal abstract val additionalEditorconfig: MapProperty<String, String>
 
     @get:Incremental
     @get:PathSensitive(PathSensitivity.RELATIVE)
@@ -285,6 +289,7 @@ abstract class BaseKtLintCheckTask @Inject constructor(
             params.disabledRules.set(disabledRules)
             params.debug.set(debug)
             params.additionalEditorconfigFile.set(additionalEditorconfigFile)
+            params.additionalEditorconfig.set(additionalEditorconfig)
             params.formatSource.set(formatSources)
             params.discoveredErrorsFile.set(discoveredErrors)
             params.ktLintVersion.set(ktLintVersion)
