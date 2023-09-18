@@ -7,6 +7,7 @@ import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.util.PatternFilterable
@@ -107,6 +108,11 @@ internal constructor(
      */
     @Deprecated("not supported with ktlint 0.47+")
     val additionalEditorconfigFile: RegularFileProperty = objectFactory.fileProperty()
+    val additionalEditorconfig: MapProperty<String, String> =
+        objectFactory.mapProperty(String::class.java, String::class.java)
+            .apply {
+                convention(emptyMap())
+            }
 
     /**
      * Disable particular rules, by default enabled in ktlint, using rule id.

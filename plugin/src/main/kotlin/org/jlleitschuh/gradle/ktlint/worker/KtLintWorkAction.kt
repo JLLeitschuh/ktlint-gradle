@@ -6,6 +6,7 @@ import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.Logging
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.workers.WorkAction
@@ -37,6 +38,11 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
             parameters.ktLintVersion.map { SemVer.parse(it) }.get() >= SemVer(0, 47)
         ) {
             logger.warn("additionalEditorconfigFile no longer supported in ktlint 0.47+")
+        }
+        if (parameters.additionalEditorconfig.isPresent &&
+            parameters.ktLintVersion.map { SemVer.parse(it) }.get() < SemVer(0, 49)
+        ) {
+            logger.warn("additionalEditorconfig not supported until ktlint 0.49")
         }
         val ktlintInvoker: KtLintInvocation = when (
             val ktlintInvokerFactory = selectInvocation(parameters.ktLintVersion.get())
@@ -82,12 +88,17 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
             }
 
             is KtLintInvocation49.Factory -> {
-                ktlintInvokerFactory.initialize()
+                ktlintInvokerFactory.initialize(parameters.additionalEditorconfig.get())
             }
 
             is KtLintInvocation50.Factory -> {
-                ktlintInvokerFactory.initialize()
+                ktlintInvokerFactory.initialize(parameters.additionalEditorconfig.get())
             }
+
+            is KtLintInvocation100.Factory -> {
+                ktlintInvokerFactory.initialize(parameters.additionalEditorconfig.get())
+            }
+
             else -> {
                 throw GradleException("Incompatible ktlint version ${parameters.ktLintVersion}")
             }
@@ -161,6 +172,7 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
         val enableExperimental: Property<Boolean>
         val debug: Property<Boolean>
         val additionalEditorconfigFile: RegularFileProperty
+        val additionalEditorconfig: MapProperty<String, String>
         val formatSource: Property<Boolean>
         val discoveredErrorsFile: RegularFileProperty
         val ktLintVersion: Property<String>

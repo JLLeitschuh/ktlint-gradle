@@ -88,6 +88,9 @@ sourceSets {
     val adapter50 by creating {
         compileClasspath += adapter.output
     }
+    val adapter100 by creating {
+        compileClasspath += adapter.output
+    }
     val adapters = listOf(
         adapter,
         adapter34,
@@ -97,7 +100,8 @@ sourceSets {
         adapter47,
         adapter48,
         adapter49,
-        adapter50
+        adapter50,
+        adapter100
     )
     val main by getting {
         kotlin {
@@ -121,7 +125,8 @@ val adapterSources = listOf(
     sourceSets.named("adapter47"),
     sourceSets.named("adapter48"),
     sourceSets.named("adapter49"),
-    sourceSets.named("adapter50")
+    sourceSets.named("adapter50"),
+    sourceSets.named("adapter100")
 )
 tasks.named<Jar>("shadowJar") {
     this.from(adapterSources.map { sourceSet -> sourceSet.map { it.output.classesDirs } })
@@ -158,6 +163,11 @@ dependencies {
     add("adapter50CompileOnly", "com.pinterest.ktlint:ktlint-rule-engine:0.50.0")
     add("adapter50CompileOnly", "com.pinterest.ktlint:ktlint-ruleset-standard:0.50.0")
     add("adapter50CompileOnly", "com.pinterest.ktlint:ktlint-reporter-baseline:0.50.0")
+
+    add("adapter100CompileOnly", "com.pinterest.ktlint:ktlint-cli-reporter-core:1.0.0")
+    add("adapter100CompileOnly", "com.pinterest.ktlint:ktlint-rule-engine:1.0.0")
+    add("adapter100CompileOnly", "com.pinterest.ktlint:ktlint-ruleset-standard:1.0.0")
+    add("adapter100CompileOnly", "com.pinterest.ktlint:ktlint-cli-reporter-baseline:1.0.0")
 
     compileOnly(libs.kotlin.gradle.plugin)
     compileOnly(libs.android.gradle.plugin)

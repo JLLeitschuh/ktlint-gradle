@@ -165,7 +165,11 @@ open class KtlintPlugin : Plugin<Project> {
         }
 
         val ktlintConfiguration: Configuration = createKtlintConfiguration(target, extension)
-        val ktlintRulesetConfiguration: Configuration = createKtlintRulesetConfiguration(target, ktlintConfiguration)
+        val ktlintRulesetConfiguration: Configuration = createKtlintRulesetConfiguration(
+            target,
+            ktlintConfiguration,
+            extension
+        )
         val ktlintReporterConfiguration: Configuration = createKtLintReporterConfiguration(target, extension, ktlintConfiguration)
         val ktlintBaselineReporterConfiguration: Configuration = createKtLintBaselineReporterConfiguration(
             target,

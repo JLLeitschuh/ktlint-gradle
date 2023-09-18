@@ -271,6 +271,8 @@ object will be used.
 
 The version of ktlint used by default _may change_ between patch versions of this plugin.
 If you don't want to inherit these changes then make sure you lock your version here.
+Consult the [ktlint release notes](https://github.com/pinterest/ktlint/releases) for more information about the differences between ktlint versions.
+
 <details>
 <summary>Groovy</summary>
 
@@ -287,6 +289,9 @@ ktlint {
     ignoreFailures = true
     enableExperimentalRules = true
     additionalEditorconfigFile = file("/some/additional/.editorconfig")  // not supported with ktlint 0.47+
+    additionalEditorconfig = [ // not supported until ktlint 0.49
+        "max_line_length": "20"
+    ]
     disabledRules = ["final-newline"] // not supported with ktlint 0.48+
     baseline = file("my-project-ktlint-baseline.xml")
     reporters {
@@ -339,6 +344,11 @@ configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
     ignoreFailures.set(true)
     enableExperimentalRules.set(true)
     additionalEditorconfigFile.set(file("/some/additional/.editorconfig")) // not supported with ktlint 0.47+
+    additionalEditorconfig.set( // not supported until ktlint 0.49
+        mapOf(
+            "max_line_length" to "20"
+        )
+    )
     disabledRules.set(setOf("final-newline")) // not supported with ktlint 0.48+
     baseline.set(file("my-project-ktlint-baseline.xml"))
     reporters {
