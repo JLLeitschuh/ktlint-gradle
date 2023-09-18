@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [11.6.0] - 2023-09-18
+
 -   ktlint 1.0 support [#708](https://github.com/JLLeitschuh/ktlint-gradle/pull/708)
 -   Allow editorconfig overrides in ktlint 0.49+ [#708](https://github.com/JLLeitschuh/ktlint-gradle/pull/708)
 -   update latest version text file manually [#700](https://github.com/JLLeitschuh/ktlint-gradle/pull/700)
@@ -686,7 +688,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 -   Renamed task with name `ktlint` to `ktlintCheck` (#3)
 -   Renamed tasks with names `ktlint[source set name]` to `ktlint[source set name]Check` (#3)
 
-[Unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.5.1...HEAD
+[Unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.6.0...HEAD
+
+[11.6.0]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.5.1...v11.6.0
 
 [11.5.1]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.5.0...v11.5.1
 
