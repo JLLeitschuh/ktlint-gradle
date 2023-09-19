@@ -123,6 +123,7 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
                     results.add(result)
                 }
             } catch (e: RuntimeException) {
+                logger.error(e.message)
                 throw GradleException(
                     "KtLint failed to parse file: ${it.absolutePath}",
                     e
