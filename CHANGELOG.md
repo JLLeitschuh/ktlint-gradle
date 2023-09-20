@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 -   update latest version text file manually [#709](https://github.com/JLLeitschuh/ktlint-gradle/pull/709)
+-   Improve error logging [#711](https://github.com/JLLeitschuh/ktlint-gradle/pull/711)
 
 ## [11.6.0] - 2023-09-18
 
