@@ -40,6 +40,7 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
             logger.warn("additionalEditorconfigFile no longer supported in ktlint 0.47+")
         }
         if (parameters.additionalEditorconfig.isPresent &&
+            parameters.additionalEditorconfig.get().isNotEmpty() &&
             parameters.ktLintVersion.map { SemVer.parse(it) }.get() < SemVer(0, 49)
         ) {
             logger.warn("additionalEditorconfig not supported until ktlint 0.49")
