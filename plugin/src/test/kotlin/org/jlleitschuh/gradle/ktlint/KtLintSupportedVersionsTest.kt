@@ -94,10 +94,12 @@ class KtLintSupportedVersionsTest : AbstractPluginTest() {
                 buildAndFail(CHECK_PARENT_TASK_NAME) {
                     assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
                     assertThat(output).contains("additionalEditorconfigFile no longer supported in ktlint 0.47+")
+                    assertThat(output).doesNotContain("additionalEditorconfig not supported until ktlint 0.49")
                 }
             } else {
                 build(CHECK_PARENT_TASK_NAME) {
                     assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                    assertThat(output).doesNotContain("additionalEditorconfig not supported until ktlint 0.49")
                 }
             }
         }
