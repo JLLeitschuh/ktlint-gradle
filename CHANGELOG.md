@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+-   update latest version text file manually [#716](https://github.com/JLLeitschuh/ktlint-gradle/pull/716)
+
 ## [11.6.1] - 2023-10-10
 
 -   fix "additionalEditorconfig not supported until ktlint 0.49" warning [#712](https://github.com/JLLeitschuh/ktlint-gradle/pull/712)
