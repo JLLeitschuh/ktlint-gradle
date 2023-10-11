@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 -   fix "additionalEditorconfig not supported until ktlint 0.49" warning [#712](https://github.com/JLLeitschuh/ktlint-gradle/pull/712)
 -   update latest version text file manually [#709](https://github.com/JLLeitschuh/ktlint-gradle/pull/709)
 -   Improve error logging [#711](https://github.com/JLLeitschuh/ktlint-gradle/pull/711)
+-   Fixed a case, when -on Windows- an exclude filter is ignored [#715](https://github.com/JLLeitschuh/ktlint-gradle/pull/715)
 
 ## [11.6.0] - 2023-09-18
 
