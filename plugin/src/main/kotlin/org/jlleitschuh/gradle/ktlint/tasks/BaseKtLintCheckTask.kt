@@ -1,9 +1,7 @@
 package org.jlleitschuh.gradle.ktlint.tasks
 
 import groovy.lang.Closure
-import net.swiftzer.semver.SemVer
 import org.gradle.api.DefaultTask
-import org.gradle.api.GradleException
 import org.gradle.api.JavaVersion
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
@@ -188,8 +186,6 @@ abstract class BaseKtLintCheckTask @Inject constructor(
     protected fun runLint(
         inputChanges: InputChanges
     ) {
-        checkDisabledRulesSupportedKtLintVersion()
-
         val editorConfigUpdated = wasEditorConfigFilesUpdated(inputChanges)
         val filesToCheck = if (editorConfigUpdated) {
             source.files
@@ -219,8 +215,6 @@ abstract class BaseKtLintCheckTask @Inject constructor(
         inputChanges: InputChanges,
         formatSnapshot: File
     ) {
-        checkDisabledRulesSupportedKtLintVersion()
-
         val editorConfigUpdated = wasEditorConfigFilesUpdated(inputChanges)
         val filesToCheck = if (editorConfigUpdated) {
             source.files
@@ -269,32 +263,32 @@ abstract class BaseKtLintCheckTask @Inject constructor(
         // Process isolation is used here to run KtLint in a separate java process.
         // This allows to better isolate work actions from different projects tasks between each other
         // and to not pollute Gradle daemon heap, which otherwise greatly increases GC time.
-        val queue = workerExecutor.processIsolation { spec ->
-            spec.classpath.from(ktLintClasspath, ruleSetsClasspath)
-            spec.forkOptions { options ->
-                options.maxHeapSize = workerMaxHeapSize.get()
+        val queue = workerExecutor.processIsolation {
+            classpath.from(ktLintClasspath, ruleSetsClasspath)
+            forkOptions {
+                maxHeapSize = workerMaxHeapSize.get()
 
                 // Work around ktlint triggering reflective access errors from the embedded Kotlin
                 // compiler. See https://youtrack.jetbrains.com/issue/KT-43704 for details.
                 if (JavaVersion.current() >= JavaVersion.VERSION_16) {
-                    options.jvmArgs("--add-opens", "java.base/java.lang=ALL-UNNAMED")
+                    jvmArgs("--add-opens", "java.base/java.lang=ALL-UNNAMED")
                 }
             }
         }
 
-        queue.submit(KtLintWorkAction::class.java) { params ->
-            params.filesToLint.from(filesToCheck)
-            params.enableExperimental.set(enableExperimentalRules)
-            params.android.set(android)
-            params.disabledRules.set(disabledRules)
-            params.debug.set(debug)
-            params.additionalEditorconfigFile.set(additionalEditorconfigFile)
-            params.additionalEditorconfig.set(additionalEditorconfig)
-            params.formatSource.set(formatSources)
-            params.discoveredErrorsFile.set(discoveredErrors)
-            params.ktLintVersion.set(ktLintVersion)
-            params.editorconfigFilesWereChanged.set(editorConfigUpdated)
-            params.formatSnapshot.set(formatSnapshot)
+        queue.submit(KtLintWorkAction::class.java) {
+            val task = this@BaseKtLintCheckTask
+            filesToLint.from(filesToCheck)
+            enableExperimental.set(task.enableExperimentalRules)
+            android.set(task.android)
+            disabledRules.set(task.disabledRules)
+            debug.set(task.debug)
+            additionalEditorconfig.set(task.additionalEditorconfig)
+            formatSource.set(formatSources)
+            discoveredErrorsFile.set(task.discoveredErrors)
+            ktLintVersion.set(task.ktLintVersion)
+            editorconfigFilesWereChanged.set(editorConfigUpdated)
+            this.formatSnapshot.set(formatSnapshot)
         }
     }
 
@@ -315,12 +309,4 @@ abstract class BaseKtLintCheckTask @Inject constructor(
         }
         .map { it.file }
         .toSet()
-
-    private fun checkDisabledRulesSupportedKtLintVersion() {
-        if (disabledRules.get().isNotEmpty() &&
-            SemVer.parse(ktLintVersion.get()) < SemVer(0, 34, 2)
-        ) {
-            throw GradleException("Rules disabling is supported since 0.34.2 ktlint version.")
-        }
-    }
 }

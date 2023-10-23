@@ -1,13 +1,16 @@
 package org.jlleitschuh.gradle.ktlint.sample
 
-import com.pinterest.ktlint.core.LintError
-import com.pinterest.ktlint.core.Reporter
+import com.pinterest.ktlint.cli.reporter.core.api.KtlintCliError
+import com.pinterest.ktlint.cli.reporter.core.api.ReporterV2
 import java.io.PrintStream
 
-class CsvReporter(
-    private val out: PrintStream
-) : Reporter {
-    override fun onLintError(file: String, err: LintError, corrected: Boolean) {
-        out.println("$file;${err.line};${err.col};${err.ruleId};${err.detail};$corrected")
+class CsvReporter(private val out: PrintStream) : ReporterV2 {
+    override fun onLintError(
+        file: String,
+        ktlintCliError: KtlintCliError,
+    ) {
+        out.println(
+            "$file;${ktlintCliError.line};${ktlintCliError.col};${ktlintCliError.ruleId};${ktlintCliError.detail}",
+        )
     }
 }

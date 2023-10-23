@@ -36,7 +36,7 @@ internal constructor(
     /**
      * The version of KtLint to use.
      */
-    val version: Property<String> = objectFactory.property { set("0.47.1") }
+    val version: Property<String> = objectFactory.property { set("1.0.1") }
 
     /**
      * Enable relative paths in reports
@@ -104,10 +104,8 @@ internal constructor(
     }
 
     /**
-     * Provide additional `.editorconfig` file, that are not in the project or project parent folders.
+     * Provide additional `.editorconfig` properties, that are not in the project or project parent folders.
      */
-    @Deprecated("not supported with ktlint 0.47+")
-    val additionalEditorconfigFile: RegularFileProperty = objectFactory.fileProperty()
     val additionalEditorconfig: MapProperty<String, String> =
         objectFactory.mapProperty(String::class.java, String::class.java)
             .apply {

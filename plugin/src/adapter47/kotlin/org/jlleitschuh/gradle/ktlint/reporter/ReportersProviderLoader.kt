@@ -7,32 +7,32 @@ import java.io.ObjectInputStream
 import java.util.ServiceLoader
 
 class ReportersProviderLoader :
-    ReportersLoaderAdapter<Reporter, ReporterProvider, Ktlint41Reporter, Ktlint41ReporterProvider> {
-    override fun loadAllReporterProviders(): List<ReporterProviderWrapper<ReporterProvider>> = ServiceLoader
+    ReportersLoaderAdapter<Reporter, ReporterProvider<out Reporter>, LegacyKtlintReporter, LegacyKtlintReporterProvider> {
+    override fun loadAllReporterProviders(): List<ReporterProviderWrapper<ReporterProvider<out Reporter>>> = ServiceLoader
         .load(ReporterProvider::class.java)
         .toList().map {
             ReporterProviderWrapper(it.id, it)
         }
 
-    override fun loadAllGenericReporterProviders(): List<Ktlint41ReporterProvider> = ServiceLoader
+    override fun loadAllGenericReporterProviders(): List<LegacyKtlintReporterProvider> = ServiceLoader
         .load(ReporterProvider::class.java)
         .toList().map {
-            Ktlint41ReporterProvider(it)
+            LegacyKtlintReporterProvider(it)
         }
 
-    override fun loadReporterProviders(serializedReporterProviders: File): List<Ktlint41ReporterProvider> {
+    override fun loadReporterProviders(serializedReporterProviders: File): List<LegacyKtlintReporterProvider> {
         return ObjectInputStream(
             serializedReporterProviders.inputStream().buffered()
         ).use {
             @Suppress("UNCHECKED_CAST")
-            it.readObject() as List<ReporterProvider>
-        }.map { Ktlint41ReporterProvider(it) }
+            it.readObject() as List<ReporterProvider<out Reporter>>
+        }.map { LegacyKtlintReporterProvider(it) }
     }
 
     override fun filterEnabledBuiltInProviders(
         enabledReporters: Set<ReporterType>,
-        allProviders: List<ReporterProviderWrapper<ReporterProvider>>
-    ): List<Pair<LoadedReporter, ReporterProvider>> {
+        allProviders: List<ReporterProviderWrapper<ReporterProvider<out Reporter>>>
+    ): List<Pair<LoadedReporter, ReporterProvider<out Reporter>>> {
         val enabledProviders = allProviders
             .filter { reporterProvider ->
                 enabledReporters.any {
@@ -58,8 +58,8 @@ class ReportersProviderLoader :
 
     override fun filterCustomProviders(
         customReporters: Set<CustomReporter>,
-        allProviders: List<ReporterProvider>
-    ): List<Pair<LoadedReporter, ReporterProvider>> {
+        allProviders: List<ReporterProvider<out Reporter>>
+    ): List<Pair<LoadedReporter, ReporterProvider<out Reporter>>> {
         val customProviders = allProviders
             .filter { reporterProvider ->
                 customReporters.any { reporterProvider.id == it.reporterId }

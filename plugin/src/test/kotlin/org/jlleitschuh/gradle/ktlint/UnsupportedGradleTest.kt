@@ -14,7 +14,7 @@ class UnsupportedGradleTest : AbstractPluginTest() {
     @Test
     @DisabledOnOs(OS.WINDOWS)
     internal fun errorOnOldGradleVersion() {
-        project(GradleVersion.version("5.6.4")) {
+        project(GradleVersion.version("6.9.2")) {
             buildAndFail(CHECK_PARENT_TASK_NAME) {
                 assertThat(output).contains(
                     "Current version of plugin supports minimal Gradle version: " +
