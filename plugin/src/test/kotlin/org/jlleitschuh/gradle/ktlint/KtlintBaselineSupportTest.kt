@@ -10,6 +10,7 @@ import org.jlleitschuh.gradle.ktlint.testdsl.GradleTestVersions
 import org.jlleitschuh.gradle.ktlint.testdsl.TestProject.Companion.FAIL_SOURCE_FILE
 import org.jlleitschuh.gradle.ktlint.testdsl.build
 import org.jlleitschuh.gradle.ktlint.testdsl.buildAndFail
+import org.jlleitschuh.gradle.ktlint.testdsl.defaultProjectSetup
 import org.jlleitschuh.gradle.ktlint.testdsl.project
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.params.ParameterizedTest
@@ -120,6 +121,28 @@ class KtlintBaselineSupportTest : AbstractPluginTest() {
             build(GenerateBaselineTask.NAME) {
                 assertThat(task(":${GenerateBaselineTask.NAME}")?.outcome).isEqualTo(TaskOutcome.SKIPPED)
                 assertThat(output).containsSequence("Generate baseline only works starting from KtLint 0.41.0 version")
+            }
+        }
+    }
+
+    @DisplayName("Generate baseline task should work only with ktlint 1.0 and kotlin 1.6")
+    @CommonTest
+    fun generateBaseline1(gradleVersion: GradleVersion) {
+        project(gradleVersion = gradleVersion, projectSetup = defaultProjectSetup(gradleVersion, "1.6.21")) {
+            withFailingSources()
+
+            //language=Groovy
+            buildGradle.appendText(
+                """
+
+                ktlint {
+                    version.set("1.0.0")
+                }
+                """.trimIndent()
+            )
+
+            build(GenerateBaselineTask.NAME, "--refresh-dependencies") {
+                assertThat(task(":${GenerateBaselineTask.NAME}")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             }
         }
     }

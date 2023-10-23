@@ -30,7 +30,7 @@ object TestVersions {
 annotation class GradleTestVersions(
     val minVersion: String = TestVersions.minSupportedGradleVersion,
     val maxVersion: String = TestVersions.maxSupportedGradleVersion,
-    val additionalVersions: Array<String> = []
+    val additionalVersions: Array<String> = ["7.4.2"]
 )
 
 open class GradleArgumentsProvider : ArgumentsProvider {

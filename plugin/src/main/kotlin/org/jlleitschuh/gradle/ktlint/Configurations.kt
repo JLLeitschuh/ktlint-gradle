@@ -8,8 +8,10 @@ import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.artifacts.component.ModuleComponentSelector
 import org.gradle.api.artifacts.component.ProjectComponentIdentifier
 import org.gradle.api.artifacts.result.ResolvedDependencyResult
+import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Bundling
 import org.gradle.util.GradleVersion
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 internal const val KTLINT_CONFIGURATION_NAME = "ktlint"
 internal const val KTLINT_CONFIGURATION_DESCRIPTION = "Main ktlint-gradle configuration"
@@ -35,6 +37,7 @@ internal fun createKtlintConfiguration(target: Project, extension: KtlintExtensi
         // Starting from KtLint 0.41.0 version published artifact has two variants: "external" and "shadowed"
         attributes {
             it.attribute(Bundling.BUNDLING_ATTRIBUTE, target.objects.named(Bundling::class.java, Bundling.EXTERNAL))
+     //       it.attribute(Attribute.of("org.jetbrains.kotlin.platform.type", KotlinPlatformType::class.java),KotlinPlatformType.jvm)
         }
 
         // Workaround for gradle 6 https://github.com/gradle/gradle/issues/13255

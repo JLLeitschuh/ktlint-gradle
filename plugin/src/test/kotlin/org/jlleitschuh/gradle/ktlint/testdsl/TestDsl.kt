@@ -151,17 +151,18 @@ fun TestProject.buildAndFail(
         .run { assertions() }
 }
 
-fun defaultProjectSetup(gradleVersion: GradleVersion): (File) -> Unit =
-    projectSetup("jvm", gradleVersion)
+fun defaultProjectSetup(gradleVersion: GradleVersion, kotlinVersion: String? = null): (File) -> Unit =
+    projectSetup("jvm", gradleVersion, kotlinVersion)
 
 private val GradleVersion.supportedKotlinVersion
     get() = TestVersions.maxSupportedKotlinPluginVersion(this)
 
 fun projectSetup(
     kotlinPluginType: String,
-    gradleVersion: GradleVersion
+    gradleVersion: GradleVersion,
+    kotlinVersion: String? = null
 ): (File) -> Unit = {
-    val kotlinPluginVersion = gradleVersion.supportedKotlinVersion
+    val kotlinPluginVersion = kotlinVersion ?: gradleVersion.supportedKotlinVersion
     //language=Groovy
     it.resolve("build.gradle").writeText(
         """
