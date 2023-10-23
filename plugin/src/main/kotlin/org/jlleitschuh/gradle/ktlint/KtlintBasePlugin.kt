@@ -30,8 +30,8 @@ open class KtlintBasePlugin : Plugin<Project> {
         }
 
         val kotlinScriptAdditionalPathApplier: KotlinScriptAdditionalPathApplier = { additionalFileTree ->
-            val configureAction = Action<Task> { task ->
-                with(task as BaseKtLintCheckTask) {
+            val configureAction = Action<Task> {
+                with(this as BaseKtLintCheckTask) {
                     source(
                         additionalFileTree.also {
                             it.include("*.kts")
@@ -63,6 +63,6 @@ open class KtlintBasePlugin : Plugin<Project> {
     }
 
     companion object {
-        const val LOWEST_SUPPORTED_GRADLE_VERSION = "6.8"
+        const val LOWEST_SUPPORTED_GRADLE_VERSION = "7.4.2"
     }
 }

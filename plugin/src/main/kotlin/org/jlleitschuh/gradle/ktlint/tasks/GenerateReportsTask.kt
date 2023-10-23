@@ -1,8 +1,6 @@
 package org.jlleitschuh.gradle.ktlint.tasks
 
-import net.swiftzer.semver.SemVer
 import org.gradle.api.DefaultTask
-import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.ProjectLayout
@@ -125,12 +123,10 @@ abstract class GenerateReportsTask @Inject constructor(
     @Suppress("UnstableApiUsage")
     @TaskAction
     fun generateReports() {
-        checkBaselineSupportedKtLintVersion()
-
         // Classloader isolation is enough here as we just want to use some classes from KtLint classpath
         // to get errors and generate files/console reports. No KtLint main object is initialized/used in this case.
-        val queue = workerExecutor.classLoaderIsolation { spec ->
-            spec.classpath.from(ktLintClasspath, reportersClasspath)
+        val queue = workerExecutor.classLoaderIsolation {
+            classpath.from(ktLintClasspath, reportersClasspath)
         }
 
         val loadedReporters = loadLoadedReporters()
@@ -138,31 +134,32 @@ abstract class GenerateReportsTask @Inject constructor(
                 reportsOutputDirectory.file("${reportsName.get()}.${it.fileExtension}")
             }
 
+        val task = this
         loadedReporters.forEach { (loadedReporter, reporterOutput) ->
-            queue.submit(GenerateReportsWorkAction::class.java) { param ->
-                param.discoveredErrorsFile.set(discoveredErrors)
-                param.loadedReporterProviders.set(loadedReporterProviders)
-                param.reporterId.set(loadedReporter.reporterId)
-                param.reporterOutput.set(reporterOutput)
-                param.reporterOptions.set(generateReporterOptions(loadedReporter))
-                param.ktLintVersion.set(ktLintVersion)
-                param.baseline.set(baseline)
-                param.projectDirectory.set(projectLayout.projectDirectory)
-                if (relative.get()) {
-                    param.filePathsRelativeTo.set(rootDir)
+            queue.submit(GenerateReportsWorkAction::class.java) {
+                discoveredErrorsFile.set(task.discoveredErrors)
+                loadedReporterProviders.set(task.loadedReporterProviders)
+                reporterId.set(loadedReporter.reporterId)
+                this.reporterOutput.set(reporterOutput)
+                reporterOptions.set(generateReporterOptions(loadedReporter))
+                ktLintVersion.set(task.ktLintVersion)
+                baseline.set(task.baseline)
+                projectDirectory.set(task.projectLayout.projectDirectory)
+                if (task.relative.get()) {
+                    filePathsRelativeTo.set(rootDir)
                 }
             }
         }
 
-        queue.submit(ConsoleReportWorkAction::class.java) { param ->
-            param.discoveredErrors.set(discoveredErrors)
-            param.outputToConsole.set(outputToConsole)
-            param.ignoreFailures.set(ignoreFailures)
-            param.verbose.set(verbose)
-            param.generatedReportsPaths.from(loadedReporters.values)
-            param.ktLintVersion.set(ktLintVersion)
-            param.baseline.set(baseline)
-            param.projectDirectory.set(projectLayout.projectDirectory)
+        queue.submit(ConsoleReportWorkAction::class.java) {
+            discoveredErrors.set(task.discoveredErrors)
+            outputToConsole.set(task.outputToConsole)
+            ignoreFailures.set(task.ignoreFailures)
+            verbose.set(task.verbose)
+            generatedReportsPaths.from(loadedReporters.values)
+            ktLintVersion.set(task.ktLintVersion)
+            baseline.set(task.baseline)
+            projectDirectory.set(projectLayout.projectDirectory)
         }
     }
 
@@ -188,12 +185,6 @@ abstract class GenerateReportsTask @Inject constructor(
         }
         options.putAll(loadedReporter.reporterOptions)
         return options.toMap()
-    }
-
-    private fun checkBaselineSupportedKtLintVersion() {
-        if (baseline.isPresent && SemVer.parse(ktLintVersion.get()) < SemVer(0, 41, 0)) {
-            throw GradleException("Baseline support is only enabled for KtLint versions 0.41.0+.")
-        }
     }
 
     internal enum class LintType(

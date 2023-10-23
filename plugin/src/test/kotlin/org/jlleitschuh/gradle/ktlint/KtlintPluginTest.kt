@@ -45,86 +45,6 @@ class KtlintPluginTest : AbstractPluginTest() {
         }
     }
 
-    @DisplayName("Should generate code style files in project < 0.47.0")
-    @CommonTest
-    fun generateIdeaCodeStyle(gradleVersion: GradleVersion) {
-        project(gradleVersion) {
-            buildGradle.appendText(
-                """
-                ktlint.version = "0.46.1"
-
-                """.trimIndent()
-            )
-            withCleanSources()
-            val ideaRootDir = projectPath.resolve(".idea").apply { mkdir() }
-
-            build(APPLY_TO_IDEA_TASK_NAME) {
-                assertThat(task(":$APPLY_TO_IDEA_TASK_NAME")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-                assertThat(ideaRootDir.listFiles()?.isNullOrEmpty()).isFalse()
-            }
-        }
-    }
-
-    @DisplayName("Should not generate code style files in project >= 0.47.0")
-    @CommonTest
-    fun generateIdeaCodeStyleNew(gradleVersion: GradleVersion) {
-        project(gradleVersion) {
-            buildGradle.appendText(
-                """
-                ktlint.version = "0.47.1"
-
-                """.trimIndent()
-            )
-            withCleanSources()
-            val ideaRootDir = projectPath.resolve(".idea").apply { mkdir() }
-
-            build(APPLY_TO_IDEA_TASK_NAME) {
-                assertThat(task(":$APPLY_TO_IDEA_TASK_NAME")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-                assertThat(output).contains("Skipping ktlintApplyToIdea. The applyToIDEA functionality was removed from ktlint in 0.47.0.")
-                assertThat(ideaRootDir.listFiles()?.isNullOrEmpty()).isTrue()
-            }
-        }
-    }
-
-    @DisplayName("Should generate code style file globally < 0.47.0")
-    @CommonTest
-    fun generateIdeaCodeStyleGloballyOld(gradleVersion: GradleVersion) {
-        project(gradleVersion) {
-            buildGradle.appendText(
-                """
-                ktlint.version = "0.46.1"
-
-                """.trimIndent()
-            )
-            val ideaRootDir = projectPath.resolve(".idea").apply { mkdir() }
-
-            build(APPLY_TO_IDEA_GLOBALLY_TASK_NAME) {
-                assertThat(task(":$APPLY_TO_IDEA_GLOBALLY_TASK_NAME")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-                assertThat(ideaRootDir.listFiles()?.isNullOrEmpty()).isFalse()
-            }
-        }
-    }
-
-    @DisplayName("Should not generate code style file globally >= 0.47.0")
-    @CommonTest
-    fun generateIdeaCodeStyleGloballyNew(gradleVersion: GradleVersion) {
-        project(gradleVersion) {
-            buildGradle.appendText(
-                """
-                ktlint.version = "0.47.1"
-
-                """.trimIndent()
-            )
-            val ideaRootDir = projectPath.resolve(".idea").apply { mkdir() }
-
-            build(APPLY_TO_IDEA_GLOBALLY_TASK_NAME) {
-                assertThat(task(":$APPLY_TO_IDEA_GLOBALLY_TASK_NAME")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-                assertThat(output).contains("Skipping ktlintApplyToIdeaGlobally. The applyToIDEA functionality was removed from ktlint in 0.47.0.")
-                assertThat(ideaRootDir.listFiles()?.isNullOrEmpty()).isTrue()
-            }
-        }
-    }
-
     @DisplayName("Should show only plugin meta tasks in task output")
     @CommonTest
     fun showOnlyMetaTasks(gradleVersion: GradleVersion) {
@@ -137,11 +57,9 @@ class KtlintPluginTest : AbstractPluginTest() {
                     .filter { it.startsWith("ktlint", ignoreCase = true) }
                     .toList()
 
-                assertThat(ktlintTasks).hasSize(5)
+                assertThat(ktlintTasks).hasSize(3)
                 assertThat(ktlintTasks).anyMatch { it.startsWith(CHECK_PARENT_TASK_NAME) }
                 assertThat(ktlintTasks).anyMatch { it.startsWith(FORMAT_PARENT_TASK_NAME) }
-                assertThat(ktlintTasks).anyMatch { it.startsWith(APPLY_TO_IDEA_TASK_NAME) }
-                assertThat(ktlintTasks).anyMatch { it.startsWith(APPLY_TO_IDEA_GLOBALLY_TASK_NAME) }
                 assertThat(ktlintTasks).anyMatch { it.startsWith(GenerateBaselineTask.NAME) }
             }
         }
@@ -159,11 +77,9 @@ class KtlintPluginTest : AbstractPluginTest() {
 
                 // Plus for main and test sources format and check tasks
                 // Plus two kotlin script tasks
-                assertThat(ktlintTasks).hasSize(11)
+                assertThat(ktlintTasks).hasSize(9)
                 assertThat(ktlintTasks).anyMatch { it.startsWith(CHECK_PARENT_TASK_NAME) }
                 assertThat(ktlintTasks).anyMatch { it.startsWith(FORMAT_PARENT_TASK_NAME) }
-                assertThat(ktlintTasks).anyMatch { it.startsWith(APPLY_TO_IDEA_TASK_NAME) }
-                assertThat(ktlintTasks).anyMatch { it.startsWith(APPLY_TO_IDEA_GLOBALLY_TASK_NAME) }
                 assertThat(ktlintTasks).anyMatch { it.startsWith(kotlinScriptCheckTaskName) }
                 assertThat(ktlintTasks).anyMatch {
                     it.startsWith(
@@ -451,7 +367,7 @@ class KtlintPluginTest : AbstractPluginTest() {
                 """
 
                 ktlint.enableExperimentalRules = true
-                ktlint.version = "0.34.0"
+                ktlint.version = "0.47.1"
                 """.trimIndent()
             )
 
@@ -671,13 +587,13 @@ class KtlintPluginTest : AbstractPluginTest() {
                 """
 
                 dependencies {
-                    $KTLINT_RULESET_CONFIGURATION_NAME "com.pinterest.ktlint:ktlint-core:0.34.2"
+                    $KTLINT_RULESET_CONFIGURATION_NAME "com.pinterest.ktlint:ktlint-cli-ruleset-core:1.0.0"
                 }
                 """.trimIndent()
             )
 
             build(":dependencies", "--configuration", KTLINT_RULESET_CONFIGURATION_NAME) {
-                assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.47.1")
+                assertThat(output).contains("com.pinterest.ktlint:ktlint-cli-ruleset-core:1.0.0 -> 1.0.1")
             }
         }
     }
@@ -693,13 +609,13 @@ class KtlintPluginTest : AbstractPluginTest() {
                 """
 
                 dependencies {
-                    $KTLINT_REPORTER_CONFIGURATION_NAME "com.pinterest.ktlint:ktlint-core:0.34.2"
+                    $KTLINT_REPORTER_CONFIGURATION_NAME "com.pinterest.ktlint:ktlint-cli-ruleset-core:1.0.0"
                 }
                 """.trimIndent()
             )
 
             build(":dependencies", "--configuration", KTLINT_REPORTER_CONFIGURATION_NAME) {
-                assertThat(output).contains("com.pinterest.ktlint:ktlint-core:0.34.2 -> 0.47.1")
+                assertThat(output).contains("com.pinterest.ktlint:ktlint-cli-ruleset-core:1.0.0 -> 1.0.1")
             }
         }
     }

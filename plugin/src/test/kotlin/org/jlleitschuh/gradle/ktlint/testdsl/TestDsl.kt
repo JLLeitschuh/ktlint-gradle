@@ -4,6 +4,7 @@ import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.util.GradleVersion
 import org.jlleitschuh.gradle.ktlint.AbstractPluginTest
+import org.jlleitschuh.gradle.ktlint.testdsl.TestVersions.maxSupportedKotlinPluginVersion
 import java.io.File
 
 fun AbstractPluginTest.project(
@@ -154,14 +155,11 @@ fun TestProject.buildAndFail(
 fun defaultProjectSetup(gradleVersion: GradleVersion): (File) -> Unit =
     projectSetup("jvm", gradleVersion)
 
-private val GradleVersion.supportedKotlinVersion
-    get() = TestVersions.maxSupportedKotlinPluginVersion(this)
-
 fun projectSetup(
     kotlinPluginType: String,
     gradleVersion: GradleVersion
 ): (File) -> Unit = {
-    val kotlinPluginVersion = gradleVersion.supportedKotlinVersion
+    val kotlinPluginVersion = maxSupportedKotlinPluginVersion
     //language=Groovy
     it.resolve("build.gradle").writeText(
         """

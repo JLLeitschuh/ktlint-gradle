@@ -47,11 +47,7 @@ class ConfigurationCacheTest : AbstractPluginTest() {
     @CommonTest
     fun configurationCacheForFormatTasks(gradleVersion: GradleVersion) {
         project(gradleVersion) {
-            val sourceFile = "\nval foo = \"bar\"\n"
-            createSourceFile(
-                "src/main/kotlin/CleanSource.kt",
-                sourceFile
-            )
+            withCleanSources()
             val formatTaskName = KtLintFormatTask.buildTaskNameForSourceSet("main")
             build(
                 configurationCacheFlag,
@@ -92,11 +88,7 @@ class ConfigurationCacheTest : AbstractPluginTest() {
                 }
                 """.trimIndent()
             )
-            val sourceFile = "\nval foo = \"bar\"\n"
-            createSourceFile(
-                "src/main/kotlin/CleanSource.kt",
-                sourceFile
-            )
+            withCleanSources()
             val formatTaskName = KtLintFormatTask.buildTaskNameForSourceSet("main")
             build(
                 configurationCacheFlag,

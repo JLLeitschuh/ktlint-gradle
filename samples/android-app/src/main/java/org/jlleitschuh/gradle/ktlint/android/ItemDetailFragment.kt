@@ -15,7 +15,6 @@ import org.jlleitschuh.gradle.ktlint.android.dummy.DummyContent
  * on handsets.
  */
 class ItemDetailFragment : Fragment() {
-
     /**
      * The dummy content this fragment is presenting.
      */
@@ -40,7 +39,7 @@ class ItemDetailFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         viewBinding = ItemDetailBinding.inflate(inflater, container, false)
 

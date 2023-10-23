@@ -11,8 +11,6 @@ import org.jlleitschuh.gradle.ktlint.testdsl.build
 import org.jlleitschuh.gradle.ktlint.testdsl.buildAndFail
 import org.jlleitschuh.gradle.ktlint.testdsl.project
 import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.condition.DisabledOnOs
-import org.junit.jupiter.api.condition.OS
 
 @GradleTestVersions
 class ReportersTest : AbstractPluginTest() {
@@ -204,31 +202,6 @@ class ReportersTest : AbstractPluginTest() {
             build(CHECK_PARENT_TASK_NAME) {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
                 assertReportCreated(ReporterType.SARIF.fileExtension, mainSourceSetCheckTaskName)
-            }
-        }
-    }
-
-    @DisplayName("Should ignore html reporter on KtLint versions less then 0.36.0")
-    @CommonTest
-    @DisabledOnOs(OS.WINDOWS)
-    internal fun ignoreHtmlOnOldVersions(gradleVersion: GradleVersion) {
-        project(gradleVersion) {
-            withCleanSources()
-
-            //language=Groovy
-            buildGradle.appendText(
-                """
-
-                ktlint.version = "0.35.0"
-                ktlint.reporters {
-                    reporter "html"
-                }
-                """.trimIndent()
-            )
-
-            build(CHECK_PARENT_TASK_NAME) {
-                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-                assertReportNotCreated(ReporterType.HTML.fileExtension, mainSourceSetCheckTaskName)
             }
         }
     }

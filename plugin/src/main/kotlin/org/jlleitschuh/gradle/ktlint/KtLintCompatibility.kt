@@ -5,16 +5,11 @@ import org.gradle.api.GradleException
 import org.jlleitschuh.gradle.ktlint.reporter.ReportersLoaderAdapter
 import org.jlleitschuh.gradle.ktlint.reporter.ReportersProviderLoader
 import org.jlleitschuh.gradle.ktlint.reporter.ReportersProviderV2Loader
-import org.jlleitschuh.gradle.ktlint.reporter.SerializableReportersProviderLoader
 import org.jlleitschuh.gradle.ktlint.worker.BaselineLoader
-import org.jlleitschuh.gradle.ktlint.worker.BaselineLoader45
-import org.jlleitschuh.gradle.ktlint.worker.BaselineLoader46
 import org.jlleitschuh.gradle.ktlint.worker.BaselineLoader47
 import org.jlleitschuh.gradle.ktlint.worker.BaselineLoader48
 import org.jlleitschuh.gradle.ktlint.worker.BaselineLoader49
 import org.jlleitschuh.gradle.ktlint.worker.KtLintInvocation100
-import org.jlleitschuh.gradle.ktlint.worker.KtLintInvocation45
-import org.jlleitschuh.gradle.ktlint.worker.KtLintInvocation46
 import org.jlleitschuh.gradle.ktlint.worker.KtLintInvocation47
 import org.jlleitschuh.gradle.ktlint.worker.KtLintInvocation48
 import org.jlleitschuh.gradle.ktlint.worker.KtLintInvocation49
@@ -25,11 +20,7 @@ import java.io.Serializable
 internal fun selectInvocation(version: String): KtLintInvocationFactory {
     val semVer = SemVer.parse(version)
     return if (semVer.major == 0) {
-        if (semVer.minor < 46) {
-            KtLintInvocation45
-        } else if (semVer.minor == 46) {
-            KtLintInvocation46
-        } else if (semVer.minor == 47) {
+        if (semVer.minor == 47) {
             KtLintInvocation47
         } else if (semVer.minor == 48) {
             KtLintInvocation48
@@ -46,11 +37,7 @@ internal fun selectInvocation(version: String): KtLintInvocationFactory {
 internal fun selectBaselineLoader(version: String): BaselineLoader {
     val semVer = SemVer.parse(version)
     return if (semVer.major == 0) {
-        if (semVer.minor < 46) {
-            BaselineLoader45()
-        } else if (semVer.minor == 46) {
-            BaselineLoader46()
-        } else if (semVer.minor == 47) {
+        if (semVer.minor == 47) {
             BaselineLoader47()
         } else if (semVer.minor == 48) {
             BaselineLoader48()
@@ -71,9 +58,7 @@ internal fun selectBaselineLoader(version: String): BaselineLoader {
 internal fun selectReportersLoaderAdapter(version: String): ReportersLoaderAdapter<*, out Serializable, *, *> {
     val semVer = SemVer.parse(version)
     return if (semVer.major == 0) {
-        if (semVer.minor < 41) {
-            SerializableReportersProviderLoader()
-        } else if (semVer.minor < 49) {
+        if (semVer.minor < 49) {
             ReportersProviderLoader()
         } else {
             ReportersProviderV2Loader()

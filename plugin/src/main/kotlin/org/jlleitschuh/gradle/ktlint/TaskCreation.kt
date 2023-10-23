@@ -5,6 +5,7 @@ import org.gradle.api.file.FileTree
 import org.gradle.api.tasks.TaskCollection
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.util.PatternSet
+import org.gradle.kotlin.dsl.register
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jlleitschuh.gradle.ktlint.tasks.BaseKtLintCheckTask
 import org.jlleitschuh.gradle.ktlint.tasks.GenerateBaselineTask
@@ -16,13 +17,13 @@ import org.jlleitschuh.gradle.ktlint.tasks.LoadReportersTask
 internal fun KtlintPlugin.PluginHolder.addGenerateReportsTaskToProjectMetaCheckTask(
     generatesReportsTask: TaskProvider<GenerateReportsTask>
 ) {
-    metaKtlintCheckTask.configure { it.dependsOn(generatesReportsTask) }
+    metaKtlintCheckTask.configure { dependsOn(generatesReportsTask) }
 }
 
 internal fun KtlintPlugin.PluginHolder.addGenerateReportsTaskToProjectMetaFormatTask(
     generateReportsTask: TaskProvider<GenerateReportsTask>
 ) {
-    metaKtlintFormatTask.configure { it.dependsOn(generateReportsTask) }
+    metaKtlintFormatTask.configure { dependsOn(generateReportsTask) }
 }
 
 internal fun createFormatTask(
@@ -103,26 +104,25 @@ internal fun KtlintPlugin.PluginHolder.setCheckTaskDependsOnGenerateReportsTask(
     generateReportsTask: TaskProvider<GenerateReportsTask>
 ) {
     target.plugins.withType(LifecycleBasePlugin::class.java) {
-        target.tasks.named(LifecycleBasePlugin.CHECK_TASK_NAME).configure { task ->
-            task.dependsOn(generateReportsTask)
+        target.tasks.named(LifecycleBasePlugin.CHECK_TASK_NAME) {
+            dependsOn(generateReportsTask)
         }
     }
 }
 
 internal fun createLoadReportersTask(
     pluginHolder: KtlintPlugin.PluginHolder
-): TaskProvider<LoadReportersTask> = pluginHolder.target.registerTask(
-    LoadReportersTask.TASK_NAME
-) {
-    description = LoadReportersTask.DESCRIPTION
+): TaskProvider<LoadReportersTask> =
+    pluginHolder.target.tasks.register<LoadReportersTask>(LoadReportersTask.TASK_NAME) {
+        description = LoadReportersTask.DESCRIPTION
 
-    ktLintClasspath.setFrom(pluginHolder.ktlintConfiguration)
-    reportersClasspath.setFrom(pluginHolder.ktlintReporterConfiguration)
-    debug.set(pluginHolder.extension.debug)
-    ktLintVersion.set(pluginHolder.extension.version)
-    enabledReporters.set(pluginHolder.extension.reporterExtension.reporters)
-    customReporters.set(pluginHolder.extension.reporterExtension.customReporters)
-}
+        ktLintClasspath.setFrom(pluginHolder.ktlintConfiguration)
+        reportersClasspath.setFrom(pluginHolder.ktlintReporterConfiguration)
+        debug.set(pluginHolder.extension.debug)
+        ktLintVersion.set(pluginHolder.extension.version)
+        enabledReporters.set(pluginHolder.extension.reporterExtension.reporters)
+        customReporters.set(pluginHolder.extension.reporterExtension.customReporters)
+    }
 
 private fun BaseKtLintCheckTask.configureBaseCheckTask(
     pluginHolder: KtlintPlugin.PluginHolder,
@@ -130,7 +130,6 @@ private fun BaseKtLintCheckTask.configureBaseCheckTask(
 ) {
     ktLintClasspath.setFrom(pluginHolder.ktlintConfiguration)
     ktLintVersion.set(pluginHolder.extension.version)
-    additionalEditorconfigFile.set(pluginHolder.extension.additionalEditorconfigFile)
     additionalEditorconfig.set(pluginHolder.extension.additionalEditorconfig)
     debug.set(pluginHolder.extension.debug)
     ruleSetsClasspath.setFrom(pluginHolder.ktlintRulesetConfiguration)

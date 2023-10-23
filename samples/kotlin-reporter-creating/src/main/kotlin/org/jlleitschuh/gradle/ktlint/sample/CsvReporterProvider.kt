@@ -1,14 +1,14 @@
 package org.jlleitschuh.gradle.ktlint.sample
 
-import com.pinterest.ktlint.core.Reporter
-import com.pinterest.ktlint.core.ReporterProvider
+import com.pinterest.ktlint.cli.reporter.core.api.ReporterProviderV2
+import com.pinterest.ktlint.cli.reporter.core.api.ReporterV2
 import java.io.PrintStream
 
-class CsvReporterProvider : ReporterProvider<Reporter> {
+class CsvReporterProvider : ReporterProviderV2<ReporterV2> {
     override val id: String = "csv"
 
     override fun get(
         out: PrintStream,
-        opt: Map<String, String>
-    ): Reporter = CsvReporter(out)
+        opt: Map<String, String>,
+    ): ReporterV2 = CsvReporter(out)
 }

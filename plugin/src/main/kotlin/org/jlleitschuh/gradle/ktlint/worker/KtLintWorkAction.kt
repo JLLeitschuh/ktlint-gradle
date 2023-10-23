@@ -24,21 +24,11 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
     private val logger = Logging.getLogger("ktlint-worker")
 
     override fun execute() {
-        val additionalEditorConfig = parameters
-            .additionalEditorconfigFile
-            .orNull
-            ?.asFile
-            ?.absolutePath
         val userData = generateUserData()
         val debug = parameters.debug.get()
         val formatSource = parameters.formatSource.getOrElse(false)
         val results = mutableListOf<LintErrorResult>()
         val formattedFiles = mutableMapOf<File, ByteArray>()
-        if (parameters.additionalEditorconfigFile.isPresent &&
-            parameters.ktLintVersion.map { SemVer.parse(it) }.get() >= SemVer(0, 47)
-        ) {
-            logger.warn("additionalEditorconfigFile no longer supported in ktlint 0.47+")
-        }
         if (parameters.additionalEditorconfig.isPresent &&
             parameters.additionalEditorconfig.get().isNotEmpty() &&
             parameters.ktLintVersion.map { SemVer.parse(it) }.get() < SemVer(0, 49)
@@ -48,31 +38,9 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
         val ktlintInvoker: KtLintInvocation = when (
             val ktlintInvokerFactory = selectInvocation(parameters.ktLintVersion.get())
         ) {
-            is KtLintInvocation45.Factory -> {
-                ktlintInvokerFactory.initialize(
-                    editorConfigPath = additionalEditorConfig,
-
-                    parameters.enableExperimental.getOrElse(false),
-                    parameters.disabledRules.getOrElse(emptySet()),
-
-                    userData = userData,
-                    debug = debug
-                )
-            }
-
-            is KtLintInvocation46.Factory -> {
-                ktlintInvokerFactory.initialize(
-                    editorConfigPath = additionalEditorConfig,
-                    enableExperimental = parameters.enableExperimental.getOrElse(false),
-                    disabledRules = parameters.disabledRules.getOrElse(emptySet()),
-                    userData = userData,
-                    debug = debug
-                )
-            }
-
             is KtLintInvocation47.Factory -> {
                 ktlintInvokerFactory.initialize(
-                    editorConfigPath = additionalEditorConfig,
+                    editorConfigPath = null,
                     userData = userData,
                     debug = debug,
                     parameters.enableExperimental.getOrElse(false),
@@ -173,7 +141,6 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
         val disabledRules: SetProperty<String>
         val enableExperimental: Property<Boolean>
         val debug: Property<Boolean>
-        val additionalEditorconfigFile: RegularFileProperty
         val additionalEditorconfig: MapProperty<String, String>
         val formatSource: Property<Boolean>
         val discoveredErrorsFile: RegularFileProperty

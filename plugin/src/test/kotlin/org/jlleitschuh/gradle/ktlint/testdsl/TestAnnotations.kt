@@ -12,17 +12,10 @@ import kotlin.streams.asStream
 
 object TestVersions {
     const val minSupportedGradleVersion = KtlintBasePlugin.LOWEST_SUPPORTED_GRADLE_VERSION
-    const val maxSupportedGradleVersion = "8.1.1"
+    const val maxSupportedGradleVersion = "8.4"
     val pluginVersion = File("VERSION_CURRENT.txt").readText().trim()
     const val minSupportedKotlinPluginVersion = "1.4.32"
-
-    fun maxSupportedKotlinPluginVersion(
-        gradleVersion: GradleVersion = GradleVersion.version(maxSupportedGradleVersion)
-    ): String = when (gradleVersion) {
-        in (GradleVersion.version("6.8.3")..GradleVersion.version(maxSupportedGradleVersion)) -> "1.8.10"
-        in (GradleVersion.version("6.7.1")..GradleVersion.version("7.1.1")) -> "1.7.21"
-        else -> minSupportedKotlinPluginVersion
-    }
+    const val maxSupportedKotlinPluginVersion = "1.9.10"
 }
 
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)

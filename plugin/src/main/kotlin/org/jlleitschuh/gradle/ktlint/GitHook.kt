@@ -114,12 +114,12 @@ private fun KtlintPlugin.PluginHolder.addInstallGitHookFormatTask() {
         INSTALL_GIT_HOOK_FORMAT_TASK,
         KtlintInstallGitHookTask::class.java
     ) {
-        it.description = "Adds git hook to run ktlintFormat on changed files"
-        it.group = HELP_GROUP
-        it.taskName.set(FORMAT_PARENT_TASK_NAME)
+        description = "Adds git hook to run ktlintFormat on changed files"
+        group = HELP_GROUP
+        taskName.set(FORMAT_PARENT_TASK_NAME)
         // Format git hook will automatically add back updated files to git commit
-        it.shouldUpdateCommit.set(true)
-        it.hookName.set("pre-commit")
+        shouldUpdateCommit.set(true)
+        hookName.set("pre-commit")
     }
 }
 
@@ -128,11 +128,11 @@ private fun KtlintPlugin.PluginHolder.addInstallGitHookCheckTask() {
         INSTALL_GIT_HOOK_CHECK_TASK,
         KtlintInstallGitHookTask::class.java
     ) {
-        it.description = "Adds git hook to run ktlintCheck on changed files"
-        it.group = HELP_GROUP
-        it.taskName.set(CHECK_PARENT_TASK_NAME)
-        it.shouldUpdateCommit.set(false)
-        it.hookName.set("pre-commit")
+        description = "Adds git hook to run ktlintCheck on changed files"
+        group = HELP_GROUP
+        taskName.set(CHECK_PARENT_TASK_NAME)
+        shouldUpdateCommit.set(false)
+        hookName.set("pre-commit")
     }
 }
 

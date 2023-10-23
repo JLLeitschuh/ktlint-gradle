@@ -24,7 +24,6 @@ pluginManagement {
     }
 }
 
-enableFeaturePreview("VERSION_CATALOGS")
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 dependencyResolutionManagement {
@@ -62,6 +61,7 @@ fun isAndroidSdkInLocalPropertiesSet(): Boolean {
 }
 
 fun isAndroidSdkVariableSet(): Boolean = System.getenv().containsKey("ANDROID_HOME")
+
 fun isAndroidSdkAvailable(): Boolean = isAndroidSdkVariableSet() || isAndroidSdkInLocalPropertiesSet()
 
 include("samples:kotlin-ks")

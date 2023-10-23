@@ -64,19 +64,19 @@ private typealias AndroidCommonExtension = CommonExtension<
 private fun androidPluginConfigureAction(
     pluginHolder: KtlintPlugin.PluginHolder
 ): (Plugin<Any>) -> Unit = {
-    pluginHolder.target.extensions.configure(CommonExtension::class.java) { ext ->
-        val androidCommonExtension = ext as AndroidCommonExtension
+    pluginHolder.target.extensions.configure(CommonExtension::class.java) {
+        val androidCommonExtension = this as AndroidCommonExtension
 
-        androidCommonExtension.sourceSets.all { sourceSet ->
+        androidCommonExtension.sourceSets.all {
             // https://issuetracker.google.com/u/1/issues/170650362
-            val androidSourceSet = sourceSet.java as DefaultAndroidSourceDirectorySet
+            val androidSourceSet = java as DefaultAndroidSourceDirectorySet
             // Passing Callable, so returned FileCollection, will lazy evaluate it
             // only when task will need it.
             // Solves the problem of having additional source dirs in
             // current AndroidSourceSet, that are not available on eager
             // evaluation.
             pluginHolder.createAndroidTasks(
-                sourceSet.name,
+                name,
                 pluginHolder.target.files(Callable { androidSourceSet.srcDirs })
             )
         }

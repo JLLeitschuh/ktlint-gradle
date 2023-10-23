@@ -7,14 +7,11 @@ import org.jetbrains.kotlin.com.intellij.psi.impl.source.tree.LeafPsiElement
 import org.jetbrains.kotlin.com.intellij.psi.util.PsiTreeUtil.getNonStrictParentOfType
 import org.jetbrains.kotlin.psi.KtStringTemplateEntry
 
-class NoVarRule : Rule(
-    RuleId("test:novar"),
-    About()
-) {
+class NoVarRule : Rule(RuleId("test:novar"), About()) {
     override fun beforeVisitChildNodes(
         node: ASTNode,
         autoCorrect: Boolean,
-        emit: (offset: Int, errorMessage: String, canBeAutoCorrected: Boolean) -> Unit
+        emit: (offset: Int, errorMessage: String, canBeAutoCorrected: Boolean) -> Unit,
     ) {
         if (node is LeafPsiElement && node.textMatches("var") &&
             getNonStrictParentOfType(node, KtStringTemplateEntry::class.java) == null

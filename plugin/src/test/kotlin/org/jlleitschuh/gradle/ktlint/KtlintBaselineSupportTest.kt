@@ -1,6 +1,5 @@
 package org.jlleitschuh.gradle.ktlint
 
-import net.swiftzer.semver.SemVer
 import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testkit.runner.TaskOutcome
 import org.gradle.util.GradleVersion
@@ -59,13 +58,12 @@ class KtlintBaselineSupportTest : AbstractPluginTest() {
                     |<?xml version="1.0" encoding="utf-8"?>
                     |<baseline version="1.0">
                     |	<file name="kotlin-script-fail.kts">
-                    |		<error line="1" column="15" source="no-trailing-spaces" />
-                    |		<error line="1" column="16" source="no-multi-spaces" />
+                    |		<error line="1" column="15" source="standard:no-trailing-spaces" />
                     |	</file>
                     |	<file name="src/main/kotlin/FailSource.kt">
-                    |		<error line="1" column="5" source="no-multi-spaces" />
-                    |		<error line="1" column="10" source="no-multi-spaces" />
-                    |		<error line="1" column="15" source="no-multi-spaces" />
+                    |		<error line="1" column="5" source="standard:no-multi-spaces" />
+                    |		<error line="1" column="10" source="standard:no-multi-spaces" />
+                    |		<error line="1" column="15" source="standard:no-multi-spaces" />
                     |	</file>
                     |</baseline>
                     |
@@ -101,49 +99,23 @@ class KtlintBaselineSupportTest : AbstractPluginTest() {
         }
     }
 
-    @DisplayName("Generate baseline task should work only when KtLint version is higher then 0.41.0")
-    @CommonTest
-    fun generateBaselineMinVersion(gradleVersion: GradleVersion) {
-        project(gradleVersion) {
-            withFailingSources()
-
-            //language=Groovy
-            buildGradle.appendText(
-                """
-
-                ktlint {
-                    version.set("0.40.0")
-                }
-                """.trimIndent()
-            )
-
-            build(GenerateBaselineTask.NAME) {
-                assertThat(task(":${GenerateBaselineTask.NAME}")?.outcome).isEqualTo(TaskOutcome.SKIPPED)
-                assertThat(output).containsSequence("Generate baseline only works starting from KtLint 0.41.0 version")
-            }
-        }
-    }
-
     @DisplayName("Should consider existing issues in baseline")
     @ParameterizedTest(name = "{0} with KtLint {1}: {displayName}")
     @ArgumentsSource(KtLintSupportedVersionsTest.SupportedKtlintVersionsProvider::class)
     fun existingIssueFilteredByBaseline(gradleVersion: GradleVersion, ktLintVersion: String) {
-        if (SemVer.parse(ktLintVersion) >= SemVer(0, 41, 0)) {
-            // baseline support was added in 0.41.0
-            project(gradleVersion) {
-                //language=Groovy
-                buildGradle.appendText(
-                    """
+        project(gradleVersion) {
+            //language=Groovy
+            buildGradle.appendText(
+                """
                     ktlint.version = "$ktLintVersion"
                     ktlint.debug = true
-                    """.trimIndent()
-                )
-                withFailingSources()
+                """.trimIndent()
+            )
+            withFailingSources()
 
-                build(GenerateBaselineTask.NAME)
-                build(CHECK_PARENT_TASK_NAME) {
-                    assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-                }
+            build(GenerateBaselineTask.NAME)
+            build(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             }
         }
     }
@@ -158,30 +130,6 @@ class KtlintBaselineSupportTest : AbstractPluginTest() {
             withFailingKotlinScript()
             buildAndFail(CHECK_PARENT_TASK_NAME) {
                 assertThat(task(":$kotlinScriptCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
-            }
-        }
-    }
-
-    @DisplayName("Should fail the build if baseline file is present and ktlint version is less then 0.41.0")
-    @CommonTest
-    fun failBuildOnOldKtlintVersionsAndBaselinePresent(gradleVersion: GradleVersion) {
-        project(gradleVersion) {
-            withCleanSources()
-            build(GenerateBaselineTask.NAME)
-
-            //language=Groovy
-            buildGradle.appendText(
-                """
-
-                ktlint {
-                    version.set("0.40.0")
-                }
-                """.trimIndent()
-            )
-
-            buildAndFail(CHECK_PARENT_TASK_NAME) {
-                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
-                assertThat(output).contains("Baseline support is only enabled for KtLint versions 0.41.0+.")
             }
         }
     }

@@ -1,12 +1,12 @@
 [versions]
 kotlin = "1.5.31"
-ktlint = "0.45.2" # last version prior to API changes. we can increase this more once we drop support for the old API.
+ktlint = "0.47.1" # last version prior to API changes. we can increase this more once we drop support for the old API.
 androidPlugin = "4.1.0"
 semver = "1.1.1"
 jgit = "5.6.0.201912101111-r"
 sl4fj = "1.7.30"
-gradleWrapper = "7.3.3"
-gradleWrapperSha = "b586e04868a22fd817c8971330fec37e298f3242eb85c374181b12d637f80302"
+gradleWrapper = "8.4"
+gradleWrapperSha = "3e1af3ae886920c3ac87f7a91f816c0c7c436f276a6eefdb3da152100fef72ae"
 junit5 = "5.5.2"
 assertJ = "3.11.1"
 commonsIo = "2.8.0"

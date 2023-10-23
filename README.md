@@ -64,12 +64,11 @@ open a [new issue](https://github.com/JLLeitschuh/ktlint-gradle/issues/new).
 This plugin was written using the new API available for the Gradle script Kotlin builds.
 This API is available in new versions of Gradle.
 
-Minimal supported [Gradle](https://www.gradle.org) version: `6.8`
+Minimal supported [Gradle](https://www.gradle.org) version: `7.4`
 
 Minimal supported [Kotlin](https://kotlinlang.org) version: `1.4`
 
-Minimal supported [ktlint](https://github.com/pinterest/ktlint) version: `0.34.0`
-(additionally excluding `0.37.0` on Windows OS and `0.38.0`, `0.43.0`, `0.43.1` on all OS types)
+Minimal supported [ktlint](https://github.com/pinterest/ktlint) version: `0.47.1`
 
 ### Ktlint plugin
 

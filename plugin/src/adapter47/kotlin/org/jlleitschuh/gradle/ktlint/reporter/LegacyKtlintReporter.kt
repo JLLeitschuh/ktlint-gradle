@@ -7,7 +7,7 @@ import org.jlleitschuh.gradle.ktlint.worker.toCore
 /**
  * implementation of GenericReporter for the Reporter ktlint class
  */
-class Ktlint34Reporter(val reporter: Reporter) : GenericReporter<Reporter> {
+class LegacyKtlintReporter(val reporter: Reporter) : GenericReporter<Reporter> {
     override fun beforeAll() {
         reporter.beforeAll()
     }
