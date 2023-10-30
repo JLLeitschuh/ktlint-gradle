@@ -90,6 +90,13 @@ abstract class GenerateReportsTask @Inject constructor(
     @get:Optional
     internal abstract val baseline: RegularFileProperty
 
+    /**
+     * Reading a project's rootDir within a task's action is not allowed for configuration
+     * cache, so read it eagerly on task initialization.
+     * see: https://docs.gradle.org/current/userguide/configuration_cache.html#config_cache
+     */
+    private val rootDir: File = project.rootDir
+
     init {
         // Workaround for https://github.com/gradle/gradle/issues/2919
         onlyIf {
@@ -142,7 +149,7 @@ abstract class GenerateReportsTask @Inject constructor(
                 param.baseline.set(baseline)
                 param.projectDirectory.set(projectLayout.projectDirectory)
                 if (relative.get()) {
-                    param.filePathsRelativeTo.set(project.rootDir)
+                    param.filePathsRelativeTo.set(rootDir)
                 }
             }
         }
