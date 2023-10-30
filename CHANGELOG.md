@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 -   update latest version text file manually [#716](https://github.com/JLLeitschuh/ktlint-gradle/pull/716)
+-   Fix configuration cache for relative paths [#722](https://github.com/JLLeitschuh/ktlint-gradle/pull/722)
 
 ## [11.6.1] - 2023-10-10
 
