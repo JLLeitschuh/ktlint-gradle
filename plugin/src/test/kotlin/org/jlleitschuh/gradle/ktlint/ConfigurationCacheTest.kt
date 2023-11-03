@@ -13,7 +13,6 @@ import org.junit.jupiter.api.DisplayName
 @GradleTestVersions
 class ConfigurationCacheTest : AbstractPluginTest() {
     private val configurationCacheFlag = "--configuration-cache"
-    private val configurationCacheWarnFlag = "--configuration-cache-problems=warn"
 
     @DisplayName("Should support configuration cache without errors on running linting")
     @CommonTest
@@ -29,7 +28,6 @@ class ConfigurationCacheTest : AbstractPluginTest() {
 
             build(
                 configurationCacheFlag,
-                configurationCacheWarnFlag,
                 CHECK_PARENT_TASK_NAME
             ) {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
@@ -37,7 +35,6 @@ class ConfigurationCacheTest : AbstractPluginTest() {
 
             build(
                 configurationCacheFlag,
-                configurationCacheWarnFlag,
                 CHECK_PARENT_TASK_NAME
             ) {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
@@ -58,7 +55,6 @@ class ConfigurationCacheTest : AbstractPluginTest() {
             val formatTaskName = KtLintFormatTask.buildTaskNameForSourceSet("main")
             build(
                 configurationCacheFlag,
-                configurationCacheWarnFlag,
                 FORMAT_PARENT_TASK_NAME
             ) {
                 assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
@@ -66,9 +62,52 @@ class ConfigurationCacheTest : AbstractPluginTest() {
             }
             build(
                 configurationCacheFlag,
-                configurationCacheWarnFlag,
                 FORMAT_PARENT_TASK_NAME,
                 "--debug"
+            ) {
+                assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+                assertThat(task(":$mainSourceSetFormatTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+                assertThat(output).contains("Reusing configuration cache.")
+            }
+        }
+    }
+
+    @DisplayName("Should support configuration cache on running format tasks with relative paths")
+    @CommonTest
+    fun configurationCacheForFormatTasksWithRelativePaths(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            buildGradle.appendText(
+                //language=Groovy
+                """
+                repositories {
+                    jcenter()
+                }
+
+                ktlint {
+                    relative = true
+                    reporters {
+                        reporter "plain"
+                        reporter "checkstyle"
+                    }
+                }
+                """.trimIndent()
+            )
+            val sourceFile = "\nval foo = \"bar\"\n"
+            createSourceFile(
+                "src/main/kotlin/CleanSource.kt",
+                sourceFile
+            )
+            val formatTaskName = KtLintFormatTask.buildTaskNameForSourceSet("main")
+            build(
+                configurationCacheFlag,
+                FORMAT_PARENT_TASK_NAME
+            ) {
+                assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(task(":$mainSourceSetFormatTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+            build(
+                configurationCacheFlag,
+                FORMAT_PARENT_TASK_NAME
             ) {
                 assertThat(task(":$formatTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
                 assertThat(task(":$mainSourceSetFormatTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
@@ -85,7 +124,6 @@ class ConfigurationCacheTest : AbstractPluginTest() {
 
             build(
                 configurationCacheFlag,
-                configurationCacheWarnFlag,
                 INSTALL_GIT_HOOK_FORMAT_TASK
             ) {
                 assertThat(task(":$INSTALL_GIT_HOOK_FORMAT_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
@@ -93,7 +131,6 @@ class ConfigurationCacheTest : AbstractPluginTest() {
 
             build(
                 configurationCacheFlag,
-                configurationCacheWarnFlag,
                 INSTALL_GIT_HOOK_FORMAT_TASK
             ) {
                 assertThat(task(":$INSTALL_GIT_HOOK_FORMAT_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
@@ -110,7 +147,6 @@ class ConfigurationCacheTest : AbstractPluginTest() {
 
             build(
                 configurationCacheFlag,
-                configurationCacheWarnFlag,
                 INSTALL_GIT_HOOK_CHECK_TASK
             ) {
                 assertThat(task(":$INSTALL_GIT_HOOK_CHECK_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
@@ -118,7 +154,6 @@ class ConfigurationCacheTest : AbstractPluginTest() {
 
             build(
                 configurationCacheFlag,
-                configurationCacheWarnFlag,
                 INSTALL_GIT_HOOK_CHECK_TASK
             ) {
                 assertThat(task(":$INSTALL_GIT_HOOK_CHECK_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
