@@ -7,9 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [12.0.0] - 2023-11-28
+
 -   update latest version text file manually [#716](https://github.com/JLLeitschuh/ktlint-gradle/pull/716)
 -   Fix configuration cache for relative paths [#722](https://github.com/JLLeitschuh/ktlint-gradle/pull/722)
--   Drop support for Gradle 6 and ktlint < 0.47.1 [#720](https://github.com/JLLeitschuh/ktlint-gradle/pull/720)
+-   Drop support for Gradle 6 and ktlint &lt; 0.47.1 [#720](https://github.com/JLLeitschuh/ktlint-gradle/pull/720)
 
 ## [11.6.1] - 2023-10-10
 
@@ -698,7 +700,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 -   Renamed task with name `ktlint` to `ktlintCheck` (#3)
 -   Renamed tasks with names `ktlint[source set name]` to `ktlint[source set name]Check` (#3)
 
-[Unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.6.1...HEAD
+[Unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v12.0.0...HEAD
+
+[12.0.0]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.6.1...v12.0.0
 
 [11.6.1]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.6.0...v11.6.1
 
