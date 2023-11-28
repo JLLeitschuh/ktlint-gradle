@@ -306,10 +306,12 @@ gradlePlugin {
         register("ktlintPlugin") {
             id = "org.jlleitschuh.gradle.ktlint"
             implementationClass = "org.jlleitschuh.gradle.ktlint.KtlintPlugin"
+            displayName = "Ktlint Gradle Plugin"
         }
         register("ktlintIdeaPlugin") {
             id = "org.jlleitschuh.gradle.ktlint-idea"
             implementationClass = "org.jlleitschuh.gradle.ktlint.KtlintIdeaPlugin"
+            displayName = "Ktlint Gradle IDEA Plugin"
         }
     }
 }
