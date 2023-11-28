@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+-   update configure-pagefile-action task [#725](https://github.com/JLLeitschuh/ktlint-gradle/pull/725)
+
 ## [12.0.0] - 2023-11-28
 
 -   update latest version text file manually [#716](https://github.com/JLLeitschuh/ktlint-gradle/pull/716)
