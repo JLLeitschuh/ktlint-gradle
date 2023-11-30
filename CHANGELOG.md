@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+-  remove KtLintIdea Plugin [#726](https://github.com/JLLeitschuh/ktlint-gradle/pull/726).
+   This plugin is no longer needed as ktlint configuration is driven by .editorconfig now, which IDEA will respect out of the box.
+
 ## [12.0.1] - 2023-11-30
 
 -   update configure-pagefile-action task [#725](https://github.com/JLLeitschuh/ktlint-gradle/pull/725)
