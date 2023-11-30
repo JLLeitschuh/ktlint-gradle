@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [12.0.1] - 2023-11-30
+
 -   update configure-pagefile-action task [#725](https://github.com/JLLeitschuh/ktlint-gradle/pull/725)
 
 ## [12.0.0] - 2023-11-28
@@ -702,7 +704,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 -   Renamed task with name `ktlint` to `ktlintCheck` (#3)
 -   Renamed tasks with names `ktlint[source set name]` to `ktlint[source set name]Check` (#3)
 
-[Unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v12.0.0...HEAD
+[Unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v12.0.1...HEAD
+
+[12.0.1]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v12.0.0...v12.0.1
 
 [12.0.0]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v11.6.1...v12.0.0
 
