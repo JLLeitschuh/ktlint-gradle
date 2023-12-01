@@ -7,8 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
--  remove KtLintIdea Plugin [#726](https://github.com/JLLeitschuh/ktlint-gradle/pull/726).
-   This plugin is no longer needed as ktlint configuration is driven by .editorconfig now, which IDEA will respect out of the box.
+## [12.0.2] - 2023-12-01
+
+-   remove KtLintIdea Plugin [#726](https://github.com/JLLeitschuh/ktlint-gradle/pull/726).
+    This plugin is no longer needed as ktlint configuration is driven by .editorconfig now, which IDEA will respect out of the box.
 
 ## [12.0.1] - 2023-11-30
 
@@ -707,7 +709,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 -   Renamed task with name `ktlint` to `ktlintCheck` (#3)
 -   Renamed tasks with names `ktlint[source set name]` to `ktlint[source set name]Check` (#3)
 
-[Unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v12.0.1...HEAD
+[Unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v12.0.2...HEAD
+
+[12.0.2]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v12.0.1...v12.0.2
 
 [12.0.1]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v12.0.0...v12.0.1
 
