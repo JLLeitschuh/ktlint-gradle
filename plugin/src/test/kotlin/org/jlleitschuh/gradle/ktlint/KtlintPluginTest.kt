@@ -12,6 +12,7 @@ import org.jlleitschuh.gradle.ktlint.testdsl.TestProject.Companion.FAIL_SOURCE_F
 import org.jlleitschuh.gradle.ktlint.testdsl.build
 import org.jlleitschuh.gradle.ktlint.testdsl.buildAndFail
 import org.jlleitschuh.gradle.ktlint.testdsl.project
+import org.jlleitschuh.gradle.ktlint.testdsl.projectSetup
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.condition.EnabledOnOs
 import org.junit.jupiter.api.condition.OS
@@ -686,6 +687,45 @@ class KtlintPluginTest : AbstractPluginTest() {
 
             build(CHECK_PARENT_TASK_NAME, "--info") { // <-- Fails, file one is not found.
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+        }
+    }
+
+    @DisplayName("Should add check on additional sources")
+    @CommonTest
+    fun checkAdditionalSources(gradleVersion: GradleVersion) {
+        fun projectSetup(file: File) {
+            projectSetup("jvm", gradleVersion).invoke(file)
+
+            //language=Groovy
+            file.resolve("build.gradle").appendText(
+                """
+                |
+                |sourceSets {
+                |  additionalSources {
+                |    kotlin {
+                |      srcDir 'src/additionalSources/kotlin'
+                |    }
+                |  }
+                |}
+                """.trimMargin()
+            )
+        }
+
+        val additionalSourcesSourceSetCheckTaskName = GenerateReportsTask.generateNameForSourceSets(
+            "additionalSources",
+            GenerateReportsTask.LintType.CHECK
+        )
+
+        project(gradleVersion, projectSetup = ::projectSetup) {
+            build("-m", CHECK_PARENT_TASK_NAME) {
+                val ktlintTasks = output.lineSequence().toList()
+                assertThat(ktlintTasks).anySatisfy {
+                    assertThat(it).contains(mainSourceSetCheckTaskName)
+                }
+                assertThat(ktlintTasks).anySatisfy {
+                    assertThat(it).contains(additionalSourcesSourceSetCheckTaskName)
+                }
             }
         }
     }
