@@ -39,7 +39,7 @@ open class KtlintPlugin : Plugin<Project> {
     private fun PluginHolder.applyKtlintMultiplatform(): (Plugin<in Any>) -> Unit = {
         val multiplatformExtension = target.extensions.getByType(KotlinMultiplatformExtension::class.java)
 
-        multiplatformExtension.sourceSets.forEach { sourceSet ->
+        multiplatformExtension.sourceSets.all(fun(sourceSet) {
             val checkTask = createCheckTask(
                 this,
                 sourceSet.name,
@@ -68,18 +68,18 @@ open class KtlintPlugin : Plugin<Project> {
             )
 
             addGenerateReportsTaskToProjectMetaFormatTask(generateReportsFormatTask)
-        }
+        })
 
-        multiplatformExtension.targets.forEach { kotlinTarget ->
+        multiplatformExtension.targets.all(fun(kotlinTarget) {
             if (kotlinTarget.platformType == KotlinPlatformType.androidJvm) {
                 applyKtLintToAndroid()
             }
-        }
+        })
     }
 
     private fun PluginHolder.applyKtLint(): (Plugin<in Any>) -> Unit = {
         target.extensions.configure(KotlinProjectExtension::class.java) {
-            sourceSets.forEach { sourceSet ->
+            sourceSets.all(fun(sourceSet) {
                 val kotlinSourceDirectories = sourceSet.kotlin.sourceDirectories
                 val checkTask = createCheckTask(
                     this@applyKtLint,
@@ -109,7 +109,7 @@ open class KtlintPlugin : Plugin<Project> {
                 )
 
                 addGenerateReportsTaskToProjectMetaFormatTask(generateReportsFormatTask)
-            }
+            })
         }
     }
 

@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+- fix: apply configuration for source sets and targets that are added after the plugin is
+  applied [#732](https://github.com/JLLeitschuh/ktlint-gradle/pull/732)
+
 ## [12.0.2] - 2023-12-01
 
 -   remove KtLintIdea Plugin [#726](https://github.com/JLLeitschuh/ktlint-gradle/pull/726).
