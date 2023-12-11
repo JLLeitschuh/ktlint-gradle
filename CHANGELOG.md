@@ -7,8 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
-- fix: apply configuration for source sets and targets that are added after the plugin is
-  applied [#732](https://github.com/JLLeitschuh/ktlint-gradle/pull/732)
+## [12.0.3] - 2023-12-11
+
+-   fix: apply configuration for source sets and targets that are added after the plugin is
+    applied [#732](https://github.com/JLLeitschuh/ktlint-gradle/pull/732)
 
 ## [12.0.2] - 2023-12-01
 
@@ -712,7 +714,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 -   Renamed task with name `ktlint` to `ktlintCheck` (#3)
 -   Renamed tasks with names `ktlint[source set name]` to `ktlint[source set name]Check` (#3)
 
-[Unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v12.0.2...HEAD
+[Unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v12.0.3...HEAD
+
+[12.0.3]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v12.0.2...v12.0.3
 
 [12.0.2]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v12.0.1...v12.0.2
 
