@@ -1,7 +1,6 @@
 package org.jlleitschuh.gradle.ktlint.testdsl
 
 import org.gradle.util.GradleVersion
-import org.jetbrains.kotlin.utils.addToStdlib.cast
 import org.jlleitschuh.gradle.ktlint.KtlintBasePlugin
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.provider.Arguments
@@ -10,12 +9,15 @@ import java.io.File
 import java.util.stream.Stream
 import kotlin.streams.asStream
 
+@Suppress("ConstPropertyName")
 object TestVersions {
     const val minSupportedGradleVersion = KtlintBasePlugin.LOWEST_SUPPORTED_GRADLE_VERSION
-    const val maxSupportedGradleVersion = "8.4"
+    const val maxSupportedGradleVersion = "8.5"
     val pluginVersion = File("VERSION_CURRENT.txt").readText().trim()
     const val minSupportedKotlinPluginVersion = "1.4.32"
-    const val maxSupportedKotlinPluginVersion = "1.9.10"
+    const val maxSupportedKotlinPluginVersion = "1.9.21"
+    const val minAgpVersion = "4.1.0"
+    const val maxAgpVersion = "8.2.0"
 }
 
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
@@ -42,11 +44,16 @@ open class GradleArgumentsProvider : ArgumentsProvider {
             .testMethod
             .get()
             .annotations
-            .firstOrNull { it is GradleTestVersions }
-            ?.let { it.cast() }
-            ?: context.testClass.get().annotations.first { it is GradleTestVersions }.cast()
+            .filterIsInstance<GradleTestVersions>()
+            .firstOrNull()
+            ?: context.testClass.get().annotations.filterIsInstance<GradleTestVersions>().first()
 
-        val minGradleVersion = GradleVersion.version(versionsAnnotation.minVersion)
+        val minGradleVersion = if (getMajorJavaVersion() >= 21) {
+            // Gradle 8.5 is needed to run on Java 21
+            GradleVersion.version("8.5")
+        } else {
+            GradleVersion.version(versionsAnnotation.minVersion)
+        }
         val maxGradleVersion = GradleVersion.version(versionsAnnotation.maxVersion)
         val additionalGradleVersions = versionsAnnotation
             .additionalVersions

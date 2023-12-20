@@ -1,3 +1,5 @@
+@file:Suppress("ConstPropertyName")
+
 package org.jlleitschuh.gradle.ktlint
 
 import org.eclipse.jgit.lib.RepositoryBuilder

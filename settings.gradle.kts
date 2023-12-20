@@ -6,21 +6,13 @@ pluginManagement {
     plugins {
         id("org.jetbrains.kotlin.jvm") version "1.8.22"
         id("org.jetbrains.kotlin.js") version "1.8.22"
+        id("com.android.application") version "4.2.2"
     }
 
     repositories {
         gradlePluginPortal()
         google()
         maven("https://dl.bintray.com/jetbrains/kotlin-native-dependencies")
-    }
-
-    resolutionStrategy {
-        eachPlugin {
-            when (requested.id.id) {
-                "com.android.application" ->
-                    useModule("com.android.tools.build:gradle:4.1.3")
-            }
-        }
     }
 }
 

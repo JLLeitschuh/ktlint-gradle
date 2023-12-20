@@ -70,6 +70,8 @@ Minimal supported [Kotlin](https://kotlinlang.org) version: `1.4`
 
 Minimal supported [ktlint](https://github.com/pinterest/ktlint) version: `0.47.1`
 
+Minimal supported [Android Gradle plugin](https://developer.android.com/build) version: `4.1.0`
+
 ### Ktlint plugin
 
 #### Simple setup

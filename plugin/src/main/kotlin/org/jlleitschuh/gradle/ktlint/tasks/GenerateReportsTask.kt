@@ -190,7 +190,8 @@ abstract class GenerateReportsTask @Inject constructor(
     internal enum class LintType(
         val suffix: String
     ) {
-        CHECK("Check"), FORMAT("Format")
+        CHECK("Check"),
+        FORMAT("Format")
     }
 
     internal companion object {

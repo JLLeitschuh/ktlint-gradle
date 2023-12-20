@@ -677,7 +677,8 @@ class KtlintPluginTest : AbstractPluginTest() {
 
             removeSourceFile(fileOne)
             val fileThree = "src/main/kotlin/FileThree.kt"
-            createSourceFile( // Need to add or modify a source to repro file not found error.
+            // Need to add or modify a source to repro file not found error.
+            createSourceFile(
                 fileThree,
                 """
                 val bar = "foo"

@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+-   fix detection of android kotlin source directories in AGP >= 7 [#733](https://github.com/JLLeitschuh/ktlint-gradle/pull/733)
+
 ## [12.0.3] - 2023-12-11
 
 -   fix: apply configuration for source sets and targets that are added after the plugin is
