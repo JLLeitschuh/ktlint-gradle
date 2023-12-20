@@ -12,7 +12,8 @@ interface ReportersLoaderAdapter<
     R,
     RP : Serializable,
     GR : GenericReporter<R>,
-    GRP : GenericReporterProvider<GR>> {
+    GRP : GenericReporterProvider<GR>
+    > {
     fun loadAllReporterProviders(): List<ReporterProviderWrapper<RP>>
     fun filterEnabledBuiltInProviders(
         enabledReporters: Set<ReporterType>,

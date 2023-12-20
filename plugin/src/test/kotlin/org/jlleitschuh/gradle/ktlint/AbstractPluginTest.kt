@@ -28,8 +28,7 @@ abstract class AbstractPluginTest {
         GenerateReportsTask.LintType.CHECK
     )
 
-    protected
-    fun File.withCleanSources() = createSourceFile(
+    protected fun File.withCleanSources() = createSourceFile(
         "src/main/kotlin/CleanSource.kt",
         """
             val foo = "bar"
@@ -53,12 +52,10 @@ abstract class AbstractPluginTest {
         """.trimIndent()
     )
 
-    protected
-    fun File.withAlternativeFailingSources(baseDir: String) =
+    protected fun File.withAlternativeFailingSources(baseDir: String) =
         createSourceFile("$baseDir/FailSource.kt", """val  foo    =     "bar"""")
 
-    protected
-    fun File.createSourceFile(sourceFilePath: String, contents: String) {
+    protected fun File.createSourceFile(sourceFilePath: String, contents: String) {
         val sourceFile = resolve(sourceFilePath)
         sourceFile.parentFile.mkdirs()
         sourceFile.writeText(contents)

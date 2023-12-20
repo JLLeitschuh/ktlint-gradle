@@ -40,9 +40,9 @@ class TestProject(
     val settingsGradle get() = projectPath.resolve("settings.gradle")
     val editorConfig get() = projectPath.resolve(".editorconfig")
 
-    fun withCleanSources() {
+    fun withCleanSources(filePath: String = CLEAN_SOURCES_FILE) {
         createSourceFile(
-            CLEAN_SOURCES_FILE,
+            filePath,
             """
             |val foo = "bar"
             |

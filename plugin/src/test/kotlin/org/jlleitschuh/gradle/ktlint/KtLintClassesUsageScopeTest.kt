@@ -7,6 +7,7 @@ import com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses
 @AnalyzeClasses(
     packages = ["org.jlleitschuh.gradle.ktlint.."]
 )
+@Suppress("PropertyName")
 internal class KtLintClassesUsageScopeTest {
     @ArchTest
     val `Non-worker plugin classes should not use ktlint classes` = noClasses()

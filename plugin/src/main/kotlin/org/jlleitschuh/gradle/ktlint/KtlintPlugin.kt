@@ -29,7 +29,7 @@ open class KtlintPlugin : Plugin<Project> {
     private fun PluginHolder.addKtLintTasksToKotlinPlugin() {
         target.plugins.withId("kotlin", applyKtLint())
         target.plugins.withId("org.jetbrains.kotlin.js", applyKtLint())
-        target.plugins.withId("kotlin-android", applyKtLintToAndroid())
+        target.plugins.withId("org.jetbrains.kotlin.android", applyKtLintToAndroid())
         target.plugins.withId(
             "org.jetbrains.kotlin.multiplatform",
             applyKtlintMultiplatform()

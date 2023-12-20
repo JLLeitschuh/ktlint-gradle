@@ -30,6 +30,10 @@ java {
     }
 }
 
+ktlint {
+    version = "1.1.0"
+}
+
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         // target 1.4 as ktlint 0.49 requires it for inline classes
@@ -56,6 +60,7 @@ configurations {
 }
 configurations["compileOnly"].extendsFrom(shadowImplementation)
 configurations["testImplementation"].extendsFrom(shadowImplementation)
+
 sourceSets {
     val adapter by creating {
     }
@@ -88,6 +93,7 @@ sourceSets {
             runtimeClasspath = adapters.map { it.output }.fold(runtimeClasspath) { a, b -> a + b }
         }
     }
+
     val test by getting {
         kotlin {
             compileClasspath = adapters.map { it.output }.fold(compileClasspath) { a, b -> a + b }
@@ -95,6 +101,7 @@ sourceSets {
         }
     }
 }
+
 val adapterSources = listOf(
     sourceSets.named("adapter"),
     sourceSets.named("adapter47"),
@@ -140,12 +147,6 @@ dependencies {
     // Explicitly added for shadow plugin to relocate implementation as well
     shadowImplementation(libs.slf4j.nop)
 
-    /*
-     * Do not depend upon the gradle script kotlin plugin API. IE: gradleScriptKotlinApi()
-     * It's currently in flux and has binary breaking changes in gradle 4.0
-     * https://github.com/JLLeitschuh/ktlint-gradle/issues/9
-     */
-
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.assertj.core)
     testImplementation(libs.kotlin.reflect)
@@ -165,12 +166,8 @@ kotlin {
     }
 }
 
-// Test tasks loods plugin from local maven repository
-tasks.named<Test>("test") {
-    dependsOn("publishToMavenLocal")
-}
-
 tasks.withType<Test> {
+    dependsOn("publishToMavenLocal")
     useJUnitPlatform()
     maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
     doFirst {
@@ -195,6 +192,12 @@ tasks.withType<Test> {
             maxFailures.set(10)
         }
     }
+
+    javaLauncher.set(
+        javaToolchains.launcherFor {
+            languageVersion = JavaLanguageVersion.of(JavaVersion.current().majorVersion)
+        }
+    )
 }
 
 val relocateShadowJar = tasks.register<ConfigureShadowRelocation>("relocateShadowJar")
@@ -273,7 +276,9 @@ fun setupPublishingEnvironment() {
 
     if (System.getProperty(keyProperty) == null || System.getProperty(secretProperty) == null) {
         logger
-            .info("`$keyProperty` or `$secretProperty` were not set. Attempting to configure from environment variables")
+            .info(
+                "`$keyProperty` or `$secretProperty` were not set. Attempting to configure from environment variables"
+            )
 
         val key: String? = System.getenv(keyEnvironmentVariable)
         val secret: String? = System.getenv(secretEnvironmentVariable)

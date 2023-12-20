@@ -181,7 +181,8 @@ class KtLintSupportedVersionsTest : AbstractPluginTest() {
             "0.49.1",
             "0.50.0",
             "1.0.0",
-            "1.0.1"
+            "1.0.1",
+            "1.1.0"
         )
 
         override fun provideArguments(
