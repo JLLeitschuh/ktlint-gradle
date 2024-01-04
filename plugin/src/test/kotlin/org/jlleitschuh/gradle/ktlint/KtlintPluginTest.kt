@@ -307,6 +307,23 @@ class KtlintPluginTest : AbstractPluginTest() {
         }
     }
 
+    @DisplayName("Internal Git filter works with Windows on MINGW")
+    @CommonTest
+    @EnabledOnOs(OS.WINDOWS)
+    fun gitFilterOnCheckWindowsMingw(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
+            withFailingSources()
+
+            build(
+                ":$CHECK_PARENT_TASK_NAME",
+                "-P$FILTER_INCLUDE_PROPERTY_NAME=src/main/kotlin/CleanSource.kt"
+            ) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+        }
+    }
+
     @DisplayName("Git filter should respect already applied filters")
     @CommonTest
     fun gitFilterAlreadyAppliedFilters(gradleVersion: GradleVersion) {
