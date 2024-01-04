@@ -225,10 +225,12 @@ internal fun BaseKtLintCheckTask.applyGitFilter() {
     val projectRelativePath = project.rootDir.toPath()
         .relativize(project.projectDir.toPath())
         .toString()
+        .replace("\\", "/")
+
     val filesToInclude = (project.property(FILTER_INCLUDE_PROPERTY_NAME) as String)
-        .split('\n')
-        .filter { it.startsWith(projectRelativePath) }
+        .lines()
         .map { it.replace("\\", "/") }
+        .filter { it.startsWith(projectRelativePath) }
 
     if (filesToInclude.isNotEmpty()) {
         include { fileTreeElement ->
