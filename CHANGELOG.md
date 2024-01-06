@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+- fix [#544](https://github.com/JLLeitschuh/ktlint-gradle/issues/544): make git filter work
+  with any os [#738](https://github.com/JLLeitschuh/ktlint-gradle/pull/738)
+
 ## [12.1.0] - 2024-01-09
 
 -   fix detection of android kotlin source directories in AGP >= 7 [#733](https://github.com/JLLeitschuh/ktlint-gradle/pull/733)
