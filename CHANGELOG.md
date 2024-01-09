@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [12.1.0] - 2024-01-09
+
 -   fix detection of android kotlin source directories in AGP >= 7 [#733](https://github.com/JLLeitschuh/ktlint-gradle/pull/733)
 
 ## [12.0.3] - 2023-12-11
@@ -716,7 +718,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 -   Renamed task with name `ktlint` to `ktlintCheck` (#3)
 -   Renamed tasks with names `ktlint[source set name]` to `ktlint[source set name]Check` (#3)
 
-[Unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v12.0.3...HEAD
+[Unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v12.1.0...HEAD
+
+[12.1.0]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v12.0.3...v12.1.0
 
 [12.0.3]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v12.0.2...v12.0.3
 
