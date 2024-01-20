@@ -2,11 +2,10 @@ name: "Perform Release"
 on:
   workflow_dispatch:
     inputs:
-       new_version:
-
-         description: "Release Version (no 'v')"
-         required: true
-         type: string
+      new_version:
+        description: "Release Version (no 'v')"
+        required: true
+        type: string
 
 jobs:
   perform-release:
