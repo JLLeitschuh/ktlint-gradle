@@ -9,6 +9,7 @@ jobs:
     name: Changelog Entry Check
 
     runs-on: ubuntu-latest
+    if: github.repository == 'JLLeitschuh/ktlint-gradle'
 
     steps:
       - uses: actions/checkout@v2

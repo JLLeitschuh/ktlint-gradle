@@ -11,6 +11,7 @@ on:
 jobs:
   perform-release:
     runs-on: ubuntu-latest
+    if: github.repository == 'JLLeitschuh/ktlint-gradle'
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
