@@ -8,6 +8,10 @@ jobs:
   make-new-release:
     name: "Releasing plugin"
     runs-on: ubuntu-latest
+    env:
+      GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
+      GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
+      GITHUB_KEY: ${{ secrets.GithubKey }}
     steps:
       - uses: actions/checkout@v2
       - name: set up JDK 1.8
@@ -19,16 +23,8 @@ jobs:
         with:
           gradle-home-cache-cleanup: true
       - name: Publish plugin
-        env:
-          GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
-          GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
-          GITHUB_KEY: ${{ secrets.GithubKey }}
         run: ./plugin/gradlew -p ./plugin publishPlugins --no-daemon
       - name: Create new Github release
-        env:
-          GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
-          GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
-          GITHUB_KEY: ${{ secrets.GITHUB_TOKEN }}
         run: ./plugin/gradlew -p ./plugin githubRelease --no-daemon
       - name: Update VERSION_LATEST_RELEASE to new published version
         run: cp plugin/VERSION_CURRENT.txt plugin/VERSION_LATEST_RELEASE.txt
