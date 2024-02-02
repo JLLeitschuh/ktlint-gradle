@@ -41,7 +41,7 @@ jobs:
         with:
           java-version: ${{ matrix.java_version }}
           distribution: 'zulu'
-      - uses: gradle/gradle-build-action@v2
+      - uses: gradle/actions/setup-gradle@v3
         with:
           gradle-home-cache-cleanup: true
       - name: Build plugin
@@ -83,7 +83,7 @@ jobs:
         run: sudo apt install -qq libdistro-info-perl
       - name: Install checkbashisms
         run: sudo apt-get install -qq devscripts
-      - uses: gradle/gradle-build-action@v2
+      - uses: gradle/actions/setup-gradle@v3
         with:
           gradle-home-cache-cleanup: true
       - name: Check git bashisms
@@ -102,7 +102,7 @@ jobs:
         with:
           java-version: 8
           distribution: 'zulu'
-      - uses: gradle/gradle-build-action@v2
+      - uses: gradle/actions/setup-gradle@v3
         with:
           gradle-home-cache-cleanup: true
       - name: Check ktlint-plugin on samples
