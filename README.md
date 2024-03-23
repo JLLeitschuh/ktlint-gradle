@@ -82,7 +82,7 @@ Build script snippet for new plugin mechanism introduced in Gradle 2.1:
 
 ```groovy
 plugins {
-  id "org.jlleitschuh.gradle.ktlint" version "<current_version>"
+  id "org.jlleitschuh.gradle.ktlint" version "12.1.0"
 }
 
 repositories {
@@ -96,7 +96,7 @@ repositories {
 
 ```kotlin
 plugins {
-  id("org.jlleitschuh.gradle.ktlint") version "<current_version>"
+  id("org.jlleitschuh.gradle.ktlint") version "12.1.0"
 }
 
 repositories {
@@ -120,7 +120,7 @@ buildscript {
     }
   }
   dependencies {
-    classpath "org.jlleitschuh.gradle:ktlint-gradle:<current_version>"
+    classpath "org.jlleitschuh.gradle:ktlint-gradle:12.1.0"
   }
 }
 
@@ -141,7 +141,7 @@ buildscript {
     maven("https://plugins.gradle.org/m2/")
   }
   dependencies {
-    classpath("org.jlleitschuh.gradle:ktlint-gradle:<current_version>")
+    classpath("org.jlleitschuh.gradle:ktlint-gradle:12.1.0")
   }
 }
 
@@ -250,7 +250,7 @@ rules using ktlint.
 Build script snippet for new plugin mechanism introduced in Gradle 2.1:
 ```kotlin
 plugins {
-  id("org.jlleitschuh.gradle.ktlint-idea") version "<current_version>"
+  id("org.jlleitschuh.gradle.ktlint-idea") version "12.1.0"
 }
 ```
 
