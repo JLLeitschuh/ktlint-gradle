@@ -147,6 +147,26 @@ class EditorConfigTests : AbstractPluginTest() {
         }
     }
 
+    @DisplayName("Check task should rerun if additionalEditorconfig property changes")
+    @CommonTest
+    fun checkRerunOnAdditionalEditorconfigPropertyChange(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withAdditionalEditorconfigProperty(120)
+            withCleanSources()
+
+            build(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$lintTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+
+            withAdditionalEditorconfigProperty(10)
+
+            buildAndFail(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$lintTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            }
+        }
+    }
+
     private fun TestProject.createEditorconfigFile(
         maxLineLength: Int = 120,
         filePath: String = ""
@@ -167,5 +187,19 @@ class EditorConfigTests : AbstractPluginTest() {
             editorconfigFile.delete()
         }
         createEditorconfigFile(maxLineLength)
+    }
+
+    private fun TestProject.withAdditionalEditorconfigProperty(
+        maxLineLength: Int
+    ) {
+        //language=Groovy
+        buildGradle.appendText(
+            """
+
+            ktlint {
+                additionalEditorconfig["max_line_length"] = "$maxLineLength"
+            }
+            """.trimIndent()
+        )
     }
 }

@@ -55,7 +55,7 @@ abstract class BaseKtLintCheckTask @Inject constructor(
     @get:Internal
     internal abstract val additionalEditorconfigFile: RegularFileProperty
 
-    @get:Internal
+    @get:Input
     internal abstract val additionalEditorconfig: MapProperty<String, String>
 
     @get:Incremental
