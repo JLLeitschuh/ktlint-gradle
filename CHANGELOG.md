@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 - fix [#544](https://github.com/JLLeitschuh/ktlint-gradle/issues/544): make git filter work
   with any os [#738](https://github.com/JLLeitschuh/ktlint-gradle/pull/738)
+- fix [#750](https://github.com/JLLeitschuh/ktlint-gradle/issues/750): additionalEditorconfig property not being
+  accounted for up-to-date checks and caching [#758](https://github.com/JLLeitschuh/ktlint-gradle/pull/758)
 
 ## [12.1.0] - 2024-01-09
 
