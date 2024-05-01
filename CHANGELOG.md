@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   with any os [#738](https://github.com/JLLeitschuh/ktlint-gradle/pull/738)
 - fix [#750](https://github.com/JLLeitschuh/ktlint-gradle/issues/750): additionalEditorconfig property not being
   accounted for up-to-date checks and caching [#758](https://github.com/JLLeitschuh/ktlint-gradle/pull/758)
+- Update versions used for testing [#763](https://github.com/JLLeitschuh/ktlint-gradle/pull/763)
 
 ## [12.1.0] - 2024-01-09
 
