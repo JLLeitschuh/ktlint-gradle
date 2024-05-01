@@ -53,6 +53,7 @@ abstract class BaseKtLintCheckTask @Inject constructor(
     internal abstract val ktLintClasspath: ConfigurableFileCollection
 
     @get:Internal
+    @get:Deprecated("ktlint no longer supports this parameter")
     internal abstract val additionalEditorconfigFile: RegularFileProperty
 
     @get:Input
