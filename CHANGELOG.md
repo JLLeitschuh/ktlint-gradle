@@ -7,11 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
-- fix [#544](https://github.com/JLLeitschuh/ktlint-gradle/issues/544): make git filter work
-  with any os [#738](https://github.com/JLLeitschuh/ktlint-gradle/pull/738)
-- fix [#750](https://github.com/JLLeitschuh/ktlint-gradle/issues/750): additionalEditorconfig property not being
-  accounted for up-to-date checks and caching [#758](https://github.com/JLLeitschuh/ktlint-gradle/pull/758)
-- Update versions used for testing [#763](https://github.com/JLLeitschuh/ktlint-gradle/pull/763)
+## [12.1.1] - 2024-05-07
+
+-   fix [#544](https://github.com/JLLeitschuh/ktlint-gradle/issues/544): make git filter work
+    with any os [#738](https://github.com/JLLeitschuh/ktlint-gradle/pull/738)
+-   fix [#750](https://github.com/JLLeitschuh/ktlint-gradle/issues/750): additionalEditorconfig property not being
+    accounted for up-to-date checks and caching [#758](https://github.com/JLLeitschuh/ktlint-gradle/pull/758)
+-   Update versions used for testing [#763](https://github.com/JLLeitschuh/ktlint-gradle/pull/763)
 
 ## [12.1.0] - 2024-01-09
 
@@ -724,7 +726,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 -   Renamed task with name `ktlint` to `ktlintCheck` (#3)
 -   Renamed tasks with names `ktlint[source set name]` to `ktlint[source set name]Check` (#3)
 
-[Unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v12.1.0...HEAD
+[Unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v12.1.1...HEAD
+
+[12.1.1]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v12.1.0...v12.1.1
 
 [12.1.0]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v12.0.3...v12.1.0
 
