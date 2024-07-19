@@ -104,7 +104,7 @@ jobs:
       - name: update apt
         run: sudo apt update
       - name: Install lintian
-        run: sudo apt install -qq lintian=2.114.0ubuntu1.3
+        run: sudo apt install -qq lintian
       - name: Install libdistro
         run: sudo apt install -qq libdistro-info-perl
       - name: Install checkbashisms
