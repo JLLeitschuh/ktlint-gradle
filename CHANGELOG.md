@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+-   builds: remove specific lintian version, as latest ubuntu is now a new version
+    [#767](https://github.com/JLLeitschuh/ktlint-gradle/pull/767)
+
 ## [12.1.1] - 2024-05-07
 
 -   fix [#544](https://github.com/JLLeitschuh/ktlint-gradle/issues/544): make git filter work
