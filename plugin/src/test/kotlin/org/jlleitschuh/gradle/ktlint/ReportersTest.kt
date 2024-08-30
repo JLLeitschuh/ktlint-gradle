@@ -9,7 +9,9 @@ import org.jlleitschuh.gradle.ktlint.testdsl.GradleTestVersions
 import org.jlleitschuh.gradle.ktlint.testdsl.TestProject
 import org.jlleitschuh.gradle.ktlint.testdsl.build
 import org.jlleitschuh.gradle.ktlint.testdsl.buildAndFail
+import org.jlleitschuh.gradle.ktlint.testdsl.getMajorJavaVersion
 import org.jlleitschuh.gradle.ktlint.testdsl.project
+import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.DisplayName
 
 @GradleTestVersions
@@ -44,23 +46,18 @@ class ReportersTest : AbstractPluginTest() {
     @DisplayName("Should create 3rd party report")
     @CommonTest
     internal fun thirdPartyReport(gradleVersion: GradleVersion) {
-        // TODO: switch to some 3rd party reporter that is published to Maven Central
+        // custom reporter is compiled on java 11
+        Assumptions.assumeTrue(getMajorJavaVersion() >= 11)
         project(gradleVersion) {
             // https://github.com/mcassiano/ktlint-html-reporter/releases
             //language=Groovy
             buildGradle.appendText(
                 """
-
-                repositories {
-                    jcenter()
-                }
-
                 ktlint.reporters {
                     reporter "checkstyle"
                     customReporters {
-                        "html" {
-                            fileExtension = "html"
-                            dependency = "me.cassiano:ktlint-html-reporter:0.2.3"
+                        "github" {
+                            dependency = "de.musichin.ktlint.reporter:ktlint-reporter-github:3.1.0"
                         }
                     }
                 }
@@ -74,7 +71,7 @@ class ReportersTest : AbstractPluginTest() {
                 assertReportCreated(ReporterType.CHECKSTYLE.fileExtension, mainSourceSetCheckTaskName)
                 assertReportNotCreated(ReporterType.PLAIN.fileExtension, mainSourceSetCheckTaskName)
                 assertReportNotCreated(ReporterType.JSON.fileExtension, mainSourceSetCheckTaskName)
-                assertReportCreated("html", mainSourceSetCheckTaskName)
+                assertReportCreated("github", mainSourceSetCheckTaskName)
             }
         }
     }
