@@ -8,7 +8,9 @@ import org.jlleitschuh.gradle.ktlint.testdsl.CommonTest
 import org.jlleitschuh.gradle.ktlint.testdsl.GradleTestVersions
 import org.jlleitschuh.gradle.ktlint.testdsl.TestProject
 import org.jlleitschuh.gradle.ktlint.testdsl.build
+import org.jlleitschuh.gradle.ktlint.testdsl.getMajorJavaVersion
 import org.jlleitschuh.gradle.ktlint.testdsl.project
+import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.DisplayName
 import java.io.File
 
@@ -47,6 +49,8 @@ class BuildCacheTest : AbstractPluginTest() {
     @DisplayName("Check task with additional reporters should be relocatable")
     @CommonTest
     fun checkWithReportersIsRelocatable(gradleVersion: GradleVersion) {
+        // custom reporter is compiled on java 11
+        Assumptions.assumeTrue(getMajorJavaVersion() >= 11)
         project(gradleVersion, projectPath = originalRoot) {
             configureDefaultProject()
             useExternalKtLintReporter()
@@ -70,18 +74,12 @@ class BuildCacheTest : AbstractPluginTest() {
         .appendText(
             //language=Groovy
             """
-
-            repositories {
-                jcenter()
-            }
-
             ktlint.reporters {
                 reporter "plain"
                 reporter "checkstyle"
                 customReporters {
-                    "html" {
-                        fileExtension = "html"
-                        dependency = "me.cassiano:ktlint-html-reporter:0.2.3"
+                    "github" {
+                        dependency = "de.musichin.ktlint.reporter:ktlint-reporter-github:3.1.0"
                     }
                 }
             }

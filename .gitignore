@@ -160,3 +160,4 @@ gradle-app.setting
 # End of https://www.gitignore.io/api/eclipse,gradle,intellij,vim,java
 
 .gradle-test-kit
+.obsidian

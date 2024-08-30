@@ -75,10 +75,6 @@ class ConfigurationCacheTest : AbstractPluginTest() {
             buildGradle.appendText(
                 //language=Groovy
                 """
-                repositories {
-                    jcenter()
-                }
-
                 ktlint {
                     relative = true
                     reporters {
