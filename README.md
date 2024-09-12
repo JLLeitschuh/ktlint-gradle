@@ -281,32 +281,6 @@ ktlint {
 ```
 </details>
 
-### IntelliJ Idea Only Plugin
-
-**Note:** This plugin is automatically applied by the main `ktlint` plugin.
-
-This plugin just adds [special tasks](#additional-helper-tasks) that can generate IntelliJ IDEA codestyle
-rules using ktlint.
-
-#### Idea plugin simple setup
-
-Build script snippet for new plugin mechanism introduced in Gradle 2.1:
-```kotlin
-plugins {
-  id("org.jlleitschuh.gradle.ktlint-idea") version "<current_version>"
-}
-```
-
-#### Idea plugin setup using legacy apply method
-
-For all Gradle versions:
-
-Use the same `buildscript` logic as [above](#simple-setup), but with this instead of the above suggested `apply` line. If you also want the GIT pre-commit gradle tasks, keep both `apply` variations.
-
-```groovy
-apply plugin: "org.jlleitschuh.gradle.ktlint-idea"
-```
-
 ### Configuration
 The following configuration block is _optional_.
 
