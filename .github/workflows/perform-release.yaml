@@ -2,18 +2,18 @@ name: "Perform Release"
 on:
   workflow_dispatch:
     inputs:
-       new_version:
-
-         description: "Release Version (no 'v')"
-         required: true
-         type: string
+      new_version:
+        description: "Release Version (no 'v')"
+        required: true
+        type: string
 
 jobs:
   perform-release:
     runs-on: ubuntu-latest
+    if: github.repository == 'JLLeitschuh/ktlint-gradle'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.PAT }}
       - name: Update Changelog
