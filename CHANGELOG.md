@@ -6,13 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
-- Update version for jgit to 5.13.3.202401111512-r [#766](https://github.com/JLLeitschuh/ktlint-gradle/pull/766)
 
--   builds: remove specific lintian version, as latest ubuntu is now a new version
-    [#767](https://github.com/JLLeitschuh/ktlint-gradle/pull/767)
-    
--   docs: add Version Catalog setup instructions in README
+- Update version for jgit to 5.13.3.202401111512-r [#766](https://github.com/JLLeitschuh/ktlint-gradle/pull/766)
+- builds: remove specific lintian version, as latest ubuntu is now a new version
+    [#767](https://github.com/JLLeitschuh/ktlint-gradle/pull/767)    
+- docs: add Version Catalog setup instructions in README
     [#770](https://github.com/JLLeitschuh/ktlint-gradle/pull/770)
+- fix tests which relied on a third party reporter in jcenter [#772](https://github.com/JLLeitschuh/ktlint-gradle/pull/772)
 
 ## [12.1.1] - 2024-05-07
 
