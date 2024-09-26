@@ -106,6 +106,49 @@ repositories {
 ```
 </details>
 
+#### Using Version Catalog
+
+To configure the plugin using a version catalog, first, add the following entries to your libs.versions.toml file:
+
+```toml
+[versions]
+ktlint = "<current_version>"
+
+[plugins]
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
+```
+
+Next, apply it to your project:
+
+<details>
+<summary>Groovy</summary>
+
+```groovy
+plugins {
+  alias(libs.plugins.ktlint)
+}
+
+repositories {
+  // Required to download KtLint
+  mavenCentral()
+}
+```
+</details>
+<details open>
+<summary>Kotlin</summary>
+
+```kotlin
+plugins {
+  alias(libs.plugins.ktlint)
+}
+
+repositories {
+  // Required to download KtLint
+  mavenCentral()
+}
+```
+</details>
+
 #### Using legacy apply method
 
 Build script snippet for use in all Gradle versions:
