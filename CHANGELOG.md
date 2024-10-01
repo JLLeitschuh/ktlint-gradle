@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - builds: remove specific lintian version, as latest ubuntu is now a new version
     [#767](https://github.com/JLLeitschuh/ktlint-gradle/pull/767)
 - fix tests which relied on a third party reporter in jcenter [#772](https://github.com/JLLeitschuh/ktlint-gradle/pull/772)
+- Remove IntelliJ plugin references from README [#775](https://github.com/JLLeitschuh/ktlint-gradle/pull/775)
 
 ## [12.1.1] - 2024-05-07
 
