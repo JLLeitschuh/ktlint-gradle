@@ -7,9 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- Bump al-cheb/configure-pagefile-action from 1.3 to 1.4 [#780](https://github.com/JLLeitschuh/ktlint-gradle/pull/780)
 - Update version for jgit to 5.13.3.202401111512-r [#766](https://github.com/JLLeitschuh/ktlint-gradle/pull/766)
 - builds: remove specific lintian version, as latest ubuntu is now a new version
     [#767](https://github.com/JLLeitschuh/ktlint-gradle/pull/767)
+
+### Fixed
 - fix tests which relied on a third party reporter in jcenter [#772](https://github.com/JLLeitschuh/ktlint-gradle/pull/772)
 
 ## [12.1.1] - 2024-05-07
