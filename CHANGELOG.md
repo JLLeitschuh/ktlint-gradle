@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Bump gradle/wrapper-validation-action from 1 to 3 [#784](https://github.com/JLLeitschuh/ktlint-gradle/pull/784)
 - Bump github/codeql-action from 2.2.4 to 3.27.0 [#777](https://github.com/JLLeitschuh/ktlint-gradle/pull/777)
 - Bump al-cheb/configure-pagefile-action from 1.3 to 1.4 [#780](https://github.com/JLLeitschuh/ktlint-gradle/pull/780)
 - Update version for jgit to 5.13.3.202401111512-r [#766](https://github.com/JLLeitschuh/ktlint-gradle/pull/766)
