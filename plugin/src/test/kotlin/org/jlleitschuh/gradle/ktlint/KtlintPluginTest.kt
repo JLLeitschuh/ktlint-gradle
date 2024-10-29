@@ -113,6 +113,37 @@ class KtlintPluginTest : AbstractPluginTest() {
         }
     }
 
+    @DisplayName("Should ignore excluded sources which are generated during build")
+    @CommonTest
+    fun ignoreExcludedSourcesGeneratedByBuild(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
+
+            //language=Groovy
+            buildGradle.appendText(
+                """
+                ktlint.filter { exclude { it.file.path.contains("Failing") } }
+
+                task createExtraFile() {
+                    def rootDir = project.getRootDir().toString()
+                    def fileDir = rootDir + "/src/main/kotlin"
+                    def fileName = "FailingSource.kt"
+                    doLast {
+                        file(fileDir).mkdirs()
+                        file(fileDir + "/" + fileName) << "val  foo    =     \"bar\"\n"
+                    }
+                }
+
+                $CHECK_PARENT_TASK_NAME.dependsOn createExtraFile
+                """.trimIndent()
+            )
+
+            build(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+        }
+    }
+
     @DisplayName("Should fail on additional source set directories files style violation")
     @CommonTest
     fun additionalSourceSetsViolations(gradleVersion: GradleVersion) {
