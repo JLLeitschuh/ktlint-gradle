@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Bump al-cheb/configure-pagefile-action from 1.3 to 1.4 [#780](https://github.com/JLLeitschuh/ktlint-gradle/pull/780)
 - Update version for jgit to 5.13.3.202401111512-r [#766](https://github.com/JLLeitschuh/ktlint-gradle/pull/766)
 - builds: remove specific lintian version, as latest ubuntu is now a new version
+    [#767](https://github.com/JLLeitschuh/ktlint-gradle/pull/767)    
+- docs: add Version Catalog setup instructions in README
+    [#770](https://github.com/JLLeitschuh/ktlint-gradle/pull/770)
     [#767](https://github.com/JLLeitschuh/ktlint-gradle/pull/767)
 
 ### Fixed
