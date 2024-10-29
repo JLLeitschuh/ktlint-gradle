@@ -1,5 +1,5 @@
 [versions]
-androidXFragment = "1.2.5"
+androidXFragment = "1.8.4"
 androidXRecyclerView = "1.1.0"
 androidMaterial = "1.2.1"
 androidXTestRunner = "1.3.0"
