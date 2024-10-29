@@ -528,7 +528,7 @@ Then for each `SourceSet` plugin adds following tasks:
 - `ktlint[source set name]SourceSetCheck` - generates reports and prints issues into Gradle console based on lint check found errors.
   This task execution depends on `loadKtlintReporters` and `runKtlintCheckOver[source set name]SourceSet` tasks execution outputs
 - `runKtlintFormatOver[source set name]SourceSet` - tries to format according to the code style every Kotlin file in given `SourceSet`
-- `ktlint[source set name]SourceSetFormat` - generates reports and prints issues into Gradle console based on found non-formattable errors.
+- `ktlint[source set name]SourceSetFormat` - reformats files, generates reports and prints issues into Gradle console based on found non-formattable errors.
   This task execution depends on `loadKtlintReporters` and `runKtlintFormatOver[source set name]SourceSet` tasks execution outputs
 
 ### Additional helper tasks
