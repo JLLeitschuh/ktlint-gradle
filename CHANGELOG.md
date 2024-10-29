@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Changed
-
+- Bump `org.gradle.toolchains.foojay-resolver-convention` from `0.7.0` to `0.8.0` [#779](https://github.com/JLLeitschuh/ktlint-gradle/pull/779)
 - Bump gradle/wrapper-validation-action from 1 to 3 [#784](https://github.com/JLLeitschuh/ktlint-gradle/pull/784)
 - Bump github/codeql-action from 2.2.4 to 3.27.0 [#777](https://github.com/JLLeitschuh/ktlint-gradle/pull/777)
 - Bump al-cheb/configure-pagefile-action from 1.3 to 1.4 [#780](https://github.com/JLLeitschuh/ktlint-gradle/pull/780)
