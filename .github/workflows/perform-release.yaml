@@ -31,7 +31,7 @@ jobs:
         run: printf "${{ github.event.inputs.new_version }}\n" > plugin/VERSION_CURRENT.txt
       - name: Perform Release Tagging and Push
         # This will trigger the new release job that will take the tag and push the release to the plugin portal
-        uses: stefanzweifel/git-auto-commit-action@v4
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Release version ${{ github.event.inputs.new_version }}
           tagging_message: 'v${{ github.event.inputs.new_version }}'
