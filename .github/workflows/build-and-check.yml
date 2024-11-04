@@ -41,7 +41,7 @@ jobs:
           java-version: ${{ matrix.java_version }}
           distribution: 'zulu'
       - name: Restore Gradle caches
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches/modules-2
@@ -52,7 +52,7 @@ jobs:
             ${{ runner.os }}-gradle-cache-
       # Inspired by https://github.com/actions/cache/issues/432#issuecomment-740376179
       - name: Restore TestKit cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: |
             plugin/.gradle-test-kit/caches/modules-2
@@ -63,7 +63,7 @@ jobs:
             ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradlew') }}-
             ${{ runner.os }}-gradle-wrapper-
       - name: Restore Gradle wrapper
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/wrapper
@@ -110,14 +110,14 @@ jobs:
       - name: Install checkbashisms
         run: sudo apt-get install -qq devscripts
       - name: Restore Gradle caches
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-cache-${{ hashFiles('**/*.gradle.kts') }}-${{ hashFiles('**/gradle.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-cache-
       - name: Restore Gradle wrapper
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradlew') }}
@@ -140,14 +140,14 @@ jobs:
           java-version: 8
           distribution: 'zulu'
       - name: Restore Gradle caches
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-cache-${{ hashFiles('**/*.gradle.kts') }}-${{ hashFiles('**/gradle.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-cache-
       - name: Restore Gradle wrapper
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradlew') }}
