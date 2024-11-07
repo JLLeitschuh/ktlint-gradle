@@ -73,13 +73,13 @@ jobs:
       - name: Build plugin
         run: ./plugin/gradlew -p ./plugin assemble ensureDependenciesAreInlined test --no-daemon
       - name: Upload test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.4.3
         if: failure()
         with:
           name: test-results-${{ runner.os }}
           path: plugin/build/reports/tests/test/
       - name: Upload Memory Dump
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.4.3
         if: failure()
         with:
           name: memory-dump-${{ runner.os }}
