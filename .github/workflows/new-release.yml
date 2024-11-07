@@ -44,6 +44,6 @@ jobs:
       - name: Update VERSION_LATEST_RELEASE to new published version
         run: cp plugin/VERSION_CURRENT.txt plugin/VERSION_LATEST_RELEASE.txt
       - name: Update VERSION_LATEST_RELEASE
-        uses: stefanzweifel/git-auto-commit-action@v4
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Update VERSION_LATEST_RELEASE to ${{ github.event.inputs.new_version }}
