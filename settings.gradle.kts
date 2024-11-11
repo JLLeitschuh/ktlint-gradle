@@ -5,7 +5,7 @@ pluginManagement {
 
     plugins {
         id("org.jetbrains.kotlin.jvm") version "1.8.22"
-        id("org.jetbrains.kotlin.js") version "1.8.22"
+        id("org.jetbrains.kotlin.js") version "2.0.21"
         id("com.android.application") version "4.2.2"
     }
 
