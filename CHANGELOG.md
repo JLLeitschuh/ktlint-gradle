@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+- Update Gradle wrapper and Gradle versions for testing. [#819](https://github.com/JLLeitschuh/ktlint-gradle/pull/819)
+
 ## [12.1.2] - 2024-11-25
 
 ### Changed
@@ -18,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Bump commons-io:commons-io from 2.8.0 to 2.17.0 [#802](https://github.com/JLLeitschuh/ktlint-gradle/pull/802)
 - Update version for jgit to 5.13.3.202401111512-r [#766](https://github.com/JLLeitschuh/ktlint-gradle/pull/766)
 - builds: remove specific lintian version, as latest ubuntu is now a new version
-    [#767](https://github.com/JLLeitschuh/ktlint-gradle/pull/767)    
+    [#767](https://github.com/JLLeitschuh/ktlint-gradle/pull/767)
 - docs: add Version Catalog setup instructions in README
     [#770](https://github.com/JLLeitschuh/ktlint-gradle/pull/770)
     [#767](https://github.com/JLLeitschuh/ktlint-gradle/pull/767)
