@@ -306,6 +306,12 @@ fun setupPublishingEnvironment() {
 
 setupPublishingEnvironment()
 
+configurations.named("implementation") {
+    attributes {
+        attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, objects.named("7.4"))
+    }
+}
+
 gradlePlugin {
     (plugins) {
         register("ktlintPlugin") {

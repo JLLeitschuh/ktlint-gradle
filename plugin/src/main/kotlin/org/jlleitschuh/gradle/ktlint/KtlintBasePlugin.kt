@@ -54,6 +54,11 @@ open class KtlintBasePlugin : Plugin<Project> {
         )
     }
 
+    /**
+     * @deprecated Now that we declare gradle API metadata, this code should not be needed.
+     * Ee need to check which version of gradle introduced gradle API metadata checking
+     */
+    @Deprecated("Now that we declare gradle API metadata, this code should not be needed")
     private fun Project.checkMinimalSupportedGradleVersion() {
         if (GradleVersion.version(gradle.gradleVersion) < GradleVersion.version(LOWEST_SUPPORTED_GRADLE_VERSION)) {
             throw GradleException(

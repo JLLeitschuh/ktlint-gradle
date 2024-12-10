@@ -113,6 +113,8 @@ fabric.properties
 # BlueJ files
 *.ctxt
 
+.kotlin/
+
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 

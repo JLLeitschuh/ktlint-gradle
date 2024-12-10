@@ -12,7 +12,7 @@ import kotlin.streams.asStream
 @Suppress("ConstPropertyName")
 object TestVersions {
     const val minSupportedGradleVersion = KtlintBasePlugin.LOWEST_SUPPORTED_GRADLE_VERSION
-    const val maxSupportedGradleVersion = "8.6"
+    const val maxSupportedGradleVersion = "8.11.1"
     val pluginVersion = File("VERSION_CURRENT.txt").readText().trim()
     const val minSupportedKotlinPluginVersion = "1.4.32"
     const val maxSupportedKotlinPluginVersion = "1.9.23"
