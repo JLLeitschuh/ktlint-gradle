@@ -4,7 +4,7 @@ pluginManagement {
     includeBuild("./plugin")
 
     plugins {
-        id("org.jetbrains.kotlin.jvm") version "1.8.22"
+        id("org.jetbrains.kotlin.jvm") version "2.1.0"
         id("org.jetbrains.kotlin.js") version "1.8.22"
         id("com.android.application") version "4.2.2"
     }
