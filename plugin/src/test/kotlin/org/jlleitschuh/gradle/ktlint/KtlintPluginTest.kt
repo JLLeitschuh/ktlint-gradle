@@ -713,7 +713,7 @@ class KtlintPluginTest : AbstractPluginTest() {
     @CommonTest
     fun checkAdditionalSources(gradleVersion: GradleVersion) {
         fun projectSetup(file: File) {
-            projectSetup("jvm", gradleVersion).invoke(file)
+            projectSetup("jvm").invoke(file)
 
             //language=Groovy
             file.resolve("build.gradle").appendText(

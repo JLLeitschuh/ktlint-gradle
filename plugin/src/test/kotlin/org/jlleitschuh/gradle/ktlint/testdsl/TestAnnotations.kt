@@ -1,7 +1,6 @@
 package org.jlleitschuh.gradle.ktlint.testdsl
 
 import org.gradle.util.GradleVersion
-import org.jlleitschuh.gradle.ktlint.KtlintBasePlugin
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.ArgumentsProvider
@@ -11,13 +10,13 @@ import kotlin.streams.asStream
 
 @Suppress("ConstPropertyName")
 object TestVersions {
-    const val minSupportedGradleVersion = KtlintBasePlugin.LOWEST_SUPPORTED_GRADLE_VERSION
-    const val maxSupportedGradleVersion = "8.11.1"
+    const val minSupportedGradleVersion = "7.6.3" // lowest version for testing
+    const val maxSupportedGradleVersion = "8.12.1"
     val pluginVersion = File("VERSION_CURRENT.txt").readText().trim()
     const val minSupportedKotlinPluginVersion = "1.4.32"
-    const val maxSupportedKotlinPluginVersion = "1.9.23"
+    const val maxSupportedKotlinPluginVersion = "2.1.10"
     const val minAgpVersion = "4.1.0"
-    const val maxAgpVersion = "8.4.0"
+    const val maxAgpVersion = "8.8.0"
 }
 
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
