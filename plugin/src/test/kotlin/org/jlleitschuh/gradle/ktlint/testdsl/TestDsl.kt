@@ -10,7 +10,7 @@ import java.io.File
 fun AbstractPluginTest.project(
     gradleVersion: GradleVersion,
     projectPath: File = projectRoot,
-    projectSetup: (File) -> Unit = defaultProjectSetup(gradleVersion),
+    projectSetup: (File) -> Unit = defaultProjectSetup(),
     test: TestProject.() -> Unit = {}
 ): TestProject {
     projectSetup(projectPath)
@@ -152,14 +152,13 @@ fun TestProject.buildAndFail(
         .run { assertions() }
 }
 
-fun defaultProjectSetup(gradleVersion: GradleVersion): (File) -> Unit =
-    projectSetup("jvm", gradleVersion)
+fun defaultProjectSetup(): (File) -> Unit =
+    projectSetup("jvm")
 
 fun projectSetup(
     kotlinPluginType: String,
-    gradleVersion: GradleVersion
+    kotlinPluginVersion: String = maxSupportedKotlinPluginVersion
 ): (File) -> Unit = {
-    val kotlinPluginVersion = maxSupportedKotlinPluginVersion
     //language=Groovy
     it.resolve("build.gradle").writeText(
         """

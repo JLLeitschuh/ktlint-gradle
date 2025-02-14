@@ -16,8 +16,8 @@ import java.io.File
  */
 @GradleTestVersions
 class KotlinMultiplatformPluginTests : AbstractPluginTest() {
-    private fun multiplatformProjectSetup(gradleVersion: GradleVersion): (File) -> Unit = {
-        projectSetup("multiplatform", gradleVersion).invoke(it)
+    private fun multiplatformProjectSetup(): (File) -> Unit = {
+        projectSetup("multiplatform").invoke(it)
 
         //language=Groovy
         it.resolve("build.gradle").appendText(
@@ -36,7 +36,7 @@ class KotlinMultiplatformPluginTests : AbstractPluginTest() {
     @DisplayName("Should add check on all sources")
     @CommonTest
     fun addCheckTasks(gradleVersion: GradleVersion) {
-        project(gradleVersion, projectSetup = multiplatformProjectSetup(gradleVersion)) {
+        project(gradleVersion, projectSetup = multiplatformProjectSetup()) {
             build("-m", CHECK_PARENT_TASK_NAME) {
                 val ktlintTasks = output.lineSequence().toList()
 

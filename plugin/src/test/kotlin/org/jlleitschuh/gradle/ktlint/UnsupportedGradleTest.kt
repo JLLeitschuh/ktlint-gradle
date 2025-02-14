@@ -5,6 +5,7 @@ import org.gradle.util.GradleVersion
 import org.jlleitschuh.gradle.ktlint.testdsl.buildAndFail
 import org.jlleitschuh.gradle.ktlint.testdsl.getMajorJavaVersion
 import org.jlleitschuh.gradle.ktlint.testdsl.project
+import org.jlleitschuh.gradle.ktlint.testdsl.projectSetup
 import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -24,7 +25,10 @@ class UnsupportedGradleTest : AbstractPluginTest() {
          */
         Assumptions.assumeFalse(getMajorJavaVersion() >= 21)
 
-        project(GradleVersion.version("7.4.1")) {
+        project(
+            gradleVersion = GradleVersion.version("7.4.1"),
+            projectSetup = projectSetup("jvm", "1.9.22")
+        ) {
             buildAndFail(CHECK_PARENT_TASK_NAME) {
                 assertThat(output).contains(
                     "Current version of plugin supports minimal Gradle version: " +

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 - Update Gradle wrapper and Gradle versions for testing. [#819](https://github.com/JLLeitschuh/ktlint-gradle/pull/819)
+- Test against newest kotlin, gradle, ktlint, and AGP versions [#833](https://github.com/JLLeitschuh/ktlint-gradle/pull/833). Drop testing for gradle 7.4 and 7.5 because they cause our tests with kotlin 2.x to fail, but the plugin will still work in those gradle versions if kotlin 1.x is being used
 
 ## [12.1.2] - 2024-11-25
 

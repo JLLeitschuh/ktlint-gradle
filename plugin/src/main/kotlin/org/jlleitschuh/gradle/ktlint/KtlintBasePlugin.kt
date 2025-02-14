@@ -24,7 +24,6 @@ open class KtlintBasePlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         target.checkMinimalSupportedGradleVersion()
-
         val filterTargetApplier: FilterApplier = {
             target.tasks.withType(BaseKtLintCheckTask::class.java).configureEach(it)
         }
@@ -54,6 +53,10 @@ open class KtlintBasePlugin : Plugin<Project> {
         )
     }
 
+    companion object {
+        const val LOWEST_SUPPORTED_GRADLE_VERSION = "7.4.2"
+    }
+
     /**
      * @deprecated Now that we declare gradle API metadata, this code should not be needed.
      * Ee need to check which version of gradle introduced gradle API metadata checking
@@ -65,9 +68,5 @@ open class KtlintBasePlugin : Plugin<Project> {
                 "Current version of plugin supports minimal Gradle version: $LOWEST_SUPPORTED_GRADLE_VERSION"
             )
         }
-    }
-
-    companion object {
-        const val LOWEST_SUPPORTED_GRADLE_VERSION = "7.4.2"
     }
 }
