@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [12.2.0] - 2025-02-27
+
 - Update Gradle wrapper and Gradle versions for testing. [#819](https://github.com/JLLeitschuh/ktlint-gradle/pull/819)
 - Test against newest kotlin, gradle, ktlint, and AGP versions [#833](https://github.com/JLLeitschuh/ktlint-gradle/pull/833). Drop testing for gradle 7.4 and 7.5 because they cause our tests with kotlin 2.x to fail, but the plugin will still work in those gradle versions if kotlin 1.x is being used
 
@@ -749,7 +751,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Renamed task with name `ktlint` to `ktlintCheck` (#3)
 - Renamed tasks with names `ktlint[source set name]` to `ktlint[source set name]Check` (#3)
 
-[unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v12.1.2...HEAD
+[unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v12.2.0...HEAD
+[12.2.0]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v12.1.2...v12.2.0
 [12.1.2]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v12.1.1...v12.1.2
 [12.1.1]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v12.1.0...v12.1.1
 [12.1.0]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v12.0.3...v12.1.0
