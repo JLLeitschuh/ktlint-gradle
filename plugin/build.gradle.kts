@@ -31,7 +31,7 @@ java {
 }
 
 ktlint {
-    version = "1.1.0"
+    version.set("1.1.0")
 }
 
 tasks.withType<KotlinCompile> {
@@ -195,7 +195,7 @@ tasks.withType<Test> {
 
     javaLauncher.set(
         javaToolchains.launcherFor {
-            languageVersion = JavaLanguageVersion.of(JavaVersion.current().majorVersion)
+            languageVersion.set(JavaLanguageVersion.of(JavaVersion.current().majorVersion))
         }
     )
 }
