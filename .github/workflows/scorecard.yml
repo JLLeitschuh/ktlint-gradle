@@ -31,6 +31,11 @@ jobs:
       # actions: read
 
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+        with:
+          egress-policy: audit
+
       - name: "Checkout code"
         uses: actions/checkout@cbb722410c2e876e24abbe8de2cc27693e501dcb # v2.7.0
         with:
