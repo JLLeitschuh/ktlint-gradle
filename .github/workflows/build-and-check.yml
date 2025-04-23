@@ -20,7 +20,7 @@ jobs:
         with:
           egress-policy: audit
       - id: set-matrix
-        run: echo "::set-output name=version_matrix::$(curl https://endoflife.date/api/oracle-jdk.json | jq -c '[.[] | select(.extendedSupport > (now | strftime("%Y-%m-%d"))) | .cycle]' | sed 's/ //g')"
+        run: echo "version_matrix=$(curl https://endoflife.date/api/oracle-jdk.json | jq -c '[.[] | select(.extendedSupport > (now | strftime("%Y-%m-%d"))) | .cycle]' | sed 's/ //g')" >> $GITHUB_OUTPUT
       - name: verify-matrix
         run: echo "The selected java versions are ${{ steps.set-matrix.outputs.version_matrix }}"
     outputs:
@@ -140,3 +140,4 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
       - name: Check ktlint-plugin on samples
         run: ./gradlew ktlintCheck --no-daemon
+
