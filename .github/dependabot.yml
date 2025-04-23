@@ -12,6 +12,12 @@ updates:
     schedule:
       interval: "weekly"
   - package-ecosystem: gradle
+    directory: "/plugin" # Plugin directory
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: gradle
     directory: "/" # Location of package manifests
+    labels:
+      - "skip news" # We can skip news for all updates to the samples
     schedule:
       interval: "weekly"
