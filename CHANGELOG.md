@@ -10,6 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Changed
 
 - Updated build to use Gradle version 8.13 [#850](https://github.com/JLLeitschuh/ktlint-gradle/pull/850)
+- Updated the following dependencies: [#852](https://github.com/JLLeitschuh/ktlint-gradle/pull/852)
+  - Build plugin: `org.jetbrains.kotlin.jvm` to `2.1.20`
+  - Build plugin: `org.jetbrains.kotlin.js` to `2.1.20`
+  - Build plugin: `com.android.application` to `7.3.1`
+  - Sample Dependency: `androidx.fragment:fragment-ktx` to `1.8.6`
+  - Sample Dependency: `com.google.android.material:material` to `1.12.0`
+  - Sample Dependency: `androidx.test:runner` to `1.6.2`
+  - Sample Dependency: `junit` to 4.13.2`
+
+
 
 ## [12.2.0] - 2025-02-27
 

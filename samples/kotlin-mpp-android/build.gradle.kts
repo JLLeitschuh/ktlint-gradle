@@ -13,7 +13,7 @@ ktlint {
     outputToConsole.set(true)
 }
 
-android {
+androidTarget {
     compileSdkVersion(30)
 
     defaultConfig {
