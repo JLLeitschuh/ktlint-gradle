@@ -21,6 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 
 
+### Fixed
+
+- Force the pre-commit script to continue even if there is error to ensure the unstaged files are reapplied. [#814](https://github.com/JLLeitschuh/ktlint-gradle/pull/814)
+
 ## [12.2.0] - 2025-02-27
 
 - Update Gradle wrapper and Gradle versions for testing. [#819](https://github.com/JLLeitschuh/ktlint-gradle/pull/819)
