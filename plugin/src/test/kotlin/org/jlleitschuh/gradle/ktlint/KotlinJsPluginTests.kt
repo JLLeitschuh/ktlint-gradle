@@ -18,13 +18,13 @@ import java.io.File
  */
 @GradleTestVersions
 class KotlinJsPluginTests : AbstractPluginTest() {
-    private fun jsProjectSetup(gradleVersion: GradleVersion): (File) -> Unit = {
-        projectSetup("js", gradleVersion).invoke(it)
+    private fun jsProjectSetup(): (File) -> Unit = {
+        projectSetup("js").invoke(it)
 
         //language=Groovy
         it.resolve("build.gradle").appendText(
             """
-            
+
             kotlin {
                 js(IR) {
                     nodejs()
@@ -37,7 +37,7 @@ class KotlinJsPluginTests : AbstractPluginTest() {
     @DisplayName("Should add check tasks")
     @CommonTest
     fun addCheckTasks(gradleVersion: GradleVersion) {
-        project(gradleVersion, projectSetup = jsProjectSetup(gradleVersion)) {
+        project(gradleVersion, projectSetup = jsProjectSetup()) {
             build("-m", CHECK_PARENT_TASK_NAME) {
                 val ktlintTasks = output.lineSequence().toList()
 
@@ -59,7 +59,7 @@ class KotlinJsPluginTests : AbstractPluginTest() {
     @DisplayName("Should add format tasks")
     @CommonTest
     fun addFormatTasks(gradleVersion: GradleVersion) {
-        project(gradleVersion, projectSetup = jsProjectSetup(gradleVersion)) {
+        project(gradleVersion, projectSetup = jsProjectSetup()) {
             build("-m", FORMAT_PARENT_TASK_NAME) {
                 val ktlintTasks = output.lineSequence().toList()
 
@@ -81,7 +81,7 @@ class KotlinJsPluginTests : AbstractPluginTest() {
     @DisplayName("Should fail check task on un-formatted sources")
     @CommonTest
     fun failOnStyleViolation(gradleVersion: GradleVersion) {
-        project(gradleVersion, projectSetup = jsProjectSetup(gradleVersion)) {
+        project(gradleVersion, projectSetup = jsProjectSetup()) {
             withFailingSources()
 
             buildAndFail(CHECK_PARENT_TASK_NAME) {

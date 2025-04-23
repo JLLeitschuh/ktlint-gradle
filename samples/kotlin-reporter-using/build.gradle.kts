@@ -27,7 +27,10 @@ ktlint {
     }
 }
 
-// TODO: fix it
-tasks.named("loadKtlintReporters").configure {
-    dependsOn(projects.samples.kotlinReporterCreating)
+tasks.named("loadKtlintReporters") {
+    dependsOn(":samples:kotlin-rulesets-creating:build")
+}
+
+ktlint {
+    version = "1.0.1"
 }

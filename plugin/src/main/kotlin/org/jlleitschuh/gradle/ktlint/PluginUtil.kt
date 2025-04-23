@@ -15,6 +15,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.kotlin.dsl.register
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import java.io.File
 import java.nio.file.Files
@@ -26,9 +27,9 @@ internal inline fun <reified T : Task> Project.registerTask(
     noinline configuration: T.() -> Unit
 ): TaskProvider<T> {
     return tasks
-        .register(name, T::class.java, *constructorArguments)
+        .register<T>(name, *constructorArguments)
         .apply {
-            configure { configuration(it) }
+            this.configure(configuration)
         }
 }
 
@@ -70,9 +71,9 @@ private tailrec fun searchEditorConfigFiles(
     }
 }
 
-private val editorConfigRootRegex = "^root\\s?=\\s?true\\R".toRegex()
+private val editorConfigRootRegex = "^root\\s?=\\s?true".toRegex()
 
-private fun Path.isRootEditorConfig(): Boolean {
+internal fun Path.isRootEditorConfig(): Boolean {
     if (!Files.exists(this) || !Files.isReadable(this)) return false
 
     toFile().useLines { lines ->
@@ -86,8 +87,6 @@ internal const val FORMATTING_GROUP = "Formatting"
 internal const val HELP_GROUP = HelpTasksPlugin.HELP_GROUP
 internal const val CHECK_PARENT_TASK_NAME = "ktlintCheck"
 internal const val FORMAT_PARENT_TASK_NAME = "ktlintFormat"
-internal const val APPLY_TO_IDEA_TASK_NAME = "ktlintApplyToIdea"
-internal const val APPLY_TO_IDEA_GLOBALLY_TASK_NAME = "ktlintApplyToIdeaGlobally"
 internal const val INSTALL_GIT_HOOK_CHECK_TASK = "addKtlintCheckGitPreCommitHook"
 internal const val INSTALL_GIT_HOOK_FORMAT_TASK = "addKtlintFormatGitPreCommitHook"
 internal val KOTLIN_EXTENSIONS = listOf("kt", "kts")
@@ -125,9 +124,9 @@ internal fun Logger.logKtLintDebugMessage(
 }
 
 internal fun checkMinimalSupportedKtLintVersion(ktLintVersion: String) {
-    if (SemVer.parse(ktLintVersion) < SemVer(0, 34, 0)) {
+    if (SemVer.parse(ktLintVersion) < SemVer(0, 47, 1)) {
         throw GradleException(
-            "KtLint versions less than 0.34.0 are not supported. " +
+            "KtLint versions less than 0.47.1 are not supported. " +
                 "Detected KtLint version: $ktLintVersion."
         )
     }

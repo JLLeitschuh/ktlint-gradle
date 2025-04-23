@@ -113,6 +113,8 @@ fabric.properties
 # BlueJ files
 *.ctxt
 
+.kotlin/
+
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
@@ -160,3 +162,4 @@ gradle-app.setting
 # End of https://www.gitignore.io/api/eclipse,gradle,intellij,vim,java
 
 .gradle-test-kit
+.obsidian

@@ -4,12 +4,13 @@ import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.util.GradleVersion
 import org.jlleitschuh.gradle.ktlint.AbstractPluginTest
+import org.jlleitschuh.gradle.ktlint.testdsl.TestVersions.maxSupportedKotlinPluginVersion
 import java.io.File
 
 fun AbstractPluginTest.project(
     gradleVersion: GradleVersion,
     projectPath: File = projectRoot,
-    projectSetup: (File) -> Unit = defaultProjectSetup(gradleVersion),
+    projectSetup: (File) -> Unit = defaultProjectSetup(),
     test: TestProject.() -> Unit = {}
 ): TestProject {
     projectSetup(projectPath)
@@ -39,9 +40,9 @@ class TestProject(
     val settingsGradle get() = projectPath.resolve("settings.gradle")
     val editorConfig get() = projectPath.resolve(".editorconfig")
 
-    fun withCleanSources() {
+    fun withCleanSources(filePath: String = CLEAN_SOURCES_FILE) {
         createSourceFile(
-            CLEAN_SOURCES_FILE,
+            filePath,
             """
             |val foo = "bar"
             |
@@ -56,6 +57,18 @@ class TestProject(
             |val  foo    =     "bar"
             |
             """.trimMargin()
+        )
+    }
+
+    fun withFailingMaxLineSources() {
+        createSourceFile(
+            FAIL_SOURCE_FILE,
+            buildString {
+                append("val nameOfVariable =")
+                append("\n")
+                append("    listOf(1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 2)")
+                append("\n")
+            }
         )
     }
 
@@ -139,17 +152,13 @@ fun TestProject.buildAndFail(
         .run { assertions() }
 }
 
-fun defaultProjectSetup(gradleVersion: GradleVersion): (File) -> Unit =
-    projectSetup("jvm", gradleVersion)
-
-private val GradleVersion.supportedKotlinVersion
-    get() = TestVersions.maxSupportedKotlinPluginVersion(this)
+fun defaultProjectSetup(): (File) -> Unit =
+    projectSetup("jvm")
 
 fun projectSetup(
     kotlinPluginType: String,
-    gradleVersion: GradleVersion
+    kotlinPluginVersion: String = maxSupportedKotlinPluginVersion
 ): (File) -> Unit = {
-    val kotlinPluginVersion = gradleVersion.supportedKotlinVersion
     //language=Groovy
     it.resolve("build.gradle").writeText(
         """

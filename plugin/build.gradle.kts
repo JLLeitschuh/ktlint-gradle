@@ -1,19 +1,18 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import com.gradle.enterprise.gradleplugin.testretry.retry
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.util.prefixIfNot
 
 plugins {
-    kotlin("jvm")
     id("com.gradle.plugin-publish")
-    `java-gradle-plugin`
+    `kotlin-dsl`
     `maven-publish`
     id("org.jlleitschuh.gradle.ktlint")
     id("com.github.johnrengelman.shadow")
     id("com.github.breadmoirai.github-release")
-    id("org.gradle.test-retry")
 }
 
 val pluginGroup = "org.jlleitschuh.gradle"
@@ -31,9 +30,15 @@ java {
     }
 }
 
-tasks.withType<KotlinCompile>() {
+ktlint {
+    version.set("1.1.0")
+}
+
+tasks.withType<KotlinCompile> {
     kotlinOptions {
-        apiVersion = "1.3"
+        // target 1.4 as ktlint 0.49 requires it for inline classes
+        languageVersion = "1.4"
+        apiVersion = "1.4"
         jvmTarget = "1.8"
     }
 }
@@ -47,12 +52,92 @@ tasks.withType<PluginUnderTestMetadata>().configureEach {
  * metadata files.
  */
 val shadowImplementation by configurations.creating
+configurations {
+    val compileOnly by getting {
+        extendsFrom(shadowImplementation)
+        isCanBeResolved = true
+    }
+}
 configurations["compileOnly"].extendsFrom(shadowImplementation)
 configurations["testImplementation"].extendsFrom(shadowImplementation)
 
+sourceSets {
+    val adapter by creating {
+    }
+    val adapter47 by creating {
+        compileClasspath += adapter.output
+    }
+    val adapter48 by creating {
+        compileClasspath += adapter.output
+    }
+    val adapter49 by creating {
+        compileClasspath += adapter.output
+    }
+    val adapter50 by creating {
+        compileClasspath += adapter.output
+    }
+    val adapter100 by creating {
+        compileClasspath += adapter.output
+    }
+    val adapters = listOf(
+        adapter,
+        adapter47,
+        adapter48,
+        adapter49,
+        adapter50,
+        adapter100
+    )
+    val main by getting {
+        kotlin {
+            compileClasspath = adapters.map { it.output }.fold(compileClasspath) { a, b -> a + b }
+            runtimeClasspath = adapters.map { it.output }.fold(runtimeClasspath) { a, b -> a + b }
+        }
+    }
+
+    val test by getting {
+        kotlin {
+            compileClasspath = adapters.map { it.output }.fold(compileClasspath) { a, b -> a + b }
+            runtimeClasspath = adapters.map { it.output }.fold(runtimeClasspath) { a, b -> a + b }
+        }
+    }
+}
+
+val adapterSources = listOf(
+    sourceSets.named("adapter"),
+    sourceSets.named("adapter47"),
+    sourceSets.named("adapter48"),
+    sourceSets.named("adapter49"),
+    sourceSets.named("adapter50"),
+    sourceSets.named("adapter100")
+)
+tasks.named<Jar>("shadowJar") {
+    this.from(adapterSources.map { sourceSet -> sourceSet.map { it.output.classesDirs } })
+}
+
 dependencies {
-    compileOnly(gradleApi())
-    compileOnly(libs.ktlint.core)
+    add("adapterCompileOnly", "com.pinterest.ktlint:ktlint-core:0.34.0")
+    add("adapterImplementation", libs.commons.io)
+    add("adapterImplementation", libs.semver)
+
+    add("adapter47CompileOnly", "com.pinterest.ktlint:ktlint-core:0.47.1")
+    add("adapter48CompileOnly", "com.pinterest.ktlint:ktlint-core:0.48.2")
+
+    add("adapter49CompileOnly", "com.pinterest.ktlint:ktlint-core:0.49.1")
+    add("adapter49CompileOnly", "com.pinterest.ktlint:ktlint-cli-reporter:0.49.1")
+    add("adapter49CompileOnly", "com.pinterest.ktlint:ktlint-rule-engine:0.49.1")
+    add("adapter49CompileOnly", "com.pinterest.ktlint:ktlint-ruleset-standard:0.49.1")
+    add("adapter49CompileOnly", "com.pinterest.ktlint:ktlint-reporter-baseline:0.49.1")
+
+    add("adapter50CompileOnly", "com.pinterest.ktlint:ktlint-cli-reporter:0.50.0")
+    add("adapter50CompileOnly", "com.pinterest.ktlint:ktlint-rule-engine:0.50.0")
+    add("adapter50CompileOnly", "com.pinterest.ktlint:ktlint-ruleset-standard:0.50.0")
+    add("adapter50CompileOnly", "com.pinterest.ktlint:ktlint-reporter-baseline:0.50.0")
+
+    add("adapter100CompileOnly", "com.pinterest.ktlint:ktlint-cli-reporter-core:1.0.0")
+    add("adapter100CompileOnly", "com.pinterest.ktlint:ktlint-rule-engine:1.0.0")
+    add("adapter100CompileOnly", "com.pinterest.ktlint:ktlint-ruleset-standard:1.0.0")
+    add("adapter100CompileOnly", "com.pinterest.ktlint:ktlint-cli-reporter-baseline:1.0.0")
+
     compileOnly(libs.kotlin.gradle.plugin)
     compileOnly(libs.android.gradle.plugin)
     compileOnly(kotlin("stdlib-jdk8"))
@@ -62,13 +147,6 @@ dependencies {
     // Explicitly added for shadow plugin to relocate implementation as well
     shadowImplementation(libs.slf4j.nop)
 
-    /*
-     * Do not depend upon the gradle script kotlin plugin API. IE: gradleScriptKotlinApi()
-     * It's currently in flux and has binary breaking changes in gradle 4.0
-     * https://github.com/JLLeitschuh/ktlint-gradle/issues/9
-     */
-
-    testImplementation(gradleTestKit())
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.assertj.core)
     testImplementation(libs.kotlin.reflect)
@@ -76,12 +154,20 @@ dependencies {
     testImplementation(libs.archunit.junit5)
 }
 
-// Test tasks loods plugin from local maven repository
-tasks.named("test").configure {
-    dependsOn("publishToMavenLocal")
+kotlin {
+    // set up friend paths so that we can use internal classes across source sets
+    target.compilations.forEach {
+        if (it.name.startsWith("adapter")) {
+            if (it.name != "adapter") {
+                it.associateWith(target.compilations.getByName("adapter"))
+            }
+            target.compilations.getByName("main").associateWith(it)
+        }
+    }
 }
 
-tasks.withType<Test>().configureEach {
+tasks.withType<Test> {
+    dependsOn("publishToMavenLocal")
     useJUnitPlatform()
     maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
     doFirst {
@@ -89,7 +175,6 @@ tasks.withType<Test>().configureEach {
     }
     testLogging {
         events(
-            TestLogEvent.STARTED,
             TestLogEvent.FAILED,
             TestLogEvent.PASSED,
             TestLogEvent.SKIPPED
@@ -107,6 +192,12 @@ tasks.withType<Test>().configureEach {
             maxFailures.set(10)
         }
     }
+
+    javaLauncher.set(
+        javaToolchains.launcherFor {
+            languageVersion.set(JavaLanguageVersion.of(JavaVersion.current().majorVersion))
+        }
+    )
 }
 
 val relocateShadowJar = tasks.register<ConfigureShadowRelocation>("relocateShadowJar")
@@ -154,9 +245,7 @@ val ensureDependenciesAreInlined by tasks.registering {
                 val path = relativePath
                 if (!path.startsWith("META-INF") &&
                     path.lastName.endsWith(".class") &&
-                    !path.pathString.startsWith(
-                            pluginGroup.replace(".", "/")
-                        )
+                    !path.pathString.startsWith(pluginGroup.replace(".", "/"))
                 ) {
                     nonInlinedDependencies.add(path.pathString)
                 }
@@ -187,7 +276,9 @@ fun setupPublishingEnvironment() {
 
     if (System.getProperty(keyProperty) == null || System.getProperty(secretProperty) == null) {
         logger
-            .info("`$keyProperty` or `$secretProperty` were not set. Attempting to configure from environment variables")
+            .info(
+                "`$keyProperty` or `$secretProperty` were not set. Attempting to configure from environment variables"
+            )
 
         val key: String? = System.getenv(keyEnvironmentVariable)
         val secret: String? = System.getenv(secretEnvironmentVariable)
@@ -215,15 +306,18 @@ fun setupPublishingEnvironment() {
 
 setupPublishingEnvironment()
 
+configurations.named("implementation") {
+    attributes {
+        attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, objects.named("7.4"))
+    }
+}
+
 gradlePlugin {
     (plugins) {
         register("ktlintPlugin") {
             id = "org.jlleitschuh.gradle.ktlint"
             implementationClass = "org.jlleitschuh.gradle.ktlint.KtlintPlugin"
-        }
-        register("ktlintIdeaPlugin") {
-            id = "org.jlleitschuh.gradle.ktlint-idea"
-            implementationClass = "org.jlleitschuh.gradle.ktlint.KtlintIdeaPlugin"
+            displayName = "Ktlint Gradle Plugin"
         }
     }
 }
@@ -258,9 +352,6 @@ pluginBundle {
     (plugins) {
         "ktlintPlugin" {
             displayName = "Ktlint Gradle Plugin"
-        }
-        "ktlintIdeaPlugin" {
-            displayName = "Ktlint Gradle IntelliJ Configuration Plugin"
         }
     }
 }

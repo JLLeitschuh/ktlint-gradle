@@ -64,14 +64,3 @@ private fun loadNewBaselineRules(path: String): Map<String, List<LintError>> {
     return newBaseline.javaClass.getDeclaredMethod("getLintErrorsPerFile")
         .invoke(newBaseline) as Map<String, List<LintError>>
 }
-
-/**
- * This helper method is not consistent across multiple ktlint versions, so it is copied here
- */
-internal fun List<LintError>.containsLintError(error: LintError): Boolean {
-    return firstOrNull { lintError ->
-        lintError.col == error.col &&
-            lintError.line == error.line &&
-            lintError.ruleId == error.ruleId
-    } != null
-}

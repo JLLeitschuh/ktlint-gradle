@@ -4,8 +4,9 @@ pluginManagement {
     includeBuild("./plugin")
 
     plugins {
-        id("org.jetbrains.kotlin.jvm") version "1.5.31"
-        id("org.jetbrains.kotlin.js") version "1.5.31"
+        id("org.jetbrains.kotlin.jvm") version "1.8.22"
+        id("org.jetbrains.kotlin.js") version "1.8.22"
+        id("com.android.application") version "4.2.2"
     }
 
     repositories {
@@ -13,18 +14,8 @@ pluginManagement {
         google()
         maven("https://dl.bintray.com/jetbrains/kotlin-native-dependencies")
     }
-
-    resolutionStrategy {
-        eachPlugin {
-            when (requested.id.id) {
-                "com.android.application" ->
-                    useModule("com.android.tools.build:gradle:4.1.0")
-            }
-        }
-    }
 }
 
-enableFeaturePreview("VERSION_CATALOGS")
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 dependencyResolutionManagement {
@@ -36,15 +27,13 @@ dependencyResolutionManagement {
 }
 
 plugins {
-    `gradle-enterprise`
+    id("com.gradle.develocity") version "3.17"
 }
 
-gradleEnterprise {
+develocity {
     buildScan {
-        termsOfServiceUrl = "https://gradle.com/terms-of-service"
-        termsOfServiceAgree = "yes"
-
-        publishAlways()
+        termsOfUseUrl.set("https://gradle.com/help/legal-terms-of-use")
+        termsOfUseAgree.set("yes")
     }
 }
 
@@ -62,6 +51,7 @@ fun isAndroidSdkInLocalPropertiesSet(): Boolean {
 }
 
 fun isAndroidSdkVariableSet(): Boolean = System.getenv().containsKey("ANDROID_HOME")
+
 fun isAndroidSdkAvailable(): Boolean = isAndroidSdkVariableSet() || isAndroidSdkInLocalPropertiesSet()
 
 include("samples:kotlin-ks")

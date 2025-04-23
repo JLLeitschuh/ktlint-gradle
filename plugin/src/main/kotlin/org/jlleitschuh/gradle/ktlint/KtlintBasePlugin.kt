@@ -24,14 +24,13 @@ open class KtlintBasePlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         target.checkMinimalSupportedGradleVersion()
-
         val filterTargetApplier: FilterApplier = {
             target.tasks.withType(BaseKtLintCheckTask::class.java).configureEach(it)
         }
 
         val kotlinScriptAdditionalPathApplier: KotlinScriptAdditionalPathApplier = { additionalFileTree ->
-            val configureAction = Action<Task> { task ->
-                with(task as BaseKtLintCheckTask) {
+            val configureAction = Action<Task> {
+                with(this as BaseKtLintCheckTask) {
                     source(
                         additionalFileTree.also {
                             it.include("*.kts")
@@ -54,15 +53,20 @@ open class KtlintBasePlugin : Plugin<Project> {
         )
     }
 
+    companion object {
+        const val LOWEST_SUPPORTED_GRADLE_VERSION = "7.4.2"
+    }
+
+    /**
+     * @deprecated Now that we declare gradle API metadata, this code should not be needed.
+     * Ee need to check which version of gradle introduced gradle API metadata checking
+     */
+    @Deprecated("Now that we declare gradle API metadata, this code should not be needed")
     private fun Project.checkMinimalSupportedGradleVersion() {
         if (GradleVersion.version(gradle.gradleVersion) < GradleVersion.version(LOWEST_SUPPORTED_GRADLE_VERSION)) {
             throw GradleException(
                 "Current version of plugin supports minimal Gradle version: $LOWEST_SUPPORTED_GRADLE_VERSION"
             )
         }
-    }
-
-    companion object {
-        const val LOWEST_SUPPORTED_GRADLE_VERSION = "6.8"
     }
 }

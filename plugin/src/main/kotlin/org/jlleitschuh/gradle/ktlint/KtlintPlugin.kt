@@ -20,9 +20,6 @@ open class KtlintPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         val holder = PluginHolder(target)
-        // Apply the idea plugin
-        target.plugins.apply(KtlintIdeaPlugin::class.java)
-
         holder.addKotlinScriptTasks()
         holder.addKtLintTasksToKotlinPlugin()
         holder.addGenerateBaselineTask()
@@ -32,7 +29,7 @@ open class KtlintPlugin : Plugin<Project> {
     private fun PluginHolder.addKtLintTasksToKotlinPlugin() {
         target.plugins.withId("kotlin", applyKtLint())
         target.plugins.withId("org.jetbrains.kotlin.js", applyKtLint())
-        target.plugins.withId("kotlin-android", applyKtLintToAndroid())
+        target.plugins.withId("org.jetbrains.kotlin.android", applyKtLintToAndroid())
         target.plugins.withId(
             "org.jetbrains.kotlin.multiplatform",
             applyKtlintMultiplatform()
@@ -42,7 +39,7 @@ open class KtlintPlugin : Plugin<Project> {
     private fun PluginHolder.applyKtlintMultiplatform(): (Plugin<in Any>) -> Unit = {
         val multiplatformExtension = target.extensions.getByType(KotlinMultiplatformExtension::class.java)
 
-        multiplatformExtension.sourceSets.all { sourceSet ->
+        multiplatformExtension.sourceSets.all(fun(sourceSet) {
             val checkTask = createCheckTask(
                 this,
                 sourceSet.name,
@@ -71,26 +68,26 @@ open class KtlintPlugin : Plugin<Project> {
             )
 
             addGenerateReportsTaskToProjectMetaFormatTask(generateReportsFormatTask)
-        }
+        })
 
-        multiplatformExtension.targets.all { kotlinTarget ->
+        multiplatformExtension.targets.all(fun(kotlinTarget) {
             if (kotlinTarget.platformType == KotlinPlatformType.androidJvm) {
                 applyKtLintToAndroid()
             }
-        }
+        })
     }
 
     private fun PluginHolder.applyKtLint(): (Plugin<in Any>) -> Unit = {
-        target.extensions.configure<KotlinProjectExtension>("kotlin") { extension ->
-            extension.sourceSets.all { sourceSet ->
+        target.extensions.configure(KotlinProjectExtension::class.java) {
+            sourceSets.all(fun(sourceSet) {
                 val kotlinSourceDirectories = sourceSet.kotlin.sourceDirectories
                 val checkTask = createCheckTask(
-                    this,
+                    this@applyKtLint,
                     sourceSet.name,
                     kotlinSourceDirectories
                 )
                 val generateReportsCheckTask = createGenerateReportsTask(
-                    this,
+                    this@applyKtLint,
                     checkTask,
                     GenerateReportsTask.LintType.CHECK,
                     sourceSet.name
@@ -100,19 +97,19 @@ open class KtlintPlugin : Plugin<Project> {
                 setCheckTaskDependsOnGenerateReportsTask(generateReportsCheckTask)
 
                 val formatTask = createFormatTask(
-                    this,
+                    this@applyKtLint,
                     sourceSet.name,
                     kotlinSourceDirectories
                 )
                 val generateReportsFormatTask = createGenerateReportsTask(
-                    this,
+                    this@applyKtLint,
                     formatTask,
                     GenerateReportsTask.LintType.FORMAT,
                     sourceSet.name
                 )
 
                 addGenerateReportsTaskToProjectMetaFormatTask(generateReportsFormatTask)
-            }
+            })
         }
     }
 
@@ -165,7 +162,11 @@ open class KtlintPlugin : Plugin<Project> {
         }
 
         val ktlintConfiguration: Configuration = createKtlintConfiguration(target, extension)
-        val ktlintRulesetConfiguration: Configuration = createKtlintRulesetConfiguration(target, ktlintConfiguration)
+        val ktlintRulesetConfiguration: Configuration = createKtlintRulesetConfiguration(
+            target,
+            ktlintConfiguration,
+            extension
+        )
         val ktlintReporterConfiguration: Configuration = createKtLintReporterConfiguration(target, extension, ktlintConfiguration)
         val ktlintBaselineReporterConfiguration: Configuration = createKtLintBaselineReporterConfiguration(
             target,

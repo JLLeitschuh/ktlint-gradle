@@ -22,7 +22,6 @@ import org.jlleitschuh.gradle.ktlint.android.dummy.DummyContent
  * item details side-by-side using two vertical panes.
  */
 class ItemListActivity : AppCompatActivity() {
-
     private var viewBinding: ActivityItemListBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,28 +45,36 @@ class ItemListActivity : AppCompatActivity() {
     }
 
     class SimpleItemRecyclerViewAdapter(
-        private val mValues: List<DummyContent.DummyItem>
+        private val mValues: List<DummyContent.DummyItem>,
     ) : RecyclerView.Adapter<ViewHolder>() {
-
         private val mOnClickListener: View.OnClickListener
 
         init {
-            mOnClickListener = View.OnClickListener { v ->
-                val item = v.tag as DummyContent.DummyItem
-                val intent = Intent(v.context, ItemDetailActivity::class.java).apply {
-                    putExtra(ItemDetailFragment.ARG_ITEM_ID, item.id)
+            mOnClickListener =
+                View.OnClickListener { v ->
+                    val item = v.tag as DummyContent.DummyItem
+                    val intent =
+                        Intent(v.context, ItemDetailActivity::class.java).apply {
+                            putExtra(ItemDetailFragment.ARG_ITEM_ID, item.id)
+                        }
+                    v.context.startActivity(intent)
                 }
-                v.context.startActivity(intent)
-            }
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.item_list_content, parent, false)
+        override fun onCreateViewHolder(
+            parent: ViewGroup,
+            viewType: Int,
+        ): ViewHolder {
+            val view =
+                LayoutInflater.from(parent.context)
+                    .inflate(R.layout.item_list_content, parent, false)
             return ViewHolder(view)
         }
 
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        override fun onBindViewHolder(
+            holder: ViewHolder,
+            position: Int,
+        ) {
             val item = mValues[position]
             holder.mIdView.text = item.id
             holder.mContentView.text = item.content

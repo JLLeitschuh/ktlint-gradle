@@ -4,5 +4,9 @@ plugins {
 }
 
 dependencies {
-    compileOnly(pluginLibs.ktlint.core)
+    compileOnly("com.pinterest.ktlint:ktlint-cli-reporter-core:1.0.1")
+}
+
+ktlint {
+    version = "1.0.1"
 }

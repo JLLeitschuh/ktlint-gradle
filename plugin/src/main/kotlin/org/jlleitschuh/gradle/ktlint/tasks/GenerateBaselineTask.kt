@@ -1,6 +1,5 @@
 package org.jlleitschuh.gradle.ktlint.tasks
 
-import net.swiftzer.semver.SemVer
 import org.gradle.api.DefaultTask
 import org.gradle.api.Task
 import org.gradle.api.file.ConfigurableFileCollection
@@ -50,28 +49,20 @@ abstract class GenerateBaselineTask @Inject constructor(
         super.onlyIf(spec)
     }
 
-    init {
-        onlyIf {
-            val isEnabled = SemVer.parse(ktLintVersion.get()) >= SemVer(0, 41, 0)
-            if (!isEnabled) logger.warn("Generate baseline only works starting from KtLint 0.41.0 version")
-            isEnabled
-        }
-    }
-
     @Suppress("UnstableApiUsage")
     @TaskAction
     fun generateBaseline() {
         // Classloader isolation is enough here as we just want to use some classes from KtLint classpath
         // to get errors and generate files/console reports. No KtLint main object is initialized/used in this case.
-        val queue = workerExecutor.classLoaderIsolation { spec ->
-            spec.classpath.from(ktLintClasspath, baselineReporterClasspath)
+        val queue = workerExecutor.classLoaderIsolation {
+            classpath.from(ktLintClasspath, baselineReporterClasspath)
         }
-
-        queue.submit(GenerateBaselineWorkAction::class.java) { param ->
-            param.discoveredErrors.setFrom(discoveredErrors)
-            param.ktLintVersion.set(ktLintVersion)
-            param.baselineFile.set(baselineFile)
-            param.projectDirectory.set(projectLayout.projectDirectory)
+        val task = this
+        queue.submit(GenerateBaselineWorkAction::class.java) {
+            discoveredErrors.setFrom(task.discoveredErrors)
+            ktLintVersion.set(task.ktLintVersion)
+            baselineFile.set(task.baselineFile)
+            projectDirectory.set(projectLayout.projectDirectory)
         }
     }
 

@@ -1,9 +1,7 @@
 package org.jlleitschuh.gradle.ktlint.tasks
 
 import groovy.lang.Closure
-import net.swiftzer.semver.SemVer
 import org.gradle.api.DefaultTask
-import org.gradle.api.GradleException
 import org.gradle.api.JavaVersion
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
@@ -12,6 +10,7 @@ import org.gradle.api.file.FileType
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.specs.Spec
@@ -36,6 +35,7 @@ import org.jlleitschuh.gradle.ktlint.applyGitFilter
 import org.jlleitschuh.gradle.ktlint.getEditorConfigFiles
 import org.jlleitschuh.gradle.ktlint.intermediateResultsBuildDir
 import org.jlleitschuh.gradle.ktlint.property
+import org.jlleitschuh.gradle.ktlint.worker.KtLintClassesSerializer
 import org.jlleitschuh.gradle.ktlint.worker.KtLintWorkAction
 import java.io.File
 import javax.inject.Inject
@@ -53,7 +53,11 @@ abstract class BaseKtLintCheckTask @Inject constructor(
     internal abstract val ktLintClasspath: ConfigurableFileCollection
 
     @get:Internal
+    @get:Deprecated("ktlint no longer supports this parameter")
     internal abstract val additionalEditorconfigFile: RegularFileProperty
+
+    @get:Input
+    internal abstract val additionalEditorconfig: MapProperty<String, String>
 
     @get:Incremental
     @get:PathSensitive(PathSensitivity.RELATIVE)
@@ -183,8 +187,6 @@ abstract class BaseKtLintCheckTask @Inject constructor(
     protected fun runLint(
         inputChanges: InputChanges
     ) {
-        checkDisabledRulesSupportedKtLintVersion()
-
         val editorConfigUpdated = wasEditorConfigFilesUpdated(inputChanges)
         val filesToCheck = if (editorConfigUpdated) {
             source.files
@@ -195,15 +197,25 @@ abstract class BaseKtLintCheckTask @Inject constructor(
         logTaskExecutionState(inputChanges, editorConfigUpdated)
         if (skipExecution(filesToCheck)) return
 
-        submitKtLintWork(filesToCheck, false, editorConfigUpdated, null)
+        val previousErrors: Set<File> = if (discoveredErrors.asFile.get().exists()) {
+            KtLintClassesSerializer
+                .create()
+                .loadErrors(discoveredErrors.asFile.get())
+                .map { it.lintedFile }
+                .filter { it.exists() }
+                .toSet()
+        } else {
+            emptySet()
+        }
+        val allfilesToCheck = filesToCheck + previousErrors
+
+        submitKtLintWork(allfilesToCheck, false, editorConfigUpdated, null)
     }
 
     protected fun runFormat(
         inputChanges: InputChanges,
         formatSnapshot: File
     ) {
-        checkDisabledRulesSupportedKtLintVersion()
-
         val editorConfigUpdated = wasEditorConfigFilesUpdated(inputChanges)
         val filesToCheck = if (editorConfigUpdated) {
             source.files
@@ -252,31 +264,32 @@ abstract class BaseKtLintCheckTask @Inject constructor(
         // Process isolation is used here to run KtLint in a separate java process.
         // This allows to better isolate work actions from different projects tasks between each other
         // and to not pollute Gradle daemon heap, which otherwise greatly increases GC time.
-        val queue = workerExecutor.processIsolation { spec ->
-            spec.classpath.from(ktLintClasspath, ruleSetsClasspath)
-            spec.forkOptions { options ->
-                options.maxHeapSize = workerMaxHeapSize.get()
+        val queue = workerExecutor.processIsolation {
+            classpath.from(ktLintClasspath, ruleSetsClasspath)
+            forkOptions {
+                maxHeapSize = workerMaxHeapSize.get()
 
                 // Work around ktlint triggering reflective access errors from the embedded Kotlin
                 // compiler. See https://youtrack.jetbrains.com/issue/KT-43704 for details.
                 if (JavaVersion.current() >= JavaVersion.VERSION_16) {
-                    options.jvmArgs("--add-opens", "java.base/java.lang=ALL-UNNAMED")
+                    jvmArgs("--add-opens", "java.base/java.lang=ALL-UNNAMED")
                 }
             }
         }
 
-        queue.submit(KtLintWorkAction::class.java) { params ->
-            params.filesToLint.from(filesToCheck)
-            params.enableExperimental.set(enableExperimentalRules)
-            params.android.set(android)
-            params.disabledRules.set(disabledRules)
-            params.debug.set(debug)
-            params.additionalEditorconfigFile.set(additionalEditorconfigFile)
-            params.formatSource.set(formatSources)
-            params.discoveredErrorsFile.set(discoveredErrors)
-            params.ktLintVersion.set(ktLintVersion)
-            params.editorconfigFilesWereChanged.set(editorConfigUpdated)
-            params.formatSnapshot.set(formatSnapshot)
+        queue.submit(KtLintWorkAction::class.java) {
+            val task = this@BaseKtLintCheckTask
+            filesToLint.from(filesToCheck)
+            enableExperimental.set(task.enableExperimentalRules)
+            android.set(task.android)
+            disabledRules.set(task.disabledRules)
+            debug.set(task.debug)
+            additionalEditorconfig.set(task.additionalEditorconfig)
+            formatSource.set(formatSources)
+            discoveredErrorsFile.set(task.discoveredErrors)
+            ktLintVersion.set(task.ktLintVersion)
+            editorconfigFilesWereChanged.set(editorConfigUpdated)
+            this.formatSnapshot.set(formatSnapshot)
         }
     }
 
@@ -297,12 +310,4 @@ abstract class BaseKtLintCheckTask @Inject constructor(
         }
         .map { it.file }
         .toSet()
-
-    private fun checkDisabledRulesSupportedKtLintVersion() {
-        if (disabledRules.get().isNotEmpty() &&
-            SemVer.parse(ktLintVersion.get()) < SemVer(0, 34, 2)
-        ) {
-            throw GradleException("Rules disabling is supported since 0.34.2 ktlint version.")
-        }
-    }
 }

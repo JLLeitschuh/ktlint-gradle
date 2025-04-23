@@ -2,13 +2,12 @@ package org.jlleitschuh.gradle.ktlint
 
 import net.swiftzer.semver.SemVer
 import org.assertj.core.api.Assertions.assertThat
+import org.gradle.api.logging.Logging
 import org.gradle.testkit.runner.TaskOutcome
 import org.gradle.util.GradleVersion
-import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
 import org.jlleitschuh.gradle.ktlint.testdsl.CommonTest
 import org.jlleitschuh.gradle.ktlint.testdsl.GradleTestVersions
 import org.jlleitschuh.gradle.ktlint.testdsl.build
-import org.jlleitschuh.gradle.ktlint.testdsl.buildAndFail
 import org.jlleitschuh.gradle.ktlint.testdsl.project
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.params.ParameterizedTest
@@ -16,89 +15,21 @@ import org.junit.jupiter.params.provider.ArgumentsSource
 
 @GradleTestVersions
 class DisabledRulesTest : AbstractPluginTest() {
+    private val logger = Logging.getLogger(DisabledRulesTest::class.java)
 
     @DisplayName("Should lint without errors when 'final-newline' rule is disabled")
     @ParameterizedTest(name = "{0} with KtLint {1}: {displayName}")
     @ArgumentsSource(KtLintSupportedVersionsTest.SupportedKtlintVersionsProvider::class)
     fun lintDisabledRuleFinalNewline(gradleVersion: GradleVersion, ktLintVersion: String) {
-        project(gradleVersion) {
-            //language=Groovy
-            buildGradle.appendText(
-                """
-                ktlint {
-                    version = "$ktLintVersion"
-                    disabledRules = ["final-newline"]
-                }
-                """.trimIndent()
-            )
-
-            createSourceFile(
-                "src/main/kotlin/CleanSource.kt",
-                "val foo = \"bar\""
-            )
-
-            if (SemVer.parse(ktLintVersion) < SemVer.parse("0.34.2")) {
-                buildAndFail(CHECK_PARENT_TASK_NAME) {
-                    assertThat(task(":runKtlintCheckOverMainSourceSet")?.outcome)
-                        .`as`("Rules disabling is supported since 0.34.2 ktlint version")
-                        .isEqualTo(TaskOutcome.FAILED)
-                }
-            } else if (SemVer.parse(ktLintVersion) < SemVer.parse("0.48.0")) {
-                build(CHECK_PARENT_TASK_NAME) {
-                    assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-                    assertThat(output).doesNotContain("Property 'ktlint_disabled_rules' is deprecated")
-                }
-            } else {
-                build(CHECK_PARENT_TASK_NAME) {
-                    assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-                    assertThat(output)
-                        .`as`("old disabled_rules list is deprecated in 0.48, slated for removal in 0.49")
-                        .contains("Property 'ktlint_disabled_rules' is deprecated")
-                }
-            }
-        }
-    }
-
-    @DisplayName("Should lint without errors when 'final-newline' rule is disabled via editorconfig")
-    @ParameterizedTest(name = "{0} with KtLint {1}: {displayName}")
-    @ArgumentsSource(KtLintSupportedVersionsTest.SupportedKtlintVersionsProvider::class)
-    fun lintDisabledRuleFinalNewlineEditorconfig(gradleVersion: GradleVersion, ktLintVersion: String) {
-        if (SemVer.parse(ktLintVersion) >= SemVer.parse("0.34.2")) {
-            // Rules disabling is supported since 0.34.2 ktlint version
+        if (SemVer.parse(ktLintVersion) < SemVer.parse("0.49.0")) {
             project(gradleVersion) {
-                if (SemVer.parse(ktLintVersion) >= SemVer.parse("0.48.0")) {
-                    // new way of disabling rules introduced in 0.48
-                    editorConfig.appendText(
-                        """
-                        root = true
-
-                        [*.kt]
-                        ktlint_standard_final-newline = disabled
-                        """.trimIndent()
-                    )
-                } else if (SemVer.parse(ktLintVersion) >= SemVer.parse("0.47.0")) {
-                    // disabled rules property renamed in 0.47 (disabled_rules is still honored, but will print a warning)
-                    editorConfig.appendText(
-                        """
-                        root = true
-                        [*.kt]
-                        ktlint_disabled_rules = final-newline
-                        """.trimIndent()
-                    )
-                } else {
-                    editorConfig.appendText(
-                        """
-                        root = true
-
-                        [*.kt]
-                        disabled_rules = final-newline
-                        """.trimIndent()
-                    )
-                }
                 //language=Groovy
                 buildGradle.appendText(
                     """
-                    ktlint.version = "$ktLintVersion"
+                    ktlint {
+                        version = "$ktLintVersion"
+                        disabledRules = ["final-newline"]
+                    }
                     """.trimIndent()
                 )
 
@@ -107,11 +38,66 @@ class DisabledRulesTest : AbstractPluginTest() {
                     "val foo = \"bar\""
                 )
 
-                build(CHECK_PARENT_TASK_NAME) {
-                    assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-                    assertThat(output).doesNotContain("Property 'ktlint_disabled_rules' is deprecated")
-                    assertThat(output).doesNotContain("Property 'disabled_rules' is deprecated")
+                if (SemVer.parse(ktLintVersion) < SemVer.parse("0.48.0")) {
+                    build(CHECK_PARENT_TASK_NAME) {
+                        assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                        assertThat(output).doesNotContain("Property 'ktlint_disabled_rules' is deprecated")
+                    }
+                } else {
+                    build(CHECK_PARENT_TASK_NAME) {
+                        assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                        assertThat(output)
+                            .`as`("old disabled_rules list is deprecated in 0.48, slated for removal in 0.49")
+                            .contains("Property 'ktlint_disabled_rules' is deprecated")
+                    }
                 }
+            }
+        } else {
+            logger.info("ktlint $ktLintVersion only supports disabling rules via .editorconfig")
+        }
+    }
+
+    @DisplayName("Should lint without errors when 'final-newline' rule is disabled via editorconfig")
+    @ParameterizedTest(name = "{0} with KtLint {1}: {displayName}")
+    @ArgumentsSource(KtLintSupportedVersionsTest.SupportedKtlintVersionsProvider::class)
+    fun lintDisabledRuleFinalNewlineEditorconfig(gradleVersion: GradleVersion, ktLintVersion: String) {
+        project(gradleVersion) {
+            if (SemVer.parse(ktLintVersion) >= SemVer.parse("0.48.0")) {
+                // new way of disabling rules introduced in 0.48
+                editorConfig.appendText(
+                    """
+                        root = true
+
+                        [*.kt]
+                        ktlint_standard_final-newline = disabled
+                    """.trimIndent()
+                )
+            } else {
+                // disabled rules property renamed in 0.47 (disabled_rules is still honored, but will print a warning)
+                editorConfig.appendText(
+                    """
+                        root = true
+                        [*.kt]
+                        ktlint_disabled_rules = final-newline
+                    """.trimIndent()
+                )
+            }
+            //language=Groovy
+            buildGradle.appendText(
+                """
+                    ktlint.version = "$ktLintVersion"
+                """.trimIndent()
+            )
+
+            createSourceFile(
+                "src/main/kotlin/CleanSource.kt",
+                "val foo = \"bar\""
+            )
+
+            build(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(output).doesNotContain("Property 'ktlint_disabled_rules' is deprecated")
+                assertThat(output).doesNotContain("Property 'disabled_rules' is deprecated")
             }
         }
     }
@@ -123,7 +109,7 @@ class DisabledRulesTest : AbstractPluginTest() {
             //language=Groovy
             buildGradle.appendText(
                 """
-
+                ktlint.version = "0.47.1"
                 ktlint.disabledRules = ["final-newline", "no-consecutive-blank-lines"]
                 """.trimIndent()
             )
@@ -150,6 +136,12 @@ class DisabledRulesTest : AbstractPluginTest() {
     @CommonTest
     fun lintRuleDisabledInTheCode(gradleVersion: GradleVersion) {
         project(gradleVersion) {
+            //language=Groovy
+            buildGradle.appendText(
+                """
+                ktlint.version = "0.47.1"
+                """.trimIndent()
+            )
             createSourceFile(
                 "src/main/kotlin/CleanSource.kt",
                 """
@@ -168,30 +160,6 @@ class DisabledRulesTest : AbstractPluginTest() {
 
             build(CHECK_PARENT_TASK_NAME) {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            }
-        }
-    }
-
-    @DisplayName("Should fail if KtLint version is lower then 0.34.2 and disabled rules configuration is set")
-    @CommonTest
-    fun lintShouldFailOnUnsupportedVersion(gradleVersion: GradleVersion) {
-        project(gradleVersion) {
-            //language=Groovy
-            buildGradle.appendText(
-                """
-
-                ktlint.version = "0.34.0"
-                ktlint.disabledRules = ["final-newline"]
-                """.trimIndent()
-            )
-
-            withCleanSources()
-
-            buildAndFail(CHECK_PARENT_TASK_NAME) {
-                assertThat(
-                    task(":${KtLintCheckTask.buildTaskNameForSourceSet("main")}")?.outcome
-                ).isEqualTo(TaskOutcome.FAILED)
-                assertThat(output).contains("Rules disabling is supported since 0.34.2 ktlint version.")
             }
         }
     }

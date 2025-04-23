@@ -1,8 +1,6 @@
 package org.jlleitschuh.gradle.ktlint.testdsl
 
 import org.gradle.util.GradleVersion
-import org.jetbrains.kotlin.utils.addToStdlib.cast
-import org.jlleitschuh.gradle.ktlint.KtlintBasePlugin
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.ArgumentsProvider
@@ -10,19 +8,15 @@ import java.io.File
 import java.util.stream.Stream
 import kotlin.streams.asStream
 
+@Suppress("ConstPropertyName")
 object TestVersions {
-    const val minSupportedGradleVersion = KtlintBasePlugin.LOWEST_SUPPORTED_GRADLE_VERSION
-    const val maxSupportedGradleVersion = "8.0.1"
+    const val minSupportedGradleVersion = "7.6.3" // lowest version for testing
+    const val maxSupportedGradleVersion = "8.12.1"
     val pluginVersion = File("VERSION_CURRENT.txt").readText().trim()
     const val minSupportedKotlinPluginVersion = "1.4.32"
-
-    fun maxSupportedKotlinPluginVersion(
-        gradleVersion: GradleVersion = GradleVersion.version(maxSupportedGradleVersion)
-    ): String = when (gradleVersion) {
-        in (GradleVersion.version("6.8.3")..GradleVersion.version(maxSupportedGradleVersion)) -> "1.8.10"
-        in (GradleVersion.version("6.7.1")..GradleVersion.version("7.1.1")) -> "1.7.21"
-        else -> minSupportedKotlinPluginVersion
-    }
+    const val maxSupportedKotlinPluginVersion = "2.1.10"
+    const val minAgpVersion = "4.1.0"
+    const val maxAgpVersion = "8.8.0"
 }
 
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
@@ -49,11 +43,16 @@ open class GradleArgumentsProvider : ArgumentsProvider {
             .testMethod
             .get()
             .annotations
-            .firstOrNull { it is GradleTestVersions }
-            ?.let { it.cast() }
-            ?: context.testClass.get().annotations.first { it is GradleTestVersions }.cast()
+            .filterIsInstance<GradleTestVersions>()
+            .firstOrNull()
+            ?: context.testClass.get().annotations.filterIsInstance<GradleTestVersions>().first()
 
-        val minGradleVersion = GradleVersion.version(versionsAnnotation.minVersion)
+        val minGradleVersion = if (getMajorJavaVersion() >= 21) {
+            // Gradle 8.5 is needed to run on Java 21
+            GradleVersion.version("8.5")
+        } else {
+            GradleVersion.version(versionsAnnotation.minVersion)
+        }
         val maxGradleVersion = GradleVersion.version(versionsAnnotation.maxVersion)
         val additionalGradleVersions = versionsAnnotation
             .additionalVersions

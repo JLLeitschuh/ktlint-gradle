@@ -1,8 +1,6 @@
 package org.jlleitschuh.gradle.ktlint.tasks
 
-import net.swiftzer.semver.SemVer
 import org.gradle.api.DefaultTask
-import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.ProjectLayout
@@ -20,10 +18,10 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.workers.WorkerExecutor
+import org.jlleitschuh.gradle.ktlint.reporter.LoadedReporter
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import org.jlleitschuh.gradle.ktlint.worker.ConsoleReportWorkAction
 import org.jlleitschuh.gradle.ktlint.worker.GenerateReportsWorkAction
-import org.jlleitschuh.gradle.ktlint.worker.LoadReportersWorkAction
 import java.io.File
 import java.io.FileInputStream
 import java.io.ObjectInputStream
@@ -90,6 +88,13 @@ abstract class GenerateReportsTask @Inject constructor(
     @get:Optional
     internal abstract val baseline: RegularFileProperty
 
+    /**
+     * Reading a project's rootDir within a task's action is not allowed for configuration
+     * cache, so read it eagerly on task initialization.
+     * see: https://docs.gradle.org/current/userguide/configuration_cache.html#config_cache
+     */
+    private val rootDir: File = project.rootDir
+
     init {
         // Workaround for https://github.com/gradle/gradle/issues/2919
         onlyIf {
@@ -118,12 +123,10 @@ abstract class GenerateReportsTask @Inject constructor(
     @Suppress("UnstableApiUsage")
     @TaskAction
     fun generateReports() {
-        checkBaselineSupportedKtLintVersion()
-
         // Classloader isolation is enough here as we just want to use some classes from KtLint classpath
         // to get errors and generate files/console reports. No KtLint main object is initialized/used in this case.
-        val queue = workerExecutor.classLoaderIsolation { spec ->
-            spec.classpath.from(ktLintClasspath, reportersClasspath)
+        val queue = workerExecutor.classLoaderIsolation {
+            classpath.from(ktLintClasspath, reportersClasspath)
         }
 
         val loadedReporters = loadLoadedReporters()
@@ -131,31 +134,32 @@ abstract class GenerateReportsTask @Inject constructor(
                 reportsOutputDirectory.file("${reportsName.get()}.${it.fileExtension}")
             }
 
+        val task = this
         loadedReporters.forEach { (loadedReporter, reporterOutput) ->
-            queue.submit(GenerateReportsWorkAction::class.java) { param ->
-                param.discoveredErrorsFile.set(discoveredErrors)
-                param.loadedReporterProviders.set(loadedReporterProviders)
-                param.reporterId.set(loadedReporter.reporterId)
-                param.reporterOutput.set(reporterOutput)
-                param.reporterOptions.set(generateReporterOptions(loadedReporter))
-                param.ktLintVersion.set(ktLintVersion)
-                param.baseline.set(baseline)
-                param.projectDirectory.set(projectLayout.projectDirectory)
-                if (relative.get()) {
-                    param.filePathsRelativeTo.set(project.rootDir)
+            queue.submit(GenerateReportsWorkAction::class.java) {
+                discoveredErrorsFile.set(task.discoveredErrors)
+                loadedReporterProviders.set(task.loadedReporterProviders)
+                reporterId.set(loadedReporter.reporterId)
+                this.reporterOutput.set(reporterOutput)
+                reporterOptions.set(generateReporterOptions(loadedReporter))
+                ktLintVersion.set(task.ktLintVersion)
+                baseline.set(task.baseline)
+                projectDirectory.set(task.projectLayout.projectDirectory)
+                if (task.relative.get()) {
+                    filePathsRelativeTo.set(rootDir)
                 }
             }
         }
 
-        queue.submit(ConsoleReportWorkAction::class.java) { param ->
-            param.discoveredErrors.set(discoveredErrors)
-            param.outputToConsole.set(outputToConsole)
-            param.ignoreFailures.set(ignoreFailures)
-            param.verbose.set(verbose)
-            param.generatedReportsPaths.from(loadedReporters.values)
-            param.ktLintVersion.set(ktLintVersion)
-            param.baseline.set(baseline)
-            param.projectDirectory.set(projectLayout.projectDirectory)
+        queue.submit(ConsoleReportWorkAction::class.java) {
+            discoveredErrors.set(task.discoveredErrors)
+            outputToConsole.set(task.outputToConsole)
+            ignoreFailures.set(task.ignoreFailures)
+            verbose.set(task.verbose)
+            generatedReportsPaths.from(loadedReporters.values)
+            ktLintVersion.set(task.ktLintVersion)
+            baseline.set(task.baseline)
+            projectDirectory.set(projectLayout.projectDirectory)
         }
     }
 
@@ -163,11 +167,11 @@ abstract class GenerateReportsTask @Inject constructor(
         FileInputStream(loadedReporters.asFile.get())
     ).use {
         @Suppress("UNCHECKED_CAST")
-        it.readObject() as List<LoadReportersWorkAction.LoadedReporter>
+        it.readObject() as List<LoadedReporter>
     }
 
     private fun generateReporterOptions(
-        loadedReporter: LoadReportersWorkAction.LoadedReporter
+        loadedReporter: LoadedReporter
     ): Map<String, String> {
         val options = mutableMapOf(
             "verbose" to verbose.get().toString(),
@@ -183,16 +187,11 @@ abstract class GenerateReportsTask @Inject constructor(
         return options.toMap()
     }
 
-    private fun checkBaselineSupportedKtLintVersion() {
-        if (baseline.isPresent && SemVer.parse(ktLintVersion.get()) < SemVer(0, 41, 0)) {
-            throw GradleException("Baseline support is only enabled for KtLint versions 0.41.0+.")
-        }
-    }
-
     internal enum class LintType(
         val suffix: String
     ) {
-        CHECK("Check"), FORMAT("Format")
+        CHECK("Check"),
+        FORMAT("Format")
     }
 
     internal companion object {

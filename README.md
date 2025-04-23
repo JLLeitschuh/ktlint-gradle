@@ -3,12 +3,13 @@
 **Provides a convenient wrapper plugin over the [ktlint](https://github.com/pinterest/ktlint) project.**
 
 <!-- Note: if changing the line below, the `sed` command in the perform-release.yaml needs to be updated too -->
-Latest plugin version: [11.3.1](/CHANGELOG.md#---20230303)
+Latest plugin version: [12.2.0](/CHANGELOG.md#---20250227)
 
 [![Join the chat at https://kotlinlang.slack.com](https://img.shields.io/badge/slack-@kotlinlang/ktlint-yellow.svg?logo=slack)](https://kotlinlang.slack.com/messages/CKS3XG0LS)
 [![Build and Check](https://github.com/JLLeitschuh/ktlint-gradle/actions/workflows/build-and-check.yml/badge.svg)](https://github.com/JLLeitschuh/ktlint-gradle/actions/workflows/build-and-check.yml)
 [![ktlint](https://img.shields.io/badge/code%20style-%E2%9D%A4-FF4081.svg)](https://ktlint.github.io/)
 [![Gradle Plugin Portal](https://img.shields.io/maven-metadata/v/https/plugins.gradle.org/m2/org/jlleitschuh/gradle/ktlint/org.jlleitschuh.gradle.ktlint.gradle.plugin/maven-metadata.xml.svg?colorB=007ec6&label=gradlePluginPortal)](https://plugins.gradle.org/plugin/org.jlleitschuh.gradle.ktlint)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/JLLeitschuh/ktlint-gradle/badge)](https://securityscorecards.dev/viewer/?uri=github.com/JLLeitschuh/ktlint-gradle)
 
 This plugin creates convenient tasks in your Gradle project
 that run [ktlint](https://github.com/pinterest/ktlint) checks or do code
@@ -63,10 +64,13 @@ open a [new issue](https://github.com/JLLeitschuh/ktlint-gradle/issues/new).
 This plugin was written using the new API available for the Gradle script Kotlin builds.
 This API is available in new versions of Gradle.
 
-Minimal supported [Gradle](https://www.gradle.org) version: `6.8`
+Minimal supported [Gradle](https://www.gradle.org) version: `7.4`
 
-Minimal supported [ktlint](https://github.com/pinterest/ktlint) version: `0.34.0`
-(additionally excluding `0.37.0` on Windows OS and `0.38.0`, `0.43.0`, `0.43.1` on all OS types)
+Minimal supported [Kotlin](https://kotlinlang.org) version: `1.4`
+
+Minimal supported [ktlint](https://github.com/pinterest/ktlint) version: `0.47.1`
+
+Minimal supported [Android Gradle plugin](https://developer.android.com/build) version: `4.1.0`
 
 ### Ktlint plugin
 
@@ -93,6 +97,49 @@ repositories {
 ```kotlin
 plugins {
   id("org.jlleitschuh.gradle.ktlint") version "<current_version>"
+}
+
+repositories {
+  // Required to download KtLint
+  mavenCentral()
+}
+```
+</details>
+
+#### Using Version Catalog
+
+To configure the plugin using a version catalog, first, add the following entries to your libs.versions.toml file:
+
+```toml
+[versions]
+ktlint = "<current_version>"
+
+[plugins]
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
+```
+
+Next, apply it to your project:
+
+<details>
+<summary>Groovy</summary>
+
+```groovy
+plugins {
+  alias(libs.plugins.ktlint)
+}
+
+repositories {
+  // Required to download KtLint
+  mavenCentral()
+}
+```
+</details>
+<details open>
+<summary>Kotlin</summary>
+
+```kotlin
+plugins {
+  alias(libs.plugins.ktlint)
 }
 
 repositories {
@@ -234,32 +281,6 @@ ktlint {
 ```
 </details>
 
-### IntelliJ Idea Only Plugin
-
-**Note:** This plugin is automatically applied by the main `ktlint` plugin.
-
-This plugin just adds [special tasks](#additional-helper-tasks) that can generate IntelliJ IDEA codestyle
-rules using ktlint.
-
-#### Idea plugin simple setup
-
-Build script snippet for new plugin mechanism introduced in Gradle 2.1:
-```kotlin
-plugins {
-  id("org.jlleitschuh.gradle.ktlint-idea") version "<current_version>"
-}
-```
-
-#### Idea plugin setup using legacy apply method
-
-For all Gradle versions:
-
-Use the same `buildscript` logic as [above](#simple-setup), but with this instead of the above suggested `apply` line. If you also want the GIT pre-commit gradle tasks, keep both `apply` variations.
-
-```groovy
-apply plugin: "org.jlleitschuh.gradle.ktlint-idea"
-```
-
 ### Configuration
 The following configuration block is _optional_.
 
@@ -269,6 +290,8 @@ object will be used.
 
 The version of ktlint used by default _may change_ between patch versions of this plugin.
 If you don't want to inherit these changes then make sure you lock your version here.
+Consult the [ktlint release notes](https://github.com/pinterest/ktlint/releases) for more information about the differences between ktlint versions.
+
 <details>
 <summary>Groovy</summary>
 
@@ -285,6 +308,9 @@ ktlint {
     ignoreFailures = true
     enableExperimentalRules = true
     additionalEditorconfigFile = file("/some/additional/.editorconfig")  // not supported with ktlint 0.47+
+    additionalEditorconfig = [ // not supported until ktlint 0.49
+        "max_line_length": "20"
+    ]
     disabledRules = ["final-newline"] // not supported with ktlint 0.48+
     baseline = file("my-project-ktlint-baseline.xml")
     reporters {
@@ -337,6 +363,11 @@ configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
     ignoreFailures.set(true)
     enableExperimentalRules.set(true)
     additionalEditorconfigFile.set(file("/some/additional/.editorconfig")) // not supported with ktlint 0.47+
+    additionalEditorconfig.set( // not supported until ktlint 0.49
+        mapOf(
+            "max_line_length" to "20"
+        )
+    )
     disabledRules.set(setOf("final-newline")) // not supported with ktlint 0.48+
     baseline.set(file("my-project-ktlint-baseline.xml"))
     reporters {
@@ -471,7 +502,7 @@ Then for each `SourceSet` plugin adds following tasks:
 - `ktlint[source set name]SourceSetCheck` - generates reports and prints issues into Gradle console based on lint check found errors.
   This task execution depends on `loadKtlintReporters` and `runKtlintCheckOver[source set name]SourceSet` tasks execution outputs
 - `runKtlintFormatOver[source set name]SourceSet` - tries to format according to the code style every Kotlin file in given `SourceSet`
-- `ktlint[source set name]SourceSetCheck` - generates reports and prints issues into Gradle console based on found non-formattable errors.
+- `ktlint[source set name]SourceSetFormat` - reformats files, generates reports and prints issues into Gradle console based on found non-formattable errors.
   This task execution depends on `loadKtlintReporters` and `runKtlintFormatOver[source set name]SourceSet` tasks execution outputs
 
 ### Additional helper tasks

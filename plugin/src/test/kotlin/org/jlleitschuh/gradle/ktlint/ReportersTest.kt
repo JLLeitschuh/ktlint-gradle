@@ -9,10 +9,10 @@ import org.jlleitschuh.gradle.ktlint.testdsl.GradleTestVersions
 import org.jlleitschuh.gradle.ktlint.testdsl.TestProject
 import org.jlleitschuh.gradle.ktlint.testdsl.build
 import org.jlleitschuh.gradle.ktlint.testdsl.buildAndFail
+import org.jlleitschuh.gradle.ktlint.testdsl.getMajorJavaVersion
 import org.jlleitschuh.gradle.ktlint.testdsl.project
+import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.condition.DisabledOnOs
-import org.junit.jupiter.api.condition.OS
 
 @GradleTestVersions
 class ReportersTest : AbstractPluginTest() {
@@ -46,23 +46,18 @@ class ReportersTest : AbstractPluginTest() {
     @DisplayName("Should create 3rd party report")
     @CommonTest
     internal fun thirdPartyReport(gradleVersion: GradleVersion) {
-        // TODO: switch to some 3rd party reporter that is published to Maven Central
+        // custom reporter is compiled on java 11
+        Assumptions.assumeTrue(getMajorJavaVersion() >= 11)
         project(gradleVersion) {
             // https://github.com/mcassiano/ktlint-html-reporter/releases
             //language=Groovy
             buildGradle.appendText(
                 """
-
-                repositories {
-                    jcenter()
-                }
-
                 ktlint.reporters {
                     reporter "checkstyle"
                     customReporters {
-                        "html" {
-                            fileExtension = "html"
-                            dependency = "me.cassiano:ktlint-html-reporter:0.2.3"
+                        "github" {
+                            dependency = "de.musichin.ktlint.reporter:ktlint-reporter-github:3.1.0"
                         }
                     }
                 }
@@ -76,7 +71,7 @@ class ReportersTest : AbstractPluginTest() {
                 assertReportCreated(ReporterType.CHECKSTYLE.fileExtension, mainSourceSetCheckTaskName)
                 assertReportNotCreated(ReporterType.PLAIN.fileExtension, mainSourceSetCheckTaskName)
                 assertReportNotCreated(ReporterType.JSON.fileExtension, mainSourceSetCheckTaskName)
-                assertReportCreated("html", mainSourceSetCheckTaskName)
+                assertReportCreated("github", mainSourceSetCheckTaskName)
             }
         }
     }
@@ -204,31 +199,6 @@ class ReportersTest : AbstractPluginTest() {
             build(CHECK_PARENT_TASK_NAME) {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
                 assertReportCreated(ReporterType.SARIF.fileExtension, mainSourceSetCheckTaskName)
-            }
-        }
-    }
-
-    @DisplayName("Should ignore html reporter on KtLint versions less then 0.36.0")
-    @CommonTest
-    @DisabledOnOs(OS.WINDOWS)
-    internal fun ignoreHtmlOnOldVersions(gradleVersion: GradleVersion) {
-        project(gradleVersion) {
-            withCleanSources()
-
-            //language=Groovy
-            buildGradle.appendText(
-                """
-
-                ktlint.version = "0.35.0"
-                ktlint.reporters {
-                    reporter "html"
-                }
-                """.trimIndent()
-            )
-
-            build(CHECK_PARENT_TASK_NAME) {
-                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-                assertReportNotCreated(ReporterType.HTML.fileExtension, mainSourceSetCheckTaskName)
             }
         }
     }
