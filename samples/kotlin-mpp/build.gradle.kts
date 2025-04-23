@@ -1,11 +1,19 @@
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+
 plugins {
-    application
     kotlin("multiplatform")
     id("org.jlleitschuh.gradle.ktlint")
 }
 
 kotlin {
-    jvm()
+    jvm {
+        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+        binaries {
+            executable {
+                mainClass.set("org.jlleitschuh.gradle.ktlint.sample.mpp.MainKt")
+            }
+        }
+    }
     js {
         nodejs()
     }
@@ -17,10 +25,6 @@ kotlin {
         val jsMain by getting
         val linuxX64Main by getting
     }
-}
-
-application {
-    mainClass.set("org.jlleitschuh.gradle.ktlint.sample.mpp.MainKt")
 }
 
 ktlint {

@@ -85,10 +85,6 @@ jobs:
             plugin/replay_pid*
       - name: Check plugin codestyle
         run: ./plugin/gradlew -p ./plugin ktlintCheck --no-daemon
-      - name: Generate and submit dependency graph
-        uses: gradle/actions/dependency-submission@v4
-        with:
-          dependency-graph: generate-and-upload
 
   check_bashisms:
     runs-on: ubuntu-latest
@@ -137,4 +133,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
       - name: Check ktlint-plugin on samples
         run: ./gradlew ktlintCheck --no-daemon
-
+      - name: Generate and submit dependency graph
+        uses: gradle/actions/dependency-submission@v4
+        with:
+          dependency-graph: generate-and-upload
