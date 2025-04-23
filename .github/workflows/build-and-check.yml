@@ -19,7 +19,6 @@ jobs:
         uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
         with:
           egress-policy: audit
-
       - id: set-matrix
         run: echo "::set-output name=version_matrix::$(curl https://endoflife.date/api/oracle-jdk.json | jq -c '[.[] | select(.extendedSupport > (now | strftime("%Y-%m-%d"))) | .cycle]' | sed 's/ //g')"
       - name: verify-matrix
@@ -39,7 +38,6 @@ jobs:
         uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
         with:
           egress-policy: audit
-
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - name: configure windows pagefile
         if: ${{ matrix.os  == 'windows-latest' }}
@@ -53,18 +51,10 @@ jobs:
         with:
           java-version: ${{ matrix.java_version }}
           distribution: 'zulu'
-      - name: Restore Gradle caches
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
-        with:
-          path: |
-            ~/.gradle/caches/modules-2
-            ~/.gradle/caches/files-2.1
-            ~/.gradle/caches/metadata-2.96
-          key: ${{ runner.os }}-gradle-cache-${{ hashFiles('**/*.gradle.kts') }}-${{ hashFiles('**/gradle.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-cache-
-      # Inspired by https://github.com/actions/cache/issues/432#issuecomment-740376179
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
       - name: Restore TestKit cache
+        # Inspired by https://github.com/actions/cache/issues/432#issuecomment-740376179
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
         with:
           path: |
@@ -74,14 +64,6 @@ jobs:
           key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradlew') }}-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradlew') }}-
-            ${{ runner.os }}-gradle-wrapper-
-      - name: Restore Gradle wrapper
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
-        with:
-          path: |
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradlew') }}
-          restore-keys: |
             ${{ runner.os }}-gradle-wrapper-
       - name: Build plugin
         run: ./plugin/gradlew -p ./plugin assemble ensureDependenciesAreInlined test --no-daemon
@@ -103,6 +85,10 @@ jobs:
             plugin/replay_pid*
       - name: Check plugin codestyle
         run: ./plugin/gradlew -p ./plugin ktlintCheck --no-daemon
+      - name: Generate and submit dependency graph
+        uses: gradle/actions/dependency-submission@v4
+        with:
+          dependency-graph: generate-and-upload
 
   check_bashisms:
     runs-on: ubuntu-latest
@@ -119,6 +105,8 @@ jobs:
         with:
           java-version: 11
           distribution: 'zulu'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
       - name: update apt
         run: sudo apt update
       - name: Install lintian
@@ -127,20 +115,6 @@ jobs:
         run: sudo apt install -qq libdistro-info-perl
       - name: Install checkbashisms
         run: sudo apt-get install -qq devscripts
-      - name: Restore Gradle caches
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-cache-${{ hashFiles('**/*.gradle.kts') }}-${{ hashFiles('**/gradle.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-cache-
-      - name: Restore Gradle wrapper
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
-        with:
-          path: ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradlew') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-wrapper-
       - name: Check git bashisms
         run: ./gradlew addKtlintCheckGitPreCommitHook --no-daemon && checkbashisms .git/hooks/pre-commit
 
@@ -162,19 +136,7 @@ jobs:
         with:
           java-version: 8
           distribution: 'zulu'
-      - name: Restore Gradle caches
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-cache-${{ hashFiles('**/*.gradle.kts') }}-${{ hashFiles('**/gradle.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-cache-
-      - name: Restore Gradle wrapper
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
-        with:
-          path: ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradlew') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-wrapper-
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
       - name: Check ktlint-plugin on samples
         run: ./gradlew ktlintCheck --no-daemon
