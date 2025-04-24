@@ -162,6 +162,11 @@ open class KtlintInstallGitHookTask @Inject constructor(
 
     @TaskAction
     fun installHook() {
+        /*
+         * Note: `projectDir` and `rootDirectory` are both using `Property<String>` instead
+         * of a `DirectoryProperty` because we want to rely upon the *path* not the *contents*
+         * https://github.com/JLLeitschuh/ktlint-gradle/pull/837
+         */
         val repo = RepositoryBuilder().findGitDir(File(projectDir.get())).setMustExist(false).build()
         if (!repo.objectDatabase.exists()) {
             logger.warn("No git folder was found!")
