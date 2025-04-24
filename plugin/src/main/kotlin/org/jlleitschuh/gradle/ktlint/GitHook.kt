@@ -69,7 +69,7 @@ internal fun generateGitHook(
     gradleRootDirPrefix: String
 ) =
     """
-
+    set +e
     CHANGED_FILES="${'$'}(${generateGitCommand(gradleRootDirPrefix)} | awk '$1 != "D" && $NF ~ /\.kts?$/ { print $NF }')"
 
     if [ -z "${'$'}CHANGED_FILES" ]; then
