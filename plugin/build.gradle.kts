@@ -1,3 +1,4 @@
+import com.github.breadmoirai.githubreleaseplugin.GithubReleaseTask
 import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.gradle.enterprise.gradleplugin.testretry.retry
@@ -13,11 +14,11 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint")
     id("com.github.johnrengelman.shadow")
     id("com.github.breadmoirai.github-release")
+    id("com.netflix.nebula.release")
 }
 
 val pluginGroup = "org.jlleitschuh.gradle"
 group = pluginGroup
-version = projectDir.resolve("VERSION_CURRENT.txt").readText().trim()
 
 repositories {
     google()
@@ -110,8 +111,17 @@ val adapterSources = listOf(
     sourceSets.named("adapter50"),
     sourceSets.named("adapter100")
 )
-tasks.named<Jar>("shadowJar") {
+
+tasks.named<Jar>("shadowJar").configure {
     this.from(adapterSources.map { sourceSet -> sourceSet.map { it.output.classesDirs } })
+    manifest {
+        attributes(
+            "Implementation-Title" to project.name,
+            "Implementation-Version" to project.version,
+            "Implementation-Vendor" to project.group,
+            "Implementation-Vendor-Id" to project.group
+        )
+    }
 }
 
 dependencies {
@@ -173,6 +183,8 @@ tasks.withType<Test> {
     doFirst {
         logger.lifecycle("maxParallelForks for '$path' is $maxParallelForks")
     }
+    // Set the system property for the project version to be used in the tests
+    systemProperty("project.version", project.version.toString())
     testLogging {
         events(
             TestLogEvent.FAILED,
@@ -256,7 +268,9 @@ val ensureDependenciesAreInlined by tasks.registering {
         }
     }
 }
+
 tasks.named("check") {
+    dependsOn(tasks.named("assemble"))
     dependsOn(ensureDependenciesAreInlined)
 }
 
@@ -322,6 +336,10 @@ gradlePlugin {
     }
 }
 
+tasks.named<ValidatePlugins>("validatePlugins").configure {
+    enableStricterValidation = true
+}
+
 // Need to move publishing configuration into afterEvaluate {}
 // to override changes done by "com.gradle.plugin-publish" plugin in afterEvaluate {} block
 // See PublishPlugin class for details
@@ -364,17 +382,48 @@ githubRelease {
     releaseAssets(
         tasks.named("shadowJar")
     )
+
+    fun isPreReleaseVersion(): Boolean {
+        val version = project.version.toString()
+        return version.endsWith("-rc") ||
+            version.contains("-dev") ||
+            version.contains("-SNAPSHOT")
+    }
+
+    prerelease.set(provider { isPreReleaseVersion() })
     body.set(
         provider {
-            projectDir.resolve("../CHANGELOG.md")
-                .readText()
-                .substringAfter("## [")
-                .substringAfter("## [")
-                .substringBefore("## [")
-                .prefixIfNot("## [")
+            // If publishing a rc version use the [Unreleased] section of the changelog
+            if (isPreReleaseVersion()) {
+                projectDir.resolve("../CHANGELOG.md")
+                    .readText()
+                    .substringAfter("## [")
+                    .substringBefore("## [")
+                    .prefixIfNot("## [")
+                    .replace("## [Unreleased]", "## [${project.version}]")
+            } else {
+                projectDir.resolve("../CHANGELOG.md")
+                    .readText()
+                    .substringAfter("## [")
+                    .substringAfter("## [")
+                    .substringBefore("## [")
+                    .prefixIfNot("## [")
+            }
         }
     )
-    dryRun = true
+    dryRun.set(providers.systemProperty("dryRun").orElse("false").map { it.toBoolean() })
+}
+
+tasks.named<GithubReleaseTask>("githubRelease") {
+    doLast {
+        if (tagName.get().startsWith("v0.1.0")) {
+            throw GradleException(
+                "Release version (${tagName.get()}) was not correcly detected. " +
+                    "Please check that the git repository is corretly initialized and the tag is correct. " +
+                    "For GiHub Actions environments, check the fetch-depth setting in the actions/checkout step."
+            )
+        }
+    }
 }
 
 tasks.withType<Wrapper>().configureEach {

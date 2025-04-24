@@ -14,6 +14,7 @@ import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.specs.Spec
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.IgnoreEmptyDirectories
 import org.gradle.api.tasks.Input
@@ -41,6 +42,7 @@ import java.io.File
 import javax.inject.Inject
 
 @Suppress("UnstableApiUsage")
+@CacheableTask
 abstract class BaseKtLintCheckTask @Inject constructor(
     private val objectFactory: ObjectFactory,
     projectLayout: ProjectLayout,
