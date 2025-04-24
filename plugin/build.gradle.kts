@@ -357,18 +357,24 @@ pluginBundle {
 }
 
 githubRelease {
-    setToken(System.getProperty("github.secret"))
-    setOwner("JLLeitschuh")
-    setRepo("ktlint-gradle")
-    setOverwrite(true)
-    body {
-        projectDir.resolve("../CHANGELOG.md")
-            .readText()
-            .substringAfter("## [")
-            .substringAfter("## [")
-            .substringBefore("## [")
-            .prefixIfNot("## [")
-    }
+    setToken(providers.systemProperty("github.secret"))
+    owner = "JLLeitschuh"
+    repo = "ktlint-gradle"
+    overwrite = true
+    releaseAssets(
+        tasks.named("shadowJar")
+    )
+    body.set(
+        provider {
+            projectDir.resolve("../CHANGELOG.md")
+                .readText()
+                .substringAfter("## [")
+                .substringAfter("## [")
+                .substringBefore("## [")
+                .prefixIfNot("## [")
+        }
+    )
+    dryRun = true
 }
 
 tasks.withType<Wrapper>().configureEach {

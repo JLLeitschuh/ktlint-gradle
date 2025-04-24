@@ -7,7 +7,7 @@ pluginManagement {
         `java-gradle-plugin`
         `maven-publish`
         id("com.github.johnrengelman.shadow") version "7.0.0"
-        id("com.github.breadmoirai.github-release") version "2.3.7"
+        id("com.github.breadmoirai.github-release") version "2.5.2"
     }
 }
 
