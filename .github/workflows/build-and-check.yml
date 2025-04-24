@@ -111,7 +111,7 @@ jobs:
       - name: Install checkbashisms
         run: sudo apt-get install -qq devscripts
       - name: Check git bashisms
-        run: ./gradlew addKtlintCheckGitPreCommitHook --no-daemon && checkbashisms .git/hooks/pre-commit
+        run: ./gradlew compileKotlin addKtlintCheckGitPreCommitHook --no-daemon && checkbashisms .git/hooks/pre-commit
 
   check_samples:
     strategy:

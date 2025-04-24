@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- Fix `addKtlintCheckGitPreCommitHook` task marking the entire project root and contents as input ([#837](https://github.com/JLLeitschuh/ktlint-gradle/pull/837))
 - Force the pre-commit script to continue even if there is error to ensure the unstaged files are reapplied. [#814](https://github.com/JLLeitschuh/ktlint-gradle/pull/814)
 
 ### Fixed
