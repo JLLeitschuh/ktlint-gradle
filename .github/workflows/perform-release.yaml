@@ -3,7 +3,6 @@ on:
   workflow_dispatch:
     inputs:
        new_version:
-
          description: "Release Version (no 'v')"
          required: true
          type: string
