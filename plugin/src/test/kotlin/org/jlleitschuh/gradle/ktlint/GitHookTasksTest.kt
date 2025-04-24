@@ -241,7 +241,7 @@ class GitHookTasksTest : AbstractPluginTest() {
             build(":$INSTALL_GIT_HOOK_FORMAT_TASK") {
                 assertThat(task(":$INSTALL_GIT_HOOK_FORMAT_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
                 val hookText = gitDir.preCommitGitHook().readText()
-                assertThat(hookText).contains("git diff --color=never > \$diff")
+                assertThat(hookText).contains("git diff --binary --color=never > \$diff")
                 assertThat(hookText).contains("git apply -R \$diff")
                 assertThat(hookText).contains("git apply --ignore-whitespace \$diff")
                 assertThat(hookText).contains("rm \$diff")
