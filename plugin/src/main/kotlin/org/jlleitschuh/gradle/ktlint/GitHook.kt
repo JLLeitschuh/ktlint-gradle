@@ -81,7 +81,7 @@ internal fun generateGitHook(
     echo "${'$'}CHANGED_FILES"
 
     diff=.git/unstaged-ktlint-git-hook.diff
-    git diff --color=never > ${'$'}diff
+    git diff --binary --color=never > ${'$'}diff
     if [ -s ${'$'}diff ]; then
       git apply -R ${'$'}diff
     fi
