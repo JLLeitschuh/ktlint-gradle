@@ -36,11 +36,11 @@ ktlint {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions {
+    compilerOptions {
         // target 1.4 as ktlint 0.49 requires it for inline classes
-        languageVersion = "1.4"
-        apiVersion = "1.4"
-        jvmTarget = "1.8"
+        languageVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_4
+        apiVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_4
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8
     }
 }
 
