@@ -1,10 +1,10 @@
 package org.jlleitschuh.gradle.ktlint.testdsl
 
 import org.gradle.util.GradleVersion
+import org.jlleitschuh.gradle.ktlint.KtlintPlugin
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.ArgumentsProvider
-import java.io.File
 import java.util.stream.Stream
 import kotlin.streams.asStream
 
@@ -12,7 +12,9 @@ import kotlin.streams.asStream
 object TestVersions {
     const val minSupportedGradleVersion = "7.6.3" // lowest version for testing
     const val maxSupportedGradleVersion = "8.12.1"
-    val pluginVersion = File("VERSION_CURRENT.txt").readText().trim()
+    val pluginVersion = System.getProperty("project.version")
+        ?: KtlintPlugin::class.java.`package`.implementationVersion
+        ?: error("Unable to determine plugin version.")
     const val minSupportedKotlinPluginVersion = "1.4.32"
     const val maxSupportedKotlinPluginVersion = "2.1.10"
     const val minAgpVersion = "4.1.0"

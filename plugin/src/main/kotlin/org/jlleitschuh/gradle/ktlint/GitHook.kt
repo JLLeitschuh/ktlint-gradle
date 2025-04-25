@@ -9,6 +9,7 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.UntrackedTask
 import org.intellij.lang.annotations.Language
 import org.jlleitschuh.gradle.ktlint.tasks.BaseKtLintCheckTask
 import java.io.File
@@ -137,6 +138,7 @@ private fun KtlintPlugin.PluginHolder.addInstallGitHookCheckTask() {
     }
 }
 
+@UntrackedTask(because = "Utility task used to install git hooks. Often only run once.")
 open class KtlintInstallGitHookTask @Inject constructor(
     objectFactory: ObjectFactory,
     projectLayout: ProjectLayout

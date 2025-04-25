@@ -1,13 +1,16 @@
 pluginManagement {
-    val latestRelease = file("VERSION_LATEST_RELEASE.txt").readText().trim()
     plugins {
-        id("org.jlleitschuh.gradle.ktlint") version latestRelease
+        // We just always pull the latest published version of the plugin
+        // Downside is that the build is now not 100% reproducible
+        // Upside is that we don't need to update the version in the settings.gradle.kts
+        // every release
+        id("org.jlleitschuh.gradle.ktlint") version "latest.release"
         id("org.jetbrains.kotlin.jvm") version "2.1.20"
         id("com.gradle.plugin-publish") version "0.15.0"
         `java-gradle-plugin`
-        `maven-publish`
         id("com.github.johnrengelman.shadow") version "7.0.0"
         id("com.github.breadmoirai.github-release") version "2.5.2"
+        id("com.netflix.nebula.release") version "20.2.0"
     }
 }
 

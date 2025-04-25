@@ -17,18 +17,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   - Sample Dependency: `androidx.fragment:fragment-ktx` to `1.8.6`
   - Sample Dependency: `com.google.android.material:material` to `1.12.0`
   - Sample Dependency: `androidx.test:runner` to `1.6.2`
-  - Sample Dependency: `junit` to 4.13.2`
-
-
+  - Sample Dependency: `junit` to `4.13.2`
+- Marked `KtlintInstallGitHookTask` as an `@UntrackedTask` to prevent it from being included in the configuration cache. [#862](https://github.com/JLLeitschuh/ktlint-gradle/pull/862)
 
 ### Fixed
 
 - Fix `addKtlintCheckGitPreCommitHook` task marking the entire project root and contents as input ([#837](https://github.com/JLLeitschuh/ktlint-gradle/pull/837))
 - Force the pre-commit script to continue even if there is error to ensure the unstaged files are reapplied. [#814](https://github.com/JLLeitschuh/ktlint-gradle/pull/814)
-
-### Fixed
-
--   fix the pre-commit hook to cope with unstaged binary files [#603](https://github.com/JLLeitschuh/ktlint-gradle/pull/603)
+- Fix the pre-commit hook to cope with unstaged binary files [#603](https://github.com/JLLeitschuh/ktlint-gradle/pull/603)
 
 ## [12.2.0] - 2025-02-27
 
