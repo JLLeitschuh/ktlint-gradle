@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [12.3.0-rc] - 2025-04-25
+
 ### Changed
 
 - Updated build to use Gradle version 8.13 [#850](https://github.com/JLLeitschuh/ktlint-gradle/pull/850)
@@ -770,7 +772,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Renamed task with name `ktlint` to `ktlintCheck` (#3)
 - Renamed tasks with names `ktlint[source set name]` to `ktlint[source set name]Check` (#3)
 
-[unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v12.2.0...HEAD
+[unreleased]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v12.3.0-rc...HEAD
+[12.3.0-rc]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v12.2.0...v12.3.0-rc
 [12.2.0]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v12.1.2...v12.2.0
 [12.1.2]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v12.1.1...v12.1.2
 [12.1.1]: https://github.com/JLLeitschuh/ktlint-gradle/compare/v12.1.0...v12.1.1
