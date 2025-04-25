@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
        new_version:
-         description: "Release Version (no 'v'). End with `-rc` for release candidate"
+         description: "Release Version (no 'v'). End with `-rc.#` for release candidate"
          required: true
          type: string
 
