@@ -1,5 +1,5 @@
 [versions]
-kotlin = "1.5.31"
+kotlin = "2.1.20"
 ktlint = "0.47.1" # last version prior to API changes. we can increase this more once we drop support for the old API.
 androidPlugin = "4.1.0"
 semver = "1.1.1"
