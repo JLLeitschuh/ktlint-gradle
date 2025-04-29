@@ -41,7 +41,7 @@ jobs:
           - language: actions
             build-mode: none
           - language: java-kotlin
-            build-mode: autobuild
+            build-mode: manual
         # CodeQL supports the following values keywords for 'language': 'actions', 'c-cpp', 'csharp', 'go', 'java-kotlin', 'javascript-typescript', 'python', 'ruby', 'swift'
         # Use `c-cpp` to analyze code written in C, C++ or both
         # Use 'java-kotlin' to analyze code written in Java, Kotlin or both
@@ -60,6 +60,10 @@ jobs:
       # - name: Setup runtime (example)
       #   uses: actions/setup-example@v1
 
+      - name: Setup Gradle
+        if: matrix.language == 'java-kotlin'
+        uses: gradle/actions/setup-gradle@v4
+
       # Initializes the CodeQL tools for scanning.
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
@@ -73,17 +77,11 @@ jobs:
           # For more details on CodeQL's query packs, refer to: https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning#using-queries-in-ql-packs
           # queries: security-extended,security-and-quality
 
-      - name: Setup Gradle
-        if: matrix.language == 'java-kotlin'
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Run CodeQL Autobuild
+      - name: Build
         # Now that an explicit java version has been set, use it
         if: matrix.language == 'java-kotlin'
-        uses: github/codeql-action/autobuild@v3
-        with:
-          # Only scan the plugin directory as the rest of the code is just sample code
-          working-directory: plugin
+        run: |
+          ./gradlew -p plugin --no-daemon --no-build-cache --console=plain --no-configuration-cache -x test -x check
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
