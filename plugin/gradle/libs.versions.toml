@@ -1,6 +1,6 @@
 [versions]
 kotlin = "1.5.31"
-ktlint = "0.47.1" # last version prior to API changes. we can increase this more once we drop support for the old API.
+ktlint = "0.49.1" # last version prior to API changes. we can increase this more once we drop support for the old API.
 androidPlugin = "4.1.0"
 semver = "1.1.1"
 jgit = "5.13.3.202401111512-r"
