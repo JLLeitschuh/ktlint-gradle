@@ -379,13 +379,11 @@ githubRelease {
     owner = "JLLeitschuh"
     repo = "ktlint-gradle"
     overwrite = true
-    releaseAssets(
-        tasks.named("shadowJar")
-    )
+    releaseAssets(tasks.named("shadowJar"))
 
     fun isPreReleaseVersion(): Boolean {
         val version = project.version.toString()
-        return version.endsWith("-rc") ||
+        return version.contains("-rc") ||
             version.contains("-dev") ||
             version.contains("-SNAPSHOT")
     }
@@ -393,7 +391,7 @@ githubRelease {
     prerelease.set(provider { isPreReleaseVersion() })
     body.set(
         provider {
-            // If publishing a rc version use the [Unreleased] section of the changelog
+            // If publishing a rc version, use the [Unreleased] section of the changelog
             if (isPreReleaseVersion()) {
                 projectDir.resolve("../CHANGELOG.md")
                     .readText()
@@ -418,8 +416,8 @@ tasks.named<GithubReleaseTask>("githubRelease") {
     doLast {
         if (tagName.get().startsWith("v0.1.0")) {
             throw GradleException(
-                "Release version (${tagName.get()}) was not correcly detected. " +
-                    "Please check that the git repository is corretly initialized and the tag is correct. " +
+                "Release version (${tagName.get()}) was not correctly detected. " +
+                    "Please check that the git repository is correctly initialized and the tag is correct. " +
                     "For GiHub Actions environments, check the fetch-depth setting in the actions/checkout step."
             )
         }
