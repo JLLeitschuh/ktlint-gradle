@@ -66,8 +66,8 @@ fun androidProjectSetup(
         |    }
         |
         |    plugins {
-        |        id("org.jetbrains.kotlin.android") version("$kotlinPluginVersion")
-        |        id("org.jlleitschuh.gradle.ktlint") version("${TestVersions.pluginVersion}")
+        |        id("org.jetbrains.kotlin.android") version ("$kotlinPluginVersion")
+        |        id("org.jlleitschuh.gradle.ktlint") version ("${TestVersions.pluginVersion}")
         |    $newAgp}
         |$oldAgpHack}
         |

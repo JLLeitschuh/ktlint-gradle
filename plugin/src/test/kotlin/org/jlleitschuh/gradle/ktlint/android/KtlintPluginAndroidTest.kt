@@ -74,27 +74,24 @@ class KtlintPluginAndroidTest : AbstractPluginTest() {
         MIN(
             GradleVersion.version(TestVersions.minSupportedGradleVersion),
             TestVersions.minAgpVersion,
-            // AGP 4.1 requires kotlin 1.5.20
-            "1.5.20",
+            TestVersions.minSupportedKotlinPluginVersion,
             // old AGP doesn't properly set variant info which ktlint >= 1 requires
-            "0.47.1",
+            "1.0.1",
             maximumJava = 17
         ),
         AGP_7_4(
             GradleVersion.version(TestVersions.minSupportedGradleVersion),
             "7.4.2",
-            // AGP 4.1 requires kotlin 1.5.20
-            "1.5.20",
+            TestVersions.minSupportedKotlinPluginVersion,
             // old AGP doesn't properly set variant info which ktlint >= 1 requires
-            "0.47.1",
+            "1.0.1",
             minimumJava = 11,
             maximumJava = 17
         ),
         MAX_GRADLE_MIN_AGP(
             GradleVersion.version(TestVersions.maxSupportedGradleVersion),
             TestVersions.minAgpVersion,
-            // AGP 4.1 requires kotlin 1.5.20
-            "1.5.20"
+            TestVersions.minSupportedKotlinPluginVersion
         ),
         MAX(
             GradleVersion.version(TestVersions.maxSupportedGradleVersion),

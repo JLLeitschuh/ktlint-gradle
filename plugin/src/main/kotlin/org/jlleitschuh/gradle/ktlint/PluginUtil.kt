@@ -6,7 +6,6 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFile
-import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.configuration.ConsoleOutput
 import org.gradle.api.model.ObjectFactory
@@ -35,22 +34,12 @@ internal inline fun <reified T : Task> Project.registerTask(
 
 internal const val EDITOR_CONFIG_FILE_NAME = ".editorconfig"
 
-internal fun getEditorConfigFiles(
-    currentProjectDir: Path,
-    additionalEditorconfigFile: RegularFileProperty
-): Set<Path> {
+internal fun getEditorConfigFiles(currentProjectDir: Path): Set<Path> {
     val result = mutableSetOf<Path>()
     searchEditorConfigFiles(
         currentProjectDir,
         result
     )
-
-    if (additionalEditorconfigFile.isPresent) {
-        result.add(
-            additionalEditorconfigFile.asFile.get().toPath()
-        )
-    }
-
     return result
 }
 

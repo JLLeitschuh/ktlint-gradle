@@ -1,6 +1,5 @@
 package org.jlleitschuh.gradle.ktlint.worker
 
-import net.swiftzer.semver.SemVer
 import org.apache.commons.io.input.MessageDigestCalculatingInputStream
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
@@ -8,7 +7,6 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.Logging
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.provider.SetProperty
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
 import org.jlleitschuh.gradle.ktlint.selectInvocation
@@ -24,46 +22,12 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
     private val logger = Logging.getLogger("ktlint-worker")
 
     override fun execute() {
-        val userData = generateUserData()
-        val debug = parameters.debug.get()
         val formatSource = parameters.formatSource.getOrElse(false)
         val results = mutableListOf<LintErrorResult>()
         val formattedFiles = mutableMapOf<File, ByteArray>()
-        if (parameters.additionalEditorconfig.isPresent &&
-            parameters.additionalEditorconfig.get().isNotEmpty() &&
-            parameters.ktLintVersion.map { SemVer.parse(it) }.get() < SemVer(0, 49)
-        ) {
-            logger.warn("additionalEditorconfig not supported until ktlint 0.49")
-        }
         val ktlintInvoker: KtLintInvocation = when (
             val ktlintInvokerFactory = selectInvocation(parameters.ktLintVersion.get())
         ) {
-            is KtLintInvocation47.Factory -> {
-                ktlintInvokerFactory.initialize(
-                    editorConfigPath = null,
-                    userData = userData,
-                    debug = debug,
-                    parameters.enableExperimental.getOrElse(false),
-                    parameters.disabledRules.getOrElse(emptySet())
-                )
-            }
-
-            is KtLintInvocation48.Factory -> {
-                ktlintInvokerFactory.initialize(
-                    userData,
-                    parameters.enableExperimental.getOrElse(false),
-                    parameters.disabledRules.getOrElse(emptySet())
-                )
-            }
-
-            is KtLintInvocation49.Factory -> {
-                ktlintInvokerFactory.initialize(parameters.additionalEditorconfig.get())
-            }
-
-            is KtLintInvocation50.Factory -> {
-                ktlintInvokerFactory.initialize(parameters.additionalEditorconfig.get())
-            }
-
             is KtLintInvocation100.Factory -> {
                 ktlintInvokerFactory.initialize(parameters.additionalEditorconfig.get())
             }
@@ -123,23 +87,9 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
         }
     }
 
-    private fun generateUserData(): Map<String, String> {
-        val userData = mutableMapOf(
-            "android" to parameters.android.get().toString()
-        )
-        val disabledRules = parameters.disabledRules.get()
-        if (disabledRules.isNotEmpty()) {
-            userData["disabled_rules"] = disabledRules.joinToString(separator = ",")
-        }
-
-        return userData.toMap()
-    }
-
     interface KtLintWorkParameters : WorkParameters {
         val filesToLint: ConfigurableFileCollection
         val android: Property<Boolean>
-        val disabledRules: SetProperty<String>
-        val enableExperimental: Property<Boolean>
         val debug: Property<Boolean>
         val additionalEditorconfig: MapProperty<String, String>
         val formatSource: Property<Boolean>

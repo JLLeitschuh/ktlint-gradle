@@ -27,3 +27,11 @@ fun SerializableLintError.toCliError(): KtlintCliError {
         }
     )
 }
+
+fun List<KtlintCliError>.containsLintError(error: KtlintCliError): Boolean {
+    return firstOrNull { lintError ->
+        lintError.col == error.col &&
+            lintError.line == error.line &&
+            lintError.ruleId == error.ruleId
+    } != null
+}

@@ -12,7 +12,6 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.provider.SetProperty
 import org.gradle.api.specs.Spec
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Classpath
@@ -54,10 +53,6 @@ abstract class BaseKtLintCheckTask @Inject constructor(
     @get:Classpath
     internal abstract val ktLintClasspath: ConfigurableFileCollection
 
-    @get:Internal
-    @get:Deprecated("ktlint no longer supports this parameter")
-    internal abstract val additionalEditorconfigFile: RegularFileProperty
-
     @get:Input
     internal abstract val additionalEditorconfig: MapProperty<String, String>
 
@@ -66,10 +61,7 @@ abstract class BaseKtLintCheckTask @Inject constructor(
     @get:InputFiles
     internal val editorConfigFiles: FileCollection = objectFactory.fileCollection().from(
         {
-            getEditorConfigFiles(
-                projectLayout.projectDirectory.asFile.toPath(),
-                additionalEditorconfigFile
-            )
+            getEditorConfigFiles(projectLayout.projectDirectory.asFile.toPath())
         }
     )
 
@@ -84,9 +76,6 @@ abstract class BaseKtLintCheckTask @Inject constructor(
 
     @get:Input
     internal abstract val android: Property<Boolean>
-
-    @get:Input
-    internal abstract val disabledRules: SetProperty<String>
 
     @get:Input
     internal abstract val enableExperimentalRules: Property<Boolean>
@@ -282,9 +271,7 @@ abstract class BaseKtLintCheckTask @Inject constructor(
         queue.submit(KtLintWorkAction::class.java) {
             val task = this@BaseKtLintCheckTask
             filesToLint.from(filesToCheck)
-            enableExperimental.set(task.enableExperimentalRules)
             android.set(task.android)
-            disabledRules.set(task.disabledRules)
             debug.set(task.debug)
             additionalEditorconfig.set(task.additionalEditorconfig)
             formatSource.set(formatSources)

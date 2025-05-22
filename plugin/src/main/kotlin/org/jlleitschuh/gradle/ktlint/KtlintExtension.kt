@@ -36,7 +36,7 @@ internal constructor(
     /**
      * The version of KtLint to use.
      */
-    val version: Property<String> = objectFactory.property { set("1.0.1") }
+    val version: Property<String> = objectFactory.property { set("1.5.0") }
 
     /**
      * Enable relative paths in reports
@@ -111,16 +111,6 @@ internal constructor(
             .apply {
                 convention(emptyMap())
             }
-
-    /**
-     * Disable particular rules, by default enabled in ktlint, using rule id.
-     *
-     * @since ktlint `0.34.2`
-     */
-    @Deprecated("not supported with ktlint 0.48+")
-    val disabledRules: SetProperty<String> = objectFactory.setProperty {
-        set(emptySet())
-    }
 
     /**
      * Baseline file location.
