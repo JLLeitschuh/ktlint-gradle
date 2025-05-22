@@ -1,7 +1,7 @@
 name: 'Base Release Setup'
 description: 'Setup environment for Release'
 # This action is used to set up the environment for a release.
-# It is a reusable actions because it allows us to test the release process in the
+# It is a reusable action because it allows us to test the release process in the
 # `build-and-check.yml` workflow.
 
 runs:
@@ -11,8 +11,8 @@ runs:
       shell: bash
       # Workaround for https://github.com/actions/checkout/issues/1471
       # See: https://github.com/actions/checkout/issues/1471#issuecomment-1755560284
-      run: git fetch --prune --unshallow --tags
-    - name: set up JDK 8
+      run: git fetch --prune --unshallow --tags --force
+    - name: Set up JDK 8
       uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
       with:
         java-version: 8

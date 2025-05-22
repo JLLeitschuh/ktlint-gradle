@@ -45,7 +45,7 @@ jobs:
             README.md
 
       - name: Perform Release Tagging and Push
-        if: (!contains(github.ref, '-rc.'))
+        if: (contains(github.ref, '-rc.'))
         # This will trigger the new release job that will take the tag and push the release to the plugin portal
         uses: stefanzweifel/git-auto-commit-action@b863ae1933cb653a53c021fe36dbb774e1fb9403 # v5.2.0
         with:

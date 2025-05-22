@@ -7,12 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
-## [12.3.0-rc.2] - 2025-04-25
-
-## [12.3.0-rc.1] - 2025-04-25
-
-## [12.3.0-rc] - 2025-04-25
-
 ### Changed
 
 - Updated build to use Gradle version 8.13 [#850](https://github.com/JLLeitschuh/ktlint-gradle/pull/850)
