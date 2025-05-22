@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+- remove support for ktlint < 1 [#889](https://github.com/JLLeitschuh/ktlint-gradle/pull/889)
+- increase minimum kotlin version to 1.7 [#889](https://github.com/JLLeitschuh/ktlint-gradle/pull/889)
+- update default ktlint version to 1.5 [#889](https://github.com/JLLeitschuh/ktlint-gradle/pull/889)
+
 ## [12.3.0] - 2025-05-22
 
 ### Changed

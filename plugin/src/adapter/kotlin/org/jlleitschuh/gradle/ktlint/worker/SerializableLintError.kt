@@ -16,11 +16,3 @@ data class SerializableLintError(
         private const val serialVersionUID: Long = 20120922L
     }
 }
-
-fun List<SerializableLintError>.containsLintError(error: SerializableLintError): Boolean {
-    return firstOrNull { lintError ->
-        lintError.col == error.col &&
-            lintError.line == error.line &&
-            lintError.ruleId == error.ruleId
-    } != null
-}

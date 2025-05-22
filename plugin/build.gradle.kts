@@ -4,6 +4,8 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.gradle.enterprise.gradleplugin.testretry.retry
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.util.prefixIfNot
 
@@ -32,15 +34,14 @@ java {
 }
 
 ktlint {
-    version.set("1.1.0")
+    version.set("1.6.0")
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        // target 1.4 as ktlint 0.49 requires it for inline classes
-        languageVersion = "1.4"
-        apiVersion = "1.4"
-        jvmTarget = "1.8"
+    compilerOptions {
+        languageVersion.set(KotlinVersion.KOTLIN_1_7)
+        apiVersion.set(KotlinVersion.KOTLIN_1_7)
+        jvmTarget.set(JvmTarget.JVM_1_8)
     }
 }
 
@@ -65,27 +66,12 @@ configurations["testImplementation"].extendsFrom(shadowImplementation)
 sourceSets {
     val adapter by creating {
     }
-    val adapter47 by creating {
-        compileClasspath += adapter.output
-    }
-    val adapter48 by creating {
-        compileClasspath += adapter.output
-    }
-    val adapter49 by creating {
-        compileClasspath += adapter.output
-    }
-    val adapter50 by creating {
-        compileClasspath += adapter.output
-    }
+
     val adapter100 by creating {
         compileClasspath += adapter.output
     }
     val adapters = listOf(
         adapter,
-        adapter47,
-        adapter48,
-        adapter49,
-        adapter50,
         adapter100
     )
     val main by getting {
@@ -105,10 +91,6 @@ sourceSets {
 
 val adapterSources = listOf(
     sourceSets.named("adapter"),
-    sourceSets.named("adapter47"),
-    sourceSets.named("adapter48"),
-    sourceSets.named("adapter49"),
-    sourceSets.named("adapter50"),
     sourceSets.named("adapter100")
 )
 
@@ -125,23 +107,8 @@ tasks.named<Jar>("shadowJar").configure {
 }
 
 dependencies {
-    add("adapterCompileOnly", "com.pinterest.ktlint:ktlint-core:0.34.0")
     add("adapterImplementation", libs.commons.io)
     add("adapterImplementation", libs.semver)
-
-    add("adapter47CompileOnly", "com.pinterest.ktlint:ktlint-core:0.47.1")
-    add("adapter48CompileOnly", "com.pinterest.ktlint:ktlint-core:0.48.2")
-
-    add("adapter49CompileOnly", "com.pinterest.ktlint:ktlint-core:0.49.1")
-    add("adapter49CompileOnly", "com.pinterest.ktlint:ktlint-cli-reporter:0.49.1")
-    add("adapter49CompileOnly", "com.pinterest.ktlint:ktlint-rule-engine:0.49.1")
-    add("adapter49CompileOnly", "com.pinterest.ktlint:ktlint-ruleset-standard:0.49.1")
-    add("adapter49CompileOnly", "com.pinterest.ktlint:ktlint-reporter-baseline:0.49.1")
-
-    add("adapter50CompileOnly", "com.pinterest.ktlint:ktlint-cli-reporter:0.50.0")
-    add("adapter50CompileOnly", "com.pinterest.ktlint:ktlint-rule-engine:0.50.0")
-    add("adapter50CompileOnly", "com.pinterest.ktlint:ktlint-ruleset-standard:0.50.0")
-    add("adapter50CompileOnly", "com.pinterest.ktlint:ktlint-reporter-baseline:0.50.0")
 
     add("adapter100CompileOnly", "com.pinterest.ktlint:ktlint-cli-reporter-core:1.0.0")
     add("adapter100CompileOnly", "com.pinterest.ktlint:ktlint-rule-engine:1.0.0")
@@ -160,7 +127,7 @@ dependencies {
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.assertj.core)
     testImplementation(libs.kotlin.reflect)
-    testImplementation(libs.ktlint.core)
+    testImplementation(libs.ktlint.rule.engine)
     testImplementation(libs.archunit.junit5)
 }
 
@@ -179,10 +146,8 @@ kotlin {
 tasks.withType<Test> {
     dependsOn("publishToMavenLocal")
     useJUnitPlatform()
-    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
-    doFirst {
-        logger.lifecycle("maxParallelForks for '$path' is $maxParallelForks")
-    }
+    maxParallelForks = 6 // no point in this being higher than the number of gradle workers
+
     // Set the system property for the project version to be used in the tests
     systemProperty("project.version", project.version.toString())
     testLogging {

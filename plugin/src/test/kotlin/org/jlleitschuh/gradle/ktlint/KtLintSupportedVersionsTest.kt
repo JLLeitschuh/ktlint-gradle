@@ -173,17 +173,9 @@ class KtLintSupportedVersionsTest : AbstractPluginTest() {
 
     class SupportedKtlintVersionsProvider : GradleArgumentsProvider() {
         private val supportedKtlintVersions = mutableListOf(
-            "0.47.1",
-            "0.48.2",
-            // "0.49.0" did not expose needed baseline classes
-            "0.49.1",
-            "0.50.0",
-            "1.0.1",
-            "1.1.1",
-            "1.2.1",
-            "1.3.1",
-            "1.4.1",
-            "1.5.0"
+            "1.0.1", // lowest
+            "1.5.0", // default
+            "1.6.0" // highest
         )
 
         override fun provideArguments(

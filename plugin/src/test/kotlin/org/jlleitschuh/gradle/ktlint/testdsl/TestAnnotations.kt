@@ -11,12 +11,12 @@ import kotlin.streams.asStream
 @Suppress("ConstPropertyName")
 object TestVersions {
     const val minSupportedGradleVersion = "7.6.3" // lowest version for testing
-    const val maxSupportedGradleVersion = "8.12.1"
+    const val maxSupportedGradleVersion = "8.13"
     val pluginVersion = System.getProperty("project.version")
         ?: KtlintPlugin::class.java.`package`.implementationVersion
         ?: error("Unable to determine plugin version.")
-    const val minSupportedKotlinPluginVersion = "1.4.32"
-    const val maxSupportedKotlinPluginVersion = "2.1.10"
+    const val minSupportedKotlinPluginVersion = "1.6.21"
+    const val maxSupportedKotlinPluginVersion = "2.1.21"
     const val minAgpVersion = "4.1.0"
     const val maxAgpVersion = "8.8.0"
 }

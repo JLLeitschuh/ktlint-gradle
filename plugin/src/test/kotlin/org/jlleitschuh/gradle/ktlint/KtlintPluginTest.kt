@@ -361,40 +361,6 @@ class KtlintPluginTest : AbstractPluginTest() {
         }
     }
 
-    @DisplayName("Should enable experimental indentation rule")
-    @CommonTest
-    fun enableExperimentalIndentationRule(gradleVersion: GradleVersion) {
-        project(gradleVersion) {
-            //language=Kotlin
-            createSourceFile(
-                "src/main/kotlin/C.kt",
-                """
-                    class C {
-
-                        private val Any.className
-                            get() = this.javaClass.name
-                                .fn()
-
-                        private fun String.escape() =
-                            this.fn()
-                    }
-                """.trimIndent()
-            )
-            //language=Groovy
-            buildGradle.appendText(
-                """
-
-                ktlint.enableExperimentalRules = true
-                ktlint.version = "0.47.1"
-                """.trimIndent()
-            )
-
-            buildAndFail(":$CHECK_PARENT_TASK_NAME", "-s") {
-                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
-            }
-        }
-    }
-
     @DisplayName("Lint check should run incrementally")
     @CommonTest
     fun checkIsIncremental(gradleVersion: GradleVersion) {
@@ -599,15 +565,16 @@ class KtlintPluginTest : AbstractPluginTest() {
     fun forceDependenciesRuleSetConfiguration(gradleVersion: GradleVersion) {
         project(gradleVersion) {
             withCleanSources()
-
             //language=Groovy
             buildGradle.appendText(
                 """
-
-                dependencies {
-                    $KTLINT_RULESET_CONFIGURATION_NAME "com.pinterest.ktlint:ktlint-cli-ruleset-core:1.0.0"
-                }
-                """.trimIndent()
+ktlint {
+    version = "1.0.1"
+}
+dependencies {
+    $KTLINT_RULESET_CONFIGURATION_NAME "com.pinterest.ktlint:ktlint-cli-ruleset-core:1.0.0"
+}
+"""
             )
 
             build(":dependencies", "--configuration", KTLINT_RULESET_CONFIGURATION_NAME) {
@@ -625,11 +592,13 @@ class KtlintPluginTest : AbstractPluginTest() {
             //language=Groovy
             buildGradle.appendText(
                 """
-
-                dependencies {
-                    $KTLINT_REPORTER_CONFIGURATION_NAME "com.pinterest.ktlint:ktlint-cli-ruleset-core:1.0.0"
-                }
-                """.trimIndent()
+ktlint {
+    version = "1.0.1"
+}
+dependencies {
+    $KTLINT_REPORTER_CONFIGURATION_NAME "com.pinterest.ktlint:ktlint-cli-ruleset-core:1.0.0"
+}
+"""
             )
 
             build(":dependencies", "--configuration", KTLINT_REPORTER_CONFIGURATION_NAME) {
@@ -703,7 +672,7 @@ class KtlintPluginTest : AbstractPluginTest() {
                 """.trimIndent()
             )
 
-            build(CHECK_PARENT_TASK_NAME, "--info") { // <-- Fails, file one is not found.
+            build(CHECK_PARENT_TASK_NAME, "--info") {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             }
         }

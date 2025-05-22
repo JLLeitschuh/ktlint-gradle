@@ -11,6 +11,9 @@ ij_kotlin_packages_to_use_import_on_demand = unset
 ij_kotlin_name_count_to_use_star_import = 999
 ij_kotlin_name_count_to_use_star_import_for_members = 999
 ktlint_code_style=intellij_idea
+ktlint_standard_function-expression-body = disabled
+ktlint_standard_function-signature = disabled
+ktlint_standard_class-signature = disabled
 
 [*.{yml,yaml}]
 indent_size = 2
