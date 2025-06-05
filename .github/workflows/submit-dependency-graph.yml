@@ -18,6 +18,6 @@ jobs:
         with:
           egress-policy: audit
       - name: Download and submit dependency graph
-        uses: gradle/actions/dependency-submission@v4
+        uses: gradle/actions/dependency-submission@8379f6a1328ee0e06e2bb424dadb7b159856a326 # v4.4.0
         with:
           dependency-graph: download-and-submit # Download saved dependency-graph and submit
