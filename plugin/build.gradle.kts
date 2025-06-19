@@ -113,7 +113,7 @@ dependencies {
     add("adapter100CompileOnly", "com.pinterest.ktlint:ktlint-cli-reporter-core:1.0.0")
     add("adapter100CompileOnly", "com.pinterest.ktlint:ktlint-rule-engine:1.0.0")
     add("adapter100CompileOnly", "com.pinterest.ktlint:ktlint-ruleset-standard:1.0.0")
-    add("adapter100CompileOnly", "com.pinterest.ktlint:ktlint-cli-reporter-baseline:1.0.0")
+    add("adapter100CompileOnly", "com.pinterest.ktlint:ktlint-cli-reporter-baseline:1.6.0")
 
     compileOnly(libs.kotlin.gradle.plugin)
     compileOnly(libs.android.gradle.plugin)
