@@ -28,9 +28,6 @@ The assumption being that you would not want to lint code you weren't compiling.
     - [How to apply to all subprojects](#applying-to-subprojects)
     - [Baseline support](#baseline-support)
     - [Testing KtLint snapshots](#testing-ktlint-snapshots)
-  - [Intellij IDEA plugin](#intellij-idea-only-plugin)
-    - [Simple setup](#idea-plugin-simple-setup)
-    - [Using legacy apply method](#idea-plugin-setup-using-legacy-apply-method)
   - [Plugin configuration](#configuration)
     - [Setting reports output directory](#setting-reports-output-directory)
     - [Customer reporters](#custom-reporters)
@@ -508,11 +505,6 @@ Then for each `SourceSet` plugin adds following tasks:
 ### Additional helper tasks
 
 Following additional  tasks are added:
-- `ktlintApplyToIdea` - The task generates IntelliJ IDEA (or Android Studio) Kotlin
-                        style files in the project `.idea/` folder. **Note** that this task will overwrite the existing style file.
-- `ktlintApplyToIdeaGlobally` - The task generates IntelliJ IDEA (or Android Studio) Kotlin
-                                style files in the user home IDEA
-                                (or Android Studio) settings folder. **Note** that this task will overwrite the existing style file.
 - `addKtlintCheckGitPreCommitHook` - adds [Git](https://www.git-scm.com/) `pre-commit` hook,
 that runs ktlint check over staged files.
 - `addKtlintFormatGitPreCommitHook` - adds [Git](https://www.git-scm.com/) `pre-commit` hook,
