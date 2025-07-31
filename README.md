@@ -597,3 +597,13 @@ Optionally you can add this step test run configuration.
 ## Links
 
 [Ktlint Gradle Plugin on the Gradle Plugin Registry](https://plugins.gradle.org/plugin/org.jlleitschuh.gradle.ktlint)
+
+## Star History
+
+<a href="https://www.star-history.com/#JLLeitschuh/ktlint-gradle&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=JLLeitschuh/ktlint-gradle&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=JLLeitschuh/ktlint-gradle&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=JLLeitschuh/ktlint-gradle&type=Date" />
+ </picture>
+</a>
