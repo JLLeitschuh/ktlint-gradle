@@ -118,6 +118,7 @@ dependencies {
     compileOnly(libs.kotlin.gradle.plugin)
     compileOnly(libs.android.gradle.plugin)
     compileOnly(kotlin("stdlib-jdk8"))
+    compileOnly(gradleApi())
     shadowImplementation(libs.semver)
     shadowImplementation(libs.jgit)
     shadowImplementation(libs.commons.io)
@@ -129,6 +130,9 @@ dependencies {
     testImplementation(libs.kotlin.reflect)
     testImplementation(libs.ktlint.rule.engine)
     testImplementation(libs.archunit.junit5)
+    testImplementation(gradleApi())
+    // Used to test the problems API
+    testImplementation("org.mockito.kotlin:mockito-kotlin:4.1.0")
 }
 
 kotlin {
