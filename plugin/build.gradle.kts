@@ -132,7 +132,7 @@ dependencies {
     testImplementation(libs.archunit.junit5)
     testImplementation(gradleApi())
     // Used to test the problems API
-    testImplementation("org.mockito.kotlin:mockito-kotlin:4.1.0")
+    testImplementation(libs.mockito.kotlin)
 }
 
 kotlin {
