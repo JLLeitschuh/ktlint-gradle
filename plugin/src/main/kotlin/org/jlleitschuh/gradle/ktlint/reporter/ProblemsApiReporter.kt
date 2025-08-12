@@ -24,19 +24,9 @@ class ProblemsApiReporter {
     }
 
     fun reportProblems(lintErrors: Map<String, List<SerializableLintError>>) {
-        val reporter: ProblemReporter? = problems?.reporter
-
         lintErrors.forEach { (filePath, errors) ->
             errors.forEach { error ->
-                val group = ProblemGroup.create("validation", "ktlint issue")
-                val id = ProblemId.create(error.ruleId, error.detail, group)
-                reporter?.report(id) {
-                    fileLocation(filePath)
-                    lineInFileLocation(filePath, error.line)
-                    details(error.detail)
-                    severity(Severity.WARNING)
-                    solution("Run ktlintFormat to auto-fix this issue")
-                }
+                reportProblem(error, filePath)
             }
         }
     }
