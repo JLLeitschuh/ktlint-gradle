@@ -118,7 +118,6 @@ dependencies {
     compileOnly(libs.kotlin.gradle.plugin)
     compileOnly(libs.android.gradle.plugin)
     compileOnly(kotlin("stdlib-jdk8"))
-    compileOnly(gradleApi())
     shadowImplementation(libs.semver)
     shadowImplementation(libs.jgit)
     shadowImplementation(libs.commons.io)
