@@ -10,18 +10,9 @@ import org.jlleitschuh.gradle.ktlint.worker.SerializableLintError
 import javax.inject.Inject
 
 @Incubating
-class ProblemsApiReporter {
-
-    private var problems: Problems? = null
-
-    @Inject
-    public constructor(problems: Problems) {
-        this.problems = problems
-    }
-
-    public constructor() {
-        this.problems = null
-    }
+class ProblemsApiReporter @Inject constructor(
+    private val problems: Problems,
+) {
 
     fun reportProblems(lintErrors: Map<String, List<SerializableLintError>>) {
         lintErrors.forEach { (filePath, errors) ->
@@ -32,11 +23,11 @@ class ProblemsApiReporter {
     }
 
     fun reportProblem(error: SerializableLintError, filePath: String) {
-        val reporter: ProblemReporter? = problems?.reporter
+        val reporter: ProblemReporter = problems.reporter
 
         val group = ProblemGroup.create("validation", "ktlint issue")
         val id = ProblemId.create(error.ruleId, error.detail, group)
-        reporter?.report(id) {
+        reporter.report(id) {
             fileLocation(filePath)
             lineInFileLocation(filePath, error.line)
             details(error.detail)

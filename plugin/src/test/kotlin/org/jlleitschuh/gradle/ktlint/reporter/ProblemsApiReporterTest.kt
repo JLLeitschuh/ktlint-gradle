@@ -26,8 +26,8 @@ class ProblemsApiReporterTest {
     fun setUp() {
         problemsService = mock()
         problemReporter = mock()
-        reporter = ProblemsApiReporter(problemsService)
         whenever(problemsService.reporter).thenReturn(problemReporter)
+        reporter = ProblemsApiReporter(problemsService)
     }
 
     @Test
@@ -96,22 +96,6 @@ class ProblemsApiReporterTest {
         val emptyErrors = emptyMap<String, List<SerializableLintError>>()
 
         reporter.reportProblems(emptyErrors)
-
-        verify(problemReporter, never()).report(any(), any())
-    }
-
-    @Test
-    fun `the problems service is not available when reporting`() {
-        val reporterWithoutProblems = ProblemsApiReporter()
-        val error = SerializableLintError(
-            line = 1,
-            col = 1,
-            ruleId = "test-rule",
-            detail = "Test error",
-            canBeAutoCorrected = false
-        )
-
-        reporterWithoutProblems.reportProblem(error, "test.kt")
 
         verify(problemReporter, never()).report(any(), any())
     }
