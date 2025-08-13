@@ -110,10 +110,10 @@ dependencies {
     add("adapterImplementation", libs.commons.io)
     add("adapterImplementation", libs.semver)
 
-    add("adapter100CompileOnly", "com.pinterest.ktlint:ktlint-cli-reporter-core:1.0.0")
-    add("adapter100CompileOnly", "com.pinterest.ktlint:ktlint-rule-engine:1.0.0")
-    add("adapter100CompileOnly", "com.pinterest.ktlint:ktlint-ruleset-standard:1.0.0")
-    add("adapter100CompileOnly", "com.pinterest.ktlint:ktlint-cli-reporter-baseline:1.0.0")
+    add("adapter100CompileOnly", "com.pinterest.ktlint:ktlint-cli-reporter-core:1.7.1")
+    add("adapter100CompileOnly", "com.pinterest.ktlint:ktlint-rule-engine:1.7.1")
+    add("adapter100CompileOnly", "com.pinterest.ktlint:ktlint-ruleset-standard:1.7.1")
+    add("adapter100CompileOnly", "com.pinterest.ktlint:ktlint-cli-reporter-baseline:1.7.1")
 
     compileOnly(libs.kotlin.gradle.plugin)
     compileOnly(libs.android.gradle.plugin)
