@@ -1,5 +1,6 @@
 package org.jlleitschuh.gradle.ktlint.worker
 
+import com.pinterest.ktlint.cli.reporter.baseline.loadBaseline
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
@@ -9,16 +10,13 @@ import org.gradle.api.provider.Property
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
 import org.jetbrains.kotlin.util.prefixIfNot
-import org.jlleitschuh.gradle.ktlint.selectBaselineLoader
 import java.io.File
 
-@Suppress("UnstableApiUsage")
 internal abstract class ConsoleReportWorkAction : WorkAction<ConsoleReportWorkAction.ConsoleReportParameters> {
 
     private val logger = Logging.getLogger("ktlint-console-report-worker")
 
     override fun execute() {
-        val baselineLoader = selectBaselineLoader(parameters.ktLintVersion.get())
         val errors = KtLintClassesSerializer
             .create()
             .loadErrors(
@@ -26,7 +24,7 @@ internal abstract class ConsoleReportWorkAction : WorkAction<ConsoleReportWorkAc
             )
 
         val baselineRules = parameters.baseline.orNull?.asFile?.absolutePath
-            ?.let { baselineLoader.loadBaselineRules(it) }
+            ?.let { loadBaseline(it).lintErrorsPerFile }
         val projectDir = parameters.projectDirectory.asFile.get()
 
         val lintErrors = errors.associate { lintErrorResult ->
@@ -38,7 +36,7 @@ internal abstract class ConsoleReportWorkAction : WorkAction<ConsoleReportWorkAc
                 .lintErrors
                 .filter {
                     !it.second &&
-                        baselineLintErrors?.containsLintError(it.first) != true
+                        baselineLintErrors?.containsLintError(it.first.toCliError()) != true
                 }
                 .map { it.first }
         }

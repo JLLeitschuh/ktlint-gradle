@@ -2,17 +2,17 @@ name: "Trigger Release"
 on:
   workflow_dispatch:
     inputs:
-       new_version:
-         description: "Release Version (no 'v'). End with `-rc` for release candidate"
-         required: true
-         type: string
+      new_version:
+        description: "Release Version (no 'v'). End with `-rc.#` for release candidate"
+        required: true
+        type: string
 
 jobs:
   perform-release:
     runs-on: ubuntu-latest
     steps:
       - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+        uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
         with:
           egress-policy: audit
 
@@ -37,17 +37,24 @@ jobs:
           sed -i 's|\(Latest plugin version: \[\).*\(\](/CHANGELOG.md#\).*---.*)|\1'"$new_version"'\2'"$stripped_version"'---'"$formatted_date"')|' README.md
 
       - name: Upload Changed Files as Artifacts
-        uses: actions/upload-artifact@4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: changed-files
           path: |
             CHANGELOG.md
             README.md
 
-      - name: Perform Release Tagging and Push
-        if: (!contains(github.ref, '-rc.'))
+      - name: Cleanup Changed Files for RC
+        if: contains(github.event.inputs.new_version, '-rc.')
+        run: |
+          # Reset the README.md and CHANGELOG.md files to their original state
+          git checkout HEAD -- README.md CHANGELOG.md
+
+      - name: Perform Tagging and Push
         # This will trigger the new release job that will take the tag and push the release to the plugin portal
-        uses: stefanzweifel/git-auto-commit-action@b863ae1933cb653a53c021fe36dbb774e1fb9403 # v5.2.0
+        uses: stefanzweifel/git-auto-commit-action@778341af668090896ca464160c2def5d1d1a3eb0 # v6.0.1
         with:
+          commit_options: --allow-empty
           commit_message: Release version ${{ github.event.inputs.new_version }}
           tagging_message: 'v${{ github.event.inputs.new_version }}'
+          skip_dirty_check: ${{contains(github.event.inputs.new_version, '-rc.')}}

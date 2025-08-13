@@ -1,6 +1,6 @@
 [versions]
 kotlin = "1.5.31"
-ktlint = "0.47.1" # last version prior to API changes. we can increase this more once we drop support for the old API.
+ktlint = "1.0.0"
 androidPlugin = "4.1.0"
 semver = "1.1.1"
 jgit = "5.13.3.202401111512-r"
@@ -8,7 +8,7 @@ sl4fj = "1.7.30"
 gradleWrapper = "8.13"
 gradleWrapperSha = "20f1b1176237254a6fc204d8434196fa11a4cfb387567519c61556e8710aed78"
 junit5 = "5.5.2"
-assertJ = "3.11.1"
+assertJ = "3.27.4"
 commonsIo = "2.17.0"
 archUnit = "1.4.0"
 
@@ -22,6 +22,6 @@ junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "jun
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlin-script-runtime = { module = "org.jetbrains.kotlin:kotlin-script-runtime", version.ref = "kotlin" }
-ktlint-core = { module = "com.pinterest.ktlint:ktlint-core", version.ref = "ktlint" }
+ktlint-rule-engine = { module = "com.pinterest.ktlint:ktlint-rule-engine", version.ref = "ktlint" }
 semver = { module = "net.swiftzer.semver:semver", version.ref = "semver" }
 slf4j-nop = { module = "org.slf4j:slf4j-nop", version.ref = "sl4fj" }

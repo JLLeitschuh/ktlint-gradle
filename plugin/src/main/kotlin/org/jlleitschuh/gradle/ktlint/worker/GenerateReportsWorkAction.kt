@@ -1,5 +1,6 @@
 package org.jlleitschuh.gradle.ktlint.worker
 
+import com.pinterest.ktlint.cli.reporter.baseline.loadBaseline
 import org.gradle.api.GradleException
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
@@ -7,16 +8,13 @@ import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
-import org.jlleitschuh.gradle.ktlint.selectBaselineLoader
 import org.jlleitschuh.gradle.ktlint.selectReportersLoaderAdapter
 import java.io.File
 import java.io.PrintStream
 
-@Suppress("UnstableApiUsage")
 internal abstract class GenerateReportsWorkAction : WorkAction<GenerateReportsWorkAction.GenerateReportsParameters> {
 
     override fun execute() {
-        val baselineLoader = selectBaselineLoader(parameters.ktLintVersion.get())
         val ktLintClassesSerializer = KtLintClassesSerializer
             .create()
 
@@ -27,8 +25,8 @@ internal abstract class GenerateReportsWorkAction : WorkAction<GenerateReportsWo
             .find { it.id == currentReporterId }
             ?: throw GradleException("Could not find ReporterProvider \"$currentReporterId\"")
 
-        val baselineRules: Map<String, List<SerializableLintError>>? = parameters.baseline.orNull?.asFile?.absolutePath
-            ?.let { baselineLoader.loadBaselineRules(it) }
+        val baselineRules = parameters.baseline.orNull?.asFile?.absolutePath
+            ?.let { loadBaseline(it).lintErrorsPerFile }
         val projectDir = parameters.projectDirectory.asFile.get()
 
         PrintStream(
@@ -47,7 +45,7 @@ internal abstract class GenerateReportsWorkAction : WorkAction<GenerateReportsWo
                 )
                 reporter.before(filePath)
                 lintErrorResult.lintErrors.forEach {
-                    if (baselineLintErrors?.containsLintError(it.first) != true) {
+                    if (baselineLintErrors?.containsLintError(it.first.toCliError()) != true) {
                         reporter.onLintError(filePath, it.first, it.second)
                     }
                 }

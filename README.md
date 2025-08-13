@@ -3,7 +3,7 @@
 **Provides a convenient wrapper plugin over the [ktlint](https://github.com/pinterest/ktlint) project.**
 
 <!-- Note: if changing the line below, the `sed` command in the trigger-release.yaml needs to be updated too -->
-Latest plugin version: [12.2.0](/CHANGELOG.md#---20250227)
+Latest plugin version: [13.0.0](/CHANGELOG.md#---20250707)
 
 [![Join the chat at https://kotlinlang.slack.com](https://img.shields.io/badge/slack-@kotlinlang/ktlint-yellow.svg?logo=slack)](https://kotlinlang.slack.com/messages/CKS3XG0LS)
 [![Build and Check](https://github.com/JLLeitschuh/ktlint-gradle/actions/workflows/build-and-check.yml/badge.svg)](https://github.com/JLLeitschuh/ktlint-gradle/actions/workflows/build-and-check.yml)
@@ -28,9 +28,6 @@ The assumption being that you would not want to lint code you weren't compiling.
     - [How to apply to all subprojects](#applying-to-subprojects)
     - [Baseline support](#baseline-support)
     - [Testing KtLint snapshots](#testing-ktlint-snapshots)
-  - [Intellij IDEA plugin](#intellij-idea-only-plugin)
-    - [Simple setup](#idea-plugin-simple-setup)
-    - [Using legacy apply method](#idea-plugin-setup-using-legacy-apply-method)
   - [Plugin configuration](#configuration)
     - [Setting reports output directory](#setting-reports-output-directory)
     - [Customer reporters](#custom-reporters)
@@ -508,11 +505,6 @@ Then for each `SourceSet` plugin adds following tasks:
 ### Additional helper tasks
 
 Following additional  tasks are added:
-- `ktlintApplyToIdea` - The task generates IntelliJ IDEA (or Android Studio) Kotlin
-                        style files in the project `.idea/` folder. **Note** that this task will overwrite the existing style file.
-- `ktlintApplyToIdeaGlobally` - The task generates IntelliJ IDEA (or Android Studio) Kotlin
-                                style files in the user home IDEA
-                                (or Android Studio) settings folder. **Note** that this task will overwrite the existing style file.
 - `addKtlintCheckGitPreCommitHook` - adds [Git](https://www.git-scm.com/) `pre-commit` hook,
 that runs ktlint check over staged files.
 - `addKtlintFormatGitPreCommitHook` - adds [Git](https://www.git-scm.com/) `pre-commit` hook,
@@ -605,3 +597,13 @@ Optionally you can add this step test run configuration.
 ## Links
 
 [Ktlint Gradle Plugin on the Gradle Plugin Registry](https://plugins.gradle.org/plugin/org.jlleitschuh.gradle.ktlint)
+
+## Star History
+
+<a href="https://www.star-history.com/#JLLeitschuh/ktlint-gradle&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=JLLeitschuh/ktlint-gradle&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=JLLeitschuh/ktlint-gradle&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=JLLeitschuh/ktlint-gradle&type=Date" />
+ </picture>
+</a>

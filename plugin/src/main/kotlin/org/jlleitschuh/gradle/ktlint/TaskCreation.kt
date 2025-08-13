@@ -134,7 +134,6 @@ private fun BaseKtLintCheckTask.configureBaseCheckTask(
     debug.set(pluginHolder.extension.debug)
     ruleSetsClasspath.setFrom(pluginHolder.ktlintRulesetConfiguration)
     android.set(pluginHolder.extension.android)
-    disabledRules.set(pluginHolder.extension.disabledRules)
     loadedReporters.set(pluginHolder.loadReportersTask.get().loadedReporters)
     enableExperimentalRules.set(pluginHolder.extension.enableExperimentalRules)
 
