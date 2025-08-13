@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+- Gradle 9 Support [#937](https://github.com/JLLeitschuh/ktlint-gradle/pull/937)
+
 ## [13.0.0] - 2025-07-07
 
 - remove support for ktlint &lt; 1 [#889](https://github.com/JLLeitschuh/ktlint-gradle/pull/889)

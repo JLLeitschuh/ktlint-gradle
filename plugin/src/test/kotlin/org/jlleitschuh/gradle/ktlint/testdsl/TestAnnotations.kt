@@ -1,5 +1,6 @@
 package org.jlleitschuh.gradle.ktlint.testdsl
 
+import net.swiftzer.semver.SemVer
 import org.gradle.util.GradleVersion
 import org.jlleitschuh.gradle.ktlint.KtlintPlugin
 import org.junit.jupiter.api.extension.ExtensionContext
@@ -8,15 +9,26 @@ import org.junit.jupiter.params.provider.ArgumentsProvider
 import java.util.stream.Stream
 import kotlin.streams.asStream
 
+fun getCurrentJavaVersion(): String {
+    return Runtime::class.java.getPackage().specificationVersion // java 8
+        ?: Runtime::class.java.getMethod("version").invoke(null).toString() // java 9+
+}
+
 @Suppress("ConstPropertyName")
 object TestVersions {
     const val minSupportedGradleVersion = "7.6.3" // lowest version for testing
-    const val maxSupportedGradleVersion = "8.13"
+    val maxSupportedGradleVersion =
+        // gradle 9 requires Java 17
+        if (SemVer.parse(getCurrentJavaVersion()).major >= 17) {
+            "9.0.0"
+        } else {
+            "8.14.3"
+        }
     val pluginVersion = System.getProperty("project.version")
         ?: KtlintPlugin::class.java.`package`.implementationVersion
         ?: error("Unable to determine plugin version.")
     const val minSupportedKotlinPluginVersion = "1.6.21"
-    const val maxSupportedKotlinPluginVersion = "2.1.21"
+    const val maxSupportedKotlinPluginVersion = "2.2.0"
     const val minAgpVersion = "4.1.0"
     const val maxAgpVersion = "8.8.0"
 }
@@ -25,7 +37,6 @@ object TestVersions {
 @Retention(AnnotationRetention.RUNTIME)
 annotation class GradleTestVersions(
     val minVersion: String = TestVersions.minSupportedGradleVersion,
-    val maxVersion: String = TestVersions.maxSupportedGradleVersion,
     val additionalVersions: Array<String> = []
 )
 
@@ -55,7 +66,7 @@ open class GradleArgumentsProvider : ArgumentsProvider {
         } else {
             GradleVersion.version(versionsAnnotation.minVersion)
         }
-        val maxGradleVersion = GradleVersion.version(versionsAnnotation.maxVersion)
+        val maxGradleVersion = GradleVersion.version(TestVersions.maxSupportedGradleVersion)
         val additionalGradleVersions = versionsAnnotation
             .additionalVersions
             .map(GradleVersion::version)
