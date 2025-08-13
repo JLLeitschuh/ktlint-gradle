@@ -1,4 +1,4 @@
-# Ktlint Gradle
+# Ktlint Plugin for Gradle
 
 **Provides a convenient wrapper plugin over the [ktlint](https://github.com/pinterest/ktlint) project.**
 
