@@ -6,13 +6,20 @@ import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.Logging
+import org.gradle.api.problems.Problems
 import org.gradle.api.provider.Property
+import org.gradle.util.GradleVersion
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
 import org.jetbrains.kotlin.util.prefixIfNot
+import org.jlleitschuh.gradle.ktlint.reporter.ProblemsApiReporter
 import java.io.File
+import javax.inject.Inject
 
 internal abstract class ConsoleReportWorkAction : WorkAction<ConsoleReportWorkAction.ConsoleReportParameters> {
+
+    @get:Inject
+    abstract val problems: Problems
 
     private val logger = Logging.getLogger("ktlint-console-report-worker")
 
@@ -42,6 +49,15 @@ internal abstract class ConsoleReportWorkAction : WorkAction<ConsoleReportWorkAc
         }
 
         val isLintErrorsFound = lintErrors.values.flatten().isNotEmpty()
+        // The gradle version needs to be at least 8.14 to use the problems API
+        if (isLintErrorsFound && GradleVersion.current() >= GradleVersion.version("8.14")) {
+            try {
+                val problemsApiReporter = ProblemsApiReporter(problems)
+                problemsApiReporter.reportProblems(lintErrors)
+            } catch (e: Exception) {
+                logger.error("Failed to report problems using Problems API.", e)
+            }
+        }
         if (parameters.outputToConsole.getOrElse(false) && isLintErrorsFound) {
             val verbose = parameters.verbose.get()
             lintErrors.forEach { (filePath, errors) ->

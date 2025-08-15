@@ -11,6 +11,7 @@ junit5 = "5.5.2"
 assertJ = "3.27.4"
 commonsIo = "2.17.0"
 archUnit = "1.4.0"
+mockitoKotlin = "4.1.0"
 
 [libraries]
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "androidPlugin" }
@@ -23,5 +24,6 @@ kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", v
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlin-script-runtime = { module = "org.jetbrains.kotlin:kotlin-script-runtime", version.ref = "kotlin" }
 ktlint-rule-engine = { module = "com.pinterest.ktlint:ktlint-rule-engine", version.ref = "ktlint" }
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
 semver = { module = "net.swiftzer.semver:semver", version.ref = "semver" }
 slf4j-nop = { module = "org.slf4j:slf4j-nop", version.ref = "sl4fj" }
