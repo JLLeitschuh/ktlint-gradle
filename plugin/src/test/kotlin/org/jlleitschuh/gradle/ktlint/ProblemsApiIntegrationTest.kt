@@ -53,11 +53,13 @@ class ProblemsApiIntegrationTest : AbstractPluginTest() {
             withFailingSources()
 
             // Configure the plugin to ignore failures
-            buildGradle.appendText("""
+            buildGradle.appendText(
+                """
                 ktlint {
                     ignoreFailures = true
                 }
-            """.trimIndent())
+                """.trimIndent()
+            )
 
             build(CHECK_PARENT_TASK_NAME) {
                 // Task should succeed when ignoreFailures is true
