@@ -5,7 +5,6 @@ import org.gradle.api.Action
 import org.gradle.api.problems.ProblemReporter
 import org.gradle.api.problems.ProblemSpec
 import org.gradle.api.problems.Problems
-import org.gradle.api.problems.Severity as GradleSeverity
 import org.jlleitschuh.gradle.ktlint.worker.SerializableLintError
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -14,8 +13,10 @@ import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.gradle.api.problems.Severity as GradleSeverity
 
 class ProblemsApiReporterTest {
 
@@ -89,7 +90,7 @@ class ProblemsApiReporterTest {
         reporter.reportProblems(errors, false) // ignoreFailures = false, so ERROR severity
 
         // Should report 3 total errors
-        verify(problemReporter, org.mockito.kotlin.times(3)).report(any(), any())
+        verify(problemReporter, times(3)).report(any(), any())
     }
 
     @Test
@@ -170,7 +171,7 @@ class ProblemsApiReporterTest {
         reporter.reportProblem(nonAutoCorrectableError, "test.kt", GradleSeverity.ERROR)
 
         // Both should be reported with ERROR severity
-        verify(problemReporter, org.mockito.kotlin.times(2)).report(any(), any())
+        verify(problemReporter, times(2)).report(any(), any())
     }
 
     @Test
