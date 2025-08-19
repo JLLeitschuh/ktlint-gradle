@@ -18,6 +18,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class ProblemsApiReporterTest {
+
     private lateinit var problemsService: Problems
     private lateinit var problemReporter: ProblemReporter
     private lateinit var reporter: ProblemsApiReporter
@@ -26,8 +27,8 @@ class ProblemsApiReporterTest {
     fun setUp() {
         problemsService = mock()
         problemReporter = mock()
-        whenever(problemsService.reporter).thenReturn(problemReporter)
         reporter = ProblemsApiReporter(problemsService)
+        whenever(problemsService.reporter).thenReturn(problemReporter)
     }
 
     @Test
@@ -35,13 +36,13 @@ class ProblemsApiReporterTest {
         val error = SerializableLintError(
             line = 4,
             col = 1,
-            ruleId = "no-missing-newline",
-            detail = "Missing newline at end of file",
+            ruleId = "no-wildcard-imports",
+            detail = "Wildcard import detected",
             canBeAutoCorrected = true
         )
         val filePath = "src/main/kotlin/TestFile.kt"
 
-        reporter.reportProblem(error, filePath)
+        reporter.reportProblem(error, filePath, GradleSeverity.ERROR)
 
         val specCaptor = argumentCaptor<Action<ProblemSpec>>()
         verify(problemReporter).report(any(), specCaptor.capture())
@@ -49,22 +50,21 @@ class ProblemsApiReporterTest {
         val spec: ProblemSpec = mock()
         specCaptor.firstValue.execute(spec)
 
-        verify(spec).details("Missing newline at end of file")
-        verify(spec).severity(GradleSeverity.WARNING)
-        verify(spec).lineInFileLocation(eq(filePath), eq(4))
-        verify(spec).fileLocation(eq(filePath))
+        verify(spec).details("Wildcard import detected")
+        verify(spec).severity(GradleSeverity.ERROR)
+        verify(spec).lineInFileLocation(eq(filePath), eq(4), eq(1))
         verify(spec).solution("Run ktlintFormat to auto-fix this issue")
     }
 
     @Test
-    fun `given multiple lint errors, it correctly reports all of them to the problems api`() {
+    fun `given multiple lint errors, it correctly reports all of them`() {
         val errors = mapOf(
             "src/main/kotlin/File1.kt" to listOf(
                 SerializableLintError(
-                    line = 100,
+                    line = 1,
                     col = 1,
-                    ruleId = "no-missing-newline",
-                    detail = "Missing newline at end of file",
+                    ruleId = "no-wildcard-imports",
+                    detail = "Wildcard import detected",
                     canBeAutoCorrected = true
                 )
             ),
@@ -86,41 +86,67 @@ class ProblemsApiReporterTest {
             )
         )
 
-        reporter.reportProblems(errors)
+        reporter.reportProblems(errors, false) // ignoreFailures = false, so ERROR severity
 
+        // Should report 3 total errors
         verify(problemReporter, org.mockito.kotlin.times(3)).report(any(), any())
     }
 
     @Test
-    fun `no problems should be reported if there are no errors`() {
+    fun `given no errors, it does not report any problems`() {
         val emptyErrors = emptyMap<String, List<SerializableLintError>>()
 
-        reporter.reportProblems(emptyErrors)
+        reporter.reportProblems(emptyErrors, false)
 
         verify(problemReporter, never()).report(any(), any())
     }
 
     @Test
-    fun `correctly reports problem group and id`() {
+    fun `severity is WARNING when ignoreFailures is true`() {
+        val errors = mapOf(
+            "src/main/kotlin/TestFile.kt" to listOf(
+                SerializableLintError(
+                    line = 1,
+                    col = 1,
+                    ruleId = "test-rule",
+                    detail = "Test error",
+                    canBeAutoCorrected = false
+                )
+            )
+        )
+
+        reporter.reportProblems(errors, true) // ignoreFailures = true, so WARNING severity
+
+        val specCaptor = argumentCaptor<Action<ProblemSpec>>()
+        verify(problemReporter).report(any(), specCaptor.capture())
+
+        val spec: ProblemSpec = mock()
+        specCaptor.firstValue.execute(spec)
+
+        verify(spec).severity(GradleSeverity.WARNING)
+    }
+
+    @Test
+    fun `reports correct problem group and id`() {
         val error = SerializableLintError(
             line = 1,
             col = 1,
-            ruleId = "no-unused-imports",
-            detail = "Unused import",
+            ruleId = "no-wildcard-imports",
+            detail = "Wildcard import detected",
             canBeAutoCorrected = true
         )
         val filePath = "src/main/kotlin/TestFile.kt"
 
-        reporter.reportProblem(error, filePath)
+        reporter.reportProblem(error, filePath, GradleSeverity.ERROR)
 
         val idCaptor = argumentCaptor<org.gradle.api.problems.ProblemId>()
         verify(problemReporter).report(idCaptor.capture(), any())
 
         val capturedId = idCaptor.firstValue
-        assertThat(capturedId.name).isEqualTo("no-unused-imports")
-        assertThat(capturedId.displayName).isEqualTo("Unused import")
-        assertThat(capturedId.group.name).isEqualTo("validation")
-        assertThat(capturedId.group.displayName).isEqualTo("ktlint issue")
+        assertThat(capturedId.name).isEqualTo("no-wildcard-imports")
+        assertThat(capturedId.displayName).isEqualTo("Wildcard import detected")
+        assertThat(capturedId.group.name).isEqualTo("ktlint-gradle")
+        assertThat(capturedId.group.displayName).isEqualTo("ktlint-gradle issue")
     }
 
     @Test
@@ -140,9 +166,32 @@ class ProblemsApiReporterTest {
             canBeAutoCorrected = false
         )
 
-        reporter.reportProblem(autoCorrectableError, "test.kt")
-        reporter.reportProblem(nonAutoCorrectableError, "test.kt")
+        reporter.reportProblem(autoCorrectableError, "test.kt", GradleSeverity.ERROR)
+        reporter.reportProblem(nonAutoCorrectableError, "test.kt", GradleSeverity.ERROR)
 
+        // Both should be reported with ERROR severity
         verify(problemReporter, org.mockito.kotlin.times(2)).report(any(), any())
+    }
+
+    @Test
+    fun `reports errors with correct line and column information`() {
+        val error = SerializableLintError(
+            line = 42,
+            col = 15,
+            ruleId = "test-rule",
+            detail = "Test error",
+            canBeAutoCorrected = false
+        )
+        val filePath = "src/main/kotlin/ComplexFile.kt"
+
+        reporter.reportProblem(error, filePath, GradleSeverity.ERROR)
+
+        val specCaptor = argumentCaptor<Action<ProblemSpec>>()
+        verify(problemReporter).report(any(), specCaptor.capture())
+
+        val spec: ProblemSpec = mock()
+        specCaptor.firstValue.execute(spec)
+
+        verify(spec).lineInFileLocation(eq(filePath), eq(42), eq(15))
     }
 }
