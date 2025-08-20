@@ -278,9 +278,6 @@ ktlint {
 ```
 </details>
 
-### Problems API
-The Problems API reports rich, structured information about problems happening during the build. This reporting is another way users can see the issues in their project in an appropriate way. For more information you can read [here](https://docs.gradle.org/current/userguide/reporting_problems.html).
-
 ### Configuration
 The following configuration block is _optional_.
 
