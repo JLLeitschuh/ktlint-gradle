@@ -8,7 +8,6 @@ import org.gradle.api.Task
 import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.tasks.util.PatternFilterable
 import org.gradle.util.GradleVersion
-import org.jlleitschuh.gradle.ktlint.reporter.CustomReporter
 import org.jlleitschuh.gradle.ktlint.tasks.BaseKtLintCheckTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
@@ -47,7 +46,6 @@ open class KtlintBasePlugin : Plugin<Project> {
             "ktlint",
             KtlintExtension::class.java,
             target.objects,
-            target.container(CustomReporter::class.java) { CustomReporter(it) },
             filterTargetApplier,
             kotlinScriptAdditionalPathApplier
         )

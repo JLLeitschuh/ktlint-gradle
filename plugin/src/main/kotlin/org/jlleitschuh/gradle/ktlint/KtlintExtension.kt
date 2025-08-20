@@ -1,6 +1,5 @@
 package org.jlleitschuh.gradle.ktlint
 
-import groovy.lang.Closure
 import org.gradle.api.Action
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.file.ConfigurableFileTree
@@ -11,27 +10,24 @@ import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.util.PatternFilterable
-import org.gradle.util.ConfigureUtil
+import org.gradle.kotlin.dsl.domainObjectContainer
+import org.gradle.kotlin.dsl.newInstance
 import org.jlleitschuh.gradle.ktlint.reporter.CustomReporter
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+import javax.inject.Inject
 
 /**
  * Extension class for configuring the [KtlintPlugin].
  * @param filterTargetApplier When [KtlintExtension.filter] is called, this function is executed.
  */
 @Suppress("UnstableApiUsage")
-open class KtlintExtension
-internal constructor(
+open class KtlintExtension @Inject internal constructor(
     objectFactory: ObjectFactory,
     projectLayout: ProjectLayout,
-    customReportersContainer: NamedDomainObjectContainer<CustomReporter>,
     private val filterTargetApplier: FilterApplier,
     kotlinScriptAdditionalPathApplier: KotlinScriptAdditionalPathApplier
 ) {
-    internal val reporterExtension = ReporterExtension(
-        customReportersContainer,
-        objectFactory
-    )
+    val reporterExtension = objectFactory.newInstance(ReporterExtension::class)
 
     /**
      * The version of KtLint to use.
@@ -154,13 +150,14 @@ internal constructor(
         }
     }
 
-    class ReporterExtension(
-        val customReporters: NamedDomainObjectContainer<CustomReporter>,
+    open class ReporterExtension @Inject constructor(
         objectFactory: ObjectFactory
     ) {
         internal val reporters: SetProperty<ReporterType> = objectFactory.setProperty {
             set(emptySet())
         }
+        val customReporters: NamedDomainObjectContainer<CustomReporter> =
+            objectFactory.domainObjectContainer(CustomReporter::class) { CustomReporter(it) }
 
         /**
          * Use one of default Ktlint output reporter
@@ -176,10 +173,8 @@ internal constructor(
         /**
          * Add 3rd party reporters.
          */
-        fun customReporters(configuration: Closure<NamedDomainObjectContainer<CustomReporter>>) {
-            // This method is needed for Groovy interop
-            // See https://discuss.gradle.org/t/multi-level-dsl-for-plugin-extension/19029/16
-            ConfigureUtil.configure(configuration, customReporters)
+        fun customReporters(configuration: Action<NamedDomainObjectContainer<CustomReporter>>) {
+            configuration.execute(customReporters)
         }
     }
 }

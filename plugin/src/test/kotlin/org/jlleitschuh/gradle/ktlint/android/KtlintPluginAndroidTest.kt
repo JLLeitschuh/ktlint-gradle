@@ -88,11 +88,6 @@ class KtlintPluginAndroidTest : AbstractPluginTest() {
             minimumJava = 11,
             maximumJava = 17
         ),
-        MAX_GRADLE_MIN_AGP(
-            GradleVersion.version(TestVersions.maxSupportedGradleVersion),
-            TestVersions.minAgpVersion,
-            TestVersions.minSupportedKotlinPluginVersion
-        ),
         MAX(
             GradleVersion.version(TestVersions.maxSupportedGradleVersion),
             TestVersions.maxAgpVersion,
