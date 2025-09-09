@@ -25,7 +25,7 @@ internal class ProblemsApiReporter @Inject constructor(
         }
     }
 
-    fun reportProblem(error: SerializableLintError, filePath: String, severity: Severity) {
+    private fun reportProblem(error: SerializableLintError, filePath: String, severity: Severity) {
         val reporter: ProblemReporter? = problems.reporter
         val id = ProblemId.create(error.ruleId, error.detail, PROBLEM_GROUP)
         reporter?.report(id) {
