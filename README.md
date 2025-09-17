@@ -309,6 +309,7 @@ ktlint {
         "max_line_length": "20"
     ]
     disabledRules = ["final-newline"] // not supported with ktlint 0.48+
+    maxRuleVersion = "1.0.0" // Only include rules introduced up to this version
     baseline = file("my-project-ktlint-baseline.xml")
     reporters {
         reporter "plain"
@@ -366,6 +367,7 @@ configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
         )
     )
     disabledRules.set(setOf("final-newline")) // not supported with ktlint 0.48+
+    maxRuleVersion.set("1.0.0") // Only include rules introduced up to this version
     baseline.set(file("my-project-ktlint-baseline.xml"))
     reporters {
         reporter(ReporterType.PLAIN)

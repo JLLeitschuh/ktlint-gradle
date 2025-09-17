@@ -716,4 +716,37 @@ dependencies {
             }
         }
     }
+
+    @DisplayName("Should allow setting maxRuleVersion")
+    @CommonTest
+    fun allowMaxRuleVersionConfiguration(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
+            //language=Groovy
+            buildGradle.appendText(
+                """
+
+                ktlint {
+                    maxRuleVersion = "1.0.0"
+                }
+                """.trimIndent()
+            )
+
+            build(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+        }
+    }
+
+    @DisplayName("Should work without maxRuleVersion set")
+    @CommonTest
+    fun workWithoutMaxRuleVersion(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
+
+            build(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+        }
+    }
 }
