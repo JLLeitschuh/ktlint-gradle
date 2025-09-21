@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## [13.1.0] - 2025-08-21
 
 - Gradle 9 Support [#937](https://github.com/JLLeitschuh/ktlint-gradle/pull/937)
+- Problems API Integration [#927](https://github.com/JLLeitschuh/ktlint-gradle/pull/927)
 
 ## [13.0.0] - 2025-07-07
 
