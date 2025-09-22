@@ -8,7 +8,7 @@ sl4fj = "2.0.17"
 gradleWrapper = "8.13"
 gradleWrapperSha = "20f1b1176237254a6fc204d8434196fa11a4cfb387567519c61556e8710aed78"
 junit5 = "5.5.2"
-assertJ = "3.27.4"
+assertJ = "3.27.5"
 commonsIo = "2.17.0"
 archUnit = "1.4.0"
 
