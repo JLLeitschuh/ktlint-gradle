@@ -6,17 +6,17 @@ pluginManagement {
         // every release
         id("org.jlleitschuh.gradle.ktlint") version "latest.release"
         id("org.jetbrains.kotlin.jvm") version "2.1.20"
-        id("com.gradle.plugin-publish") version "0.15.0"
+        id("com.gradle.plugin-publish") version "1.3.1"
         `java-gradle-plugin`
-        id("com.github.johnrengelman.shadow") version "7.0.0"
+        id("com.gradleup.shadow") version "8.3.9"
         id("com.github.breadmoirai.github-release") version "2.5.2"
         id("com.netflix.nebula.release") version "20.2.0"
     }
 }
 
 plugins {
-    id("com.gradle.develocity") version "3.17"
-    id("org.gradle.toolchains.foojay-resolver-convention") version "0.10.0"
+    id("com.gradle.develocity") version "4.1.1"
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
 develocity {
