@@ -1,9 +1,9 @@
 import com.github.breadmoirai.githubreleaseplugin.GithubReleaseTask
-import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.util.prefixIfNot
@@ -13,7 +13,7 @@ plugins {
     `kotlin-dsl`
     `maven-publish`
     id("org.jlleitschuh.gradle.ktlint")
-    id("com.github.johnrengelman.shadow")
+    id("com.gradleup.shadow")
     id("com.github.breadmoirai.github-release")
     id("com.netflix.nebula.release")
 }
@@ -27,6 +27,8 @@ repositories {
 }
 
 java {
+    withJavadocJar()
+    withSourcesJar()
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(8))
     }
@@ -38,29 +40,11 @@ ktlint {
 
 tasks.withType<KotlinCompile> {
     compilerOptions {
-        languageVersion.set(KotlinVersion.KOTLIN_1_7)
-        apiVersion.set(KotlinVersion.KOTLIN_1_7)
+        languageVersion.set(KotlinVersion.KOTLIN_1_8)
+        apiVersion.set(KotlinVersion.KOTLIN_1_8)
         jvmTarget.set(JvmTarget.JVM_1_8)
     }
 }
-
-tasks.withType<PluginUnderTestMetadata>().configureEach {
-    pluginClasspath.from(configurations.compileOnly)
-}
-
-/**
- * Special configuration to be included in resulting shadowed jar, but not added to the generated pom and gradle
- * metadata files.
- */
-val shadowImplementation by configurations.creating
-configurations {
-    val compileOnly by getting {
-        extendsFrom(shadowImplementation)
-        isCanBeResolved = true
-    }
-}
-configurations["compileOnly"].extendsFrom(shadowImplementation)
-configurations["testImplementation"].extendsFrom(shadowImplementation)
 
 dependencies {
     compileOnly("com.pinterest.ktlint:ktlint-cli-reporter-core:1.0.0")
@@ -70,23 +54,70 @@ dependencies {
     compileOnly(libs.kotlin.gradle.plugin)
     compileOnly(libs.android.gradle.plugin)
     compileOnly(kotlin("stdlib-jdk8"))
+    implementation(libs.semver)
+    implementation(libs.jgit)
+    implementation(libs.commons.io)
 
-    shadowImplementation(libs.semver)
-    shadowImplementation(libs.jgit)
-    shadowImplementation(libs.commons.io)
-    // Explicitly added for shadow plugin to relocate implementation as well
-    shadowImplementation(libs.slf4j.nop)
-
-    testImplementation(libs.junit.jupiter)
     testImplementation(libs.assertj.core)
     testImplementation(libs.kotlin.reflect)
     testImplementation(libs.ktlint.rule.engine)
     testImplementation(libs.archunit.junit5)
 }
 
+fun JvmTestSuite.extendFromTest() {
+    sources {
+        java {
+            source(project.sourceSets.named("test").map { it.java }.get())
+        }
+        kotlin {
+            source(project.sourceSets.named("test").map { it.kotlin }.get())
+        }
+        resources {
+            source(project.sourceSets.named("test").map { it.resources }.get())
+        }
+        compileClasspath += project.sourceSets["test"].compileClasspath + project.sourceSets["main"].compileClasspath
+        runtimeClasspath += project.sourceSets["test"].runtimeClasspath + project.sourceSets["main"].runtimeClasspath
+
+        // make internal classes available to tests
+        val compilations = project
+            .extensions
+            .getByType(KotlinJvmProjectExtension::class.java).target.compilations
+        compilations.getByName(sources.name)
+            .associateWith(compilations.getByName(SourceSet.MAIN_SOURCE_SET_NAME))
+    }
+}
+
+fun getCurrentJavaVersion(): String {
+    return Runtime::class.java.getPackage().specificationVersion // java 8
+        ?: Runtime::class.java.getMethod("version").invoke(null).toString() // java 9+
+}
+testing {
+    suites {
+        named<JvmTestSuite>("test") {
+            useJUnitJupiter()
+        }
+        listOf(8, 11, 17, 21, 25)
+            .forEach {
+                register<JvmTestSuite>("test$it") {
+                    extendFromTest()
+                    targets.all {
+                        dependencies {
+                            implementation(gradleTestKit())
+                        }
+                        testTask.configure {
+                            javaLauncher.set(
+                                javaToolchains.launcherFor {
+                                    languageVersion.set(JavaLanguageVersion.of(JavaVersion.current().majorVersion))
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+    }
+}
 tasks.withType<Test> {
     dependsOn("publishToMavenLocal")
-    useJUnitPlatform()
     maxParallelForks = 6 // no point in this being higher than the number of gradle workers
 
     // Set the system property for the project version to be used in the tests
@@ -110,15 +141,8 @@ tasks.withType<Test> {
             maxFailures.set(10)
         }
     }
-
-    javaLauncher.set(
-        javaToolchains.launcherFor {
-            languageVersion.set(JavaLanguageVersion.of(JavaVersion.current().majorVersion))
-        }
-    )
 }
 
-val relocateShadowJar = tasks.register<ConfigureShadowRelocation>("relocateShadowJar")
 val shadowJarTask = tasks.named<ShadowJar>("shadowJar") {
     manifest {
         attributes(
@@ -128,24 +152,18 @@ val shadowJarTask = tasks.named<ShadowJar>("shadowJar") {
             "Implementation-Vendor-Id" to project.group
         )
     }
-    // Enable package relocation in resulting shadow jar
-    relocateShadowJar.get().apply {
-        prefix = "$pluginGroup.shadow"
-        target = this@named
-    }
-
-    dependsOn(relocateShadowJar)
-    minimize()
-    archiveClassifier.set("")
-    configurations = listOf(shadowImplementation)
+    relocate("com.googlecode.javaewah", "$pluginGroup.shadow.com.googlecode.javaewah")
+    relocate("net.swiftzer", "$pluginGroup.shadow.net.swiftzer")
+    relocate("org.apache.commons.io", "$pluginGroup.shadow.org.apache.commons.io")
+    relocate("org.eclipse.jgit", "$pluginGroup.shadow.org.eclipse.jgit")
+    relocate("org.slf4j", "$pluginGroup.shadow.org.slf4j")
+    archiveClassifier.set(null)
 }
 
 // Add shadow jar to the Gradle module metadata api and runtime configurations
-configurations {
-    artifacts {
-        runtimeElements(shadowJarTask)
-        apiElements(shadowJarTask)
-    }
+artifacts {
+    runtimeElements(shadowJarTask)
+    apiElements(shadowJarTask)
 }
 
 tasks.whenTaskAdded {
@@ -154,38 +172,8 @@ tasks.whenTaskAdded {
     }
 }
 
-// Disabling default jar task as it is overridden by shadowJar
-tasks.named("jar").configure {
-    enabled = false
-}
-
-val ensureDependenciesAreInlined by tasks.registering {
-    description = "Ensures all declared dependencies are inlined into shadowed jar"
-    group = HelpTasksPlugin.HELP_GROUP
-    dependsOn(tasks.shadowJar)
-
-    doLast {
-        val nonInlinedDependencies = mutableListOf<String>()
-        zipTree(tasks.shadowJar.flatMap { it.archiveFile }).visit {
-            if (!isDirectory) {
-                val path = relativePath
-                if (!path.startsWith("META-INF") &&
-                    path.lastName.endsWith(".class") &&
-                    !path.pathString.startsWith(pluginGroup.replace(".", "/"))
-                ) {
-                    nonInlinedDependencies.add(path.pathString)
-                }
-            }
-        }
-        if (nonInlinedDependencies.isNotEmpty()) {
-            throw GradleException("Found non inlined dependencies: $nonInlinedDependencies")
-        }
-    }
-}
-
 tasks.named("check") {
     dependsOn(tasks.named("assemble"))
-    dependsOn(ensureDependenciesAreInlined)
 }
 
 /**
@@ -234,58 +222,28 @@ fun setupPublishingEnvironment() {
 
 setupPublishingEnvironment()
 
-configurations.named("implementation") {
+configurations.named("runtimeClasspath") {
     attributes {
         attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, objects.named("7.4"))
     }
 }
 
 gradlePlugin {
+    vcsUrl = "https://github.com/JLLeitschuh/ktlint-gradle"
+    website = vcsUrl
+    description = "Provides a convenient wrapper plugin over the ktlint project."
     (plugins) {
         register("ktlintPlugin") {
             id = "org.jlleitschuh.gradle.ktlint"
             implementationClass = "org.jlleitschuh.gradle.ktlint.KtlintPlugin"
             displayName = "Ktlint Gradle Plugin"
+            tags = listOf("ktlint", "kotlin", "linting")
         }
     }
 }
 
 tasks.named<ValidatePlugins>("validatePlugins").configure {
     enableStricterValidation = true
-}
-
-// Need to move publishing configuration into afterEvaluate {}
-// to override changes done by "com.gradle.plugin-publish" plugin in afterEvaluate {} block
-// See PublishPlugin class for details
-afterEvaluate {
-    publishing {
-        publications {
-            withType<MavenPublication> {
-                // Special workaround to publish shadow jar instead of normal one. Name to override peeked here:
-                // https://github.com/gradle/gradle/blob/master/subprojects/plugin-development/src/main/java/org/gradle/plugin/devel/plugins/MavenPluginPublishPlugin.java#L73
-                if (name == "pluginMaven") {
-                    setArtifacts(
-                        listOf(
-                            shadowJarTask.get()
-                        )
-                    )
-                }
-            }
-        }
-    }
-}
-
-pluginBundle {
-    vcsUrl = "https://github.com/JLLeitschuh/ktlint-gradle"
-    website = vcsUrl
-    description = "Provides a convenient wrapper plugin over the ktlint project."
-    tags = listOf("ktlint", "kotlin", "linting")
-
-    (plugins) {
-        "ktlintPlugin" {
-            displayName = "Ktlint Gradle Plugin"
-        }
-    }
 }
 
 githubRelease {

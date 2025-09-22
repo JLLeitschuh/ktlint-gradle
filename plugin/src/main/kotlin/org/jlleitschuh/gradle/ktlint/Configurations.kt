@@ -25,7 +25,6 @@ internal fun createKtlintConfiguration(target: Project, extension: KtlintExtensi
 
         isCanBeResolved = true
         isCanBeConsumed = false
-        isVisible = false
 
         // Starting from KtLint 0.41.0 version published artifact has two variants: "external" and "shadowed"
         attributes {
@@ -64,9 +63,8 @@ internal fun createKtlintRulesetConfiguration(
 
         isCanBeResolved = true
         isCanBeConsumed = false
-        isVisible = false
 
-        ensureConsistencyWith(target, ktLintConfiguration)
+        shouldResolveConsistentlyWith(ktLintConfiguration)
         dependencies.addLater(
             target.provider {
                 val ktlintVersion = extension.version.get()
@@ -87,9 +85,8 @@ internal fun createKtLintReporterConfiguration(
 
         isCanBeResolved = true
         isCanBeConsumed = false
-        isVisible = false
 
-        ensureConsistencyWith(target, ktLintConfiguration)
+        shouldResolveConsistentlyWith(ktLintConfiguration)
 
         withDependencies {
             // this transitive dep was introduced in ktlint 1.0, but for some reason, it is not picked up automatically
@@ -147,9 +144,8 @@ internal fun createKtLintBaselineReporterConfiguration(
 
         isCanBeResolved = true
         isCanBeConsumed = false
-        isVisible = false
 
-        ensureConsistencyWith(target, ktLintConfiguration)
+        shouldResolveConsistentlyWith(ktLintConfiguration)
 
         //     withDependencies {
         // Workaround for gradle 6 https://github.com/gradle/gradle/issues/13255
@@ -175,10 +171,3 @@ internal fun createKtLintBaselineReporterConfiguration(
         )
         //      }
     }
-
-private fun Configuration.ensureConsistencyWith(
-    target: Project,
-    otherConfiguration: Configuration
-) {
-    shouldResolveConsistentlyWith(otherConfiguration)
-}

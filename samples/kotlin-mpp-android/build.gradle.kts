@@ -14,6 +14,7 @@ ktlint {
 }
 
 android {
+    namespace = "org.jlleitschuh"
     compileSdkVersion(30)
 
     defaultConfig {

@@ -5,6 +5,7 @@ plugins {
 }
 
 android {
+    namespace = "org.jlleitschuh"
     compileSdkVersion(30)
 
     buildFeatures.viewBinding = true
