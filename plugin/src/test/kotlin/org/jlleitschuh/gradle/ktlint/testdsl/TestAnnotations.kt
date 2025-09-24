@@ -20,7 +20,7 @@ object TestVersions {
     val maxSupportedGradleVersion =
         // gradle 9 requires Java 17
         if (SemVer.parse(getCurrentJavaVersion()).major >= 17) {
-            "9.0.0"
+            "9.1.0"
         } else {
             "8.14.3"
         }
@@ -28,7 +28,7 @@ object TestVersions {
         ?: KtlintPlugin::class.java.`package`.implementationVersion
         ?: error("Unable to determine plugin version.")
     const val minSupportedKotlinPluginVersion = "1.6.21"
-    const val maxSupportedKotlinPluginVersion = "2.2.0"
+    const val maxSupportedKotlinPluginVersion = "2.2.20"
     const val minAgpVersion = "4.1.0"
     const val maxAgpVersion = "8.8.0"
 }
