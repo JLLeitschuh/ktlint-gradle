@@ -1,7 +1,6 @@
 import com.github.breadmoirai.githubreleaseplugin.GithubReleaseTask
 import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import com.gradle.enterprise.gradleplugin.testretry.retry
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -63,61 +62,15 @@ configurations {
 configurations["compileOnly"].extendsFrom(shadowImplementation)
 configurations["testImplementation"].extendsFrom(shadowImplementation)
 
-sourceSets {
-    val adapter by creating {
-    }
-
-    val adapter100 by creating {
-        compileClasspath += adapter.output
-    }
-    val adapters = listOf(
-        adapter,
-        adapter100
-    )
-    val main by getting {
-        kotlin {
-            compileClasspath = adapters.map { it.output }.fold(compileClasspath) { a, b -> a + b }
-            runtimeClasspath = adapters.map { it.output }.fold(runtimeClasspath) { a, b -> a + b }
-        }
-    }
-
-    val test by getting {
-        kotlin {
-            compileClasspath = adapters.map { it.output }.fold(compileClasspath) { a, b -> a + b }
-            runtimeClasspath = adapters.map { it.output }.fold(runtimeClasspath) { a, b -> a + b }
-        }
-    }
-}
-
-val adapterSources = listOf(
-    sourceSets.named("adapter"),
-    sourceSets.named("adapter100")
-)
-
-tasks.named<Jar>("shadowJar").configure {
-    this.from(adapterSources.map { sourceSet -> sourceSet.map { it.output.classesDirs } })
-    manifest {
-        attributes(
-            "Implementation-Title" to project.name,
-            "Implementation-Version" to project.version,
-            "Implementation-Vendor" to project.group,
-            "Implementation-Vendor-Id" to project.group
-        )
-    }
-}
-
 dependencies {
-    add("adapterImplementation", libs.commons.io)
-    add("adapterImplementation", libs.semver)
-
-    add("adapter100CompileOnly", "com.pinterest.ktlint:ktlint-cli-reporter-core:1.0.0")
-    add("adapter100CompileOnly", "com.pinterest.ktlint:ktlint-rule-engine:1.0.0")
-    add("adapter100CompileOnly", "com.pinterest.ktlint:ktlint-ruleset-standard:1.0.0")
-    add("adapter100CompileOnly", "com.pinterest.ktlint:ktlint-cli-reporter-baseline:1.0.0")
-
+    compileOnly("com.pinterest.ktlint:ktlint-cli-reporter-core:1.0.0")
+    compileOnly("com.pinterest.ktlint:ktlint-rule-engine:1.0.0")
+    compileOnly("com.pinterest.ktlint:ktlint-ruleset-standard:1.0.0")
+    compileOnly("com.pinterest.ktlint:ktlint-cli-reporter-baseline:1.0.0")
     compileOnly(libs.kotlin.gradle.plugin)
     compileOnly(libs.android.gradle.plugin)
     compileOnly(kotlin("stdlib-jdk8"))
+
     shadowImplementation(libs.semver)
     shadowImplementation(libs.jgit)
     shadowImplementation(libs.commons.io)
@@ -129,18 +82,6 @@ dependencies {
     testImplementation(libs.kotlin.reflect)
     testImplementation(libs.ktlint.rule.engine)
     testImplementation(libs.archunit.junit5)
-}
-
-kotlin {
-    // set up friend paths so that we can use internal classes across source sets
-    target.compilations.forEach {
-        if (it.name.startsWith("adapter")) {
-            if (it.name != "adapter") {
-                it.associateWith(target.compilations.getByName("adapter"))
-            }
-            target.compilations.getByName("main").associateWith(it)
-        }
-    }
 }
 
 tasks.withType<Test> {
@@ -162,7 +103,7 @@ tasks.withType<Test> {
         showStackTraces = true
     }
 
-    retry {
+    develocity.testRetry {
         val isCiServer = System.getenv().containsKey("CI")
         if (isCiServer) {
             maxRetries.set(2)
@@ -179,6 +120,14 @@ tasks.withType<Test> {
 
 val relocateShadowJar = tasks.register<ConfigureShadowRelocation>("relocateShadowJar")
 val shadowJarTask = tasks.named<ShadowJar>("shadowJar") {
+    manifest {
+        attributes(
+            "Implementation-Title" to project.name,
+            "Implementation-Version" to project.version,
+            "Implementation-Vendor" to project.group,
+            "Implementation-Vendor-Id" to project.group
+        )
+    }
     // Enable package relocation in resulting shadow jar
     relocateShadowJar.get().apply {
         prefix = "$pluginGroup.shadow"
