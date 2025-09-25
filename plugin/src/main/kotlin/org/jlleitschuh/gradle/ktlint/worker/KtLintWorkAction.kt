@@ -29,7 +29,10 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
             val ktlintInvokerFactory = selectInvocation(parameters.ktLintVersion.get())
         ) {
             is KtLintInvocation100.Factory -> {
-                ktlintInvokerFactory.initialize(parameters.additionalEditorconfig.get())
+                ktlintInvokerFactory.initialize(
+                    parameters.additionalEditorconfig.get(),
+                    parameters.maxRuleVersion.orNull
+                )
             }
 
             else -> {
@@ -97,6 +100,7 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
         val ktLintVersion: Property<String>
         val editorconfigFilesWereChanged: Property<Boolean>
         val formatSnapshot: RegularFileProperty
+        val maxRuleVersion: Property<String>
     }
 
     /**
