@@ -82,6 +82,9 @@ dependencies {
     testImplementation(libs.kotlin.reflect)
     testImplementation(libs.ktlint.rule.engine)
     testImplementation(libs.archunit.junit5)
+    testImplementation(gradleApi())
+    // Used to test the problems API
+    testImplementation(libs.mockito.kotlin)
 }
 
 tasks.withType<Test> {
