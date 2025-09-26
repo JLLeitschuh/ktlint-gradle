@@ -4,7 +4,9 @@ plugins {
     id 'org.jlleitschuh.gradle.ktlint'
 }
 
-mainClassName = "org.jlleitschuh.gradle.ktlint.sample.gradle.MainKt"
+application {
+    mainClass.set("org.jlleitschuh.gradle.ktlint.sample.gradle.MainKt")
+}
 
 ktlint {
     debug = true

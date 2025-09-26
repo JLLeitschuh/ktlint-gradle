@@ -5,10 +5,9 @@ androidPlugin = "4.1.0"
 semver = "1.1.1"
 jgit = "5.13.3.202401111512-r"
 sl4fj = "2.0.17"
-gradleWrapper = "8.13"
-gradleWrapperSha = "20f1b1176237254a6fc204d8434196fa11a4cfb387567519c61556e8710aed78"
-junit5 = "5.5.2"
-assertJ = "3.27.5"
+gradleWrapper = "9.1.0"
+gradleWrapperSha = "a17ddd85a26b6a7f5ddb71ff8b05fc5104c0202c6e64782429790c933686c806"
+assertJ = "3.27.4"
 commonsIo = "2.17.0"
 archUnit = "1.4.0"
 
@@ -18,7 +17,6 @@ archunit-junit5 = { module = "com.tngtech.archunit:archunit-junit5", version.ref
 assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertJ" }
 commons-io = { module = "commons-io:commons-io", version.ref = "commonsIo" }
 jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "jgit" }
-junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit5" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlin-script-runtime = { module = "org.jetbrains.kotlin:kotlin-script-runtime", version.ref = "kotlin" }

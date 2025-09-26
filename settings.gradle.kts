@@ -1,8 +1,6 @@
 import java.util.Properties
 
 pluginManagement {
-    includeBuild("./plugin")
-
     plugins {
         id("org.jetbrains.kotlin.jvm") version "2.1.20"
         id("org.jetbrains.kotlin.js") version "2.1.20"
@@ -27,7 +25,7 @@ dependencyResolutionManagement {
 }
 
 plugins {
-    id("com.gradle.develocity") version "3.17"
+    id("com.gradle.develocity") version "4.1.1"
 }
 
 develocity {
@@ -68,3 +66,4 @@ include("samples:kotlin-mpp")
 if (isAndroidSdkAvailable()) {
     include("samples:kotlin-mpp-android")
 }
+includeBuild("./plugin")
