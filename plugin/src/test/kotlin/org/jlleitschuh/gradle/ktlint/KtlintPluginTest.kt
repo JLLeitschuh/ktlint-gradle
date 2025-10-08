@@ -46,6 +46,18 @@ class KtlintPluginTest : AbstractPluginTest() {
         }
     }
 
+    @DisplayName("Should work with project isolation")
+    @CommonTest
+    fun `work with project isolation`(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
+
+            build(CHECK_PARENT_TASK_NAME, "-Dorg.gradle.unsafe.isolated-projects=true") {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+        }
+    }
+
     @DisplayName("Should show only plugin meta tasks in task output")
     @CommonTest
     fun showOnlyMetaTasks(gradleVersion: GradleVersion) {
