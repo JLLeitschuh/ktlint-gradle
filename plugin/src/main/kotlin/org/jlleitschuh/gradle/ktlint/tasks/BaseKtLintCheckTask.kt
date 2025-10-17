@@ -151,7 +151,7 @@ abstract class BaseKtLintCheckTask @Inject constructor(
     override fun setExcludes(excludes: MutableIterable<String>): BaseKtLintCheckTask =
         also { patternFilterable.setExcludes(excludes) }
 
-    override fun include(vararg includes: String?): BaseKtLintCheckTask =
+    override fun include(vararg includes: String): BaseKtLintCheckTask =
         also { patternFilterable.include(*includes) }
 
     override fun include(includes: MutableIterable<String>): BaseKtLintCheckTask =
@@ -163,7 +163,7 @@ abstract class BaseKtLintCheckTask @Inject constructor(
     override fun include(includeSpec: Closure<*>): BaseKtLintCheckTask =
         also { patternFilterable.include(includeSpec) }
 
-    override fun exclude(vararg excludes: String?): BaseKtLintCheckTask =
+    override fun exclude(vararg excludes: String): BaseKtLintCheckTask =
         also { patternFilterable.exclude(*excludes) }
 
     override fun exclude(excludes: MutableIterable<String>): BaseKtLintCheckTask =
