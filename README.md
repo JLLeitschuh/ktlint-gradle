@@ -10,6 +10,7 @@ Latest plugin version: [13.1.0](/CHANGELOG.md#---20250821)
 [![ktlint](https://img.shields.io/badge/code%20style-%E2%9D%A4-FF4081.svg)](https://ktlint.github.io/)
 [![Gradle Plugin Portal](https://img.shields.io/maven-metadata/v/https/plugins.gradle.org/m2/org/jlleitschuh/gradle/ktlint/org.jlleitschuh.gradle.ktlint.gradle.plugin/maven-metadata.xml.svg?colorB=007ec6&label=gradlePluginPortal)](https://plugins.gradle.org/plugin/org.jlleitschuh.gradle.ktlint)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/JLLeitschuh/ktlint-gradle/badge)](https://securityscorecards.dev/viewer/?uri=github.com/JLLeitschuh/ktlint-gradle)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/11345/badge)](https://www.bestpractices.dev/projects/11345)
 
 This plugin creates convenient tasks in your Gradle project
 that run [ktlint](https://github.com/pinterest/ktlint) checks or do code
