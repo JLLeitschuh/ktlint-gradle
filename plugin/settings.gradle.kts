@@ -6,7 +6,7 @@ pluginManagement {
         // every release
         id("org.jlleitschuh.gradle.ktlint") version "latest.release"
         id("org.jetbrains.kotlin.jvm") version "2.1.20"
-        id("com.gradle.plugin-publish") version "1.3.1"
+        id("com.gradle.plugin-publish") version "2.0.0"
         `java-gradle-plugin`
         id("com.gradleup.shadow") version "8.3.9"
         id("com.github.breadmoirai.github-release") version "2.5.2"
