@@ -2,11 +2,10 @@ import java.util.Properties
 
 pluginManagement {
     includeBuild("./plugin")
-
     plugins {
         id("org.jetbrains.kotlin.jvm") version "2.1.20"
         id("org.jetbrains.kotlin.js") version "2.1.20"
-        id("com.android.application") version "7.3.1"
+        id("com.android.application") version "8.8.0"
     }
 
     repositories {
@@ -27,7 +26,7 @@ dependencyResolutionManagement {
 }
 
 plugins {
-    id("com.gradle.develocity") version "3.17"
+    id("com.gradle.develocity") version "4.1.1"
 }
 
 develocity {

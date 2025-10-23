@@ -81,11 +81,11 @@ internal const val INSTALL_GIT_HOOK_FORMAT_TASK = "addKtlintFormatGitPreCommitHo
 internal val KOTLIN_EXTENSIONS = listOf("kt", "kts")
 internal val INTERMEDIATE_RESULTS_PATH = "intermediates${File.separator}ktLint${File.separator}"
 
-internal inline fun <reified T> ObjectFactory.property(
+internal inline fun <reified T : Any> ObjectFactory.property(
     configuration: Property<T>.() -> Unit = {}
 ): Property<T> = property(T::class.java).apply(configuration)
 
-internal inline fun <reified T> ObjectFactory.setProperty(
+internal inline fun <reified T : Any> ObjectFactory.setProperty(
     configuration: SetProperty<T>.() -> Unit = {}
 ): SetProperty<T> = setProperty(T::class.java).apply(configuration)
 
