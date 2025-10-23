@@ -18,7 +18,9 @@ jobs:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
         with:
-          egress-policy: audit
+          egress-policy: block
+          allowed-endpoints: >
+            endoflife.date:443
       - id: set-matrix
         run: echo "version_matrix=$(curl https://endoflife.date/api/oracle-jdk.json | jq -c '[.[] | select(.extendedSupport > (now | strftime("%Y-%m-%d"))) | .cycle]' | sed 's/ //g')" >> $GITHUB_OUTPUT
       - name: verify-matrix
@@ -34,10 +36,21 @@ jobs:
         java_version: ${{ fromJson(needs.build-jvm-matrix.outputs.version_matrix) }}
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Harden the runner (Audit all outbound calls)
+      - name: Harden Runner
         uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
         with:
-          egress-policy: audit
+          egress-policy: block
+          allowed-endpoints: >
+            api.azul.com:443
+            cdn.azul.com:443
+            dl.google.com:443
+            github.com:443
+            plugins-artifacts.gradle.org:443
+            plugins.gradle.org:443
+            release-assets.githubusercontent.com:443
+            repo.maven.apache.org:443
+            scans-in.gradle.com:443
+            services.gradle.org:443
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - name: configure windows pagefile
         if: ${{ matrix.os  == 'windows-latest' }}
@@ -89,10 +102,21 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Harden the runner (Audit all outbound calls)
+      - name: Harden Runner
         uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
         with:
-          egress-policy: audit
+          egress-policy: block
+          allowed-endpoints: >
+            api.azul.com:443
+            cdn.azul.com:443
+            dl.google.com:443
+            github.com:443
+            plugins-artifacts.gradle.org:443
+            plugins.gradle.org:443
+            release-assets.githubusercontent.com:443
+            repo.maven.apache.org:443
+            scans-in.gradle.com:443
+            services.gradle.org:443
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - name: set up JDK
         uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165 # v5.0.0
@@ -130,11 +154,24 @@ jobs:
   check_bashisms:
     runs-on: ubuntu-latest
     steps:
-      - name: Harden the runner (Audit all outbound calls)
+      - name: Harden Runner
         uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
         with:
-          egress-policy: audit
-
+          egress-policy: block
+          allowed-endpoints: >
+            api.azul.com:443
+            azure.archive.ubuntu.com:80
+            cdn.azul.com:443
+            dl.google.com:443
+            esm.ubuntu.com:443
+            github.com:443
+            packages.microsoft.com:443
+            plugins-artifacts.gradle.org:443
+            plugins.gradle.org:443
+            release-assets.githubusercontent.com:443
+            repo.maven.apache.org:443
+            scans-in.gradle.com:443
+            services.gradle.org:443
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - name: set up JDK 11
         uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165 # v5.0.0
@@ -160,10 +197,21 @@ jobs:
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Harden the runner (Audit all outbound calls)
+      - name: Harden Runner
         uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
         with:
-          egress-policy: audit
+          egress-policy: block
+          allowed-endpoints: >
+            api.azul.com:443
+            cdn.azul.com:443
+            dl.google.com:443
+            github.com:443
+            plugins-artifacts.gradle.org:443
+            plugins.gradle.org:443
+            release-assets.githubusercontent.com:443
+            repo.maven.apache.org:443
+            scans-in.gradle.com:443
+            services.gradle.org:443
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - name: set up JDK 21
         uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165 # v5.0.0
@@ -183,10 +231,22 @@ jobs:
     name: Test Release Pipeline
     runs-on: ubuntu-latest
     steps:
-      - name: Harden the runner (Audit all outbound calls)
+      - name: Harden Runner
         uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
         with:
-          egress-policy: audit
+          egress-policy: block
+          allowed-endpoints: >
+            api.azul.com:443
+            api.github.com:443
+            cdn.azul.com:443
+            dl.google.com:443
+            github.com:443
+            plugins-artifacts.gradle.org:443
+            plugins.gradle.org:443
+            release-assets.githubusercontent.com:443
+            repo.maven.apache.org:443
+            scans-in.gradle.com:443
+            services.gradle.org:443
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - name: Base Release Environment Setup
         uses: ./.github/actions/base-release
