@@ -26,7 +26,7 @@ dependencyResolutionManagement {
 }
 
 plugins {
-    id("com.gradle.develocity") version "4.1.1"
+    id("com.gradle.develocity") version "4.2.2"
 }
 
 develocity {
