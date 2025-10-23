@@ -60,6 +60,13 @@ jobs:
       # - name: Setup runtime (example)
       #   uses: actions/setup-example@v1
 
+      - name: set up JDK
+        if: matrix.language == 'java-kotlin'
+        uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165 # v5.0.0
+        with:
+          java-version: 21
+          distribution: 'zulu'
+
       - name: Setup Gradle
         if: matrix.language == 'java-kotlin'
         uses: gradle/actions/setup-gradle@4d9f0ba0025fe599b4ebab900eb7f3a1d93ef4c2 # v5.0.0
