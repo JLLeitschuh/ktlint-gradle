@@ -21,6 +21,7 @@ on:
 
 permissions:
   contents: read
+  security-events: write # needed to upload the SARIF file
 
 jobs:
   analyze:
