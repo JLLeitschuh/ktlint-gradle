@@ -10,7 +10,7 @@ pluginManagement {
         `java-gradle-plugin`
         id("com.gradleup.shadow") version "8.3.9"
         id("com.github.breadmoirai.github-release") version "2.5.2"
-        id("com.netflix.nebula.release") version "20.2.0"
+        id("com.netflix.nebula.release") version "21.0.0"
     }
 }
 
