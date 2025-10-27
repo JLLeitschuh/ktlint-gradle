@@ -2,7 +2,7 @@
 androidXFragment = "1.8.9"
 androidXRecyclerView = "1.4.0"
 androidMaterial = "1.12.0"
-androidXTestRunner = "1.6.2"
+androidXTestRunner = "1.7.0"
 androidXEspresso = "3.6.1"
 junit = "4.13.2"
 
