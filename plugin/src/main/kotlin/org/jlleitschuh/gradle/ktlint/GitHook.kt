@@ -44,16 +44,18 @@ private fun generateGitCommand(
 ): String = if (gradleRootDirPrefix.isEmpty()) {
     "git --no-pager diff --name-status --no-color --cached"
 } else {
-    "git --no-pager diff --name-status --no-color --cached -- $gradleRootDirPrefix/"
+    "git --no-pager diff --name-status --no-color --cached --relative=$gradleRootDirPrefix -- $gradleRootDirPrefix/"
 }
 
 private fun postCheck(
-    shouldUpdateCommit: Boolean
+    shouldUpdateCommit: Boolean,
+    gradleRootDirPrefix: String
 ): String = if (shouldUpdateCommit) {
+    val filePrefix = if (gradleRootDirPrefix.isNotEmpty()) "$gradleRootDirPrefix/" else ""
     """
     echo "${'$'}CHANGED_FILES" | while read -r file; do
-        if [ -f ${'$'}file ]; then
-            git add ${'$'}file
+        if [ -f $filePrefix${'$'}file ]; then
+            git add $filePrefix${'$'}file
         fi
     done
     """
@@ -91,7 +93,7 @@ internal fun generateGitHook(
     gradle_command_exit_code=${'$'}?
 
     echo "Completed ktlint run."
-    ${postCheck(shouldUpdateCommit)}
+    ${postCheck(shouldUpdateCommit, gradleRootDirPrefix)}
 
     if [ -s ${'$'}diff ]; then
       git apply --ignore-whitespace ${'$'}diff
