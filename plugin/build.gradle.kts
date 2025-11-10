@@ -20,7 +20,7 @@ plugins {
 
 val pluginGroup = "org.jlleitschuh.gradle"
 group = pluginGroup
-
+description = "This plugin creates convenient tasks in your Gradle project that run ktlint checks or do code auto format."
 repositories {
     google()
     mavenCentral()
@@ -231,13 +231,13 @@ configurations.named("runtimeClasspath") {
 gradlePlugin {
     vcsUrl = "https://github.com/JLLeitschuh/ktlint-gradle"
     website = vcsUrl
-    description = "Provides a convenient wrapper plugin over the ktlint project."
     (plugins) {
         register("ktlintPlugin") {
             id = "org.jlleitschuh.gradle.ktlint"
             implementationClass = "org.jlleitschuh.gradle.ktlint.KtlintPlugin"
             displayName = "Ktlint Gradle Plugin"
             tags = listOf("ktlint", "kotlin", "linting")
+            description = project.description
         }
     }
 }

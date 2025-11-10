@@ -7,10 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
-## [14.0.0] - 2025-11-10
-
 - Update build to work with gradle 9.1 and Java 25 [#962](https://github.com/JLLeitschuh/ktlint-gradle/pull/962)
 - Collapse sourcesets to simply build [#964](https://github.com/JLLeitschuh/ktlint-gradle/pull/964)
+- Fix Gradle plugin description [#999](https://github.com/JLLeitschuh/ktlint-gradle/pull/999)
 
 ## [13.1.0] - 2025-08-21
 
