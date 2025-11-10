@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+- Disable Configuration Cache in generated pre-commit Gradle call [#995](https://github.com/JLLeitschuh/ktlint-gradle/pull/995)
 - Update build to work with gradle 9.1 and Java 25 [#962](https://github.com/JLLeitschuh/ktlint-gradle/pull/962)
 - Collapse sourcesets to simply build [#964](https://github.com/JLLeitschuh/ktlint-gradle/pull/964)
 
