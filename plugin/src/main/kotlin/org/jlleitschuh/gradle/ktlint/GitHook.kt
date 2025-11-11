@@ -190,7 +190,7 @@ open class KtlintInstallGitHookTask @Inject constructor(
             gitHookFile.createNewFile()
             gitHookFile.setExecutable(true)
         }
-        val gradleRootDirPrefix = File(rootDirectory.get()).relativeTo(repo.workTree).path
+        val gradleRootDirPrefix = File(rootDirectory.get()).relativeTo(repo.workTree).path.replace(File.separator, "/")
 
         if (gitHookFile.length() == 0L) {
             gitHookFile.writeText(
