@@ -31,8 +31,19 @@ open class KtlintExtension @Inject internal constructor(
 
     /**
      * The version of KtLint to use.
+     * 
+     * If a `ktlint-plugins.properties` file exists in the project root with a `ktlint-version` property,
+     * that version will be used as the default. Otherwise, defaults to "1.5.0".
+     * 
+     * This property can be explicitly set in the build script to override the default behavior.
      */
-    val version: Property<String> = objectFactory.property { set("1.5.0") }
+    val version: Property<String> = objectFactory.property {
+        // Try to read version from ktlint-plugins.properties file first
+        val versionFromFile = readKtlintVersionFromPropertiesFile(
+            projectLayout.projectDirectory.asFile.toPath()
+        )
+        set(versionFromFile ?: "1.5.0")
+    }
 
     /**
      * Enable relative paths in reports
