@@ -49,17 +49,10 @@ internal fun readKtlintVersionFromPropertiesFile(projectDir: Path): String? {
         return null
     }
 
-    return propertiesFile.toFile().useLines { lines ->
-        lines
-            .filter { it.contains("=") }
-            .map {
-                val key = it.substringBefore("=").trim()
-                val value = it.substringAfter('=').trim()
-                key to value
-            }
-            .firstOrNull { it.first == KTLINT_PLUGINS_VERSION_PROPERTY }
-            ?.second
-            ?.takeIf { it.isNotBlank() }
+    return propertiesFile.toFile().inputStream().use { input ->
+        val properties = java.util.Properties()
+        properties.load(input)
+        properties.getProperty(KTLINT_PLUGINS_VERSION_PROPERTY)?.takeIf { it.isNotBlank() }
     }
 }
 

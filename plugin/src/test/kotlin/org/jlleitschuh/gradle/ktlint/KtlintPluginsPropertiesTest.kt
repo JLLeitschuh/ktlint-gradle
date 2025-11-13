@@ -24,7 +24,6 @@ class KtlintPluginsPropertiesTest : AbstractPluginTest() {
 
             buildGradle.appendText(
                 """
-                
                 tasks.register("printKtlintVersion") {
                     doLast {
                         println("Ktlint version: " + ktlint.version.get())
@@ -46,7 +45,6 @@ class KtlintPluginsPropertiesTest : AbstractPluginTest() {
 
             buildGradle.appendText(
                 """
-                
                 tasks.register("printKtlintVersion") {
                     doLast {
                         println("Ktlint version: " + ktlint.version.get())
@@ -75,7 +73,6 @@ class KtlintPluginsPropertiesTest : AbstractPluginTest() {
 
             buildGradle.appendText(
                 """
-                
                 ktlint {
                     version = "1.3.0"
                 }
@@ -108,7 +105,6 @@ class KtlintPluginsPropertiesTest : AbstractPluginTest() {
 
             buildGradle.appendText(
                 """
-                
                 tasks.register("printKtlintVersion") {
                     doLast {
                         println("Ktlint version: " + ktlint.version.get())
@@ -137,7 +133,6 @@ class KtlintPluginsPropertiesTest : AbstractPluginTest() {
 
             buildGradle.appendText(
                 """
-                
                 tasks.register("printKtlintVersion") {
                     doLast {
                         println("Ktlint version: " + ktlint.version.get())
