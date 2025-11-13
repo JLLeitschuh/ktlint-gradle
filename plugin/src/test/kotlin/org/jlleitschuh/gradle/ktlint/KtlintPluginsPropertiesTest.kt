@@ -11,7 +11,7 @@ import org.jlleitschuh.gradle.ktlint.testdsl.project
 class KtlintPluginsPropertiesTest : AbstractPluginTest() {
 
     @CommonTest
-    fun `should use version from ktlint-plugins properties file when present`(gradleVersion: GradleVersion) {
+    fun shouldUseVersionFromKtlintPluginsPropertiesFileWhenPresent(gradleVersion: GradleVersion) {
         project(gradleVersion) {
             // Create ktlint-plugins.properties file with version
             projectPath.resolve(KTLINT_PLUGINS_PROPERTIES_FILE_NAME).writeText(
@@ -40,7 +40,7 @@ class KtlintPluginsPropertiesTest : AbstractPluginTest() {
     }
 
     @CommonTest
-    fun `should use default version when ktlint-plugins properties file is absent`(gradleVersion: GradleVersion) {
+    fun shouldUseDefaultVersionWhenKtlintPluginsPropertiesFileIsAbsent(gradleVersion: GradleVersion) {
         project(gradleVersion) {
             withCleanSources()
 
@@ -62,7 +62,7 @@ class KtlintPluginsPropertiesTest : AbstractPluginTest() {
     }
 
     @CommonTest
-    fun `should allow explicit version override even when properties file exists`(gradleVersion: GradleVersion) {
+    fun shouldAllowExplicitVersionOverrideEvenWhenPropertiesFileExists(gradleVersion: GradleVersion) {
         project(gradleVersion) {
             // Create ktlint-plugins.properties file with version
             projectPath.resolve(KTLINT_PLUGINS_PROPERTIES_FILE_NAME).writeText(
@@ -95,7 +95,7 @@ class KtlintPluginsPropertiesTest : AbstractPluginTest() {
     }
 
     @CommonTest
-    fun `should use default version when ktlint-version property is blank`(gradleVersion: GradleVersion) {
+    fun shouldUseDefaultVersionWhenKtlintVersionPropertyIsBlank(gradleVersion: GradleVersion) {
         project(gradleVersion) {
             // Create ktlint-plugins.properties file with blank version
             projectPath.resolve(KTLINT_PLUGINS_PROPERTIES_FILE_NAME).writeText(
@@ -124,7 +124,7 @@ class KtlintPluginsPropertiesTest : AbstractPluginTest() {
     }
 
     @CommonTest
-    fun `should use default version when properties file has no ktlint-version property`(gradleVersion: GradleVersion) {
+    fun shouldUseDefaultVersionWhenPropertiesFileHasNoKtlintVersionProperty(gradleVersion: GradleVersion) {
         project(gradleVersion) {
             // Create ktlint-plugins.properties file without ktlint-version
             projectPath.resolve(KTLINT_PLUGINS_PROPERTIES_FILE_NAME).writeText(

@@ -279,6 +279,44 @@ ktlint {
 ```
 </details>
 
+#### KtLint IntelliJ Plugin Integration
+
+If you're using the [ktlint IntelliJ plugin](https://github.com/nbadal/ktlint-intellij-plugin), you can automatically synchronize the ktlint version between your IDE and Gradle builds by creating a `ktlint-plugins.properties` file in your project root directory.
+
+The IntelliJ plugin can read and write the ktlint version to this file. When this file exists and contains a `ktlint-version` property, the Gradle plugin will automatically use that version as the default.
+
+Example `ktlint-plugins.properties` file:
+```properties
+ktlint-version=1.2.1
+```
+
+**Key benefits:**
+- Ensures consistency between IDE and build tool ktlint versions
+- Simplifies version management across your development team
+- Allows IntelliJ plugin to manage the version
+
+**Override behavior:**
+Even when the `ktlint-plugins.properties` file exists, you can still explicitly set the version in your `build.gradle` or `build.gradle.kts` file, which will take precedence:
+
+<details>
+<summary>Groovy</summary>
+
+```groovy
+ktlint {
+    version = "1.3.0" // This overrides the version in ktlint-plugins.properties
+}
+```
+</details>
+<details open>
+<summary>Kotlin</summary>
+
+```kotlin
+ktlint {
+    version.set("1.3.0") // This overrides the version in ktlint-plugins.properties
+}
+```
+</details>
+
 ### Configuration
 The following configuration block is _optional_.
 
