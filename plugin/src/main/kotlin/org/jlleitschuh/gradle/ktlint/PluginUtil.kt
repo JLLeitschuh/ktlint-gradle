@@ -33,6 +33,28 @@ internal inline fun <reified T : Task> Project.registerTask(
 }
 
 internal const val EDITOR_CONFIG_FILE_NAME = ".editorconfig"
+internal const val KTLINT_PLUGINS_PROPERTIES_FILE_NAME = "ktlint-plugins.properties"
+internal const val KTLINT_PLUGINS_VERSION_PROPERTY = "ktlint-version"
+
+/**
+ * Reads the ktlint version from the ktlint-plugins.properties file if it exists.
+ * This file is used by the ktlint IntelliJ plugin to store the ktlint version.
+ *
+ * @param projectDir The project directory to search for the properties file
+ * @return The ktlint version string if found, null otherwise
+ */
+internal fun readKtlintVersionFromPropertiesFile(projectDir: Path): String? {
+    val propertiesFile = projectDir.resolve(KTLINT_PLUGINS_PROPERTIES_FILE_NAME)
+    if (!Files.exists(propertiesFile) || !Files.isReadable(propertiesFile)) {
+        return null
+    }
+
+    return propertiesFile.toFile().inputStream().use { input ->
+        val properties = java.util.Properties()
+        properties.load(input)
+        properties.getProperty(KTLINT_PLUGINS_VERSION_PROPERTY)?.takeIf { it.isNotBlank() }
+    }
+}
 
 internal fun getEditorConfigFiles(currentProjectDir: Path): Set<Path> {
     val result = mutableSetOf<Path>()
