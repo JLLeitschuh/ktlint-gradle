@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
-- Add support for reading ktlint version from `ktlint-plugins.properties` file [#TBD](https://github.com/JLLeitschuh/ktlint-gradle/pull/TBD)
+- Add support for reading ktlint version from `ktlint-plugins.properties` file [#1001](https://github.com/JLLeitschuh/ktlint-gradle/pull/1001)
   - Enables automatic synchronization of ktlint version between IntelliJ plugin and Gradle builds
   - When `ktlint-plugins.properties` exists in project root with `ktlint-version` property, that version is used as default
   - Explicit version configuration in build script still takes precedence
