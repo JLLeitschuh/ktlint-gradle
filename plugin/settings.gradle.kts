@@ -5,7 +5,7 @@ pluginManagement {
         // Upside is that we don't need to update the version in the settings.gradle.kts
         // every release
         id("org.jlleitschuh.gradle.ktlint") version "latest.release"
-        id("org.jetbrains.kotlin.jvm") version "2.1.20"
+        id("org.jetbrains.kotlin.jvm") version "2.2.21"
         id("com.gradle.plugin-publish") version "2.0.0"
         `java-gradle-plugin`
         id("com.gradleup.shadow") version "8.3.9"
