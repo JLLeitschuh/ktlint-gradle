@@ -51,7 +51,7 @@ jobs:
             repo.maven.apache.org:443
             scans-in.gradle.com:443
             services.gradle.org:443
-      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
       - name: configure windows pagefile
         if: ${{ matrix.os  == 'windows-latest' }}
         uses: al-cheb/configure-pagefile-action@9b6da52fb72a3c6147c1aad2df22d8d905681adc # v1.5
@@ -117,7 +117,7 @@ jobs:
             repo.maven.apache.org:443
             scans-in.gradle.com:443
             services.gradle.org:443
-      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
       - name: set up JDK
         uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165 # v5.0.0
         with:
@@ -172,7 +172,7 @@ jobs:
             repo.maven.apache.org:443
             scans-in.gradle.com:443
             services.gradle.org:443
-      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
       - name: set up JDK 11
         uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165 # v5.0.0
         with:
@@ -212,7 +212,7 @@ jobs:
             repo.maven.apache.org:443
             scans-in.gradle.com:443
             services.gradle.org:443
-      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
       - name: set up JDK 21
         uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165 # v5.0.0
         with:
@@ -247,7 +247,7 @@ jobs:
             repo.maven.apache.org:443
             scans-in.gradle.com:443
             services.gradle.org:443
-      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
       - name: Base Release Environment Setup
         uses: ./.github/actions/base-release
       - name: Verify Release Pipeline
