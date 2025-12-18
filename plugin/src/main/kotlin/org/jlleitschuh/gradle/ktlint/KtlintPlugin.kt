@@ -29,11 +29,31 @@ open class KtlintPlugin : Plugin<Project> {
     private fun PluginHolder.addKtLintTasksToKotlinPlugin() {
         target.plugins.withId("kotlin", applyKtLint())
         target.plugins.withId("org.jetbrains.kotlin.js", applyKtLint())
-        target.plugins.withId("org.jetbrains.kotlin.android", applyKtLintToAndroid())
         target.plugins.withId(
             "org.jetbrains.kotlin.multiplatform",
             applyKtlintMultiplatform()
         )
+        addKtLintTasksToAndroidIfNecessary()
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun PluginHolder.addKtLintTasksToAndroidIfNecessary() {
+        // Classic API (with kotlin-android plugin)
+        target.plugins.withId("org.jetbrains.kotlin.android", applyKtLintToAndroid())
+
+        // New API from AGP 9+ (with built-in Kotlin plugin)
+        target.pluginManager.withPlugin("com.android.base") {
+            val kotlinBaseApiPluginClass = try {
+                Class.forName("org.jetbrains.kotlin.gradle.plugin.KotlinBaseApiPlugin")
+                    as? Class<out Plugin<*>>
+            } catch (_: ClassNotFoundException) {
+                null
+            }
+
+            if (kotlinBaseApiPluginClass != null && target.plugins.hasPlugin(kotlinBaseApiPluginClass)) {
+                target.plugins.withId(id, applyKtLintToAndroid())
+            }
+        }
     }
 
     private fun PluginHolder.applyKtlintMultiplatform(): (Plugin<in Any>) -> Unit = {
