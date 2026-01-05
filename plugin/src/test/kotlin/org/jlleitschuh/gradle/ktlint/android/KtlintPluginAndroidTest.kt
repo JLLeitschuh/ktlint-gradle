@@ -66,7 +66,7 @@ class KtlintPluginAndroidTest : AbstractPluginTest() {
     enum class AndroidTestInput(
         val gradleVersion: GradleVersion,
         val agpVersion: String,
-        val kotlinVersion: String,
+        val kotlinVersion: String? = null,
         val ktlintVersion: String? = null,
         val minimumJava: Int? = null,
         val maximumJava: Int? = null
@@ -87,6 +87,13 @@ class KtlintPluginAndroidTest : AbstractPluginTest() {
             "1.0.1",
             minimumJava = 11,
             maximumJava = 17
+        ),
+        AGP_9_0(
+            GradleVersion.version(TestVersions.maxSupportedGradleVersion),
+            "9.0.0-rc02",
+            // Use built-in Kotlin for this project setup
+            kotlinVersion = null,
+            minimumJava = 17
         ),
         MAX(
             GradleVersion.version(TestVersions.maxSupportedGradleVersion),
