@@ -3,7 +3,7 @@
 **Provides a convenient wrapper plugin over the [ktlint](https://github.com/pinterest/ktlint) project.**
 
 <!-- Note: if changing the line below, the `sed` command in the trigger-release.yaml needs to be updated too -->
-Latest plugin version: [13.1.0](/CHANGELOG.md#---20250821)
+Latest plugin version: [14.0.1](/CHANGELOG.md#---20251110)
 
 [![Join the chat at https://kotlinlang.slack.com](https://img.shields.io/badge/slack-@kotlinlang/ktlint-yellow.svg?logo=slack)](https://kotlinlang.slack.com/messages/CKS3XG0LS)
 [![Build and Check](https://github.com/JLLeitschuh/ktlint-gradle/actions/workflows/build-and-check.yml/badge.svg)](https://github.com/JLLeitschuh/ktlint-gradle/actions/workflows/build-and-check.yml)
