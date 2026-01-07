@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+- Add support for Android projects with new DSL i.e. built-in Kotlin [#1016](https://github.com/JLLeitschuh/ktlint-gradle/pull/1016)
+
 ## [14.0.1] - 2025-11-10
 
 - Update build to work with gradle 9.1 and Java 25 [#962](https://github.com/JLLeitschuh/ktlint-gradle/pull/962)
