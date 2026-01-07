@@ -146,4 +146,49 @@ class KtlintPluginsPropertiesTest : AbstractPluginTest() {
             }
         }
     }
+
+    @CommonTest
+    fun shouldMarkTaskOutOfDateWhenPropertiesFileChanges(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            // Create ktlint-plugins.properties file with version
+            val propertiesFile = projectPath.resolve(KTLINT_PLUGINS_PROPERTIES_FILE_NAME)
+            propertiesFile.writeText(
+                """
+                ktlint-version=1.2.1
+                """.trimIndent()
+            )
+
+            withCleanSources()
+
+            // First run - task should execute (never run before)
+            build(mainSourceSetCheckTaskName, "--no-build-cache") {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isIn(
+                    org.gradle.testkit.runner.TaskOutcome.SUCCESS,
+                    org.gradle.testkit.runner.TaskOutcome.NO_SOURCE
+                )
+            }
+
+            // Second run - task should be UP-TO-DATE
+            build(mainSourceSetCheckTaskName, "--no-build-cache") {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(
+                    org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
+                )
+            }
+
+            // Update the ktlint-plugins.properties file
+            propertiesFile.writeText(
+                """
+                ktlint-version=1.3.0
+                """.trimIndent()
+            )
+
+            // Third run - task should be out-of-date and execute again
+            build(mainSourceSetCheckTaskName, "--no-build-cache") {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isIn(
+                    org.gradle.testkit.runner.TaskOutcome.SUCCESS,
+                    org.gradle.testkit.runner.TaskOutcome.NO_SOURCE
+                )
+            }
+        }
+    }
 }

@@ -130,6 +130,7 @@ private fun BaseKtLintCheckTask.configureBaseCheckTask(
 ) {
     ktLintClasspath.setFrom(pluginHolder.ktlintConfiguration)
     ktLintVersion.set(pluginHolder.extension.version)
+    ktlintPluginsPropertiesFile.set(pluginHolder.extension.ktlintPluginsPropertiesFile)
     additionalEditorconfig.set(pluginHolder.extension.additionalEditorconfig)
     debug.set(pluginHolder.extension.debug)
     ruleSetsClasspath.setFrom(pluginHolder.ktlintRulesetConfiguration)
