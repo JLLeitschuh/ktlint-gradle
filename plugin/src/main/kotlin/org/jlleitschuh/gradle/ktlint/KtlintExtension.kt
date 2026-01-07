@@ -46,8 +46,8 @@ open class KtlintExtension @Inject internal constructor(
      *
      * This property can be explicitly set in the build script to override the default behavior.
      */
-    val version: Property<String> = objectFactory.property {
-        convention(
+    val version: Property<String> = objectFactory.property(String::class.java)
+        .convention(
             ktlintPluginsPropertiesFile.map { propertiesFile ->
                 if (propertiesFile.asFile.exists()) {
                     readKtlintVersionFromPropertiesFile(propertiesFile.asFile.toPath()) ?: "1.5.0"
@@ -56,7 +56,6 @@ open class KtlintExtension @Inject internal constructor(
                 }
             }
         )
-    }
 
     /**
      * Enable relative paths in reports
