@@ -40,16 +40,15 @@ internal const val KTLINT_PLUGINS_VERSION_PROPERTY = "ktlint-version"
  * Reads the ktlint version from the ktlint-plugins.properties file if it exists.
  * This file is used by the ktlint IntelliJ plugin to store the ktlint version.
  *
- * @param projectDir The project directory to search for the properties file
+ * @param propertiesFilePath The path to the ktlint-plugins.properties file
  * @return The ktlint version string if found, null otherwise
  */
-internal fun readKtlintVersionFromPropertiesFile(projectDir: Path): String? {
-    val propertiesFile = projectDir.resolve(KTLINT_PLUGINS_PROPERTIES_FILE_NAME)
-    if (!Files.exists(propertiesFile) || !Files.isReadable(propertiesFile)) {
+internal fun readKtlintVersionFromPropertiesFile(propertiesFilePath: Path): String? {
+    if (!Files.exists(propertiesFilePath) || !Files.isReadable(propertiesFilePath)) {
         return null
     }
 
-    return propertiesFile.toFile().inputStream().use { input ->
+    return propertiesFilePath.toFile().inputStream().use { input ->
         val properties = java.util.Properties()
         properties.load(input)
         properties.getProperty(KTLINT_PLUGINS_VERSION_PROPERTY)?.takeIf { it.isNotBlank() }

@@ -50,7 +50,7 @@ internal class PluginUtilTest {
                 ktlint-version=1.2.1
                 """.trimIndent()
             )
-            val version = readKtlintVersionFromPropertiesFile(temporaryFolder.toPath())
+            val version = readKtlintVersionFromPropertiesFile(toPath())
             Assertions.assertEquals("1.2.1", version) {
                 "correctly reads version from properties file"
             }
@@ -60,7 +60,9 @@ internal class PluginUtilTest {
 
     @Test
     fun `test readKtlintVersionFromPropertiesFile returns null when file does not exist`() {
-        val version = readKtlintVersionFromPropertiesFile(temporaryFolder.toPath())
+        val version = readKtlintVersionFromPropertiesFile(
+            temporaryFolder.resolve(KTLINT_PLUGINS_PROPERTIES_FILE_NAME).toPath()
+        )
         Assertions.assertNull(version) {
             "returns null when properties file does not exist"
         }
@@ -75,7 +77,7 @@ internal class PluginUtilTest {
                 some-other-property=value
                 """.trimIndent()
             )
-            val version = readKtlintVersionFromPropertiesFile(temporaryFolder.toPath())
+            val version = readKtlintVersionFromPropertiesFile(toPath())
             Assertions.assertNull(version) {
                 "returns null when ktlint-version property is missing"
             }
@@ -92,7 +94,7 @@ internal class PluginUtilTest {
                 ktlint-version = 1.3.0
                 """.trimIndent()
             )
-            val version = readKtlintVersionFromPropertiesFile(temporaryFolder.toPath())
+            val version = readKtlintVersionFromPropertiesFile(toPath())
             Assertions.assertEquals("1.3.0", version) {
                 "correctly handles whitespace around equals sign"
             }
@@ -109,7 +111,7 @@ internal class PluginUtilTest {
                 ktlint-version=
                 """.trimIndent()
             )
-            val version = readKtlintVersionFromPropertiesFile(temporaryFolder.toPath())
+            val version = readKtlintVersionFromPropertiesFile(toPath())
             Assertions.assertNull(version) {
                 "returns null when ktlint-version is blank"
             }
@@ -128,7 +130,7 @@ internal class PluginUtilTest {
                 another-property=value2
                 """.trimIndent()
             )
-            val version = readKtlintVersionFromPropertiesFile(temporaryFolder.toPath())
+            val version = readKtlintVersionFromPropertiesFile(toPath())
             Assertions.assertEquals("1.4.0", version) {
                 "correctly finds ktlint-version among multiple properties"
             }
