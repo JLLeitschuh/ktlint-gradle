@@ -153,6 +153,75 @@ class GitHookTasksTest : AbstractPluginTest() {
         }
     }
 
+    @DisplayName("Check hook should use --relative flag when Gradle project is in subdirectory")
+    @CommonTest
+    fun checkHookUsesRelativeFlagInSubdirectory(gradleVersion: GradleVersion) {
+        val gradleRoot = projectRoot.resolve("project/submodule/").also { it.mkdirs() }
+        val gitDir = projectRoot.initGit()
+
+        project(gradleVersion, projectPath = gradleRoot) {
+            build(":$INSTALL_GIT_HOOK_CHECK_TASK") {
+                assertThat(task(":$INSTALL_GIT_HOOK_CHECK_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                val hookText = gitDir.preCommitGitHook().readText()
+                assertThat(hookText).contains("--relative=project/submodule")
+                assertThat(hookText).contains("-- project/submodule/")
+            }
+        }
+    }
+
+    @DisplayName("Format hook should use --relative flag and correct file paths when Gradle project is in subdirectory")
+    @CommonTest
+    fun formatHookUsesRelativeFlagInSubdirectory(gradleVersion: GradleVersion) {
+        val gradleRoot = projectRoot.resolve("project/submodule/").also { it.mkdirs() }
+        val gitDir = projectRoot.initGit()
+
+        project(gradleVersion, projectPath = gradleRoot) {
+            build(":$INSTALL_GIT_HOOK_FORMAT_TASK") {
+                assertThat(task(":$INSTALL_GIT_HOOK_FORMAT_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                val hookText = gitDir.preCommitGitHook().readText()
+                // Should use --relative flag for git diff
+                assertThat(hookText).contains("--relative=project/submodule")
+                assertThat(hookText).contains("-- project/submodule/")
+                // Should prefix file paths in git add command
+                assertThat(hookText).contains("if [ -f project/submodule/\$file ]; then")
+                assertThat(hookText).contains("git add project/submodule/\$file")
+            }
+        }
+    }
+
+    @DisplayName("Check hook should not use --relative flag when Gradle project is at git root")
+    @CommonTest
+    fun checkHookDoesNotUseRelativeFlagAtGitRoot(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            val gitDir = projectPath.initGit()
+
+            build(":$INSTALL_GIT_HOOK_CHECK_TASK") {
+                assertThat(task(":$INSTALL_GIT_HOOK_CHECK_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                val hookText = gitDir.preCommitGitHook().readText()
+                // Should NOT use --relative flag when at git root
+                assertThat(hookText).doesNotContain("--relative=")
+            }
+        }
+    }
+
+    @DisplayName("Format hook should not use --relative flag when Gradle project is at git root")
+    @CommonTest
+    fun formatHookDoesNotUseRelativeFlagAtGitRoot(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            val gitDir = projectPath.initGit()
+
+            build(":$INSTALL_GIT_HOOK_FORMAT_TASK") {
+                assertThat(task(":$INSTALL_GIT_HOOK_FORMAT_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                val hookText = gitDir.preCommitGitHook().readText()
+                // Should NOT use --relative flag when at git root
+                assertThat(hookText).doesNotContain("--relative=")
+                // Should NOT prefix file paths
+                assertThat(hookText).contains("if [ -f \$file ]; then")
+                assertThat(hookText).doesNotContain("if [ -f /\$file ]; then")
+            }
+        }
+    }
+
     @DisplayName("Check hook should not include files into git commit")
     @CommonTest
     fun checkHookShouldNotIncludeFilesIntoGitCommit(gradleVersion: GradleVersion) {
