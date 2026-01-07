@@ -166,7 +166,6 @@ class KtlintPluginsPropertiesTest : AbstractPluginTest() {
                 tasks.register("debugKtlintVersion") {
                     doLast {
                         println("DEBUG: ktlint.version = " + ktlint.version.get())
-                        println("DEBUG: ktlint.version.orNull = " + ktlint.version.orNull)
                         println("DEBUG: Properties file exists = " + file("$KTLINT_PLUGINS_PROPERTIES_FILE_NAME").exists())
                         if (file("$KTLINT_PLUGINS_PROPERTIES_FILE_NAME").exists()) {
                             println("DEBUG: Properties file content = " + file("$KTLINT_PLUGINS_PROPERTIES_FILE_NAME").text)
@@ -177,28 +176,18 @@ class KtlintPluginsPropertiesTest : AbstractPluginTest() {
             )
 
             // First run - task should execute (never run before)
-            build(mainSourceSetCheckTaskName, "--no-build-cache", "--info") {
+            build(mainSourceSetCheckTaskName, "--no-build-cache") {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isIn(
                     org.gradle.testkit.runner.TaskOutcome.SUCCESS,
                     org.gradle.testkit.runner.TaskOutcome.NO_SOURCE
                 )
-                println("=== First run output (version 1.2.1) ===")
-                println(output)
-            }
-
-            // Run debug task to see what version is being used
-            build("debugKtlintVersion") {
-                println("=== Debug output after first run ===")
-                println(output)
             }
 
             // Second run - task should be UP-TO-DATE
-            build(mainSourceSetCheckTaskName, "--no-build-cache", "--info") {
+            build(mainSourceSetCheckTaskName, "--no-build-cache") {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(
                     org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
                 )
-                println("=== Second run output (should be UP-TO-DATE) ===")
-                println(output)
             }
 
             // Update the ktlint-plugins.properties file
@@ -208,16 +197,8 @@ class KtlintPluginsPropertiesTest : AbstractPluginTest() {
                 """.trimIndent()
             )
 
-            // Run debug task to see what version is being used after update
-            build("debugKtlintVersion") {
-                println("=== Debug output after properties file update ===")
-                println(output)
-            }
-
             // Third run - task should be out-of-date and execute again
-            build(mainSourceSetCheckTaskName, "--no-build-cache", "--info") {
-                println("=== Third run output (version 1.3.0, should be out-of-date) ===")
-                println(output)
+            build(mainSourceSetCheckTaskName, "--no-build-cache") {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isIn(
                     org.gradle.testkit.runner.TaskOutcome.SUCCESS,
                     org.gradle.testkit.runner.TaskOutcome.NO_SOURCE
