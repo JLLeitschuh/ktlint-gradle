@@ -50,7 +50,7 @@ open class KtlintExtension @Inject internal constructor(
         .convention(
             ktlintPluginsPropertiesFile.map { propertiesFile ->
                 if (propertiesFile.asFile.exists()) {
-                    readKtlintVersionFromPropertiesFile(propertiesFile.asFile.toPath()) ?: "1.5.0"
+                    readKtlintVersionFromPropertiesFile(propertiesFile.asFile.parentFile.toPath()) ?: "1.5.0"
                 } else {
                     "1.5.0"
                 }
