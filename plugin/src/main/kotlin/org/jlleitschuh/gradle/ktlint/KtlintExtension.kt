@@ -30,9 +30,32 @@ open class KtlintExtension @Inject internal constructor(
     val reporterExtension = objectFactory.newInstance(ReporterExtension::class)
 
     /**
-     * The version of KtLint to use.
+     * The ktlint-plugins.properties file in the project root, if it exists.
+     * This file is used by the ktlint IntelliJ plugin to store configuration.
      */
-    val version: Property<String> = objectFactory.property { set("1.5.0") }
+    internal val ktlintPluginsPropertiesFile: RegularFileProperty = objectFactory.fileProperty()
+        .convention(
+            projectLayout.projectDirectory.file(KTLINT_PLUGINS_PROPERTIES_FILE_NAME)
+        )
+
+    /**
+     * The version of KtLint to use.
+     *
+     * If a `ktlint-plugins.properties` file exists in the project root with a `ktlint-version` property,
+     * that version will be used as the default. Otherwise, defaults to "1.5.0".
+     *
+     * This property can be explicitly set in the build script to override the default behavior.
+     */
+    val version: Property<String> = objectFactory.property(String::class.java)
+        .convention(
+            ktlintPluginsPropertiesFile.map { propertiesFile ->
+                if (propertiesFile.asFile.exists()) {
+                    readKtlintVersionFromPropertiesFile(propertiesFile.asFile.toPath()) ?: "1.5.0"
+                } else {
+                    "1.5.0"
+                }
+            }
+        )
 
     /**
      * Enable relative paths in reports

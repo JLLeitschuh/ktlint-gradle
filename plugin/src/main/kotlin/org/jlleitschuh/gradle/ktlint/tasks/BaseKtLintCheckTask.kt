@@ -31,6 +31,7 @@ import org.gradle.work.InputChanges
 import org.gradle.workers.WorkerExecutor
 import org.jlleitschuh.gradle.ktlint.FILTER_INCLUDE_PROPERTY_NAME
 import org.jlleitschuh.gradle.ktlint.KOTLIN_EXTENSIONS
+import org.jlleitschuh.gradle.ktlint.KTLINT_PLUGINS_PROPERTIES_FILE_NAME
 import org.jlleitschuh.gradle.ktlint.applyGitFilter
 import org.jlleitschuh.gradle.ktlint.getEditorConfigFiles
 import org.jlleitschuh.gradle.ktlint.intermediateResultsBuildDir
@@ -64,6 +65,17 @@ abstract class BaseKtLintCheckTask @Inject constructor(
             getEditorConfigFiles(projectLayout.projectDirectory.asFile.toPath())
         }
     )
+
+    /**
+     * Optional ktlint-plugins.properties file that may contain ktlint version configuration.
+     * This file is tracked as an input so that tasks become out-of-date when it changes.
+     * Even if the file doesn't exist, Gradle will track its location and mark the task
+     * out-of-date if the file is created or modified.
+     */
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    @get:org.gradle.api.tasks.Optional
+    internal abstract val ktlintPluginsPropertiesFile: RegularFileProperty
 
     @get:Input
     internal abstract val ktLintVersion: Property<String>
