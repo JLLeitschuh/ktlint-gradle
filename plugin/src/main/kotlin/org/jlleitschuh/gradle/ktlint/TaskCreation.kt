@@ -130,7 +130,13 @@ private fun BaseKtLintCheckTask.configureBaseCheckTask(
 ) {
     ktLintClasspath.setFrom(pluginHolder.ktlintConfiguration)
     ktLintVersion.set(pluginHolder.extension.version)
-    ktlintPluginsPropertiesFile.set(pluginHolder.extension.ktlintPluginsPropertiesFile)
+    // Only set the properties file if it actually exists, otherwise leave it unset
+    // This is needed because Gradle validation will fail for optional inputs that point to non-existent files
+    pluginHolder.extension.ktlintPluginsPropertiesFile.orNull?.let { fileProperty ->
+        if (fileProperty.asFile.exists()) {
+            ktlintPluginsPropertiesFile.set(fileProperty)
+        }
+    }
     additionalEditorconfig.set(pluginHolder.extension.additionalEditorconfig)
     debug.set(pluginHolder.extension.debug)
     ruleSetsClasspath.setFrom(pluginHolder.ktlintRulesetConfiguration)
