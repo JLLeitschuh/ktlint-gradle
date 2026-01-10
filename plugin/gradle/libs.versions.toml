@@ -1,6 +1,6 @@
 [versions]
 kotlin = "1.5.31"
-ktlint = "1.0.0"
+ktlint = "1.8.0"
 androidPlugin = "4.1.0"
 semver = "1.1.1"
 jgit = "5.13.3.202401111512-r"
@@ -20,6 +20,10 @@ jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "jgit" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlin-script-runtime = { module = "org.jetbrains.kotlin:kotlin-script-runtime", version.ref = "kotlin" }
+ktlint-cli-reporter-baseline = { module = "com.pinterest.ktlint:ktlint-cli-reporter-baseline", version.ref = "ktlint" }
+ktlint-cli-reporter-core = { module = "com.pinterest.ktlint:ktlint-cli-reporter-core", version.ref = "ktlint" }
 ktlint-rule-engine = { module = "com.pinterest.ktlint:ktlint-rule-engine", version.ref = "ktlint" }
+ktlint-rule-engine-core = { module = "com.pinterest.ktlint:ktlint-rule-engine-core", version.ref = "ktlint" }
+ktlint-ruleset-standard = { module = "com.pinterest.ktlint:ktlint-ruleset-standard", version.ref = "ktlint" }
 semver = { module = "net.swiftzer.semver:semver", version.ref = "semver" }
 slf4j-nop = { module = "org.slf4j:slf4j-nop", version.ref = "sl4fj" }
