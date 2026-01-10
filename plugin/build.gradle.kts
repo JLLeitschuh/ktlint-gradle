@@ -47,10 +47,10 @@ tasks.withType<KotlinCompile> {
 }
 
 dependencies {
-    compileOnly("com.pinterest.ktlint:ktlint-cli-reporter-core:1.0.0")
-    compileOnly("com.pinterest.ktlint:ktlint-rule-engine:1.0.0")
-    compileOnly("com.pinterest.ktlint:ktlint-ruleset-standard:1.0.0")
-    compileOnly("com.pinterest.ktlint:ktlint-cli-reporter-baseline:1.0.0")
+    compileOnly(libs.ktlint.cli.reporter.core)
+    compileOnly(libs.ktlint.rule.engine)
+    compileOnly(libs.ktlint.ruleset.standard)
+    compileOnly(libs.ktlint.cli.reporter.baseline)
     compileOnly(libs.kotlin.gradle.plugin)
     compileOnly(libs.android.gradle.plugin)
     compileOnly(kotlin("stdlib-jdk8"))
@@ -61,6 +61,7 @@ dependencies {
     testImplementation(libs.assertj.core)
     testImplementation(libs.kotlin.reflect)
     testImplementation(libs.ktlint.rule.engine)
+    testImplementation(libs.ktlint.rule.engine.core)
     testImplementation(libs.archunit.junit5)
 }
 

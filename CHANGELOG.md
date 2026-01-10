@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+- Add maxRuleVersion configuration for version-based rule filtering [#943](https://github.com/JLLeitschuh/ktlint-gradle/pull/943)
+
 ## [14.0.1] - 2025-11-10
 
 - Update build to work with gradle 9.1 and Java 25 [#962](https://github.com/JLLeitschuh/ktlint-gradle/pull/962)
