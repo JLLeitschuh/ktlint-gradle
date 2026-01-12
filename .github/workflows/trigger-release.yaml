@@ -37,7 +37,7 @@ jobs:
           sed -i 's|\(Latest plugin version: \[\).*\(\](/CHANGELOG.md#\).*---.*)|\1'"$new_version"'\2'"$stripped_version"'---'"$formatted_date"')|' README.md
 
       - name: Upload Changed Files as Artifacts
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: changed-files
           path: |
