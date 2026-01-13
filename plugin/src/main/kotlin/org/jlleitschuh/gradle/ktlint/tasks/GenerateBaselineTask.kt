@@ -49,7 +49,6 @@ abstract class GenerateBaselineTask @Inject constructor(
         super.onlyIf(spec)
     }
 
-    @Suppress("UnstableApiUsage")
     @TaskAction
     fun generateBaseline() {
         // Classloader isolation is enough here as we just want to use some classes from KtLint classpath

@@ -15,7 +15,6 @@ import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
 /**
  * Plugin that provides a wrapper over the `ktlint` project.
  */
-@Suppress("UnstableApiUsage")
 open class KtlintPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
