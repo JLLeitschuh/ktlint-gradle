@@ -12,7 +12,6 @@ import org.jlleitschuh.gradle.ktlint.selectReportersLoaderAdapter
 import java.io.File
 import java.io.PrintStream
 
-@Suppress("UnstableApiUsage")
 internal abstract class GenerateBaselineWorkAction :
     WorkAction<GenerateBaselineWorkAction.GenerateBaselineParameters> {
 

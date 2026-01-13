@@ -11,7 +11,6 @@ import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import org.jlleitschuh.gradle.ktlint.selectReportersLoaderAdapter
 import java.io.ObjectOutputStream
 
-@Suppress("UnstableApiUsage")
 internal abstract class LoadReportersWorkAction : WorkAction<LoadReportersWorkAction.LoadReportersParameters> {
     private val logger = Logging.getLogger("ktlint-load-reporters-worker")
 
