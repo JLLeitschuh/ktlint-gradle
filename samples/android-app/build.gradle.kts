@@ -5,14 +5,14 @@ plugins {
 }
 
 android {
-    namespace = "org.jlleitschuh"
-    compileSdkVersion(30)
+    namespace = "org.jlleitschuh.gradle.ktlint.android"
+    compileSdk = 36
 
     buildFeatures.viewBinding = true
 
     defaultConfig {
-        minSdkVersion(23)
-        targetSdkVersion(30)
+        minSdk = 23
+        targetSdk = 33
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -25,15 +25,15 @@ android {
         }
     }
 
-    flavorDimensions("beer")
+    flavorDimensions += "beer"
     productFlavors {
         register("weissbier")
         register("kellerbier")
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     sourceSets {
