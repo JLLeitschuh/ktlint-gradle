@@ -3,9 +3,9 @@ import java.util.Properties
 pluginManagement {
     includeBuild("./plugin")
     plugins {
-        id("org.jetbrains.kotlin.jvm") version "2.2.21"
-        id("org.jetbrains.kotlin.js") version "2.2.21"
-        id("com.android.application") version "8.8.0"
+        id("org.jetbrains.kotlin.jvm") version "2.3.0"
+        id("org.jetbrains.kotlin.js") version "2.3.0"
+        id("com.android.application") version "8.13.2"
     }
 
     repositories {
