@@ -163,3 +163,4 @@ gradle-app.setting
 
 .gradle-test-kit
 .obsidian
+*.lock

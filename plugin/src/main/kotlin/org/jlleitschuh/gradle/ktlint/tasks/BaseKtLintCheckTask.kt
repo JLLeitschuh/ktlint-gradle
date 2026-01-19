@@ -40,7 +40,6 @@ import org.jlleitschuh.gradle.ktlint.worker.KtLintWorkAction
 import java.io.File
 import javax.inject.Inject
 
-@Suppress("UnstableApiUsage")
 @CacheableTask
 abstract class BaseKtLintCheckTask @Inject constructor(
     private val objectFactory: ObjectFactory,
@@ -198,9 +197,9 @@ abstract class BaseKtLintCheckTask @Inject constructor(
         } else {
             emptySet()
         }
-        val allfilesToCheck = filesToCheck + previousErrors
+        val allFilesToCheck = filesToCheck + previousErrors
 
-        submitKtLintWork(allfilesToCheck, false, editorConfigUpdated, null)
+        submitKtLintWork(allFilesToCheck, false, editorConfigUpdated, null)
     }
 
     protected fun runFormat(

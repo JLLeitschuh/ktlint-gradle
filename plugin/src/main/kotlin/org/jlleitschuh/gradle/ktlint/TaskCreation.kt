@@ -184,7 +184,6 @@ private fun <T : BaseKtLintCheckTask> GenerateReportsTask.commonConfiguration(
     verbose.set(pluginHolder.extension.verbose)
     ktLintVersion.set(pluginHolder.extension.version)
     relative.set(pluginHolder.extension.relative)
-    @Suppress("UnstableApiUsage")
     baseline.set(
         pluginHolder.extension.baseline
             .flatMap {
