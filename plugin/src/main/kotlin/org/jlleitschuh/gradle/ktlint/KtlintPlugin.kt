@@ -4,6 +4,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.plugins.PluginContainer
 import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
@@ -15,7 +16,6 @@ import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
 /**
  * Plugin that provides a wrapper over the `ktlint` project.
  */
-@Suppress("UnstableApiUsage")
 open class KtlintPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
@@ -36,25 +36,30 @@ open class KtlintPlugin : Plugin<Project> {
         addKtLintTasksToAndroidIfNecessary()
     }
 
-    @Suppress("UNCHECKED_CAST")
     private fun PluginHolder.addKtLintTasksToAndroidIfNecessary() {
         // Classic API (with kotlin-android plugin)
         target.plugins.withId("org.jetbrains.kotlin.android", applyKtLintToAndroid())
 
         // New API from AGP 9+ (with built-in Kotlin plugin)
         target.pluginManager.withPlugin("com.android.base") {
-            val kotlinBaseApiPluginClass = try {
-                Class.forName("org.jetbrains.kotlin.gradle.plugin.KotlinBaseApiPlugin")
-                    as? Class<out Plugin<*>>
-            } catch (_: ClassNotFoundException) {
-                null
-            }
-
-            if (kotlinBaseApiPluginClass != null && target.plugins.hasPlugin(kotlinBaseApiPluginClass)) {
+            if (target.plugins.hasKotlinBaseApiPlugin) {
                 target.plugins.withId(id, applyKtLintToAndroid())
             }
         }
     }
+
+    @Suppress("UNCHECKED_CAST")
+    private val kotlinBaseApiPluginClass by lazy {
+        try {
+            Class.forName("org.jetbrains.kotlin.gradle.plugin.KotlinBaseApiPlugin")
+                as? Class<out Plugin<*>>
+        } catch (_: ClassNotFoundException) {
+            null
+        }
+    }
+
+    private val PluginContainer.hasKotlinBaseApiPlugin: Boolean get() =
+        kotlinBaseApiPluginClass?.let(this::hasPlugin) ?: false
 
     private fun PluginHolder.applyKtlintMultiplatform(): (Plugin<in Any>) -> Unit = {
         val multiplatformExtension = target.extensions.getByType(KotlinMultiplatformExtension::class.java)
