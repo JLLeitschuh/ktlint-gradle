@@ -36,7 +36,7 @@ object TestVersions {
     const val minSupportedKotlinPluginVersion = "1.6.21"
     const val maxSupportedKotlinPluginVersion = "2.2.20"
     const val minAgpVersion = "4.1.0"
-    const val maxAgpVersion = "8.8.0"
+    const val maxAgpVersion = "9.0.0"
 }
 
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)

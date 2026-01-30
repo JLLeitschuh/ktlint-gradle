@@ -88,17 +88,17 @@ class KtlintPluginAndroidTest : AbstractPluginTest() {
             minimumJava = 11,
             maximumJava = 17
         ),
-        AGP_9_0(
+        AGP_8_8(
             GradleVersion.version(TestVersions.maxSupportedGradleVersion),
-            "9.0.0",
-            // Use built-in Kotlin for this project setup
-            kotlinVersion = null,
+            "8.8.0",
+            TestVersions.maxSupportedKotlinPluginVersion,
             minimumJava = 17
         ),
         MAX(
             GradleVersion.version(TestVersions.maxSupportedGradleVersion),
             TestVersions.maxAgpVersion,
-            TestVersions.maxSupportedKotlinPluginVersion,
+            // Use built-in Kotlin for this project setup
+            kotlinVersion = null,
             minimumJava = 17
         )
     }

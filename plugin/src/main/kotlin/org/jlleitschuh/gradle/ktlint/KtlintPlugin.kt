@@ -51,6 +51,8 @@ open class KtlintPlugin : Plugin<Project> {
     @Suppress("UNCHECKED_CAST")
     private val kotlinBaseApiPluginClass by lazy {
         try {
+            // TODO: After raising the baseline Kotlin version to 1.7.20 or newer,
+            //  replace this reflective lookup with the actual class
             Class.forName("org.jetbrains.kotlin.gradle.plugin.KotlinBaseApiPlugin")
                 as? Class<out Plugin<*>>
         } catch (_: ClassNotFoundException) {
