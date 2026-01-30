@@ -5,7 +5,7 @@ import java.io.File
 
 fun androidProjectSetup(
     agpVersion: String,
-    kotlinPluginVersion: String,
+    kotlinPluginVersion: String?,
     ktlintVersion: String? = null
 ): (File) -> Unit = {
     val ktLintOverride = ktlintVersion?.let { "ktlint { version = \"$it\" }\n" } ?: ""
@@ -14,12 +14,16 @@ fun androidProjectSetup(
     } else {
         ""
     }
+    val kotlinPluginDeclaration = kotlinPluginVersion?.let {
+        "    id(\"org.jetbrains.kotlin.android\")"
+    }.orEmpty()
+
     //language=Groovy
     it.resolve("build.gradle").writeText(
         """
         |plugins {
         |    id("com.android.application")
-        |    id("org.jetbrains.kotlin.android")
+        |$kotlinPluginDeclaration
         |    id("org.jlleitschuh.gradle.ktlint")
         |}
         |
@@ -53,6 +57,9 @@ fun androidProjectSetup(
     } else {
         "    id(\"com.android.application\") version \"$agpVersion\"\n    "
     }
+    val kotlinSettingsDeclaration = kotlinPluginVersion
+        ?.let { version -> "        id(\"org.jetbrains.kotlin.android\") version (\"$version\")" }
+        .orEmpty()
 
     //language=Groovy
     it.resolve("settings.gradle.kts").writeText(
@@ -66,7 +73,7 @@ fun androidProjectSetup(
         |    }
         |
         |    plugins {
-        |        id("org.jetbrains.kotlin.android") version ("$kotlinPluginVersion")
+        |$kotlinSettingsDeclaration
         |        id("org.jlleitschuh.gradle.ktlint") version ("${TestVersions.pluginVersion}")
         |    $newAgp}
         |$oldAgpHack}
