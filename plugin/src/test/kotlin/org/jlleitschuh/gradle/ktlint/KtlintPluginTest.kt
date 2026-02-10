@@ -442,7 +442,7 @@ class KtlintPluginTest : AbstractPluginTest() {
         }
     }
 
-    @DisplayName("Should check files which path conatins whitespace")
+    @DisplayName("Should check files which path contains whitespace")
     @CommonTest
     fun pathsWithWhitespace(gradleVersion: GradleVersion) {
         project(gradleVersion) {

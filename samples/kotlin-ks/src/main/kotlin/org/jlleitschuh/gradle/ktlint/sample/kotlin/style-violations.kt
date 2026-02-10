@@ -4,6 +4,6 @@ object Numbers     {
 
 
 
-    val one = 1
+    const val one = 1
 
 }

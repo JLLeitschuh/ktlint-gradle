@@ -9,7 +9,6 @@ import org.gradle.work.InputChanges
 import org.gradle.workers.WorkerExecutor
 import javax.inject.Inject
 
-@Suppress("UnstableApiUsage")
 @CacheableTask
 abstract class KtLintCheckTask @Inject constructor(
     objectFactory: ObjectFactory,
@@ -31,7 +30,7 @@ abstract class KtLintCheckTask @Inject constructor(
     internal companion object {
         fun buildTaskNameForSourceSet(
             sourceSetName: String
-        ): String = "runKtlintCheckOver${sourceSetName.capitalize()}SourceSet"
+        ): String = "runKtlintCheckOver${sourceSetName.replaceFirstChar { it.uppercase() }}SourceSet"
 
         const val KOTLIN_SCRIPT_TASK_NAME = "runKtlintCheckOverKotlinScripts"
 
