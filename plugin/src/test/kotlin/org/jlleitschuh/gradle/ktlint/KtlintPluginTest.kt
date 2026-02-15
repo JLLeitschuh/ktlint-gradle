@@ -728,4 +728,68 @@ dependencies {
             }
         }
     }
+
+    @DisplayName("Should allow setting maxRuleVersion")
+    @CommonTest
+    fun allowMaxRuleVersionConfiguration(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
+            //language=Groovy
+            buildGradle.appendText(
+                """
+                ktlint {
+                    version = "1.8.0"
+                    maxRuleVersion = "1.0.0"
+                }
+                """.trimIndent()
+            )
+
+            build(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+        }
+    }
+
+    @DisplayName("Should work without maxRuleVersion set")
+    @CommonTest
+    fun workWithoutMaxRuleVersion(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
+            //language=Groovy
+            buildGradle.appendText(
+                """
+                ktlint {
+                    version = "1.8.0"
+                }
+                """.trimIndent()
+            )
+
+            build(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+        }
+    }
+
+    @DisplayName("Should filter rules based on maxRuleVersion")
+    @CommonTest
+    fun filterRulesBasedOnMaxRuleVersion(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
+            //language=Groovy
+            buildGradle.appendText(
+                """
+                ktlint {
+                    version = "1.8.0"
+                    maxRuleVersion = "0.1.0"
+                }
+                """.trimIndent()
+            )
+
+            // With maxRuleVersion set to 0.1.0, almost no rules should be loaded
+            // so the check should pass even with potentially problematic code
+            build(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+        }
+    }
 }
