@@ -1,6 +1,7 @@
 package org.jlleitschuh.gradle.ktlint
 
-import org.assertj.core.api.Assertions.assertThat
+import nebula.test.dsl.TestKitAssertions.assertThat
+import net.swiftzer.semver.SemVer
 import org.gradle.testkit.runner.TaskOutcome
 import org.gradle.util.GradleVersion
 import org.jlleitschuh.gradle.ktlint.tasks.GenerateBaselineTask
@@ -11,6 +12,7 @@ import org.jlleitschuh.gradle.ktlint.testdsl.GradleTestVersions
 import org.jlleitschuh.gradle.ktlint.testdsl.TestProject.Companion.FAIL_SOURCE_FILE
 import org.jlleitschuh.gradle.ktlint.testdsl.build
 import org.jlleitschuh.gradle.ktlint.testdsl.buildAndFail
+import org.jlleitschuh.gradle.ktlint.testdsl.getCurrentJavaVersion
 import org.jlleitschuh.gradle.ktlint.testdsl.project
 import org.jlleitschuh.gradle.ktlint.testdsl.projectSetup
 import org.junit.jupiter.api.DisplayName
@@ -211,16 +213,58 @@ class KtlintPluginTest : AbstractPluginTest() {
             //language=Groovy
             buildGradle.appendText(
                 """
-
-                ktlint.version = "0.35.0"
+                ktlint.version = "1.0.0"
                 """.trimIndent()
             )
 
             build(":dependencies") {
                 assertThat(output).contains(
                     "$KTLINT_CONFIGURATION_NAME - $KTLINT_CONFIGURATION_DESCRIPTION${System.lineSeparator()}" +
-                        "\\--- com.pinterest:ktlint:0.35.0${System.lineSeparator()}"
+                        "+--- com.pinterest.ktlint:ktlint-cli:1.0.0${System.lineSeparator()}"
                 )
+            }
+        }
+    }
+
+    @DisplayName("Should apply KtLint version from ktlint-plugins.properties")
+    @CommonTest
+    fun `ktlint version from properties`(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
+            val propsFile = projectPath.resolve("ktlint-plugins.properties")
+            propsFile.createNewFile()
+            propsFile.writeText("""ktlint-version=1.0.0""")
+
+            build(":dependencies") {
+                assertThat(output).contains(
+                    "$KTLINT_CONFIGURATION_NAME - $KTLINT_CONFIGURATION_DESCRIPTION${System.lineSeparator()}" +
+                        "+--- com.pinterest.ktlint:ktlint-cli:1.0.0${System.lineSeparator()}"
+                )
+            }
+            build(":$CHECK_PARENT_TASK_NAME", "--warning-mode=all") {
+                assertThat(task(":$mainSourceSetCheckTaskName"))
+                    .hasOutcome(TaskOutcome.SUCCESS)
+                assertThat(this)
+                    .hasNoMutableStateWarnings()
+                val majorJavaVersion = SemVer.parse(getCurrentJavaVersion()).major
+                if (!(majorJavaVersion < 17 && gradleVersion.majorVersion > 7)) {
+                    assertThat(this)
+                        .`as`("no deprecations unless we are using old java with gradle 8 which works but warns")
+                        .hasNoDeprecationWarnings()
+                }
+            }
+            build(":$CHECK_PARENT_TASK_NAME") {
+                assertThat(task(":$mainSourceSetCheckTaskName"))
+                    .`as`("task is cacheable")
+                    .hasOutcome(TaskOutcome.UP_TO_DATE)
+            }
+            propsFile.delete()
+            propsFile.createNewFile()
+            propsFile.writeText("""ktlint-version=1.1.0""")
+            build(":$CHECK_PARENT_TASK_NAME") {
+                assertThat(task(":$mainSourceSetCheckTaskName"))
+                    .`as`("changing ktlint version causes cache to clear")
+                    .hasOutcome(TaskOutcome.SUCCESS)
             }
         }
     }

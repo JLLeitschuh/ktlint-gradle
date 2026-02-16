@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [14.1.0] - 2026-03-05
 
+- Support `ktlint-plugins.properties` for version coordination with intellij plugin [#1034](https://github.com/JLLeitschuh/ktlint-gradle/pull/1034)
 - Add support for Android projects with new DSL i.e. built-in Kotlin [#1016](https://github.com/JLLeitschuh/ktlint-gradle/pull/1016)
 
 ## [14.0.1] - 2025-11-10
