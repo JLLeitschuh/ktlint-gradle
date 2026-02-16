@@ -211,15 +211,32 @@ class KtlintPluginTest : AbstractPluginTest() {
             //language=Groovy
             buildGradle.appendText(
                 """
-
-                ktlint.version = "0.35.0"
+                ktlint.version = "1.0.0"
                 """.trimIndent()
             )
 
             build(":dependencies") {
                 assertThat(output).contains(
                     "$KTLINT_CONFIGURATION_NAME - $KTLINT_CONFIGURATION_DESCRIPTION${System.lineSeparator()}" +
-                        "\\--- com.pinterest:ktlint:0.35.0${System.lineSeparator()}"
+                        "+--- com.pinterest.ktlint:ktlint-cli:1.0.0${System.lineSeparator()}"
+                )
+            }
+        }
+    }
+
+    @DisplayName("Should apply KtLint version from ktlint-plugins.properties")
+    @CommonTest
+    fun `ktlint version from properties`(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
+            val propsFile = projectPath.resolve("ktlint-plugins.properties")
+            propsFile.createNewFile()
+            propsFile.writeText("""ktlint-version=1.0.0""")
+
+            build(":dependencies") {
+                assertThat(output).contains(
+                    "$KTLINT_CONFIGURATION_NAME - $KTLINT_CONFIGURATION_DESCRIPTION${System.lineSeparator()}" +
+                        "+--- com.pinterest.ktlint:ktlint-cli:1.0.0${System.lineSeparator()}"
                 )
             }
         }
