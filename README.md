@@ -280,15 +280,31 @@ ktlint {
 </details>
 
 ### Configuration
-The following configuration block is _optional_.
 
-If you don't configure this the defaults defined
-in the [KtlintExtension](plugin/src/main/kotlin/org/jlleitschuh/gradle/ktlint/KtlintExtension.kt)
-object will be used.
+#### ktlint version
 
 The version of ktlint used by default _may change_ between patch versions of this plugin.
 If you don't want to inherit these changes then make sure you lock your version here.
 Consult the [ktlint release notes](https://github.com/pinterest/ktlint/releases) for more information about the differences between ktlint versions.
+
+You may declare the ktlint version in the `ktlint` extension, for example:
+```kotlin
+ktlint {
+    version = "1.4.0"
+}
+```
+
+You may also declare it in `ktlint-plugins.properties`, which allows coordination of the ktlint version between this plugin and the intellij kotlin plugin. Example:
+```properties
+ktlint-version=1.0.0
+```
+
+#### Other Configuration
+
+All properties in the following configuration block are _optional_.
+If you don't configure these, the defaults defined
+in the [KtlintExtension](plugin/src/main/kotlin/org/jlleitschuh/gradle/ktlint/KtlintExtension.kt)
+object will be used.
 
 <details>
 <summary>Groovy</summary>
@@ -297,7 +313,6 @@ Consult the [ktlint release notes](https://github.com/pinterest/ktlint/releases)
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 ktlint {
-    version = "0.22.0"
     debug = true
     verbose = true
     android = false
