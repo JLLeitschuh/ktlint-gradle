@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+- Make plugin compatible with Isolated Projects [#1032](https://github.com/JLLeitschuh/ktlint-gradle/pull/1032)
 
 ## [14.1.0] - 2026-03-05
 
