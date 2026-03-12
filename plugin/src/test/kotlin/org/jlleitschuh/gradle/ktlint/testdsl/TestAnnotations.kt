@@ -26,8 +26,8 @@ object TestVersions {
 
     val maxSupportedGradleVersion = when (majorJavaVersion) {
         in Int.MIN_VALUE..16 -> "8.14.3" // gradle 9 requires Java 17
-        in 17..Int.MAX_VALUE -> "9.1.0"
-        else -> "9.1.0"
+        in 17..Int.MAX_VALUE -> "9.4.0"
+        else -> "9.4.0"
     }
 
     val pluginVersion = System.getProperty("project.version")

@@ -62,6 +62,7 @@ dependencies {
     testImplementation(libs.kotlin.reflect)
     testImplementation(libs.ktlint.rule.engine)
     testImplementation(libs.archunit.junit5)
+    testImplementation("com.netflix.nebula:nebula-test:11.+")
 }
 
 fun JvmTestSuite.extendFromTest() {

@@ -11,9 +11,13 @@ import org.gradle.util.GradleVersion
 import org.jlleitschuh.gradle.ktlint.tasks.BaseKtLintCheckTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
+import java.nio.charset.StandardCharsets
 
 internal typealias FilterApplier = (Action<PatternFilterable>) -> Unit
 internal typealias KotlinScriptAdditionalPathApplier = (ConfigurableFileTree) -> Unit
+
+internal const val KTLINT_PLUGINS_VERSION_PROPERTY = "ktlint-version"
+internal const val KTLINT_PLUGINS_PROPERTIES_FILE_NAME = "ktlint-plugins.properties"
 
 /**
  * The base Ktlint plugin that all other plugins are built on.
@@ -49,6 +53,16 @@ open class KtlintBasePlugin : Plugin<Project> {
             filterTargetApplier,
             kotlinScriptAdditionalPathApplier
         )
+        val kotlinPluginsPropertiesFile = target.layout.projectDirectory.file(KTLINT_PLUGINS_PROPERTIES_FILE_NAME)
+        kotlinPluginsPropertiesFile?.also {
+            extension.version.set(
+                target.providers.fileContents(it).asText.map {
+                    val properties = java.util.Properties()
+                    properties.load(it.byteInputStream(StandardCharsets.UTF_8))
+                    properties.getProperty(KTLINT_PLUGINS_VERSION_PROPERTY)?.takeIf { it.isNotBlank() }
+                }.orElse("1.5.0")
+            )
+        }
     }
 
     companion object {
