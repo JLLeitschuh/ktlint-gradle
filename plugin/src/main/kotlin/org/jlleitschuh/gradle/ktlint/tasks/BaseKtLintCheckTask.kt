@@ -91,7 +91,7 @@ abstract class BaseKtLintCheckTask @Inject constructor(
     private var sourceFiles: ConfigurableFileCollection = objectFactory.fileCollection()
 
     init {
-        if (project.hasProperty(FILTER_INCLUDE_PROPERTY_NAME)) {
+        if (project.providers.gradleProperty(FILTER_INCLUDE_PROPERTY_NAME).orNull != null) {
             applyGitFilter()
         } else {
             KOTLIN_EXTENSIONS.forEach {
