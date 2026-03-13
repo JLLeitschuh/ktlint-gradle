@@ -83,13 +83,13 @@ jobs:
       - name: Test Plugin
         run: ./plugin/gradlew -p ./plugin test${{ matrix.java_version }} --no-daemon
       - name: Upload test results
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         if: failure()
         with:
           name: test-results-${{ runner.os }}-java-${{ matrix.java_version }}
           path: plugin/build/reports/tests/test/
       - name: Upload Memory Dump
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         if: failure()
         with:
           name: memory-dump-${{ runner.os }}
@@ -143,7 +143,7 @@ jobs:
       - name: Check Plugin
         run: ./plugin/gradlew -p ./plugin build --no-daemon
       - name: Upload test results
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         if: failure()
         with:
           name: test-results
