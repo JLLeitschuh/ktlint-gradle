@@ -1,5 +1,5 @@
 [versions]
-kotlin = "1.5.31"
+kotlin = "2.1.21"
 ktlint = "1.0.0"
 androidPlugin = "4.1.0"
 semver = "1.1.1"
