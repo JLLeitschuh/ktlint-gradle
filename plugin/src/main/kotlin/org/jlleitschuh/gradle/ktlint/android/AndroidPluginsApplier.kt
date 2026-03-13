@@ -24,7 +24,7 @@ internal fun KtlintPlugin.PluginHolder.applyKtLintToAndroid(): (Plugin<in Any>) 
             androidPluginConfigureAction(this)
         )
         target.plugins.withId(
-            "com.android.library",
+            "com.android.kotlin.multiplatform.library",
             androidPluginConfigureAction(this)
         )
         target.plugins.withId(

@@ -108,7 +108,6 @@ abstract class GenerateReportsTask @Inject constructor(
      *
      * Default is "build/reports/ktlint/${taskName}/".
      */
-    @Suppress("UnstableApiUsage")
     @get:OutputDirectory
     val reportsOutputDirectory: DirectoryProperty = objectFactory
         .directoryProperty()
@@ -120,7 +119,6 @@ abstract class GenerateReportsTask @Inject constructor(
             }
         )
 
-    @Suppress("UnstableApiUsage")
     @TaskAction
     fun generateReports() {
         // Classloader isolation is enough here as we just want to use some classes from KtLint classpath
@@ -198,7 +196,7 @@ abstract class GenerateReportsTask @Inject constructor(
         internal fun generateNameForSourceSets(
             sourceSetName: String,
             lintType: LintType
-        ): String = "ktlint${sourceSetName.capitalize()}SourceSet${lintType.suffix}"
+        ): String = "ktlint${sourceSetName.replaceFirstChar { it.uppercase() }}SourceSet${lintType.suffix}"
 
         internal fun generateNameForKotlinScripts(
             lintType: LintType

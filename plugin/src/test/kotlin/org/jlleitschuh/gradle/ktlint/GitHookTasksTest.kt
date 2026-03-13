@@ -181,7 +181,7 @@ class GitHookTasksTest : AbstractPluginTest() {
 
                 val hookTextLines = gitDir.preCommitGitHook().readLines()
                 assertThat(hookTextLines).doesNotContain("set -e")
-                assertThat(hookTextLines).contains("gradle_command_exit_code=\$?")
+                assertThat(hookTextLines).contains("gradle_command_exit_code=$?")
                 assertThat(hookTextLines).contains("exit \$gradle_command_exit_code")
             }
         }
@@ -202,7 +202,7 @@ class GitHookTasksTest : AbstractPluginTest() {
 
                 val hookTextLines = gitDir.preCommitGitHook().readLines()
                 assertThat(hookTextLines).doesNotContain("set -e")
-                assertThat(hookTextLines).contains("gradle_command_exit_code=\$?")
+                assertThat(hookTextLines).contains("gradle_command_exit_code=$?")
                 assertThat(hookTextLines).contains("exit \$gradle_command_exit_code")
             }
         }

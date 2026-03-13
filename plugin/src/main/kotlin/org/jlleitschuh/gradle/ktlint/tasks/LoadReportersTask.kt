@@ -21,7 +21,6 @@ import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import org.jlleitschuh.gradle.ktlint.worker.LoadReportersWorkAction
 import javax.inject.Inject
 
-@Suppress("UnstableApiUsage")
 @CacheableTask
 internal abstract class LoadReportersTask @Inject constructor(
     private val workerExecutor: WorkerExecutor,

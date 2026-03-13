@@ -71,7 +71,7 @@ internal fun generateGitHook(
 ) =
     """
     set +e
-    CHANGED_FILES="${'$'}(${generateGitCommand(gradleRootDirPrefix)} | awk '$1 != "D" && $NF ~ /\.kts?$/ { print $NF }')"
+    CHANGED_FILES="$(${generateGitCommand(gradleRootDirPrefix)} | awk '$1 != "D" && $NF ~ /\.kts?$/ { print $NF }')"
 
     if [ -z "${'$'}CHANGED_FILES" ]; then
         echo "No Kotlin staged files."
@@ -88,7 +88,7 @@ internal fun generateGitHook(
     fi
 
     ${generateGradleCommand(taskName, gradleRootDirPrefix)}
-    gradle_command_exit_code=${'$'}?
+    gradle_command_exit_code=$?
 
     echo "Completed ktlint run."
     ${postCheck(shouldUpdateCommit)}

@@ -26,7 +26,6 @@ open class KtlintBasePlugin : Plugin<Project> {
     internal lateinit var extension: KtlintExtension
 
     override fun apply(target: Project) {
-        target.checkMinimalSupportedGradleVersion()
         val filterTargetApplier: FilterApplier = {
             target.tasks.withType(BaseKtLintCheckTask::class.java).configureEach(it)
         }
