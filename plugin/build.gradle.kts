@@ -1,7 +1,10 @@
 import com.github.breadmoirai.githubreleaseplugin.GithubReleaseTask
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import com.gradle.scan.agent.serialization.scan.serializer.kryo.it
+import okio.`-DeprecatedOkio`.source
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.gradle.internal.impldep.org.bouncycastle.asn1.x500.style.RFC4519Style.owner
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
@@ -47,10 +50,10 @@ tasks.withType<KotlinCompile> {
 }
 
 dependencies {
-    compileOnly("com.pinterest.ktlint:ktlint-cli-reporter-core:1.0.0")
-    compileOnly("com.pinterest.ktlint:ktlint-rule-engine:1.0.0")
-    compileOnly("com.pinterest.ktlint:ktlint-ruleset-standard:1.0.0")
-    compileOnly("com.pinterest.ktlint:ktlint-cli-reporter-baseline:1.0.0")
+    compileOnly(libs.ktlint.cli.reporter.core)
+    compileOnly(libs.ktlint.rule.engine)
+    compileOnly(libs.ktlint.ruleset.standard)
+    compileOnly(libs.ktlint.cli.reporter.baseline)
     compileOnly(libs.kotlin.gradle.plugin)
     compileOnly(libs.android.gradle.plugin)
     compileOnly(kotlin("stdlib-jdk8"))
@@ -60,7 +63,8 @@ dependencies {
 
     testImplementation(libs.assertj.core)
     testImplementation(libs.kotlin.reflect)
-    testImplementation(libs.ktlint.rule.engine)
+    testImplementation(libs.ktlint.rule.engine.test)
+    testImplementation(libs.ktlint.rule.engine.core.test)
     testImplementation(libs.archunit.junit5)
     testImplementation("com.netflix.nebula:nebula-test:11.+")
 }
@@ -104,6 +108,9 @@ testing {
                     targets.all {
                         dependencies {
                             implementation(gradleTestKit())
+                            // Ensure that a custom ktlint version is used for tests
+                            implementation(libs.ktlint.rule.engine.test)
+                            implementation(libs.ktlint.rule.engine.core.test)
                         }
                         testTask.configure {
                             javaLauncher.set(
