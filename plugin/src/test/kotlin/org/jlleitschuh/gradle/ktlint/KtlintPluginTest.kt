@@ -31,6 +31,17 @@ class KtlintPluginTest : AbstractPluginTest() {
 
             buildAndFail(CHECK_PARENT_TASK_NAME) {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            }
+        }
+    }
+
+    @DisplayName("Should log issues at \"error\" level")
+    @CommonTest
+    fun logIssuesAtErrorLevel(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withFailingSources()
+
+            buildAndFail(CHECK_PARENT_TASK_NAME, "--quiet") {
                 assertThat(output).contains("Unnecessary long whitespace")
             }
         }

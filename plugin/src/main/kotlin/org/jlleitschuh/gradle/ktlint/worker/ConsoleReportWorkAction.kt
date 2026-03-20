@@ -73,7 +73,7 @@ internal abstract class ConsoleReportWorkAction : WorkAction<ConsoleReportWorkAc
         } else {
             detail
         }
-        logger.warn("$filePath:$line:$col $errorDetail$verboseSuffix")
+        logger.error("$filePath:$line:$col $errorDetail$verboseSuffix")
     }
 
     internal interface ConsoleReportParameters : WorkParameters {
