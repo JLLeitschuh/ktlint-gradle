@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+- Log issues at `ERROR` level instead of `WARNING` [#1038](https://github.com/JLLeitschuh/ktlint-gradle/pull/1038)
+
 ## [14.2.0] - 2026-03-12
 
 - Make plugin compatible with Isolated Projects [#1032](https://github.com/JLLeitschuh/ktlint-gradle/pull/1032)
