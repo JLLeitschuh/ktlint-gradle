@@ -51,6 +51,39 @@ class KtlintPluginTest : AbstractPluginTest() {
         }
     }
 
+    @DisplayName("Should log issues at \"ERROR\" level with ignoreFailures=false")
+    @CommonTest
+    fun logIssuesAtErrorLevel(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withFailingSources()
+
+            buildAndFail(CHECK_PARENT_TASK_NAME, "--quiet") {
+                assertThat(output).contains("Unnecessary long whitespace")
+            }
+        }
+    }
+
+    @DisplayName("Should log issues at \"WARNING\" level with ignoreFailures=true")
+    @CommonTest
+    fun logIssuesAtWarnLevelWithIgnoreFailures(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            buildGradle.appendText(
+                """
+                    ktlint.ignoreFailures = true
+                """.trimIndent()
+            )
+            withFailingSources()
+
+            build(CHECK_PARENT_TASK_NAME, "--warn") {
+                assertThat(output).contains("Unnecessary long whitespace")
+            }
+
+            build(CHECK_PARENT_TASK_NAME, "--quiet", "--rerun-tasks") {
+                assertThat(output).doesNotContain("Unnecessary long whitespace")
+            }
+        }
+    }
+
     @DisplayName("Should succeed check on clean sources")
     @CommonTest
     fun passCleanSources(gradleVersion: GradleVersion) {
