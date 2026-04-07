@@ -36,6 +36,21 @@ class KtlintPluginTest : AbstractPluginTest() {
         }
     }
 
+    @DisplayName("Should pass on failing sources with ignoreFailures=true")
+    @CommonTest
+    fun passOnStyleViolationWithIgnoreFailures(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            buildGradle.appendText(
+                """
+                    ktlint.ignoreFailures = true
+                """.trimIndent()
+            )
+            withFailingSources()
+
+            build(CHECK_PARENT_TASK_NAME)
+        }
+    }
+
     @DisplayName("Should succeed check on clean sources")
     @CommonTest
     fun passCleanSources(gradleVersion: GradleVersion) {
