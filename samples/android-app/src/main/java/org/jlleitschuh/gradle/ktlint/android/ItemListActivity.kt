@@ -47,18 +47,13 @@ class ItemListActivity : AppCompatActivity() {
     class SimpleItemRecyclerViewAdapter(
         private val mValues: List<DummyContent.DummyItem>,
     ) : RecyclerView.Adapter<ViewHolder>() {
-        private val mOnClickListener: View.OnClickListener
-
-        init {
-            mOnClickListener =
-                View.OnClickListener { v ->
-                    val item = v.tag as DummyContent.DummyItem
-                    val intent =
-                        Intent(v.context, ItemDetailActivity::class.java).apply {
-                            putExtra(ItemDetailFragment.ARG_ITEM_ID, item.id)
-                        }
-                    v.context.startActivity(intent)
+        private val mOnClickListener: View.OnClickListener = View.OnClickListener { v ->
+            val item = v.tag as DummyContent.DummyItem
+            val intent =
+                Intent(v.context, ItemDetailActivity::class.java).apply {
+                    putExtra(ItemDetailFragment.ARG_ITEM_ID, item.id)
                 }
+            v.context.startActivity(intent)
         }
 
         override fun onCreateViewHolder(
@@ -89,7 +84,7 @@ class ItemListActivity : AppCompatActivity() {
             return mValues.size
         }
 
-        inner class ViewHolder(mView: View) : RecyclerView.ViewHolder(mView) {
+        class ViewHolder(mView: View) : RecyclerView.ViewHolder(mView) {
             val mIdView: TextView = mView.findViewById(R.id.id_text)
             val mContentView: TextView = mView.findViewById(R.id.content)
         }

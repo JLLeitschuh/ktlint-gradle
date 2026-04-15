@@ -20,7 +20,6 @@ import javax.inject.Inject
  * Extension class for configuring the [KtlintPlugin].
  * @param filterTargetApplier When [KtlintExtension.filter] is called, this function is executed.
  */
-@Suppress("UnstableApiUsage")
 open class KtlintExtension @Inject internal constructor(
     objectFactory: ObjectFactory,
     projectLayout: ProjectLayout,
