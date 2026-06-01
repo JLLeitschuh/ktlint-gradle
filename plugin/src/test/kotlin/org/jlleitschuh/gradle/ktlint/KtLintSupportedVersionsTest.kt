@@ -175,7 +175,7 @@ class KtLintSupportedVersionsTest : AbstractPluginTest() {
         private val supportedKtlintVersions = mutableListOf(
             "1.0.1", // lowest
             "1.5.0", // default
-            "1.6.0" // highest
+            "1.8.0" // highest
         )
 
         override fun provideArguments(

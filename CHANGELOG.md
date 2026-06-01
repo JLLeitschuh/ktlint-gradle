@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+- Kotlin 2.4.0 support [#1059](https://github.com/JLLeitschuh/ktlint-gradle/pull/1059) (No changes needed, just updated tests)
+
 ## [14.2.0] - 2026-03-12
 
 - Make plugin compatible with Isolated Projects [#1032](https://github.com/JLLeitschuh/ktlint-gradle/pull/1032)
