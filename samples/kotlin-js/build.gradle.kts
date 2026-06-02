@@ -1,7 +1,7 @@
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
-    kotlin("js")
+    kotlin("multiplatform")
     id("org.jlleitschuh.gradle.ktlint")
 }
 

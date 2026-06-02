@@ -62,7 +62,9 @@ dependencies {
     testImplementation(libs.kotlin.reflect)
     testImplementation(libs.ktlint.rule.engine)
     testImplementation(libs.archunit.junit5)
-    testImplementation("com.netflix.nebula:nebula-test:11.+")
+    testImplementation("com.netflix.nebula:nebula-test:11.+") {
+        because("12.x compile son java 17, and we still test against 8 and 11")
+    }
 }
 
 fun JvmTestSuite.extendFromTest() {

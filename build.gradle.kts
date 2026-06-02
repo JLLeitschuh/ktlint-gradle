@@ -8,7 +8,7 @@ buildscript {
 plugins {
     kotlin("jvm") apply false
     id("com.android.application") apply false
-    kotlin("js") apply false
+    kotlin("multiplatform") apply false
     id("org.jlleitschuh.gradle.ktlint")
 }
 

@@ -26,15 +26,14 @@ object TestVersions {
 
     val maxSupportedGradleVersion = when (majorJavaVersion) {
         in Int.MIN_VALUE..16 -> "8.14.3" // gradle 9 requires Java 17
-        in 17..Int.MAX_VALUE -> "9.4.0"
-        else -> "9.4.0"
+        else -> "9.5.1"
     }
 
     val pluginVersion = System.getProperty("project.version")
         ?: KtlintPlugin::class.java.`package`.implementationVersion
         ?: error("Unable to determine plugin version.")
     const val minSupportedKotlinPluginVersion = "1.6.21"
-    const val maxSupportedKotlinPluginVersion = "2.2.20"
+    const val maxSupportedKotlinPluginVersion = "2.4.0-Beta2"
     const val minAgpVersion = "4.1.0"
     const val maxAgpVersion = "9.0.0"
 }

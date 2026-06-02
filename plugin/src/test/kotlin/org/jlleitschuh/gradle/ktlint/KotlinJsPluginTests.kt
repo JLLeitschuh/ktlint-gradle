@@ -19,7 +19,10 @@ import java.io.File
 @GradleTestVersions
 class KotlinJsPluginTests : AbstractPluginTest() {
     private fun jsProjectSetup(): (File) -> Unit = {
-        projectSetup("js").invoke(it)
+        projectSetup(
+            "js",
+            "2.3.20" // last version with js plugin
+        ).invoke(it)
 
         //language=Groovy
         it.resolve("build.gradle").appendText(
