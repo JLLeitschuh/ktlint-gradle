@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 - Kotlin 2.4.0 support [#1059](https://github.com/JLLeitschuh/ktlint-gradle/pull/1059) (No changes needed, just updated tests)
+- Clean up workaround for Gradle 6 [#1068](https://github.com/JLLeitschuh/ktlint-gradle/pull/1068)
 
 ## [14.2.0] - 2026-03-12
 
