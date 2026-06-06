@@ -134,7 +134,6 @@ internal fun createKtLintReporterConfiguration(
 
 internal fun createKtLintBaselineReporterConfiguration(
     target: Project,
-    extension: KtlintExtension,
     ktLintConfiguration: Configuration
 ): Configuration = target
     .configurations
@@ -146,28 +145,4 @@ internal fun createKtLintBaselineReporterConfiguration(
         isCanBeConsumed = false
 
         shouldResolveConsistentlyWith(ktLintConfiguration)
-
-        //     withDependencies {
-        // Workaround for gradle 6 https://github.com/gradle/gradle/issues/13255
-        val oldProp = target.objects.listProperty(Dependency::class.java)
-        dependencies.addAllLater(
-            oldProp.value(
-                extension.version.map { version ->
-                    val ktlintVersion = extension.version.get()
-                    val ktlintSemver = SemVer.parse(ktlintVersion)
-                    if (ktlintSemver >= SemVer(1, 0, 0)) {
-                        // Baseline reporter maven coordinates changed in 1.0
-                        listOf(
-                            target.dependencies.create("com.pinterest.ktlint:ktlint-cli-reporter-baseline:$version"),
-                            // this transitive dep was introduced in ktlint 1.0, but for some reason, it is not picked up automatically
-                            target.dependencies.create("io.github.oshai:kotlin-logging:5.1.0")
-                        )
-                    } else {
-                        // Baseline reporter is only available starting 0.41.0 release
-                        listOf(target.dependencies.create("com.pinterest.ktlint:ktlint-reporter-baseline:$version"))
-                    }
-                }
-            )
-        )
-        //      }
     }
