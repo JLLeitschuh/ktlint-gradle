@@ -50,6 +50,8 @@ abstract class BaseKtLintCheckTask @Inject constructor(
 ) : DefaultTask(),
     PatternFilterable {
 
+    private val projectDir: File = projectLayout.projectDirectory.asFile
+
     @get:Classpath
     internal abstract val ktLintClasspath: ConfigurableFileCollection
 
@@ -192,7 +194,7 @@ abstract class BaseKtLintCheckTask @Inject constructor(
             KtLintClassesSerializer
                 .create()
                 .loadErrors(discoveredErrors.asFile.get())
-                .map { it.lintedFile }
+                .map { projectDir.resolve(it.lintedFile) }
                 .filter { it.exists() }
                 .toSet()
         } else {
@@ -279,6 +281,7 @@ abstract class BaseKtLintCheckTask @Inject constructor(
             ktLintVersion.set(task.ktLintVersion)
             editorconfigFilesWereChanged.set(editorConfigUpdated)
             this.formatSnapshot.set(formatSnapshot)
+            projectDirectory.set(task.projectDir)
         }
     }
 
