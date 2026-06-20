@@ -125,6 +125,7 @@ private fun BaseKtLintCheckTask.configureBaseCheckTask(
     android.set(pluginHolder.extension.android)
     loadedReporters.set(pluginHolder.loadReportersTask.get().loadedReporters)
     enableExperimentalRules.set(pluginHolder.extension.enableExperimentalRules)
+    projectDirectory.set(pluginHolder.target.layout.projectDirectory)
 
     additionalTaskConfig()
 }

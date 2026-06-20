@@ -4,6 +4,7 @@ import groovy.lang.Closure
 import org.gradle.api.DefaultTask
 import org.gradle.api.JavaVersion
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.FileType
@@ -50,7 +51,13 @@ abstract class BaseKtLintCheckTask @Inject constructor(
 ) : DefaultTask(),
     PatternFilterable {
 
-    private val projectDir: File = projectLayout.projectDirectory.asFile
+    /**
+     * The project directory, used as the root for computing relative file paths stored in the
+     * lint-error binary output.  Annotated {@code @Internal} so Gradle does not fingerprint the
+     * entire directory tree as a task input; it is only an anchor for path relativisation.
+     */
+    @get:Internal
+    internal abstract val projectDirectory: DirectoryProperty
 
     @get:Classpath
     internal abstract val ktLintClasspath: ConfigurableFileCollection
@@ -63,7 +70,7 @@ abstract class BaseKtLintCheckTask @Inject constructor(
     @get:InputFiles
     internal val editorConfigFiles: FileCollection = objectFactory.fileCollection().from(
         {
-            getEditorConfigFiles(projectLayout.projectDirectory.asFile.toPath())
+            getEditorConfigFiles(projectDirectory.asFile.get().toPath())
         }
     )
 
@@ -93,6 +100,8 @@ abstract class BaseKtLintCheckTask @Inject constructor(
     private var sourceFiles: ConfigurableFileCollection = objectFactory.fileCollection()
 
     init {
+        projectDirectory.convention(projectLayout.projectDirectory)
+
         if (project.providers.gradleProperty(FILTER_INCLUDE_PROPERTY_NAME).orNull != null) {
             applyGitFilter()
         } else {
@@ -194,7 +203,7 @@ abstract class BaseKtLintCheckTask @Inject constructor(
             KtLintClassesSerializer
                 .create()
                 .loadErrors(discoveredErrors.asFile.get())
-                .map { projectDir.resolve(it.lintedFile) }
+                .map { projectDirectory.asFile.get().resolve(it.lintedFile) }
                 .filter { it.exists() }
                 .toSet()
         } else {
@@ -281,7 +290,7 @@ abstract class BaseKtLintCheckTask @Inject constructor(
             ktLintVersion.set(task.ktLintVersion)
             editorconfigFilesWereChanged.set(editorConfigUpdated)
             this.formatSnapshot.set(formatSnapshot)
-            projectDirectory.set(task.projectDir)
+            projectDirectory.set(task.projectDirectory)
         }
     }
 
