@@ -33,7 +33,6 @@ import org.gradle.workers.WorkerExecutor
 import org.jlleitschuh.gradle.ktlint.FILTER_INCLUDE_PROPERTY_NAME
 import org.jlleitschuh.gradle.ktlint.KOTLIN_EXTENSIONS
 import org.jlleitschuh.gradle.ktlint.applyGitFilter
-import org.jlleitschuh.gradle.ktlint.getEditorConfigFiles
 import org.jlleitschuh.gradle.ktlint.intermediateResultsBuildDir
 import org.jlleitschuh.gradle.ktlint.property
 import org.jlleitschuh.gradle.ktlint.worker.KtLintClassesSerializer
@@ -68,11 +67,7 @@ abstract class BaseKtLintCheckTask @Inject constructor(
     @get:Incremental
     @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:InputFiles
-    internal val editorConfigFiles: FileCollection = objectFactory.fileCollection().from(
-        {
-            getEditorConfigFiles(projectDirectory.asFile.get().toPath())
-        }
-    )
+    internal abstract val editorConfigFiles: ConfigurableFileCollection
 
     @get:Input
     internal abstract val ktLintVersion: Property<String>

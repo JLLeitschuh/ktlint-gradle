@@ -126,6 +126,9 @@ private fun BaseKtLintCheckTask.configureBaseCheckTask(
     loadedReporters.set(pluginHolder.loadReportersTask.get().loadedReporters)
     enableExperimentalRules.set(pluginHolder.extension.enableExperimentalRules)
     projectDirectory.set(pluginHolder.target.layout.projectDirectory)
+    editorConfigFiles.from(
+        getEditorConfigFiles(pluginHolder.target.layout.projectDirectory.asFile.toPath())
+    )
 
     additionalTaskConfig()
 }
