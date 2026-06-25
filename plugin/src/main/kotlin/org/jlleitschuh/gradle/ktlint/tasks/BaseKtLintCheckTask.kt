@@ -20,6 +20,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -79,6 +80,10 @@ abstract class BaseKtLintCheckTask @Inject constructor(
 
     @get:Input
     internal abstract val enableExperimentalRules: Property<Boolean>
+
+    @get:Input
+    @get:Optional
+    internal abstract val maxRuleVersion: Property<String>
 
     /**
      * Max lint worker heap size. Default is "256m".
@@ -279,6 +284,8 @@ abstract class BaseKtLintCheckTask @Inject constructor(
             ktLintVersion.set(task.ktLintVersion)
             editorconfigFilesWereChanged.set(editorConfigUpdated)
             this.formatSnapshot.set(formatSnapshot)
+            enableExperimentalRules.set(task.enableExperimentalRules)
+            maxRuleVersion.set(task.maxRuleVersion)
         }
     }
 
