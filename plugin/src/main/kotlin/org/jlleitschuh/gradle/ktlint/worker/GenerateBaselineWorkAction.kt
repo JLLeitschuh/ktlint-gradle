@@ -32,8 +32,6 @@ internal abstract class GenerateBaselineWorkAction :
             if (exists()) delete() else parentFile.mkdirs()
         }
 
-        val projectDir = parameters.projectDirectory.asFile.get()
-
         PrintStream(baselineFile.outputStream()).use { file ->
             val baselineReporter = selectReportersLoaderAdapter(parameters.ktLintVersion.get())
                 .loadAllGenericReporterProviders()
@@ -42,10 +40,7 @@ internal abstract class GenerateBaselineWorkAction :
 
             baselineReporter.beforeAll()
             errors.forEach { lintErrorResult ->
-                val filePath = lintErrorResult
-                    .lintedFile
-                    .toRelativeString(projectDir)
-                    .replace(File.separatorChar, '/')
+                val filePath = lintErrorResult.lintedFile.path.replace(File.separatorChar, '/')
 
                 baselineReporter.before(filePath)
                 lintErrorResult.lintErrors.forEach {
