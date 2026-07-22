@@ -3,6 +3,7 @@ package org.jlleitschuh.gradle.ktlint.worker
 import org.apache.commons.io.input.MessageDigestCalculatingInputStream
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.Logging
 import org.gradle.api.provider.MapProperty
@@ -39,12 +40,18 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
 
         resetEditorconfigCache(ktlintInvoker)
 
+        val projectDir = parameters.projectDirectory.asFile.get()
         parameters.filesToLint.files.forEach {
             try {
                 if (formatSource) {
                     val currentFileContent = it.readText()
                     val result = ktlintInvoker.invokeFormat(it)
-                    results.add(result.second)
+                    results.add(
+                        LintErrorResult(
+                            File(it.toRelativeString(projectDir)),
+                            result.second.lintErrors
+                        )
+                    )
                     val updatedFileContent = result.first
 
                     if (updatedFileContent != currentFileContent) {
@@ -53,7 +60,12 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
                     }
                 } else {
                     val result = ktlintInvoker.invokeLint(it)
-                    results.add(result)
+                    results.add(
+                        LintErrorResult(
+                            File(it.toRelativeString(projectDir)),
+                            result.lintErrors
+                        )
+                    )
                 }
             } catch (e: RuntimeException) {
                 logger.error(e.message)
@@ -97,6 +109,7 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
         val ktLintVersion: Property<String>
         val editorconfigFilesWereChanged: Property<Boolean>
         val formatSnapshot: RegularFileProperty
+        val projectDirectory: DirectoryProperty
     }
 
     /**

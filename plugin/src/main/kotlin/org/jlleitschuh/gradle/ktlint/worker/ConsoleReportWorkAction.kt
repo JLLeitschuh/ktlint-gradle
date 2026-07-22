@@ -28,9 +28,10 @@ internal abstract class ConsoleReportWorkAction : WorkAction<ConsoleReportWorkAc
         val projectDir = parameters.projectDirectory.asFile.get()
 
         val lintErrors = errors.associate { lintErrorResult ->
-            val filePath = lintErrorResult.lintedFile.absolutePath
+            val absoluteFile = projectDir.resolve(lintErrorResult.lintedFile)
+            val filePath = absoluteFile.absolutePath
             val baselineLintErrors = baselineRules?.get(
-                lintErrorResult.lintedFile.toRelativeString(projectDir).replace(File.separatorChar, '/')
+                lintErrorResult.lintedFile.path.replace(File.separatorChar, '/')
             )
             filePath to lintErrorResult
                 .lintErrors
