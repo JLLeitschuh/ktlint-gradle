@@ -100,6 +100,20 @@ open class KtlintExtension @Inject internal constructor(
     }
 
     /**
+     * Only include rules that were introduced in KtLint versions up to and including this version.
+     * When set, rules with @SinceKtlint annotations indicating they were added after this version will be excluded.
+     * Rules without the annotation (from older ktlint versions) are always included for backward compatibility.
+     *
+     * Format: "0.46.0", "0.47.1", etc.
+     * Default: null (no filtering - all rules are included)
+     *
+     * Example: `maxRuleVersion.set("0.46.0")` will exclude rules added in 0.47.0 and later.
+     *
+     * @since ktlint `1.8.0`
+     */
+    val maxRuleVersion: Property<String> = objectFactory.property(String::class.java)
+
+    /**
      * Provide additional `.editorconfig` properties, that are not in the project or project parent folders.
      */
     val additionalEditorconfig: MapProperty<String, String> =
