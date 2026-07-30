@@ -14,6 +14,6 @@ data class LintErrorResult(
     val lintErrors: List<Pair<SerializableLintError, Boolean>>
 ) : Serializable {
     companion object {
-        private const val serialVersionUID: Long = 2012012585L
+        private const val serialVersionUID: Long = 2012012586L
     }
 }

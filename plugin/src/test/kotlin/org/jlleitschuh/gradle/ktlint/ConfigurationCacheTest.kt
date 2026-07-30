@@ -3,6 +3,7 @@ package org.jlleitschuh.gradle.ktlint
 import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testkit.runner.TaskOutcome
 import org.gradle.util.GradleVersion
+import org.jlleitschuh.gradle.ktlint.tasks.GenerateBaselineTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 import org.jlleitschuh.gradle.ktlint.testdsl.CommonTest
 import org.jlleitschuh.gradle.ktlint.testdsl.GradleTestVersions
@@ -145,6 +146,34 @@ class ConfigurationCacheTest : AbstractPluginTest() {
                 INSTALL_GIT_HOOK_CHECK_TASK
             ) {
                 assertThat(task(":$INSTALL_GIT_HOOK_CHECK_TASK")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(output).contains("Reusing configuration cache.")
+            }
+        }
+    }
+
+    @DisplayName("Should support configuration cache when using a baseline file")
+    @CommonTest
+    internal fun configurationCacheWithBaseline(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withFailingSources()
+
+            // Generate baseline first (without configuration cache)
+            build(GenerateBaselineTask.NAME)
+
+            // First run with configuration cache: baseline suppresses violations
+            build(
+                configurationCacheFlag,
+                CHECK_PARENT_TASK_NAME
+            ) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+
+            // Second run must reuse the stored configuration cache
+            build(
+                configurationCacheFlag,
+                CHECK_PARENT_TASK_NAME
+            ) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
                 assertThat(output).contains("Reusing configuration cache.")
             }
         }

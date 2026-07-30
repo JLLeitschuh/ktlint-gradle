@@ -3,7 +3,9 @@ package org.jlleitschuh.gradle.ktlint
 import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testkit.runner.TaskOutcome
 import org.gradle.util.GradleVersion
+import org.jlleitschuh.gradle.ktlint.tasks.GenerateBaselineTask
 import org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
 import org.jlleitschuh.gradle.ktlint.testdsl.CommonTest
 import org.jlleitschuh.gradle.ktlint.testdsl.GradleTestVersions
 import org.jlleitschuh.gradle.ktlint.testdsl.TestProject
@@ -42,6 +44,33 @@ class BuildCacheTest : AbstractPluginTest() {
             build(CHECK_PARENT_TASK_NAME, "--build-cache") {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FROM_CACHE)
                 assertThat(task(":$testSourceCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FROM_CACHE)
+            }
+        }
+    }
+
+    @DisplayName("Check task with baseline should be relocatable")
+    @CommonTest
+    fun checkWithBaselineIsRelocatable(gradleVersion: GradleVersion) {
+        val runMainSourceSetCheckTaskName = KtLintCheckTask.buildTaskNameForSourceSet("main")
+        project(gradleVersion, projectPath = originalRoot) {
+            configureDefaultProject()
+            withFailingSources()
+
+            build(GenerateBaselineTask.NAME, "--no-build-cache")
+            build("clean", CHECK_PARENT_TASK_NAME, "--build-cache") {
+                assertThat(task(":$runMainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+        }
+
+        project(gradleVersion, projectPath = relocatedRoot) {
+            configureDefaultProject()
+            withFailingSources()
+
+            build(GenerateBaselineTask.NAME, "--no-build-cache")
+            build("clean", CHECK_PARENT_TASK_NAME, "--build-cache") {
+                assertThat(task(":$runMainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FROM_CACHE)
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FROM_CACHE)
             }
         }
     }
