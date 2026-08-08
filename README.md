@@ -318,7 +318,7 @@ ktlint {
     android = false
     outputToConsole = true
     outputColorName = "RED"
-    ignoreFailures = true
+    ignoreFailures = true // ignoring failures also decreases the log level from ERROR to WARN
     enableExperimentalRules = true
     additionalEditorconfigFile = file("/some/additional/.editorconfig")  // not supported with ktlint 0.47+
     additionalEditorconfig = [ // not supported until ktlint 0.49
@@ -373,7 +373,7 @@ configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
     android.set(false)
     outputToConsole.set(true)
     outputColorName.set("RED")
-    ignoreFailures.set(true)
+    ignoreFailures.set(true) // ignoring failures also decreases the log level from ERROR to WARN
     enableExperimentalRules.set(true)
     additionalEditorconfigFile.set(file("/some/additional/.editorconfig")) // not supported with ktlint 0.47+
     additionalEditorconfig.set( // not supported until ktlint 0.49

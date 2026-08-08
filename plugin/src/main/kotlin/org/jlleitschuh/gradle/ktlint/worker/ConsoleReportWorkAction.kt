@@ -5,6 +5,7 @@ import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.logging.LogLevel
 import org.gradle.api.logging.Logging
 import org.gradle.api.provider.Property
 import org.gradle.workers.WorkAction
@@ -42,14 +43,16 @@ internal abstract class ConsoleReportWorkAction : WorkAction<ConsoleReportWorkAc
         }
 
         val isLintErrorsFound = lintErrors.values.flatten().isNotEmpty()
+        val ignoreFailures = parameters.ignoreFailures.getOrElse(false)
         if (parameters.outputToConsole.getOrElse(false) && isLintErrorsFound) {
+            val logLevel = if (ignoreFailures) LogLevel.WARN else LogLevel.ERROR
             val verbose = parameters.verbose.get()
             lintErrors.forEach { (filePath, errors) ->
-                errors.forEach { it.logError(filePath, verbose) }
+                errors.forEach { it.logError(logLevel, filePath, verbose) }
             }
         }
 
-        if (!parameters.ignoreFailures.getOrElse(false) && isLintErrorsFound) {
+        if (!ignoreFailures && isLintErrorsFound) {
             val reportsPaths = parameters
                 .generatedReportsPaths
                 .files.joinToString(separator = "\n") { it.absolutePath.prefixIfNot("|- ") }
@@ -64,6 +67,7 @@ internal abstract class ConsoleReportWorkAction : WorkAction<ConsoleReportWorkAc
     }
 
     private fun SerializableLintError.logError(
+        logLevel: LogLevel,
         filePath: String,
         verbose: Boolean
     ) {
@@ -73,7 +77,7 @@ internal abstract class ConsoleReportWorkAction : WorkAction<ConsoleReportWorkAc
         } else {
             detail
         }
-        logger.warn("$filePath:$line:$col $errorDetail$verboseSuffix")
+        logger.log(logLevel, "$filePath:$line:$col $errorDetail$verboseSuffix")
     }
 
     internal interface ConsoleReportParameters : WorkParameters {

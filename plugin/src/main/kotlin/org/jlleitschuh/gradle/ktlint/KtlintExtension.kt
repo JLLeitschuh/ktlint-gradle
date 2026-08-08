@@ -5,6 +5,7 @@ import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.logging.LogLevel
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
@@ -72,7 +73,10 @@ open class KtlintExtension @Inject internal constructor(
     /**
      * Whether or not to allow the build to continue if there are warnings;
      * defaults to {@code false}, as for any other static code analysis tool.
-     * <p>
+     *
+     * When set to `true`, issues are logged with [LogLevel.WARN] so that they're not printed when
+     * Gradle is invoked with `--quiet`. Otherwise, issues are logged with [LogLevel.ERROR].
+     *
      * Example: `ignoreFailures = true`
      */
     val ignoreFailures: Property<Boolean> = objectFactory.property { set(false) }
