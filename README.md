@@ -483,6 +483,23 @@ tasks.withType<org.jlleitschuh.gradle.ktlint.tasks.BaseKtLintCheckTask> {
 ```
 </details>
 
+#### JAVA_TOOL_OPTIONS propagation to the Worker Daemon
+
+KtLint runs in a separate JVM process using Gradle's Worker API (process isolation). By default,
+Gradle does not forward the `JAVA_TOOL_OPTIONS` environment variable to forked worker processes,
+even though it is forwarded to other forked JVMs such as `Test` task executors.
+
+If the environment variable `JAVA_TOOL_OPTIONS` is set in the environment running Gradle, this
+plugin re-propagates it explicitly into the KtLint Worker Daemon's process environment. This
+matters for tooling that relies on JVM flags injected via `JAVA_TOOL_OPTIONS` — for example,
+sandboxing or monitoring tools that require flags like `-Djava.net.preferIPv4Stack=true` to be
+active in every forked JVM, not just the main Gradle process or `Test` workers.
+
+No configuration is needed to opt in to this behavior — if `JAVA_TOOL_OPTIONS` is present in the
+environment, it is automatically passed through. See
+[#1110](https://github.com/JLLeitschuh/ktlint-gradle/issues/1110) for the original motivating use
+case.
+
 ### Samples
 
 This repository provides the following examples of how to set up this plugin:

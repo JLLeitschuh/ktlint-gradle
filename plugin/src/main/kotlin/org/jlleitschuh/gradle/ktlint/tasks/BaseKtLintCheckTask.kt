@@ -265,6 +265,15 @@ abstract class BaseKtLintCheckTask @Inject constructor(
                 if (JavaVersion.current() >= JavaVersion.VERSION_16) {
                     jvmArgs("--add-opens", "java.base/java.lang=ALL-UNNAMED")
                 }
+
+                // Gradle strips JAVA_TOOL_OPTIONS from forwarded worker environments by
+                // default; re-propagate it explicitly so JVM flags injected via this env
+                // var (used by some sandboxing/monitoring tooling) remain active for the
+                // Worker Daemon, matching the behavior of Test task executors.
+                // See https://github.com/JLLeitschuh/ktlint-gradle/issues/1110
+                System.getenv("JAVA_TOOL_OPTIONS")?.let { javaToolOptions ->
+                    environment("JAVA_TOOL_OPTIONS", javaToolOptions)
+                }
             }
         }
 

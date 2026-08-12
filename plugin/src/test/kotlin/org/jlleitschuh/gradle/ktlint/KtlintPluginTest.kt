@@ -48,6 +48,26 @@ class KtlintPluginTest : AbstractPluginTest() {
         }
     }
 
+    @DisplayName("Should propagate JAVA_TOOL_OPTIONS to the KtLint Worker Daemon")
+    @CommonTest
+    fun `propagate JAVA_TOOL_OPTIONS to worker daemon`(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            withCleanSources()
+
+            gradleRunner.withEnvironment(
+                System.getenv() + mapOf("JAVA_TOOL_OPTIONS" to "-Dktlint.gradle.test.marker=true")
+            )
+
+            build(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                // The JVM prints this diagnostic message to stderr whenever JAVA_TOOL_OPTIONS is
+                // honored on process startup. Its presence confirms the option reached the forked
+                // KtLint Worker Daemon process, not just the Gradle daemon itself.
+                assertThat(output).contains("Picked up JAVA_TOOL_OPTIONS: -Dktlint.gradle.test.marker=true")
+            }
+        }
+    }
+
     @DisplayName("Should work with project isolation")
     @CommonTest
     fun `work with project isolation`(gradleVersion: GradleVersion) {

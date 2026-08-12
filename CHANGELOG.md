@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 - Kotlin 2.4.0 support [#1059](https://github.com/JLLeitschuh/ktlint-gradle/pull/1059) (No changes needed, just updated tests)
 - Clean up workaround for Gradle 6 [#1068](https://github.com/JLLeitschuh/ktlint-gradle/pull/1068)
+- Propagate `JAVA_TOOL_OPTIONS` environment variable to the KtLint Worker Daemon process, matching the behavior of `Test` task executors [#1110](https://github.com/JLLeitschuh/ktlint-gradle/issues/1110)
 
 ## [14.2.0] - 2026-03-12
 
