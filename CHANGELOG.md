@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 - Kotlin 2.4.0 support [#1059](https://github.com/JLLeitschuh/ktlint-gradle/pull/1059) (No changes needed, just updated tests)
 - Clean up workaround for Gradle 6 [#1068](https://github.com/JLLeitschuh/ktlint-gradle/pull/1068)
+- Ktlint 2.x support: Remove Gradle kotlin-dsl usage, per Gradle recommended practices. Plugin now requires kotlin 1.9.25+ and Gradle 8.5+ [#1114](https://github.com/JLLeitschuh/ktlint-gradle/pull/1114)
+- Plugin now require gradle daemon java version 17+
 
 ## [14.2.0] - 2026-03-12
 

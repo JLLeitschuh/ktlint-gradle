@@ -10,8 +10,6 @@ import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.util.PatternFilterable
-import org.gradle.kotlin.dsl.domainObjectContainer
-import org.gradle.kotlin.dsl.newInstance
 import org.jlleitschuh.gradle.ktlint.reporter.CustomReporter
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import javax.inject.Inject
@@ -27,12 +25,12 @@ open class KtlintExtension @Inject internal constructor(
     private val filterTargetApplier: FilterApplier,
     kotlinScriptAdditionalPathApplier: KotlinScriptAdditionalPathApplier
 ) {
-    val reporterExtension = objectFactory.newInstance(ReporterExtension::class)
+    val reporterExtension = objectFactory.newInstance(ReporterExtension::class.java)
 
     /**
      * The version of KtLint to use.
      */
-    val version: Property<String> = objectFactory.property { set("1.5.0") }
+    val version: Property<String> = objectFactory.property { set("1.8.0") }
 
     /**
      * Enable relative paths in reports
@@ -157,7 +155,7 @@ open class KtlintExtension @Inject internal constructor(
             set(emptySet())
         }
         val customReporters: NamedDomainObjectContainer<CustomReporter> =
-            objectFactory.domainObjectContainer(CustomReporter::class) { CustomReporter(it) }
+            objectFactory.domainObjectContainer(CustomReporter::class.java) { CustomReporter(it) }
 
         /**
          * Use one of default Ktlint output reporter

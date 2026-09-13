@@ -6,6 +6,7 @@ import org.gradle.util.GradleVersion
 import org.jlleitschuh.gradle.ktlint.tasks.GenerateBaselineTask
 import org.jlleitschuh.gradle.ktlint.testdsl.CommonTest
 import org.jlleitschuh.gradle.ktlint.testdsl.GradleTestVersions
+import org.jlleitschuh.gradle.ktlint.testdsl.SupportedKtlintVersionsProvider
 import org.jlleitschuh.gradle.ktlint.testdsl.TestProject.Companion.FAIL_SOURCE_FILE
 import org.jlleitschuh.gradle.ktlint.testdsl.build
 import org.jlleitschuh.gradle.ktlint.testdsl.buildAndFail
@@ -101,7 +102,7 @@ class KtlintBaselineSupportTest : AbstractPluginTest() {
 
     @DisplayName("Should consider existing issues in baseline")
     @ParameterizedTest(name = "{0} with KtLint {1}: {displayName}")
-    @ArgumentsSource(KtLintSupportedVersionsTest.SupportedKtlintVersionsProvider::class)
+    @ArgumentsSource(SupportedKtlintVersionsProvider::class)
     fun existingIssueFilteredByBaseline(gradleVersion: GradleVersion, ktLintVersion: String) {
         project(gradleVersion) {
             //language=Groovy

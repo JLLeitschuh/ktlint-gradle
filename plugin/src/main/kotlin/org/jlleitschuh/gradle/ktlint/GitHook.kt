@@ -4,6 +4,7 @@ package org.jlleitschuh.gradle.ktlint
 
 import org.eclipse.jgit.lib.RepositoryBuilder
 import org.gradle.api.DefaultTask
+import org.gradle.api.Project
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
@@ -104,37 +105,37 @@ internal fun generateGitHook(
 
     """.trimIndent()
 
-internal fun KtlintPlugin.PluginHolder.addGitHookTasks() {
-    if (target.rootProject == target) {
-        addInstallGitHookFormatTask()
-        addInstallGitHookCheckTask()
+internal fun addGitHookTasks(project: Project) {
+    if (project.rootProject == project) {
+        addInstallGitHookFormatTask(project)
+        addInstallGitHookCheckTask(project)
     }
 }
 
-private fun KtlintPlugin.PluginHolder.addInstallGitHookFormatTask() {
-    target.tasks.register(
+private fun addInstallGitHookFormatTask(project: Project) {
+    project.tasks.register(
         INSTALL_GIT_HOOK_FORMAT_TASK,
         KtlintInstallGitHookTask::class.java
     ) {
-        description = "Adds git hook to run ktlintFormat on changed files"
-        group = HELP_GROUP
-        taskName.set(FORMAT_PARENT_TASK_NAME)
+        it.description = "Adds git hook to run ktlintFormat on changed files"
+        it.group = HELP_GROUP
+        it.taskName.set(FORMAT_PARENT_TASK_NAME)
         // Format git hook will automatically add back updated files to git commit
-        shouldUpdateCommit.set(true)
-        hookName.set("pre-commit")
+        it.shouldUpdateCommit.set(true)
+        it.hookName.set("pre-commit")
     }
 }
 
-private fun KtlintPlugin.PluginHolder.addInstallGitHookCheckTask() {
-    target.tasks.register(
+private fun addInstallGitHookCheckTask(project: Project) {
+    project.tasks.register(
         INSTALL_GIT_HOOK_CHECK_TASK,
         KtlintInstallGitHookTask::class.java
     ) {
-        description = "Adds git hook to run ktlintCheck on changed files"
-        group = HELP_GROUP
-        taskName.set(CHECK_PARENT_TASK_NAME)
-        shouldUpdateCommit.set(false)
-        hookName.set("pre-commit")
+        it.description = "Adds git hook to run ktlintCheck on changed files"
+        it.group = HELP_GROUP
+        it.taskName.set(CHECK_PARENT_TASK_NAME)
+        it.shouldUpdateCommit.set(false)
+        it.hookName.set("pre-commit")
     }
 }
 

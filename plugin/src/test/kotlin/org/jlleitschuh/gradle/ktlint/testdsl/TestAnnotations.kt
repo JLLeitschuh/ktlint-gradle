@@ -1,7 +1,7 @@
 package org.jlleitschuh.gradle.ktlint.testdsl
 
-import net.swiftzer.semver.SemVer
 import org.gradle.util.GradleVersion
+import org.jlleitschuh.gradle.ktlint.KtlintBasePlugin.Companion.LOWEST_SUPPORTED_GRADLE_VERSION
 import org.jlleitschuh.gradle.ktlint.KtlintPlugin
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.provider.Arguments
@@ -16,24 +16,22 @@ fun getCurrentJavaVersion(): String {
 
 @Suppress("ConstPropertyName")
 object TestVersions {
-    val majorJavaVersion = SemVer.parse(getCurrentJavaVersion()).major
+    val majorJavaVersion = getCurrentJavaVersion().substringBefore(".").toInt()
     val minSupportedGradleVersion = when (majorJavaVersion) {
-        in Int.MIN_VALUE..20 -> "7.6.3"
-        in 21..23 -> "8.5"
         in 24..Int.MAX_VALUE -> "9.1.0"
-        else -> "7.6.3"
+        else -> LOWEST_SUPPORTED_GRADLE_VERSION
     }
 
     val maxSupportedGradleVersion = when (majorJavaVersion) {
         in Int.MIN_VALUE..16 -> "8.14.3" // gradle 9 requires Java 17
-        else -> "9.5.1"
+        else -> "9.8.2"
     }
 
     val pluginVersion = System.getProperty("project.version")
         ?: KtlintPlugin::class.java.`package`.implementationVersion
         ?: error("Unable to determine plugin version.")
-    const val minSupportedKotlinPluginVersion = "1.6.21"
-    const val maxSupportedKotlinPluginVersion = "2.4.0-Beta2"
+    const val minSupportedKotlinPluginVersion = "1.9.25"
+    const val maxSupportedKotlinPluginVersion = "2.4.21"
     const val minAgpVersion = "4.1.0"
     const val maxAgpVersion = "9.0.0"
 }
@@ -77,5 +75,35 @@ open class GradleArgumentsProvider : ArgumentsProvider {
         }
 
         return sequenceOf(minGradleVersion, *additionalGradleVersions.toTypedArray(), maxGradleVersion)
+    }
+}
+
+class SupportedKtlintVersionsProvider : GradleArgumentsProvider() {
+    val majorJavaVersion = getCurrentJavaVersion().substringBefore(".").toInt()
+    val supportedKtlintVersions = when (majorJavaVersion) {
+        in Int.MIN_VALUE..16 -> listOf(
+            "1.0.1", // lowest
+            "1.8.0", // default, and highest version that runs on Java < 17
+        )
+
+        else -> listOf(
+            "1.0.1", // lowest
+            "1.8.0", // default
+            "2.0.0-ALPHA-4" // highest
+        )
+    }
+
+    override fun provideArguments(
+        context: ExtensionContext
+    ): Stream<out Arguments> {
+        // Using multiple Gradle versions produces OOM exceptions on Windows OS
+        return sequenceOf(GradleVersion.version(TestVersions.maxSupportedGradleVersion))
+            .flatMap { gradleVersion ->
+                supportedKtlintVersions.map { gradleVersion to it }.asSequence()
+            }
+            .map {
+                Arguments.of(it.first, it.second)
+            }
+            .asStream()
     }
 }
