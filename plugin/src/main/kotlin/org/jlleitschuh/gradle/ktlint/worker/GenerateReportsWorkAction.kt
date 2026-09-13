@@ -1,6 +1,5 @@
 package org.jlleitschuh.gradle.ktlint.worker
 
-import com.pinterest.ktlint.cli.reporter.baseline.loadBaseline
 import org.gradle.api.GradleException
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
@@ -8,6 +7,7 @@ import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
+import org.jlleitschuh.gradle.ktlint.selectBaselineAdapter
 import org.jlleitschuh.gradle.ktlint.selectReportersLoaderAdapter
 import java.io.File
 import java.io.PrintStream
@@ -18,36 +18,30 @@ internal abstract class GenerateReportsWorkAction : WorkAction<GenerateReportsWo
         val ktLintClassesSerializer = KtLintClassesSerializer
             .create()
 
-        val discoveredErrors = ktLintClassesSerializer.loadErrors(parameters.discoveredErrorsFile.get().asFile)
+        val discoveredErrors = if (parameters.discoveredErrorsFile.get().asFile.exists()) {
+            ktLintClassesSerializer.loadErrors(parameters.discoveredErrorsFile.get().asFile)
+        } else {
+            emptyList()
+        }
         val currentReporterId = parameters.reporterId.get()
         val reporterAdapter = selectReportersLoaderAdapter(parameters.ktLintVersion.get())
         val reporterProvider = reporterAdapter.loadReporterProviders(parameters.loadedReporterProviders.asFile.get())
             .find { it.id == currentReporterId }
             ?: throw GradleException("Could not find ReporterProvider \"$currentReporterId\"")
 
-        val baselineRules = parameters.baseline.orNull?.asFile?.absolutePath
-            ?.let { loadBaseline(it).lintErrorsPerFile }
-        val projectDir = parameters.projectDirectory.asFile.get()
+        val baselineAdapter = selectBaselineAdapter(parameters.ktLintVersion.get())
+        parameters.baseline.orNull?.asFile
+            ?.let { baselineAdapter.loadBaselineFile(it) }
 
-        PrintStream(
-            parameters
-                .reporterOutput
-                .get()
-                .asFile
-        ).use { printStream ->
+        PrintStream(parameters.reporterOutput.get().asFile).use { printStream ->
             val reporter = reporterProvider.get(printStream, parameters.reporterOptions.get())
 
             reporter.beforeAll()
             discoveredErrors.forEach { lintErrorResult ->
                 val filePath = filePathForReport(lintErrorResult.lintedFile)
-                val baselineLintErrors = baselineRules?.get(
-                    lintErrorResult.lintedFile.toRelativeString(projectDir).replace(File.separatorChar, '/')
-                )
                 reporter.before(filePath)
-                lintErrorResult.lintErrors.forEach {
-                    if (baselineLintErrors?.containsLintError(it.first.toCliError()) != true) {
-                        reporter.onLintError(filePath, it.first, it.second)
-                    }
+                baselineAdapter.filterOutBaseline(parameters.projectDirectory.asFile.get(), lintErrorResult).forEach {
+                    reporter.onLintError(filePath, it.first, it.second)
                 }
                 reporter.after(filePath)
             }
