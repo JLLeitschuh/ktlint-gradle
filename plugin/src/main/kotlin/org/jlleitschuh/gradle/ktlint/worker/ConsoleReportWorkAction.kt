@@ -1,6 +1,5 @@
 package org.jlleitschuh.gradle.ktlint.worker
 
-import com.pinterest.ktlint.cli.reporter.baseline.loadBaseline
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
@@ -10,7 +9,7 @@ import org.gradle.api.provider.Property
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
 import org.jetbrains.kotlin.util.prefixIfNot
-import java.io.File
+import org.jlleitschuh.gradle.ktlint.selectBaselineAdapter
 
 internal abstract class ConsoleReportWorkAction : WorkAction<ConsoleReportWorkAction.ConsoleReportParameters> {
 
@@ -22,22 +21,14 @@ internal abstract class ConsoleReportWorkAction : WorkAction<ConsoleReportWorkAc
             .loadErrors(
                 parameters.discoveredErrors.asFile.get()
             )
-
-        val baselineRules = parameters.baseline.orNull?.asFile?.absolutePath
-            ?.let { loadBaseline(it).lintErrorsPerFile }
-        val projectDir = parameters.projectDirectory.asFile.get()
+        val baselineAdapter = selectBaselineAdapter(parameters.ktLintVersion.get())
+        parameters.baseline.orNull?.asFile
+            ?.let { baselineAdapter.loadBaselineFile(it) }
 
         val lintErrors = errors.associate { lintErrorResult ->
             val filePath = lintErrorResult.lintedFile.absolutePath
-            val baselineLintErrors = baselineRules?.get(
-                lintErrorResult.lintedFile.toRelativeString(projectDir).replace(File.separatorChar, '/')
-            )
-            filePath to lintErrorResult
-                .lintErrors
-                .filter {
-                    !it.second &&
-                        baselineLintErrors?.containsLintError(it.first.toCliError()) != true
-                }
+            filePath to baselineAdapter.filterOutBaseline(parameters.projectDirectory.get().asFile, lintErrorResult)
+                .filter { !it.second }
                 .map { it.first }
         }
 

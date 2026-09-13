@@ -60,21 +60,22 @@ internal abstract class LoadReportersTask @Inject constructor(
         // Classloader isolation is enough here as we just want to use some classes from KtLint classpath
         // to load reporters. No KtLint main object is initialized/used in this case.
         val queue = workerExecutor.classLoaderIsolation {
-            classpath.from(ktLintClasspath, reportersClasspath)
+            it.classpath.from(ktLintClasspath, reportersClasspath)
         }
-        val task = this
+
         queue.submit(LoadReportersWorkAction::class.java) {
-            debug.set(task.debug)
-            enabledReporters.set(
+            val task = this@LoadReportersTask
+            it.debug.set(task.debug)
+            it.enabledReporters.set(
                 task.enabledReporters
                     .map { reporters ->
                         reporters.filter { it.isAvailable() }
                     }
             )
-            customReporters.set(task.customReporters)
-            loadedReporters.set(task.loadedReporters)
-            loadedReporterProviders.set(task.loadedReporterProviders)
-            ktLintVersion.set(task.ktLintVersion)
+            it.customReporters.set(task.customReporters)
+            it.loadedReporters.set(task.loadedReporters)
+            it.loadedReporterProviders.set(task.loadedReporterProviders)
+            it.ktLintVersion.set(task.ktLintVersion)
         }
     }
 
@@ -89,15 +90,15 @@ internal abstract class LoadReportersTask @Inject constructor(
             val ktlintConfiguration = project.configurations.named(KTLINT_CONFIGURATION_NAME)
             val ktlintReporterConfiguration = project.configurations.named(KTLINT_REPORTER_CONFIGURATION_NAME)
             return project.tasks.register(TASK_NAME, LoadReportersTask::class.java) {
-                description = DESCRIPTION
-                ktLintClasspath.setFrom(ktlintConfiguration)
-                reportersClasspath.setFrom(ktlintReporterConfiguration)
-                debug.set(ktlintExtension.debug)
-                ktLintVersion.set(ktlintExtension.version)
-                enabledReporters.set(ktlintExtension.reporterExtension.reporters)
-                customReporters.set(ktlintExtension.reporterExtension.customReporters)
-                loadedReporters.set(project.layout.intermediateResultsBuildDir("reporters.bin"))
-                loadedReporterProviders.set(project.layout.intermediateResultsBuildDir("reporterProviders.bin"))
+                it.description = DESCRIPTION
+                it.ktLintClasspath.setFrom(ktlintConfiguration)
+                it.reportersClasspath.setFrom(ktlintReporterConfiguration)
+                it.debug.set(ktlintExtension.debug)
+                it.ktLintVersion.set(ktlintExtension.version)
+                it.enabledReporters.set(ktlintExtension.reporterExtension.reporters)
+                it.customReporters.set(ktlintExtension.reporterExtension.customReporters)
+                it.loadedReporters.set(project.layout.intermediateResultsBuildDir("reporters.bin"))
+                it.loadedReporterProviders.set(project.layout.intermediateResultsBuildDir("reporterProviders.bin"))
             }
         }
     }

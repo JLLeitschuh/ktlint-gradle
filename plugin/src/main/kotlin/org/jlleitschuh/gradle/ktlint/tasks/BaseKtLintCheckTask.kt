@@ -3,6 +3,7 @@ package org.jlleitschuh.gradle.ktlint.tasks
 import groovy.lang.Closure
 import org.gradle.api.DefaultTask
 import org.gradle.api.JavaVersion
+import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTreeElement
@@ -25,30 +26,31 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.util.PatternFilterable
+import org.gradle.api.tasks.util.PatternSet
 import org.gradle.work.ChangeType
 import org.gradle.work.Incremental
 import org.gradle.work.InputChanges
 import org.gradle.workers.WorkerExecutor
 import org.jlleitschuh.gradle.ktlint.FILTER_INCLUDE_PROPERTY_NAME
 import org.jlleitschuh.gradle.ktlint.KOTLIN_EXTENSIONS
+import org.jlleitschuh.gradle.ktlint.KTLINT_CONFIGURATION_NAME
+import org.jlleitschuh.gradle.ktlint.KTLINT_RULESET_CONFIGURATION_NAME
+import org.jlleitschuh.gradle.ktlint.KtlintExtension
 import org.jlleitschuh.gradle.ktlint.applyGitFilter
 import org.jlleitschuh.gradle.ktlint.getEditorConfigFiles
-import org.jlleitschuh.gradle.ktlint.intermediateResultsBuildDir
-import org.jlleitschuh.gradle.ktlint.property
 import org.jlleitschuh.gradle.ktlint.worker.KtLintClassesSerializer
 import org.jlleitschuh.gradle.ktlint.worker.KtLintWorkAction
 import java.io.File
 import javax.inject.Inject
 
-@Suppress("UnstableApiUsage")
 @CacheableTask
 abstract class BaseKtLintCheckTask @Inject constructor(
-    private val objectFactory: ObjectFactory,
-    projectLayout: ProjectLayout,
     private val workerExecutor: WorkerExecutor,
-    private val patternFilterable: PatternFilterable
-) : DefaultTask(),
-    PatternFilterable {
+    objectFactory: ObjectFactory,
+    projectLayout: ProjectLayout
+) : DefaultTask(), PatternFilterable {
+    private val patternFilterable: PatternFilterable = PatternSet()
+    private val sourceFiles: ConfigurableFileCollection = objectFactory.fileCollection()
 
     @get:Classpath
     internal abstract val ktLintClasspath: ConfigurableFileCollection
@@ -84,11 +86,7 @@ abstract class BaseKtLintCheckTask @Inject constructor(
      * Max lint worker heap size. Default is "256m".
      */
     @get:Internal
-    val workerMaxHeapSize: Property<String> = objectFactory.property {
-        convention("256m")
-    }
-
-    private var sourceFiles: ConfigurableFileCollection = objectFactory.fileCollection()
+    abstract val workerMaxHeapSize: Property<String>
 
     init {
         if (project.providers.gradleProperty(FILTER_INCLUDE_PROPERTY_NAME).orNull != null) {
@@ -108,24 +106,10 @@ abstract class BaseKtLintCheckTask @Inject constructor(
         .fileCollection()
         .from({ sourceFiles.asFileTree.matching(patternFilterable) })
 
-    /**
-     * Sets the source from this task.
-     *
-     * @param source given source objects will be evaluated as per [org.gradle.api.Project.file].
-     */
-    fun setSource(source: Any): BaseKtLintCheckTask {
-        sourceFiles = objectFactory.fileCollection().from(source)
-        return this
-    }
+    fun source(vararg sources: Any?) = also { sourceFiles.setFrom(*sources) }
 
-    /**
-     * Adds some source to this task.
-     *
-     * @param sources given source objects will be evaluated as per [org.gradle.api.Project.files].
-     */
-    fun source(vararg sources: Any): BaseKtLintCheckTask {
-        sourceFiles.from(sources)
-        return this
+    fun setSource(source: Any) {
+        sourceFiles.setFrom(source)
     }
 
     @get:PathSensitive(PathSensitivity.RELATIVE)
@@ -133,47 +117,7 @@ abstract class BaseKtLintCheckTask @Inject constructor(
     internal abstract val loadedReporters: RegularFileProperty
 
     @get:OutputFile
-    internal val discoveredErrors: RegularFileProperty = objectFactory
-        .fileProperty()
-        .convention(
-            projectLayout.intermediateResultsBuildDir("${name}_errors.bin")
-        )
-
-    @Internal
-    override fun getIncludes(): MutableSet<String> = patternFilterable.includes
-
-    @Internal
-    override fun getExcludes(): MutableSet<String> = patternFilterable.excludes
-
-    override fun setIncludes(includes: MutableIterable<String>): BaseKtLintCheckTask =
-        also { patternFilterable.setIncludes(includes) }
-
-    override fun setExcludes(excludes: MutableIterable<String>): BaseKtLintCheckTask =
-        also { patternFilterable.setExcludes(excludes) }
-
-    override fun include(vararg includes: String): BaseKtLintCheckTask =
-        also { patternFilterable.include(*includes) }
-
-    override fun include(includes: MutableIterable<String>): BaseKtLintCheckTask =
-        also { patternFilterable.include(includes) }
-
-    override fun include(includeSpec: Spec<FileTreeElement>): BaseKtLintCheckTask =
-        also { patternFilterable.include(includeSpec) }
-
-    override fun include(includeSpec: Closure<*>): BaseKtLintCheckTask =
-        also { patternFilterable.include(includeSpec) }
-
-    override fun exclude(vararg excludes: String): BaseKtLintCheckTask =
-        also { patternFilterable.exclude(*excludes) }
-
-    override fun exclude(excludes: MutableIterable<String>): BaseKtLintCheckTask =
-        also { patternFilterable.exclude(excludes) }
-
-    override fun exclude(excludeSpec: Spec<FileTreeElement>): BaseKtLintCheckTask =
-        also { patternFilterable.exclude(excludeSpec) }
-
-    override fun exclude(excludeSpec: Closure<*>): BaseKtLintCheckTask =
-        also { patternFilterable.exclude(excludeSpec) }
+    internal abstract val discoveredErrors: RegularFileProperty
 
     protected fun runLint(
         inputChanges: InputChanges
@@ -256,29 +200,29 @@ abstract class BaseKtLintCheckTask @Inject constructor(
         // This allows to better isolate work actions from different projects tasks between each other
         // and to not pollute Gradle daemon heap, which otherwise greatly increases GC time.
         val queue = workerExecutor.processIsolation {
-            classpath.from(ktLintClasspath, ruleSetsClasspath)
-            forkOptions {
-                maxHeapSize = workerMaxHeapSize.get()
+            it.classpath.from(ktLintClasspath, ruleSetsClasspath)
+            it.forkOptions {
+                it.maxHeapSize = workerMaxHeapSize.get()
 
                 // Work around ktlint triggering reflective access errors from the embedded Kotlin
                 // compiler. See https://youtrack.jetbrains.com/issue/KT-43704 for details.
                 if (JavaVersion.current() >= JavaVersion.VERSION_16) {
-                    jvmArgs("--add-opens", "java.base/java.lang=ALL-UNNAMED")
+                    it.jvmArgs("--add-opens", "java.base/java.lang=ALL-UNNAMED")
                 }
             }
         }
 
         queue.submit(KtLintWorkAction::class.java) {
             val task = this@BaseKtLintCheckTask
-            filesToLint.from(filesToCheck)
-            android.set(task.android)
-            debug.set(task.debug)
-            additionalEditorconfig.set(task.additionalEditorconfig)
-            formatSource.set(formatSources)
-            discoveredErrorsFile.set(task.discoveredErrors)
-            ktLintVersion.set(task.ktLintVersion)
-            editorconfigFilesWereChanged.set(editorConfigUpdated)
-            this.formatSnapshot.set(formatSnapshot)
+            it.filesToLint.from(filesToCheck)
+            it.android.set(task.android)
+            it.debug.set(task.debug)
+            it.additionalEditorconfig.set(task.additionalEditorconfig)
+            it.formatSource.set(formatSources)
+            it.discoveredErrorsFile.set(task.discoveredErrors)
+            it.ktLintVersion.set(task.ktLintVersion)
+            it.editorconfigFilesWereChanged.set(editorConfigUpdated)
+            it.formatSnapshot.set(formatSnapshot)
         }
     }
 
@@ -299,4 +243,35 @@ abstract class BaseKtLintCheckTask @Inject constructor(
         }
         .map { it.file }
         .toSet()
+
+    fun configureBaseCheckTask(project: Project) {
+        val extension = project.extensions.getByType(KtlintExtension::class.java)
+        val ktlintConfiguration = project.configurations.named(KTLINT_CONFIGURATION_NAME).get()
+        val ktlintRulesetConfiguration = project.configurations.named(KTLINT_RULESET_CONFIGURATION_NAME).get()
+        val loadReportersTask = project.tasks.named(LoadReportersTask.TASK_NAME, LoadReportersTask::class.java)
+        ktLintClasspath.setFrom(ktlintConfiguration)
+        ktLintVersion.set(extension.version)
+        additionalEditorconfig.set(extension.additionalEditorconfig)
+        debug.set(extension.debug)
+        ruleSetsClasspath.setFrom(ktlintRulesetConfiguration)
+        android.set(extension.android)
+        loadedReporters.set(loadReportersTask.flatMap { it.loadedReporters })
+        enableExperimentalRules.set(extension.enableExperimentalRules)
+    }
+
+    @Internal
+    override fun getIncludes(): Set<String> = patternFilterable.includes
+
+    @Internal
+    override fun getExcludes(): Set<String> = patternFilterable.excludes
+    override fun setIncludes(includes: MutableIterable<String>) = patternFilterable.setIncludes(includes)
+    override fun setExcludes(excludes: MutableIterable<String>) = patternFilterable.setExcludes(excludes)
+    override fun include(vararg includes: String) = patternFilterable.include(*includes)
+    override fun include(includes: MutableIterable<String>) = patternFilterable.include(includes)
+    override fun include(includeSpec: Spec<FileTreeElement>): PatternFilterable = patternFilterable.include(includeSpec)
+    override fun include(includeSpec: Closure<*>) = patternFilterable.include(includeSpec)
+    override fun exclude(vararg excludes: String): PatternFilterable = patternFilterable.exclude(*excludes)
+    override fun exclude(excludes: MutableIterable<String>) = patternFilterable.exclude(excludes)
+    override fun exclude(excludeSpec: Spec<FileTreeElement>) = patternFilterable.exclude(excludeSpec)
+    override fun exclude(excludeSpec: Closure<*>) = patternFilterable.exclude(excludeSpec)
 }

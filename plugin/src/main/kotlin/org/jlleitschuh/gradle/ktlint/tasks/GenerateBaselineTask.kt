@@ -55,14 +55,14 @@ abstract class GenerateBaselineTask @Inject constructor(
         // Classloader isolation is enough here as we just want to use some classes from KtLint classpath
         // to get errors and generate files/console reports. No KtLint main object is initialized/used in this case.
         val queue = workerExecutor.classLoaderIsolation {
-            classpath.from(ktLintClasspath, baselineReporterClasspath)
+            it.classpath.from(ktLintClasspath, baselineReporterClasspath)
         }
         val task = this
         queue.submit(GenerateBaselineWorkAction::class.java) {
-            discoveredErrors.setFrom(task.discoveredErrors)
-            ktLintVersion.set(task.ktLintVersion)
-            baselineFile.set(task.baselineFile)
-            projectDirectory.set(this@GenerateBaselineTask.projectDirectory)
+            it.discoveredErrors.setFrom(task.discoveredErrors)
+            it.ktLintVersion.set(task.ktLintVersion)
+            it.baselineFile.set(task.baselineFile)
+            it.projectDirectory.set(projectDirectory)
         }
     }
 
