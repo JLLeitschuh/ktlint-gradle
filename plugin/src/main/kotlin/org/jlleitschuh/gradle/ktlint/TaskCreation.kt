@@ -10,6 +10,7 @@ import org.jlleitschuh.gradle.ktlint.tasks.GenerateBaselineTask
 import org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
+import org.jlleitschuh.gradle.ktlint.tasks.LoadReportersTask
 
 const val CHECK_KOTLIN_SCRIPT_TASK_NAME = "runKtlintCheckOverKotlinScripts"
 const val FORMAT_KOTLIN_SCRIPT_TASK_NAME = "runKtlintFormatOverKotlinScripts"

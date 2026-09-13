@@ -30,7 +30,7 @@ class BuildCacheTest : AbstractPluginTest() {
         project(gradleVersion, projectPath = originalRoot) {
             configureDefaultProject()
 
-            build(CHECK_PARENT_TASK_NAME, "--build-cache") {
+            build(CHECK_PARENT_TASK_NAME, "--build-cache", "-Dorg.gradle.caching.debug=true") {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
                 assertThat(task(":$testSourceCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             }
@@ -39,7 +39,7 @@ class BuildCacheTest : AbstractPluginTest() {
         project(gradleVersion, projectPath = relocatedRoot) {
             configureDefaultProject()
 
-            build(CHECK_PARENT_TASK_NAME, "--build-cache") {
+            build(CHECK_PARENT_TASK_NAME, "--build-cache", "-Dorg.gradle.caching.debug=true") {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FROM_CACHE)
                 assertThat(task(":$testSourceCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FROM_CACHE)
             }

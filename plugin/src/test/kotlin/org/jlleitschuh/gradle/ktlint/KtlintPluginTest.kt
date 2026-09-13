@@ -1,7 +1,6 @@
 package org.jlleitschuh.gradle.ktlint
 
 import nebula.test.dsl.TestKitAssertions.assertThat
-import net.swiftzer.semver.SemVer
 import org.gradle.testkit.runner.TaskOutcome
 import org.gradle.util.GradleVersion
 import org.jlleitschuh.gradle.ktlint.tasks.GenerateBaselineTask
@@ -12,7 +11,6 @@ import org.jlleitschuh.gradle.ktlint.testdsl.GradleTestVersions
 import org.jlleitschuh.gradle.ktlint.testdsl.TestProject.Companion.FAIL_SOURCE_FILE
 import org.jlleitschuh.gradle.ktlint.testdsl.build
 import org.jlleitschuh.gradle.ktlint.testdsl.buildAndFail
-import org.jlleitschuh.gradle.ktlint.testdsl.getCurrentJavaVersion
 import org.jlleitschuh.gradle.ktlint.testdsl.project
 import org.jlleitschuh.gradle.ktlint.testdsl.projectSetup
 import org.junit.jupiter.api.DisplayName
@@ -204,9 +202,8 @@ class KtlintPluginTest : AbstractPluginTest() {
         }
     }
 
-    @DisplayName("Should apply KtLint version from extension")
     @CommonTest
-    fun ktlintVersionFromExtension(gradleVersion: GradleVersion) {
+    fun `should apply KtLint version from extension`(gradleVersion: GradleVersion) {
         project(gradleVersion) {
             withCleanSources()
 
@@ -217,11 +214,10 @@ class KtlintPluginTest : AbstractPluginTest() {
                 """.trimIndent()
             )
 
-            build(":dependencies") {
-                assertThat(output).contains(
-                    "$KTLINT_CONFIGURATION_NAME - $KTLINT_CONFIGURATION_DESCRIPTION${System.lineSeparator()}" +
-                        "+--- com.pinterest.ktlint:ktlint-cli:1.0.0${System.lineSeparator()}"
-                )
+            build(":dependencies", "--configuration", KTLINT_CONFIGURATION_NAME) {
+                assertThat(output)
+                    .contains("$KTLINT_CONFIGURATION_NAME - $KTLINT_CONFIGURATION_DESCRIPTION${System.lineSeparator()}")
+                    .contains("com.pinterest.ktlint:ktlint-cli:1.0.0${System.lineSeparator()}")
             }
         }
     }
@@ -235,23 +231,17 @@ class KtlintPluginTest : AbstractPluginTest() {
             propsFile.createNewFile()
             propsFile.writeText("""ktlint-version=1.0.0""")
 
-            build(":dependencies") {
-                assertThat(output).contains(
-                    "$KTLINT_CONFIGURATION_NAME - $KTLINT_CONFIGURATION_DESCRIPTION${System.lineSeparator()}" +
-                        "+--- com.pinterest.ktlint:ktlint-cli:1.0.0${System.lineSeparator()}"
-                )
+            build(":dependencies", "--configuration", KTLINT_CONFIGURATION_NAME) {
+                assertThat(output)
+                    .contains("$KTLINT_CONFIGURATION_NAME - $KTLINT_CONFIGURATION_DESCRIPTION${System.lineSeparator()}")
+                    .contains("com.pinterest.ktlint:ktlint-cli:1.0.0${System.lineSeparator()}")
             }
             build(":$CHECK_PARENT_TASK_NAME", "--warning-mode=all") {
                 assertThat(task(":$mainSourceSetCheckTaskName"))
                     .hasOutcome(TaskOutcome.SUCCESS)
                 assertThat(this)
                     .hasNoMutableStateWarnings()
-                val majorJavaVersion = SemVer.parse(getCurrentJavaVersion()).major
-                if (!(majorJavaVersion < 17 && gradleVersion.majorVersion > 7)) {
-                    assertThat(this)
-                        .`as`("no deprecations unless we are using old java with gradle 8 which works but warns")
-                        .hasNoDeprecationWarnings()
-                }
+                    .hasNoDeprecationWarnings()
             }
             build(":$CHECK_PARENT_TASK_NAME") {
                 assertThat(task(":$mainSourceSetCheckTaskName"))
