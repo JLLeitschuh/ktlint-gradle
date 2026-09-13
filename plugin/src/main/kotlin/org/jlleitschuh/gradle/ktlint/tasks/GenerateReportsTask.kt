@@ -142,11 +142,11 @@ abstract class GenerateReportsTask @Inject constructor(
             it.discoveredErrors.set(task.discoveredErrors)
             it.outputToConsole.set(task.outputToConsole)
             it.ignoreFailures.set(task.ignoreFailures)
-            it.verbose.set(verbose)
+            it.verbose.set(task.verbose)
             it.generatedReportsPaths.from(loadedReporters.values)
-            it.ktLintVersion.set(ktLintVersion)
-            it.baseline.set(baseline.files.firstOrNull())
-            it.projectDirectory.set(projectDirectory)
+            it.ktLintVersion.set(task.ktLintVersion)
+            it.baseline.set(task.baseline.files.firstOrNull())
+            it.projectDirectory.set(task.projectDirectory)
         }
     }
 

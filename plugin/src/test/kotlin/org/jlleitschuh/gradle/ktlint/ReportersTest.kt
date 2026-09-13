@@ -24,7 +24,6 @@ class ReportersTest : AbstractPluginTest() {
             //language=Groovy
             buildGradle.appendText(
                 """
-
                 ktlint.reporters {
                     reporter "checkstyle"
                     reporter "json"
