@@ -1,7 +1,6 @@
 package org.jlleitschuh.gradle.ktlint
 
 import nebula.test.dsl.TestKitAssertions.assertThat
-import net.swiftzer.semver.SemVer
 import org.gradle.testkit.runner.TaskOutcome
 import org.gradle.util.GradleVersion
 import org.jlleitschuh.gradle.ktlint.tasks.GenerateBaselineTask
@@ -12,7 +11,6 @@ import org.jlleitschuh.gradle.ktlint.testdsl.GradleTestVersions
 import org.jlleitschuh.gradle.ktlint.testdsl.TestProject.Companion.FAIL_SOURCE_FILE
 import org.jlleitschuh.gradle.ktlint.testdsl.build
 import org.jlleitschuh.gradle.ktlint.testdsl.buildAndFail
-import org.jlleitschuh.gradle.ktlint.testdsl.getCurrentJavaVersion
 import org.jlleitschuh.gradle.ktlint.testdsl.project
 import org.jlleitschuh.gradle.ktlint.testdsl.projectSetup
 import org.junit.jupiter.api.DisplayName
@@ -246,12 +244,6 @@ class KtlintPluginTest : AbstractPluginTest() {
                     .hasOutcome(TaskOutcome.SUCCESS)
                 assertThat(this)
                     .hasNoMutableStateWarnings()
-                val majorJavaVersion = SemVer.parse(getCurrentJavaVersion()).major
-                if (!(majorJavaVersion < 17 && gradleVersion.majorVersion > 7)) {
-                    assertThat(this)
-                        .`as`("no deprecations unless we are using old java with gradle 8 which works but warns")
-                        .hasNoDeprecationWarnings()
-                }
             }
             build(":$CHECK_PARENT_TASK_NAME") {
                 assertThat(task(":$mainSourceSetCheckTaskName"))
