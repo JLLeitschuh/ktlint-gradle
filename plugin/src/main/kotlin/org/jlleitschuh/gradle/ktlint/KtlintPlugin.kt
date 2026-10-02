@@ -197,7 +197,8 @@ open class KtlintPlugin : Plugin<Project> {
         val ktlintReporterConfiguration: Configuration = createKtLintReporterConfiguration(target, extension, ktlintConfiguration)
         val ktlintBaselineReporterConfiguration: Configuration = createKtLintBaselineReporterConfiguration(
             target,
-            ktlintConfiguration
+            ktlintConfiguration,
+            extension
         )
         val loadReportersTask = createLoadReportersTask(this)
     }

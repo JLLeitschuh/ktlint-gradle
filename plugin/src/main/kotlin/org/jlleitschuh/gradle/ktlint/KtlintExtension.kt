@@ -109,6 +109,19 @@ open class KtlintExtension @Inject internal constructor(
             }
 
     /**
+     * When enabled, forces the `org.jetbrains.kotlin` dependencies resolved by this plugin's own configurations
+     * (`ktlint`, `ktlintRuleset`, `ktlintReporter`, `ktlintBaselineReporter`) to the Kotlin compiler version that
+     * the configured [version] was actually built against.
+     *
+     * This guards against project-wide dependency constraints silently forcing KtLint onto a newer Kotlin compiler than it supports.
+     *
+     * Defaults to `false`.
+     */
+    val enforceSupportedKotlinVersion: Property<Boolean> = objectFactory.property {
+        set(false)
+    }
+
+    /**
      * Baseline file location.
      *
      * Default location is `<projectDir>/config/ktlint/baseline.xml`.

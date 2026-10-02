@@ -52,3 +52,9 @@ internal fun File.initGitWithoutHooksDir(): File {
     assert(repo.directory.resolve("hooks").delete())
     return repo.directory
 }
+
+internal val SUPPORTED_KTLINT_VERSIONS = listOf(
+    "1.0.1", // lowest
+    "1.5.0", // default
+    "1.8.0" // highest
+)
