@@ -172,19 +172,13 @@ class KtLintSupportedVersionsTest : AbstractPluginTest() {
     }
 
     class SupportedKtlintVersionsProvider : GradleArgumentsProvider() {
-        private val supportedKtlintVersions = mutableListOf(
-            "1.0.1", // lowest
-            "1.5.0", // default
-            "1.8.0" // highest
-        )
-
         override fun provideArguments(
             context: ExtensionContext
         ): Stream<out Arguments> {
             // Using multiple Gradle versions produces OOM exceptions on Windows OS
             return sequenceOf(GradleVersion.version(TestVersions.maxSupportedGradleVersion))
                 .flatMap { gradleVersion ->
-                    supportedKtlintVersions.map { gradleVersion to it }.asSequence()
+                    SUPPORTED_KTLINT_VERSIONS.map { gradleVersion to it }.asSequence()
                 }
                 .map {
                     Arguments.of(it.first, it.second)
