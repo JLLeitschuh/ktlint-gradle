@@ -1,6 +1,5 @@
 package org.jlleitschuh.gradle.ktlint.testdsl
 
-import net.swiftzer.semver.SemVer
 import org.gradle.util.GradleVersion
 import org.jlleitschuh.gradle.ktlint.KtlintPlugin
 import org.junit.jupiter.api.extension.ExtensionContext
@@ -16,7 +15,7 @@ fun getCurrentJavaVersion(): String {
 
 @Suppress("ConstPropertyName")
 object TestVersions {
-    val majorJavaVersion = SemVer.parse(getCurrentJavaVersion()).major
+    val majorJavaVersion = getCurrentJavaVersion().substringBefore(".").toInt()
     val minSupportedGradleVersion = when (majorJavaVersion) {
         in Int.MIN_VALUE..20 -> "7.6.3"
         in 21..23 -> "8.5"

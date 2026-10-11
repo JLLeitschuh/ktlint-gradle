@@ -2,7 +2,6 @@ import com.github.breadmoirai.githubreleaseplugin.GithubReleaseTask
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -30,7 +29,7 @@ java {
     withJavadocJar()
     withSourcesJar()
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(8))
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
@@ -40,9 +39,8 @@ ktlint {
 
 tasks.withType<KotlinCompile> {
     compilerOptions {
-        languageVersion.set(KotlinVersion.KOTLIN_1_8)
-        apiVersion.set(KotlinVersion.KOTLIN_1_8)
-        jvmTarget.set(JvmTarget.JVM_1_8)
+        languageVersion.set(KotlinVersion.KOTLIN_2_0)
+        apiVersion.set(KotlinVersion.KOTLIN_2_0)
     }
 }
 
@@ -51,6 +49,11 @@ dependencies {
     compileOnly("com.pinterest.ktlint:ktlint-rule-engine:1.0.0")
     compileOnly("com.pinterest.ktlint:ktlint-ruleset-standard:1.0.0")
     compileOnly("com.pinterest.ktlint:ktlint-cli-reporter-baseline:1.0.0")
+
+    compileOnly("io.github.ktlint.core:ktlint-cli-reporter-core:2.0.0-ALPHA-4")
+    compileOnly("io.github.ktlint.core:ktlint-rule-engine:2.0.0-ALPHA-4")
+    compileOnly("io.github.ktlint.core:ktlint-ruleset-standard:2.0.0-ALPHA-4")
+    compileOnly("io.github.ktlint.core:ktlint-cli-reporter-baseline:2.0.0-ALPHA-4")
     compileOnly(libs.kotlin.gradle.plugin)
     compileOnly(libs.android.gradle.plugin)
     compileOnly(kotlin("stdlib-jdk8"))

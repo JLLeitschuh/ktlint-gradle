@@ -174,8 +174,8 @@ class KtLintSupportedVersionsTest : AbstractPluginTest() {
     class SupportedKtlintVersionsProvider : GradleArgumentsProvider() {
         private val supportedKtlintVersions = mutableListOf(
             "1.0.1", // lowest
-            "1.5.0", // default
-            "1.8.0" // highest
+            "1.8.0", // default
+            "2.0.0-ALPHA-4" // highest
         )
 
         override fun provideArguments(

@@ -1,7 +1,6 @@
 package org.jlleitschuh.gradle.ktlint
 
 import org.assertj.core.api.Assertions.assertThat
-import org.gradle.api.logging.Logging
 import org.gradle.testkit.runner.TaskOutcome
 import org.gradle.util.GradleVersion
 import org.jlleitschuh.gradle.ktlint.testdsl.GradleTestVersions
@@ -13,7 +12,6 @@ import org.junit.jupiter.params.provider.ArgumentsSource
 
 @GradleTestVersions
 class DisabledRulesTest : AbstractPluginTest() {
-    private val logger = Logging.getLogger(DisabledRulesTest::class.java)
 
     @DisplayName("Should lint without errors when 'final-newline' rule is disabled via editorconfig")
     @ParameterizedTest(name = "{0} with KtLint {1}: {displayName}")
