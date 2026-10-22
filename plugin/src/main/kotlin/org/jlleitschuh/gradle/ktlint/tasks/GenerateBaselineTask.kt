@@ -3,7 +3,6 @@ package org.jlleitschuh.gradle.ktlint.tasks
 import org.gradle.api.DefaultTask
 import org.gradle.api.Task
 import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.specs.Spec
@@ -26,8 +25,7 @@ import javax.inject.Inject
  */
 @CacheableTask
 abstract class GenerateBaselineTask @Inject constructor(
-    private val workerExecutor: WorkerExecutor,
-    private val projectLayout: ProjectLayout
+    private val workerExecutor: WorkerExecutor
 ) : DefaultTask() {
     @get:Classpath
     internal abstract val ktLintClasspath: ConfigurableFileCollection
@@ -38,6 +36,9 @@ abstract class GenerateBaselineTask @Inject constructor(
     @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:InputFiles
     internal abstract val discoveredErrors: ConfigurableFileCollection
+
+    @get:Input
+    internal abstract val projectDirectory: Property<String>
 
     @get:Input
     internal abstract val ktLintVersion: Property<String>
@@ -55,14 +56,14 @@ abstract class GenerateBaselineTask @Inject constructor(
         // Classloader isolation is enough here as we just want to use some classes from KtLint classpath
         // to get errors and generate files/console reports. No KtLint main object is initialized/used in this case.
         val queue = workerExecutor.classLoaderIsolation {
-            classpath.from(ktLintClasspath, baselineReporterClasspath)
+            it.classpath.from(ktLintClasspath, baselineReporterClasspath)
         }
         val task = this
         queue.submit(GenerateBaselineWorkAction::class.java) {
-            discoveredErrors.setFrom(task.discoveredErrors)
-            ktLintVersion.set(task.ktLintVersion)
-            baselineFile.set(task.baselineFile)
-            projectDirectory.set(projectLayout.projectDirectory)
+            it.discoveredErrors.setFrom(task.discoveredErrors)
+            it.ktLintVersion.set(task.ktLintVersion)
+            it.baselineFile.set(task.baselineFile)
+            it.projectDirectory.set(projectDirectory)
         }
     }
 
