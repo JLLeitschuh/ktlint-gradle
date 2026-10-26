@@ -30,6 +30,7 @@ The assumption being that you would not want to lint code you weren't compiling.
     - [Baseline support](#baseline-support)
     - [Testing KtLint snapshots](#testing-ktlint-snapshots)
   - [Plugin configuration](#configuration)
+    - [Kotlin compiler version conflicts](#kotlin-compiler-version-conflicts)
     - [Setting reports output directory](#setting-reports-output-directory)
     - [Customer reporters](#custom-reporters)
     - [Changing workers memory usage](#changing-workers-memory-usage)
@@ -299,6 +300,45 @@ You may also declare it in `ktlint-plugins.properties`, which allows coordinatio
 ktlint-version=1.0.0
 ```
 
+#### Kotlin compiler version conflicts
+
+Each KtLint release is built against a specific Kotlin compiler version. Some Gradle plugins, most commonly
+Spring Boot's dependency management plugin, via its `kotlin-bom`, apply project-wide Kotlin version constraints
+to _every_ configuration, including the ones this plugin uses to resolve KtLint itself. That can silently force
+KtLint onto a newer Kotlin compiler than it was built for, breaking every KtLint task with
+`Extensions storage is not registered` (see [ktlint/ktlint#3403](https://github.com/ktlint/ktlint/issues/3403)).
+
+If you hit that error, opt in to `enforceSupportedKotlinVersion` to have this plugin pin its own configurations
+(`ktlint`, `ktlintRuleset`, `ktlintReporter`, `ktlintBaselineReporter`) back to the Kotlin compiler version your
+configured KtLint release actually supports:
+
+```kotlin
+ktlint {
+    enforceSupportedKotlinVersion.set(true)
+}
+```
+
+If you need finer control, use the lower-level accessor directly instead:
+
+```kotlin
+val ktlintSupportedKotlinVersion = ktlint.getSupportedKotlinVersion()
+
+configurations.named("ktlint") {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "org.jetbrains.kotlin") {
+            useVersion(ktlintSupportedKotlinVersion)
+        }
+    }
+}
+```
+
+> [!NOTE]
+> Hoist the `ktlint.getSupportedKotlinVersion()` call into a local `val` at the top level of your script, as
+> shown above. If called directly inside a nested `configurations { }` block, a bare `ktlint` reference there
+> resolves to the generated `ConfigurationContainer.ktlint` accessor for the `ktlint` _configuration_ itself, not
+> the `KtlintExtension`, a Kotlin DSL accessor-shadowing gotcha, not a bug in the function.
+> Qualifying with `project.ktlint` instead of hoisting also works.
+
 #### Other Configuration
 
 All properties in the following configuration block are _optional_.
@@ -557,28 +597,6 @@ Gradle based filtering are only working for files located inside project (subpro
 To filter files outside project dir, use:
 ```kotlin
 exclude { element -> element.file.path.contains("generated/") }
-```
-
-- Running KtLint fails with strange exception (for example, check [#383](https://github.com/JLLeitschuh/ktlint-gradle/issues/383))
-
-Ensure you are not pinning Kotlin version for "ktlint*" configurations added by plugin.
-
-KtLint relies on Kotlin compiler to parse source files. Each version of KtLint are build using specific Kotlin version.
-
-To exclude "ktlint*" Gradle configurations from Kotlin version pinning - use following approach:
-```kotlin
-configurations.all {
-    if (!name.startsWith("ktlint")) {
-        resolutionStrategy {
-            eachDependency {
-                // Force Kotlin to our version
-                if (requested.group == "org.jetbrains.kotlin") {
-                    useVersion("1.3.72")
-                }
-            }
-        }
-    }
-}
 ```
 
 ## Developers

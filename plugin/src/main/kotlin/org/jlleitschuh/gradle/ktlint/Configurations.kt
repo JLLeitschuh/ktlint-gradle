@@ -16,6 +16,21 @@ internal const val KTLINT_BASELINE_REPORTER_CONFIGURATION_NAME = "ktlintBaseline
 internal const val KTLINT_BASELINE_REPORTER_CONFIGURATION_DESCRIPTION =
     "Provides KtLint baseline reporter required to generate baseline file"
 
+/**
+ * When [KtlintExtension.enforceSupportedKotlinVersion] is enabled, forces any `org.jetbrains.kotlin` dependency
+ * resolved by this configuration to the Kotlin compiler version the configured KtLint release was built against.
+ *
+ * This runs regardless of what else in the project (e.g. a BOM applied by a dependency management plugin)
+ * tries to raise that version for this configuration specifically.
+ */
+private fun Configuration.applySupportedKotlinVersionOverride(extension: KtlintExtension) {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "org.jetbrains.kotlin" && extension.enforceSupportedKotlinVersion.get()) {
+            supportedKotlinCompilerVersionForOrNull(extension.version.get())?.let { useVersion(it) }
+        }
+    }
+}
+
 internal fun createKtlintConfiguration(target: Project, extension: KtlintExtension): Configuration =
     target.configurations.maybeCreate(KTLINT_CONFIGURATION_NAME).apply {
         // Configurations in resolved state are not allowed to modify dependencies
@@ -25,6 +40,8 @@ internal fun createKtlintConfiguration(target: Project, extension: KtlintExtensi
 
         isCanBeResolved = true
         isCanBeConsumed = false
+
+        applySupportedKotlinVersionOverride(extension)
 
         // Starting from KtLint 0.41.0 version published artifact has two variants: "external" and "shadowed"
         attributes {
@@ -64,6 +81,8 @@ internal fun createKtlintRulesetConfiguration(
         isCanBeResolved = true
         isCanBeConsumed = false
 
+        applySupportedKotlinVersionOverride(extension)
+
         shouldResolveConsistentlyWith(ktLintConfiguration)
         dependencies.addLater(
             target.provider {
@@ -85,6 +104,8 @@ internal fun createKtLintReporterConfiguration(
 
         isCanBeResolved = true
         isCanBeConsumed = false
+
+        applySupportedKotlinVersionOverride(extension)
 
         shouldResolveConsistentlyWith(ktLintConfiguration)
 
@@ -134,7 +155,8 @@ internal fun createKtLintReporterConfiguration(
 
 internal fun createKtLintBaselineReporterConfiguration(
     target: Project,
-    ktLintConfiguration: Configuration
+    ktLintConfiguration: Configuration,
+    extension: KtlintExtension
 ): Configuration = target
     .configurations
     .maybeCreate(KTLINT_BASELINE_REPORTER_CONFIGURATION_NAME)
@@ -143,6 +165,8 @@ internal fun createKtLintBaselineReporterConfiguration(
 
         isCanBeResolved = true
         isCanBeConsumed = false
+
+        applySupportedKotlinVersionOverride(extension)
 
         shouldResolveConsistentlyWith(ktLintConfiguration)
     }
