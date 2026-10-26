@@ -6,7 +6,7 @@ plugins {
 dependencies {
     compileOnly(pluginLibs.kotlin.reflect)
     compileOnly(pluginLibs.kotlin.script.runtime)
-    compileOnly("com.pinterest.ktlint:ktlint-cli-ruleset-core:0.50.0")
+    compileOnly("com.pinterest.ktlint:ktlint-cli-ruleset-core:1.8.0")
 }
 
 ktlint {
