@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Clean up workaround for Gradle 6 [#1068](https://github.com/JLLeitschuh/ktlint-gradle/pull/1068)
 - update final release version of kotlin 2.4.0 in this project [#1119](https://github.com/JLLeitschuh/ktlint-gradle/pull/1119)
 - remove custom assertion for outcome [#1120](https://github.com/JLLeitschuh/ktlint-gradle/pull/1120)
+- streamline GenerateBaselineTask creation [#1121](https://github.com/JLLeitschuh/ktlint-gradle/pull/1121)
 
 ## [14.2.0] - 2026-03-12
 

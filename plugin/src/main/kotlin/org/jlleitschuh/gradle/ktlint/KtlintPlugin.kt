@@ -22,7 +22,7 @@ open class KtlintPlugin : Plugin<Project> {
         val holder = PluginHolder(target)
         holder.addKotlinScriptTasks()
         holder.addKtLintTasksToKotlinPlugin()
-        holder.addGenerateBaselineTask()
+        createGenerateBaselineTask(target, target.tasks.withType(KtLintCheckTask::class.java))
         holder.addGitHookTasks()
     }
 
@@ -160,13 +160,6 @@ open class KtlintPlugin : Plugin<Project> {
             GenerateReportsTask.LintType.FORMAT
         )
         addGenerateReportsTaskToProjectMetaFormatTask(generateReportsFormatTask)
-    }
-
-    private fun PluginHolder.addGenerateBaselineTask() {
-        createGenerateBaselineTask(
-            this,
-            target.tasks.withType(KtLintCheckTask::class.java)
-        )
     }
 
     internal class PluginHolder(
