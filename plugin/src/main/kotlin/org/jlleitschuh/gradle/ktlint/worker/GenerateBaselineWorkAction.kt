@@ -1,7 +1,6 @@
 package org.jlleitschuh.gradle.ktlint.worker
 
 import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.logging.Logging
@@ -12,7 +11,6 @@ import org.jlleitschuh.gradle.ktlint.selectReportersLoaderAdapter
 import java.io.File
 import java.io.PrintStream
 
-@Suppress("UnstableApiUsage")
 internal abstract class GenerateBaselineWorkAction :
     WorkAction<GenerateBaselineWorkAction.GenerateBaselineParameters> {
 
@@ -32,8 +30,6 @@ internal abstract class GenerateBaselineWorkAction :
             if (exists()) delete() else parentFile.mkdirs()
         }
 
-        val projectDir = parameters.projectDirectory.asFile.get()
-
         PrintStream(baselineFile.outputStream()).use { file ->
             val baselineReporter = selectReportersLoaderAdapter(parameters.ktLintVersion.get())
                 .loadAllGenericReporterProviders()
@@ -44,7 +40,7 @@ internal abstract class GenerateBaselineWorkAction :
             errors.forEach { lintErrorResult ->
                 val filePath = lintErrorResult
                     .lintedFile
-                    .toRelativeString(projectDir)
+                    .toRelativeString(File(parameters.projectDirectory.get()))
                     .replace(File.separatorChar, '/')
 
                 baselineReporter.before(filePath)
@@ -65,7 +61,7 @@ internal abstract class GenerateBaselineWorkAction :
     internal interface GenerateBaselineParameters : WorkParameters {
         val discoveredErrors: ConfigurableFileCollection
         val baselineFile: RegularFileProperty
-        val projectDirectory: DirectoryProperty
+        val projectDirectory: Property<String>
         val ktLintVersion: Property<String>
     }
 }

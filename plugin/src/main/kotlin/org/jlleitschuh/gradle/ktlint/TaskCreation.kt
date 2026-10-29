@@ -1,5 +1,6 @@
 package org.jlleitschuh.gradle.ktlint
 
+import org.gradle.api.Project
 import org.gradle.api.file.FileTree
 import org.gradle.api.tasks.TaskCollection
 import org.gradle.api.tasks.TaskProvider
@@ -187,19 +188,25 @@ private fun <T : BaseKtLintCheckTask> GenerateReportsTask.commonConfiguration(
 }
 
 internal fun createGenerateBaselineTask(
-    pluginHolder: KtlintPlugin.PluginHolder,
+    project: Project,
     lintTasks: TaskCollection<out BaseKtLintCheckTask>
-): TaskProvider<GenerateBaselineTask> = pluginHolder.target.registerTask(
-    GenerateBaselineTask.NAME
-) {
-    description = GenerateBaselineTask.DESCRIPTION
-    group = HELP_GROUP
+): TaskProvider<GenerateBaselineTask> {
+    val ktlintExtension = project.extensions.getByType(KtlintExtension::class.java)
+    val ktlintConfiguration = project.configurations.named(KTLINT_CONFIGURATION_NAME)
+    return project.tasks.register(
+        GenerateBaselineTask.NAME,
+        GenerateBaselineTask::class.java
+    ) {
+        description = GenerateBaselineTask.DESCRIPTION
+        group = HELP_GROUP
 
-    dependsOn(lintTasks)
+        dependsOn(lintTasks)
 
-    ktLintClasspath.setFrom(pluginHolder.ktlintConfiguration)
-    baselineReporterClasspath.setFrom(pluginHolder.ktlintBaselineReporterConfiguration)
-    discoveredErrors.from(lintTasks.map { it.discoveredErrors })
-    ktLintVersion.set(pluginHolder.extension.version)
-    baselineFile.set(pluginHolder.extension.baseline)
+        ktLintClasspath.setFrom(ktlintConfiguration)
+        baselineReporterClasspath.setFrom(project.configurations.named(KTLINT_BASELINE_REPORTER_CONFIGURATION_NAME))
+        discoveredErrors.from(lintTasks.map { it.discoveredErrors })
+        ktLintVersion.set(ktlintExtension.version)
+        baselineFile.set(ktlintExtension.baseline)
+        projectDirectory.set(project.layout.projectDirectory.asFile.absolutePath)
+    }
 }
