@@ -4,6 +4,7 @@ package org.jlleitschuh.gradle.ktlint
 
 import org.eclipse.jgit.lib.RepositoryBuilder
 import org.gradle.api.DefaultTask
+import org.gradle.api.Project
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
@@ -104,15 +105,15 @@ internal fun generateGitHook(
 
     """.trimIndent()
 
-internal fun KtlintPlugin.PluginHolder.addGitHookTasks() {
-    if (target.rootProject == target) {
-        addInstallGitHookFormatTask()
-        addInstallGitHookCheckTask()
+internal fun addGitHookTasks(project: Project) {
+    if (project.rootProject == project) {
+        addInstallGitHookFormatTask(project)
+        addInstallGitHookCheckTask(project)
     }
 }
 
-private fun KtlintPlugin.PluginHolder.addInstallGitHookFormatTask() {
-    target.tasks.register(
+private fun addInstallGitHookFormatTask(project: Project) {
+    project.tasks.register(
         INSTALL_GIT_HOOK_FORMAT_TASK,
         KtlintInstallGitHookTask::class.java
     ) {
@@ -125,8 +126,8 @@ private fun KtlintPlugin.PluginHolder.addInstallGitHookFormatTask() {
     }
 }
 
-private fun KtlintPlugin.PluginHolder.addInstallGitHookCheckTask() {
-    target.tasks.register(
+private fun addInstallGitHookCheckTask(project: Project) {
+    project.tasks.register(
         INSTALL_GIT_HOOK_CHECK_TASK,
         KtlintInstallGitHookTask::class.java
     ) {
