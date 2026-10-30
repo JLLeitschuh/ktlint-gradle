@@ -28,7 +28,29 @@ fun SerializableLintError.toCliError(): KtlintCliError {
     )
 }
 
+fun SerializableLintError.toKtlint2CliError(): io.github.ktlint.core.cli.reporter.core.api.KtlintCliError {
+    return io.github.ktlint.core.cli.reporter.core.api.KtlintCliError(
+        line,
+        col,
+        ruleId,
+        detail,
+        if (canBeAutoCorrected) {
+            io.github.ktlint.core.cli.reporter.core.api.KtlintCliError.Status.LINT_CAN_BE_AUTOCORRECTED
+        } else {
+            io.github.ktlint.core.cli.reporter.core.api.KtlintCliError.Status.LINT_CAN_NOT_BE_AUTOCORRECTED
+        }
+    )
+}
+
 fun List<KtlintCliError>.containsLintError(error: KtlintCliError): Boolean {
+    return firstOrNull { lintError ->
+        lintError.col == error.col &&
+            lintError.line == error.line &&
+            lintError.ruleId == error.ruleId
+    } != null
+}
+
+fun List<io.github.ktlint.core.cli.reporter.core.api.KtlintCliError>.containsLintError(error: io.github.ktlint.core.cli.reporter.core.api.KtlintCliError): Boolean {
     return firstOrNull { lintError ->
         lintError.col == error.col &&
             lintError.line == error.line &&

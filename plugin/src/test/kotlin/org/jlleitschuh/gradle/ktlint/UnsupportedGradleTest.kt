@@ -13,18 +13,17 @@ import org.junit.jupiter.api.condition.DisabledOnOs
 import org.junit.jupiter.api.condition.OS
 
 class UnsupportedGradleTest : AbstractPluginTest() {
+    /**
+     * This test ensures the proper error message is printed when an unsupported version of gradle is used.
+     * However, our minimum version of gradle is still 7.x, which will not run at all on Java 21.
+     * Gradle 8.5 is needed for Java 21.
+     * So if java 21 is currently being used, skip this test
+     */
     @DisplayName("Should raise exception on applying plugin for build using unsupported Gradle version.")
     @Test
     @DisabledOnOs(OS.WINDOWS)
     internal fun errorOnOldGradleVersion() {
-        /**
-         * This test ensures the proper error message is printed when an unsupported version of gradle is used.
-         * However, our minimum version of gradle is still 7.x, which will not run at all on Java 21.
-         * Gradle 8.5 is needed for Java 21.
-         * So if java 21 is currently being used, skip this test
-         */
         Assumptions.assumeFalse(getMajorJavaVersion() >= 21)
-
         project(
             gradleVersion = GradleVersion.version("7.4.1"),
             projectSetup = projectSetup("jvm", "1.9.22")

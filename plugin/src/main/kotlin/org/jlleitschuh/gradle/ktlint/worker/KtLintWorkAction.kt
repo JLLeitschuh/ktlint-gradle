@@ -32,6 +32,10 @@ abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParamete
                 ktlintInvokerFactory.initialize(parameters.additionalEditorconfig.get())
             }
 
+            is KtLintInvocation2.Factory -> {
+                ktlintInvokerFactory.initialize(parameters.additionalEditorconfig.get())
+            }
+
             else -> {
                 throw GradleException("Incompatible ktlint version ${parameters.ktLintVersion}")
             }

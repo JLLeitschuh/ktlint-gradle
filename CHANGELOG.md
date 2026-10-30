@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - streamline GenerateBaselineTask creation [#1121](https://github.com/JLLeitschuh/ktlint-gradle/pull/1121)
 - remove PluginHolder usage from GitHook [#1123](https://github.com/JLLeitschuh/ktlint-gradle/pull/1123)
 - streamline LoadReportersTask creation [#1124](https://github.com/JLLeitschuh/ktlint-gradle/pull/1124)
+- Ktlint 2.x support: Remove Gradle kotlin-dsl usage, per Gradle recommended practices. Plugin now requires kotlin 1.9.25+ and Gradle 8.5+ [#1114](https://github.com/JLLeitschuh/ktlint-gradle/pull/1114)
+- Plugin now requires gradle daemon java version 17+
 
 ## [14.2.0] - 2026-03-12
 
