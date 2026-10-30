@@ -23,7 +23,7 @@ open class KtlintPlugin : Plugin<Project> {
         holder.addKotlinScriptTasks()
         holder.addKtLintTasksToKotlinPlugin()
         createGenerateBaselineTask(target, target.tasks.withType(KtLintCheckTask::class.java))
-        holder.addGitHookTasks()
+        addGitHookTasks(target)
     }
 
     private fun PluginHolder.addKtLintTasksToKotlinPlugin() {
