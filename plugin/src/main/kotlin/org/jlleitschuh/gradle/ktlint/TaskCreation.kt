@@ -5,7 +5,6 @@ import org.gradle.api.file.FileTree
 import org.gradle.api.tasks.TaskCollection
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.util.PatternSet
-import org.gradle.kotlin.dsl.register
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jlleitschuh.gradle.ktlint.tasks.BaseKtLintCheckTask
 import org.jlleitschuh.gradle.ktlint.tasks.GenerateBaselineTask
@@ -100,31 +99,18 @@ internal fun KtlintPlugin.PluginHolder.setCheckTaskDependsOnGenerateReportsTask(
     }
 }
 
-internal fun createLoadReportersTask(
-    pluginHolder: KtlintPlugin.PluginHolder
-): TaskProvider<LoadReportersTask> =
-    pluginHolder.target.tasks.register<LoadReportersTask>(LoadReportersTask.TASK_NAME) {
-        description = LoadReportersTask.DESCRIPTION
-
-        ktLintClasspath.setFrom(pluginHolder.ktlintConfiguration)
-        reportersClasspath.setFrom(pluginHolder.ktlintReporterConfiguration)
-        debug.set(pluginHolder.extension.debug)
-        ktLintVersion.set(pluginHolder.extension.version)
-        enabledReporters.set(pluginHolder.extension.reporterExtension.reporters)
-        customReporters.set(pluginHolder.extension.reporterExtension.customReporters)
-    }
-
 private fun BaseKtLintCheckTask.configureBaseCheckTask(
     pluginHolder: KtlintPlugin.PluginHolder,
     additionalTaskConfig: BaseKtLintCheckTask.() -> Unit
 ) {
+    val loadReportersTask = pluginHolder.target.tasks.named(LoadReportersTask.TASK_NAME, LoadReportersTask::class.java)
     ktLintClasspath.setFrom(pluginHolder.ktlintConfiguration)
     ktLintVersion.set(pluginHolder.extension.version)
     additionalEditorconfig.set(pluginHolder.extension.additionalEditorconfig)
     debug.set(pluginHolder.extension.debug)
     ruleSetsClasspath.setFrom(pluginHolder.ktlintRulesetConfiguration)
     android.set(pluginHolder.extension.android)
-    loadedReporters.set(pluginHolder.loadReportersTask.get().loadedReporters)
+    loadedReporters.set(loadReportersTask.flatMap { it.loadedReporters })
     enableExperimentalRules.set(pluginHolder.extension.enableExperimentalRules)
 
     additionalTaskConfig()
@@ -158,14 +144,15 @@ private fun <T : BaseKtLintCheckTask> GenerateReportsTask.commonConfiguration(
     pluginHolder: KtlintPlugin.PluginHolder,
     lintTask: TaskProvider<T>
 ) {
+    val loadReportersTask = project.tasks.named(LoadReportersTask.TASK_NAME, LoadReportersTask::class.java)
     description = GenerateReportsTask.DESCRIPTION
     dependsOn(lintTask)
 
     ktLintClasspath.setFrom(pluginHolder.ktlintConfiguration)
     reportersClasspath.setFrom(pluginHolder.ktlintReporterConfiguration)
     discoveredErrors.set(lintTask.get().discoveredErrors)
-    loadedReporterProviders.set(pluginHolder.loadReportersTask.get().loadedReporterProviders)
-    loadedReporters.set(pluginHolder.loadReportersTask.get().loadedReporters)
+    loadedReporterProviders.set(loadReportersTask.flatMap { it.loadedReporterProviders })
+    loadedReporters.set(loadReportersTask.flatMap { it.loadedReporters })
     enabledReporters.set(pluginHolder.extension.reporterExtension.reporters)
     outputToConsole.set(pluginHolder.extension.outputToConsole)
     coloredOutput.set(pluginHolder.extension.coloredOutput)
