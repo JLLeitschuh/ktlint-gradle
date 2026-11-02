@@ -1,8 +1,7 @@
 package org.jlleitschuh.gradle.ktlint.android
 
+import nebula.test.dsl.TestKitAssertions.assertThat
 import net.swiftzer.semver.SemVer
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.hasOutcome
 import org.gradle.testkit.runner.TaskOutcome
 import org.gradle.util.GradleVersion
 import org.jlleitschuh.gradle.ktlint.AbstractPluginTest

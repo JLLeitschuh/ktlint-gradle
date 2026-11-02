@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jlleitschuh.gradle.ktlint.android.applyKtLintToAndroid
 import org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
+import org.jlleitschuh.gradle.ktlint.tasks.LoadReportersTask
 
 /**
  * Plugin that provides a wrapper over the `ktlint` project.
@@ -22,8 +23,9 @@ open class KtlintPlugin : Plugin<Project> {
         val holder = PluginHolder(target)
         holder.addKotlinScriptTasks()
         holder.addKtLintTasksToKotlinPlugin()
-        holder.addGenerateBaselineTask()
-        holder.addGitHookTasks()
+        LoadReportersTask.register(target)
+        createGenerateBaselineTask(target, target.tasks.withType(KtLintCheckTask::class.java))
+        addGitHookTasks(target)
     }
 
     private fun PluginHolder.addKtLintTasksToKotlinPlugin() {
@@ -162,13 +164,6 @@ open class KtlintPlugin : Plugin<Project> {
         addGenerateReportsTaskToProjectMetaFormatTask(generateReportsFormatTask)
     }
 
-    private fun PluginHolder.addGenerateBaselineTask() {
-        createGenerateBaselineTask(
-            this,
-            target.tasks.withType(KtLintCheckTask::class.java)
-        )
-    }
-
     internal class PluginHolder(
         val target: Project
     ) {
@@ -200,6 +195,5 @@ open class KtlintPlugin : Plugin<Project> {
             ktlintConfiguration,
             extension
         )
-        val loadReportersTask = createLoadReportersTask(this)
     }
 }

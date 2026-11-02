@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 - Kotlin 2.4.0 support [#1059](https://github.com/JLLeitschuh/ktlint-gradle/pull/1059) (No changes needed, just updated tests)
 - Clean up workaround for Gradle 6 [#1068](https://github.com/JLLeitschuh/ktlint-gradle/pull/1068)
+- update final release version of kotlin 2.4.0 in this project [#1119](https://github.com/JLLeitschuh/ktlint-gradle/pull/1119)
+- remove custom assertion for outcome [#1120](https://github.com/JLLeitschuh/ktlint-gradle/pull/1120)
+- streamline GenerateBaselineTask creation [#1121](https://github.com/JLLeitschuh/ktlint-gradle/pull/1121)
+- remove PluginHolder usage from GitHook [#1123](https://github.com/JLLeitschuh/ktlint-gradle/pull/1123)
+- streamline LoadReportersTask creation [#1124](https://github.com/JLLeitschuh/ktlint-gradle/pull/1124)
 - Add `ktlint.enforceSupportedKotlinVersion` and `KtlintExtension.getSupportedKotlinVersion()` to guard against
   project-wide Kotlin version constraints (e.g. Spring Boot's dependency management BOM) breaking KtLint with
   `Extensions storage is not registered` [ktlint/ktlint#3403](https://github.com/ktlint/ktlint/issues/3403)

@@ -3,7 +3,6 @@ package org.jlleitschuh.gradle.ktlint.tasks
 import org.gradle.api.DefaultTask
 import org.gradle.api.Task
 import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.specs.Spec
@@ -26,8 +25,7 @@ import javax.inject.Inject
  */
 @CacheableTask
 abstract class GenerateBaselineTask @Inject constructor(
-    private val workerExecutor: WorkerExecutor,
-    private val projectLayout: ProjectLayout
+    private val workerExecutor: WorkerExecutor
 ) : DefaultTask() {
     @get:Classpath
     internal abstract val ktLintClasspath: ConfigurableFileCollection
@@ -42,6 +40,9 @@ abstract class GenerateBaselineTask @Inject constructor(
     @get:Input
     internal abstract val ktLintVersion: Property<String>
 
+    @get:Input
+    internal abstract val projectDirectory: Property<String>
+
     @get:OutputFile
     abstract val baselineFile: RegularFileProperty
 
@@ -49,7 +50,6 @@ abstract class GenerateBaselineTask @Inject constructor(
         super.onlyIf(spec)
     }
 
-    @Suppress("UnstableApiUsage")
     @TaskAction
     fun generateBaseline() {
         // Classloader isolation is enough here as we just want to use some classes from KtLint classpath
@@ -62,7 +62,7 @@ abstract class GenerateBaselineTask @Inject constructor(
             discoveredErrors.setFrom(task.discoveredErrors)
             ktLintVersion.set(task.ktLintVersion)
             baselineFile.set(task.baselineFile)
-            projectDirectory.set(projectLayout.projectDirectory)
+            projectDirectory.set(this@GenerateBaselineTask.projectDirectory)
         }
     }
 
