@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - streamline GenerateBaselineTask creation [#1121](https://github.com/JLLeitschuh/ktlint-gradle/pull/1121)
 - remove PluginHolder usage from GitHook [#1123](https://github.com/JLLeitschuh/ktlint-gradle/pull/1123)
 - streamline LoadReportersTask creation [#1124](https://github.com/JLLeitschuh/ktlint-gradle/pull/1124)
+- Add `ktlint.enforceSupportedKotlinVersion` and `KtlintExtension.getSupportedKotlinVersion()` to guard against
+  project-wide Kotlin version constraints (e.g. Spring Boot's dependency management BOM) breaking KtLint with
+  `Extensions storage is not registered` [ktlint/ktlint#3403](https://github.com/ktlint/ktlint/issues/3403)
 
 ## [14.2.0] - 2026-03-12
 
