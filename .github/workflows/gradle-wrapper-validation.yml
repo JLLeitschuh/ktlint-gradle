@@ -15,6 +15,6 @@ jobs:
           egress-policy: audit
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: gradle/wrapper-validation-action@f9c9c575b8b21b6485636a91ffecd10e558c62f6 # v3.5.0
+      - uses: gradle/actions/wrapper-validation@a7406612929c8997f724ceab900ed029936e3bf5 # v6.4.1
         with:
           min-wrapper-count: 2

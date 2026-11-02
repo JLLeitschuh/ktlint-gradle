@@ -11,6 +11,7 @@ import org.jlleitschuh.gradle.ktlint.tasks.GenerateBaselineTask
 import org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask.Companion.FORMAT_KOTLIN_SCRIPT_TASK_NAME
 import org.jlleitschuh.gradle.ktlint.tasks.LoadReportersTask
 
 internal fun KtlintPlugin.PluginHolder.addGenerateReportsTaskToProjectMetaCheckTask(
@@ -35,7 +36,7 @@ internal fun createFormatTask(
         KtLintFormatTask.buildTaskNameForSourceSet(sourceSetName),
         PatternSet()
     ) {
-        mustRunAfter(project.tasks.named(KtLintFormatTask.KOTLIN_SCRIPT_TASK_NAME))
+        mustRunAfter(project.tasks.named(FORMAT_KOTLIN_SCRIPT_TASK_NAME))
 
         description = KtLintFormatTask.buildDescription(".kt")
         configureBaseCheckTask(pluginHolder) {
@@ -80,7 +81,7 @@ internal fun createKotlinScriptFormatTask(
 ): TaskProvider<KtLintFormatTask> = pluginHolder
     .target
     .registerTask(
-        KtLintFormatTask.KOTLIN_SCRIPT_TASK_NAME,
+        FORMAT_KOTLIN_SCRIPT_TASK_NAME,
         PatternSet()
     ) {
         description = KtLintFormatTask.buildDescription(".kts")
@@ -114,64 +115,6 @@ private fun BaseKtLintCheckTask.configureBaseCheckTask(
     enableExperimentalRules.set(pluginHolder.extension.enableExperimentalRules)
 
     additionalTaskConfig()
-}
-
-internal fun <T : BaseKtLintCheckTask> createGenerateReportsTask(
-    pluginHolder: KtlintPlugin.PluginHolder,
-    lintTask: TaskProvider<T>,
-    lintType: GenerateReportsTask.LintType,
-    sourceSetName: String
-): TaskProvider<GenerateReportsTask> = pluginHolder.target.registerTask(
-    GenerateReportsTask.generateNameForSourceSets(sourceSetName, lintType)
-) {
-    mustRunAfter(project.tasks.named(KtLintFormatTask.KOTLIN_SCRIPT_TASK_NAME))
-    reportsName.set(GenerateReportsTask.generateNameForSourceSets(sourceSetName, lintType))
-    commonConfiguration(pluginHolder, lintTask)
-}
-
-internal fun <T : BaseKtLintCheckTask> createKotlinScriptGenerateReportsTask(
-    pluginHolder: KtlintPlugin.PluginHolder,
-    lintTask: TaskProvider<T>,
-    lintType: GenerateReportsTask.LintType
-): TaskProvider<GenerateReportsTask> = pluginHolder.target.registerTask(
-    GenerateReportsTask.generateNameForKotlinScripts(lintType)
-) {
-    reportsName.set(GenerateReportsTask.generateNameForKotlinScripts(lintType))
-    commonConfiguration(pluginHolder, lintTask)
-}
-
-private fun <T : BaseKtLintCheckTask> GenerateReportsTask.commonConfiguration(
-    pluginHolder: KtlintPlugin.PluginHolder,
-    lintTask: TaskProvider<T>
-) {
-    val loadReportersTask = project.tasks.named(LoadReportersTask.TASK_NAME, LoadReportersTask::class.java)
-    description = GenerateReportsTask.DESCRIPTION
-    dependsOn(lintTask)
-
-    ktLintClasspath.setFrom(pluginHolder.ktlintConfiguration)
-    reportersClasspath.setFrom(pluginHolder.ktlintReporterConfiguration)
-    discoveredErrors.set(lintTask.get().discoveredErrors)
-    loadedReporterProviders.set(loadReportersTask.flatMap { it.loadedReporterProviders })
-    loadedReporters.set(loadReportersTask.flatMap { it.loadedReporters })
-    enabledReporters.set(pluginHolder.extension.reporterExtension.reporters)
-    outputToConsole.set(pluginHolder.extension.outputToConsole)
-    coloredOutput.set(pluginHolder.extension.coloredOutput)
-    outputColorName.set(pluginHolder.extension.outputColorName)
-    ignoreFailures.set(pluginHolder.extension.ignoreFailures)
-    verbose.set(pluginHolder.extension.verbose)
-    ktLintVersion.set(pluginHolder.extension.version)
-    relative.set(pluginHolder.extension.relative)
-    @Suppress("UnstableApiUsage")
-    baseline.set(
-        pluginHolder.extension.baseline
-            .flatMap {
-                if (it.asFile.exists()) {
-                    pluginHolder.target.objects.fileProperty().apply { set(it.asFile) }
-                } else {
-                    pluginHolder.target.objects.fileProperty()
-                }
-            }
-    )
 }
 
 internal fun createGenerateBaselineTask(
