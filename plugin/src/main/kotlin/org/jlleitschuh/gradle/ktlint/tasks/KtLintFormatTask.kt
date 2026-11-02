@@ -64,7 +64,7 @@ abstract class KtLintFormatTask @Inject constructor(
             sourceSetName: String
         ): String = "runKtlintFormatOver${sourceSetName.capitalize()}SourceSet"
 
-        const val KOTLIN_SCRIPT_TASK_NAME = "runKtlintFormatOverKotlinScripts"
+        const val FORMAT_KOTLIN_SCRIPT_TASK_NAME = "runKtlintFormatOverKotlinScripts"
 
         fun buildDescription(
             fileType: String

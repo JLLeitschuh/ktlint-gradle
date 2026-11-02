@@ -43,7 +43,7 @@ open class KtlintBasePlugin : Plugin<Project> {
             }
 
             target.tasks.named(KtLintCheckTask.KOTLIN_SCRIPT_TASK_NAME).configure(configureAction)
-            target.tasks.named(KtLintFormatTask.KOTLIN_SCRIPT_TASK_NAME).configure(configureAction)
+            target.tasks.named(KtLintFormatTask.FORMAT_KOTLIN_SCRIPT_TASK_NAME).configure(configureAction)
         }
 
         extension = target.extensions.create(

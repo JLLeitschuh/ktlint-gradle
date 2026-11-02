@@ -11,7 +11,6 @@ import org.jlleitschuh.gradle.ktlint.addGenerateReportsTaskToProjectMetaCheckTas
 import org.jlleitschuh.gradle.ktlint.addGenerateReportsTaskToProjectMetaFormatTask
 import org.jlleitschuh.gradle.ktlint.createCheckTask
 import org.jlleitschuh.gradle.ktlint.createFormatTask
-import org.jlleitschuh.gradle.ktlint.createGenerateReportsTask
 import org.jlleitschuh.gradle.ktlint.setCheckTaskDependsOnGenerateReportsTask
 import org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask
 import java.util.concurrent.Callable
@@ -86,12 +85,8 @@ private fun KtlintPlugin.PluginHolder.createAndroidTasks(
         sourceSetName,
         sources
     )
-    val generateReportsCheckTask = createGenerateReportsTask(
-        this,
-        checkTask,
-        GenerateReportsTask.LintType.CHECK,
-        sourceSetName
-    )
+    val generateReportsCheckTask =
+        GenerateReportsTask.registerCheckReportTaskForSourceSet(target, checkTask, sourceSetName)
 
     addGenerateReportsTaskToProjectMetaCheckTask(generateReportsCheckTask)
     setCheckTaskDependsOnGenerateReportsTask(generateReportsCheckTask)
@@ -101,11 +96,8 @@ private fun KtlintPlugin.PluginHolder.createAndroidTasks(
         sourceSetName,
         sources
     )
-    val generateReportsFormatTask = createGenerateReportsTask(
-        this,
-        formatTask,
-        GenerateReportsTask.LintType.FORMAT,
-        sourceSetName
-    )
+
+    val generateReportsFormatTask =
+        GenerateReportsTask.registerFormatReportTaskForSourceSet(target, formatTask, sourceSetName)
     addGenerateReportsTaskToProjectMetaFormatTask(generateReportsFormatTask)
 }
