@@ -113,6 +113,7 @@ private fun BaseKtLintCheckTask.configureBaseCheckTask(
     android.set(pluginHolder.extension.android)
     loadedReporters.set(loadReportersTask.flatMap { it.loadedReporters })
     enableExperimentalRules.set(pluginHolder.extension.enableExperimentalRules)
+    maxRuleVersion.set(pluginHolder.extension.maxRuleVersion)
 
     additionalTaskConfig()
 }
