@@ -290,13 +290,13 @@ abstract class BaseKtLintCheckTask @Inject constructor(
 
     private fun getChangedSources(
         inputChanges: InputChanges
-    ): Set<File> = inputChanges
-        .getFileChanges(source)
-        .asSequence()
-        .filter {
-            it.fileType != FileType.DIRECTORY &&
-                it.changeType != ChangeType.REMOVED
+    ): Set<File> {
+        val changes = inputChanges.getFileChanges(source)
+            .filter { it.fileType != FileType.DIRECTORY }
+        if (changes.any { it.changeType == ChangeType.REMOVED }) {
+            // Refresh results after removals, including errors in unchanged sources.
+            return source.files
         }
-        .map { it.file }
-        .toSet()
+        return changes.map { it.file }.toSet()
+    }
 }
