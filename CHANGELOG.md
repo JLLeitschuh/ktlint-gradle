@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - remove PluginHolder usage from GitHook [#1123](https://github.com/JLLeitschuh/ktlint-gradle/pull/1123)
 - streamline LoadReportersTask creation [#1124](https://github.com/JLLeitschuh/ktlint-gradle/pull/1124)
 - streamline GenerateReportsTask creation [#1130](https://github.com/JLLeitschuh/ktlint-gradle/pull/1130)
+- streamline KtLintCheckTask and KtLintFormatTask [#1131](https://github.com/JLLeitschuh/ktlint-gradle/pull/1131)
 
 ## [14.2.0] - 2026-03-12
 

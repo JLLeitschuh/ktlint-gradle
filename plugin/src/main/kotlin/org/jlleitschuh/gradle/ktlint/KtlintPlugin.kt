@@ -23,6 +23,8 @@ open class KtlintPlugin : Plugin<Project> {
         val holder = PluginHolder(target)
         holder.addKotlinScriptTasks()
         holder.addKtLintTasksToKotlinPlugin()
+        createKtLintReporterConfiguration(target, holder.extension, holder.ktlintConfiguration)
+        createKtLintBaselineReporterConfiguration(target, holder.ktlintConfiguration)
         LoadReportersTask.register(target)
         createGenerateBaselineTask(target, target.tasks.withType(KtLintCheckTask::class.java))
         addGitHookTasks(target)
@@ -71,9 +73,9 @@ open class KtlintPlugin : Plugin<Project> {
 
         multiplatformExtension.sourceSets.all(fun(sourceSet) {
             val checkTask = createCheckTask(
-                this,
+                target,
                 sourceSet.name,
-                sourceSet.kotlin.sourceDirectories
+                sourceSet.kotlin
             )
             val generateReportsCheckTask =
                 GenerateReportsTask.registerCheckReportTaskForSourceSet(target, checkTask, sourceSet.name)
@@ -82,9 +84,9 @@ open class KtlintPlugin : Plugin<Project> {
             setCheckTaskDependsOnGenerateReportsTask(generateReportsCheckTask)
 
             val formatTask = createFormatTask(
-                this,
+                target,
                 sourceSet.name,
-                sourceSet.kotlin.sourceDirectories
+                sourceSet.kotlin
             )
             val generateReportsFormatTask =
                 GenerateReportsTask.registerFormatReportTaskForSourceSet(target, formatTask, sourceSet.name)
@@ -102,11 +104,10 @@ open class KtlintPlugin : Plugin<Project> {
     private fun PluginHolder.applyKtLint(): (Plugin<in Any>) -> Unit = {
         target.extensions.configure(KotlinProjectExtension::class.java) {
             sourceSets.all(fun(sourceSet) {
-                val kotlinSourceDirectories = sourceSet.kotlin.sourceDirectories
                 val checkTask = createCheckTask(
-                    this@applyKtLint,
+                    target,
                     sourceSet.name,
-                    kotlinSourceDirectories
+                    sourceSet.kotlin
                 )
                 val generateReportsCheckTask =
                     GenerateReportsTask.registerCheckReportTaskForSourceSet(target, checkTask, sourceSet.name)
@@ -115,9 +116,9 @@ open class KtlintPlugin : Plugin<Project> {
                 setCheckTaskDependsOnGenerateReportsTask(generateReportsCheckTask)
 
                 val formatTask = createFormatTask(
-                    this@applyKtLint,
+                    target,
                     sourceSet.name,
-                    kotlinSourceDirectories
+                    sourceSet.kotlin
                 )
                 val generateReportsFormatTask =
                     GenerateReportsTask.registerFormatReportTaskForSourceSet(target, formatTask, sourceSet.name)
@@ -128,16 +129,13 @@ open class KtlintPlugin : Plugin<Project> {
     }
 
     private fun PluginHolder.addKotlinScriptTasks() {
-        val projectDirectoryScriptFiles = target.fileTree(target.projectDir)
-        projectDirectoryScriptFiles.include("*.kts")
-
-        val checkTask = createKotlinScriptCheckTask(this, projectDirectoryScriptFiles)
+        val checkTask = createKotlinScriptCheckTask(target)
         val generateReportsCheckTask = GenerateReportsTask.registerCheckReportTaskForScript(target, checkTask)
 
         addGenerateReportsTaskToProjectMetaCheckTask(generateReportsCheckTask)
         setCheckTaskDependsOnGenerateReportsTask(generateReportsCheckTask)
 
-        val formatTask = createKotlinScriptFormatTask(this, projectDirectoryScriptFiles)
+        val formatTask = createKotlinScriptFormatTask(target)
         val generateReportsFormatTask = GenerateReportsTask.registerFormatReportTaskForScript(target, formatTask)
         addGenerateReportsTaskToProjectMetaFormatTask(generateReportsFormatTask)
     }
@@ -166,12 +164,6 @@ open class KtlintPlugin : Plugin<Project> {
             target,
             ktlintConfiguration,
             extension
-        )
-        val ktlintReporterConfiguration: Configuration =
-            createKtLintReporterConfiguration(target, extension, ktlintConfiguration)
-        val ktlintBaselineReporterConfiguration: Configuration = createKtLintBaselineReporterConfiguration(
-            target,
-            ktlintConfiguration
         )
     }
 }

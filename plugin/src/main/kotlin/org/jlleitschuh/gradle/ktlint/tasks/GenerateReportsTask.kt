@@ -20,12 +20,12 @@ import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.workers.WorkerExecutor
+import org.jlleitschuh.gradle.ktlint.FORMAT_KOTLIN_SCRIPT_TASK_NAME
 import org.jlleitschuh.gradle.ktlint.KTLINT_CONFIGURATION_NAME
 import org.jlleitschuh.gradle.ktlint.KTLINT_REPORTER_CONFIGURATION_NAME
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
 import org.jlleitschuh.gradle.ktlint.reporter.LoadedReporter
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
-import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask.Companion.FORMAT_KOTLIN_SCRIPT_TASK_NAME
 import org.jlleitschuh.gradle.ktlint.worker.ConsoleReportWorkAction
 import org.jlleitschuh.gradle.ktlint.worker.GenerateReportsWorkAction
 import java.io.File
