@@ -9,8 +9,6 @@ import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.tasks.util.PatternFilterable
 import org.gradle.util.GradleVersion
 import org.jlleitschuh.gradle.ktlint.tasks.BaseKtLintCheckTask
-import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
-import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 import java.nio.charset.StandardCharsets
 
 internal typealias FilterApplier = (Action<PatternFilterable>) -> Unit
@@ -42,8 +40,8 @@ open class KtlintBasePlugin : Plugin<Project> {
                 }
             }
 
-            target.tasks.named(KtLintCheckTask.KOTLIN_SCRIPT_TASK_NAME).configure(configureAction)
-            target.tasks.named(KtLintFormatTask.FORMAT_KOTLIN_SCRIPT_TASK_NAME).configure(configureAction)
+            target.tasks.named(CHECK_KOTLIN_SCRIPT_TASK_NAME).configure(configureAction)
+            target.tasks.named(FORMAT_KOTLIN_SCRIPT_TASK_NAME).configure(configureAction)
         }
 
         extension = target.extensions.create(
