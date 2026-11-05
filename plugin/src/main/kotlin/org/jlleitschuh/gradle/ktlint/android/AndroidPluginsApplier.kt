@@ -5,34 +5,33 @@ import com.android.build.api.dsl.AndroidSourceSet
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.gradle.internal.api.DefaultAndroidSourceDirectorySet
 import org.gradle.api.Plugin
+import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
-import org.jlleitschuh.gradle.ktlint.KtlintPlugin
 import org.jlleitschuh.gradle.ktlint.addGenerateReportsTaskToProjectMetaCheckTask
 import org.jlleitschuh.gradle.ktlint.addGenerateReportsTaskToProjectMetaFormatTask
 import org.jlleitschuh.gradle.ktlint.setCheckTaskDependsOnGenerateReportsTask
 import org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
-import java.util.concurrent.Callable
 import kotlin.reflect.full.memberProperties
 
-internal fun KtlintPlugin.PluginHolder.applyKtLintToAndroid(): (Plugin<in Any>) -> Unit {
+internal fun applyKtLintToAndroid(project: Project): (Plugin<in Any>) -> Unit {
     return {
-        target.plugins.withId(
+        project.plugins.withId(
             "com.android.application",
-            androidPluginConfigureAction(this)
+            androidPluginConfigureAction(project)
         )
-        target.plugins.withId(
+        project.plugins.withId(
             "com.android.library",
-            androidPluginConfigureAction(this)
+            androidPluginConfigureAction(project)
         )
-        target.plugins.withId(
+        project.plugins.withId(
             "com.android.test",
-            androidPluginConfigureAction(this)
+            androidPluginConfigureAction(project)
         )
-        target.plugins.withId(
+        project.plugins.withId(
             "com.android.dynamic-feature",
-            androidPluginConfigureAction(this)
+            androidPluginConfigureAction(project)
         )
     }
 }
@@ -44,13 +43,13 @@ internal fun KtlintPlugin.PluginHolder.applyKtLintToAndroid(): (Plugin<in Any>) 
  */
 @Suppress("UnstableApiUsage")
 private fun androidPluginConfigureAction(
-    pluginHolder: KtlintPlugin.PluginHolder
+    project: Project
 ): (Plugin<Any>) -> Unit = {
-    pluginHolder.target.extensions.configure(CommonExtension::class.java) {
+    project.extensions.configure(CommonExtension::class.java) {
         // kotlin property exists in AGP >= 7
         val kotlinProperty = AndroidSourceSet::class.memberProperties.firstOrNull { it.name == "kotlin" }
         if (kotlinProperty == null) {
-            pluginHolder.target.logger.warn(
+            project.logger.warn(
                 buildString {
                     append("In AGP <7 kotlin source directories are not auto-detected. ")
                     append("In order to lint kotlin sources, manually add the directory to the source set. ")
@@ -61,36 +60,38 @@ private fun androidPluginConfigureAction(
         val sourceMember: AndroidSourceSet.() -> AndroidSourceDirectorySet = {
             kotlinProperty?.get(this) as AndroidSourceDirectorySet? ?: this.java
         }
-        sourceSets.all {
+        sourceSets.configureEach {
             val androidSourceSet = sourceMember(this) as DefaultAndroidSourceDirectorySet
             // Passing Callable, so returned FileCollection, will lazy evaluate it
             // only when task will need it.
             // Solves the problem of having additional source dirs in
             // current AndroidSourceSet, that are not available on eager
             // evaluation.
-            pluginHolder.createAndroidTasks(
+            createAndroidTasks(
+                project,
                 name,
-                pluginHolder.target.files(Callable { androidSourceSet.srcDirs })
+                project.files(androidSourceSet.srcDirs)
             )
         }
     }
 }
 
-private fun KtlintPlugin.PluginHolder.createAndroidTasks(
+private fun createAndroidTasks(
+    project: Project,
     sourceSetName: String,
     sources: FileCollection
 ) {
     val checkTask =
-        KtLintCheckTask.register(target, sources, KtLintCheckTask.buildTaskNameForSourceSet(sourceSetName))
+        KtLintCheckTask.register(project, sources, KtLintCheckTask.buildTaskNameForSourceSet(sourceSetName))
     val generateReportsCheckTask =
-        GenerateReportsTask.registerCheckReportTaskForSourceSet(target, checkTask, sourceSetName)
+        GenerateReportsTask.registerCheckReportTaskForSourceSet(project, checkTask, sourceSetName)
 
-    addGenerateReportsTaskToProjectMetaCheckTask(generateReportsCheckTask)
-    setCheckTaskDependsOnGenerateReportsTask(generateReportsCheckTask)
+    addGenerateReportsTaskToProjectMetaCheckTask(project, generateReportsCheckTask)
+    setCheckTaskDependsOnGenerateReportsTask(project, generateReportsCheckTask)
 
     val formatTask =
-        KtLintFormatTask.register(target, sources, KtLintFormatTask.buildTaskNameForSourceSet(sourceSetName))
+        KtLintFormatTask.register(project, sources, KtLintFormatTask.buildTaskNameForSourceSet(sourceSetName))
     val generateReportsFormatTask =
-        GenerateReportsTask.registerFormatReportTaskForSourceSet(target, formatTask, sourceSetName)
-    addGenerateReportsTaskToProjectMetaFormatTask(generateReportsFormatTask)
+        GenerateReportsTask.registerFormatReportTaskForSourceSet(project, formatTask, sourceSetName)
+    addGenerateReportsTaskToProjectMetaFormatTask(project, generateReportsFormatTask)
 }

@@ -2,10 +2,8 @@ package org.jlleitschuh.gradle.ktlint
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.PluginContainer
-import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
@@ -20,11 +18,20 @@ import org.jlleitschuh.gradle.ktlint.tasks.LoadReportersTask
 open class KtlintPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
+        target.tasks.register(CHECK_PARENT_TASK_NAME) {
+            group = VERIFICATION_GROUP
+            description = "Runs ktlint on all kotlin sources in this project."
+        }
+        target.tasks.register(FORMAT_PARENT_TASK_NAME) {
+            group = FORMATTING_GROUP
+            description = "Runs the ktlint formatter on all kotlin sources in this project."
+        }
         val holder = PluginHolder(target)
         holder.addKotlinScriptTasks()
         holder.addKtLintTasksToKotlinPlugin()
         createKtLintReporterConfiguration(target, holder.extension, holder.ktlintConfiguration)
         createKtLintBaselineReporterConfiguration(target, holder.ktlintConfiguration)
+        createKtlintRulesetConfiguration(target, holder.ktlintConfiguration, holder.extension)
         LoadReportersTask.register(target)
         createGenerateBaselineTask(target, target.tasks.withType(KtLintCheckTask::class.java))
         addGitHookTasks(target)
@@ -42,12 +49,12 @@ open class KtlintPlugin : Plugin<Project> {
 
     private fun PluginHolder.addKtLintTasksToAndroidIfNecessary() {
         // Classic API (with kotlin-android plugin)
-        target.plugins.withId("org.jetbrains.kotlin.android", applyKtLintToAndroid())
+        target.plugins.withId("org.jetbrains.kotlin.android", applyKtLintToAndroid(target))
 
         // New API from AGP 9+ (with built-in Kotlin plugin)
         target.pluginManager.withPlugin("com.android.base") {
             if (target.plugins.hasKotlinBaseApiPlugin) {
-                target.plugins.withId(id, applyKtLintToAndroid())
+                target.plugins.withId(id, applyKtLintToAndroid(target))
             }
         }
     }
@@ -80,8 +87,8 @@ open class KtlintPlugin : Plugin<Project> {
             val generateReportsCheckTask =
                 GenerateReportsTask.registerCheckReportTaskForSourceSet(target, checkTask, sourceSet.name)
 
-            addGenerateReportsTaskToProjectMetaCheckTask(generateReportsCheckTask)
-            setCheckTaskDependsOnGenerateReportsTask(generateReportsCheckTask)
+            addGenerateReportsTaskToProjectMetaCheckTask(target, generateReportsCheckTask)
+            setCheckTaskDependsOnGenerateReportsTask(target, generateReportsCheckTask)
 
             val formatTask = createFormatTask(
                 target,
@@ -91,12 +98,12 @@ open class KtlintPlugin : Plugin<Project> {
             val generateReportsFormatTask =
                 GenerateReportsTask.registerFormatReportTaskForSourceSet(target, formatTask, sourceSet.name)
 
-            addGenerateReportsTaskToProjectMetaFormatTask(generateReportsFormatTask)
+            addGenerateReportsTaskToProjectMetaFormatTask(target, generateReportsFormatTask)
         })
 
         multiplatformExtension.targets.all(fun(kotlinTarget) {
             if (kotlinTarget.platformType == KotlinPlatformType.androidJvm) {
-                applyKtLintToAndroid()
+                applyKtLintToAndroid(target)
             }
         })
     }
@@ -112,8 +119,8 @@ open class KtlintPlugin : Plugin<Project> {
                 val generateReportsCheckTask =
                     GenerateReportsTask.registerCheckReportTaskForSourceSet(target, checkTask, sourceSet.name)
 
-                addGenerateReportsTaskToProjectMetaCheckTask(generateReportsCheckTask)
-                setCheckTaskDependsOnGenerateReportsTask(generateReportsCheckTask)
+                addGenerateReportsTaskToProjectMetaCheckTask(target, generateReportsCheckTask)
+                setCheckTaskDependsOnGenerateReportsTask(target, generateReportsCheckTask)
 
                 val formatTask = createFormatTask(
                     target,
@@ -123,7 +130,7 @@ open class KtlintPlugin : Plugin<Project> {
                 val generateReportsFormatTask =
                     GenerateReportsTask.registerFormatReportTaskForSourceSet(target, formatTask, sourceSet.name)
 
-                addGenerateReportsTaskToProjectMetaFormatTask(generateReportsFormatTask)
+                addGenerateReportsTaskToProjectMetaFormatTask(target, generateReportsFormatTask)
             })
         }
     }
@@ -132,38 +139,18 @@ open class KtlintPlugin : Plugin<Project> {
         val checkTask = createKotlinScriptCheckTask(target)
         val generateReportsCheckTask = GenerateReportsTask.registerCheckReportTaskForScript(target, checkTask)
 
-        addGenerateReportsTaskToProjectMetaCheckTask(generateReportsCheckTask)
-        setCheckTaskDependsOnGenerateReportsTask(generateReportsCheckTask)
+        addGenerateReportsTaskToProjectMetaCheckTask(target, generateReportsCheckTask)
+        setCheckTaskDependsOnGenerateReportsTask(target, generateReportsCheckTask)
 
         val formatTask = createKotlinScriptFormatTask(target)
         val generateReportsFormatTask = GenerateReportsTask.registerFormatReportTaskForScript(target, formatTask)
-        addGenerateReportsTaskToProjectMetaFormatTask(generateReportsFormatTask)
+        addGenerateReportsTaskToProjectMetaFormatTask(target, generateReportsFormatTask)
     }
 
     internal class PluginHolder(
         val target: Project
     ) {
         val extension = target.plugins.apply(KtlintBasePlugin::class.java).extension
-
-        val metaKtlintCheckTask: TaskProvider<Task> by lazy {
-            target.registerTask(CHECK_PARENT_TASK_NAME) {
-                group = VERIFICATION_GROUP
-                description = "Runs ktlint on all kotlin sources in this project."
-            }
-        }
-
-        val metaKtlintFormatTask: TaskProvider<Task> by lazy {
-            target.registerTask(FORMAT_PARENT_TASK_NAME) {
-                group = FORMATTING_GROUP
-                description = "Runs the ktlint formatter on all kotlin sources in this project."
-            }
-        }
-
         val ktlintConfiguration: Configuration = createKtlintConfiguration(target, extension)
-        val ktlintRulesetConfiguration: Configuration = createKtlintRulesetConfiguration(
-            target,
-            ktlintConfiguration,
-            extension
-        )
     }
 }
