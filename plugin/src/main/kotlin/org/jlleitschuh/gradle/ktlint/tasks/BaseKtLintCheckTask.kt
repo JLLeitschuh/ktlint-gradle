@@ -237,29 +237,29 @@ abstract class BaseKtLintCheckTask @Inject constructor(
         // This allows to better isolate work actions from different projects tasks between each other
         // and to not pollute Gradle daemon heap, which otherwise greatly increases GC time.
         val queue = workerExecutor.processIsolation {
-            classpath.from(ktLintClasspath, ruleSetsClasspath)
-            forkOptions {
-                maxHeapSize = workerMaxHeapSize.get()
+            it.classpath.from(ktLintClasspath, ruleSetsClasspath)
+            it.forkOptions {
+                it.maxHeapSize = workerMaxHeapSize.get()
 
                 // Work around ktlint triggering reflective access errors from the embedded Kotlin
                 // compiler. See https://youtrack.jetbrains.com/issue/KT-43704 for details.
                 if (JavaVersion.current() >= JavaVersion.VERSION_16) {
-                    jvmArgs("--add-opens", "java.base/java.lang=ALL-UNNAMED")
+                    it.jvmArgs("--add-opens", "java.base/java.lang=ALL-UNNAMED")
                 }
             }
         }
 
         queue.submit(KtLintWorkAction::class.java) {
             val task = this@BaseKtLintCheckTask
-            filesToLint.from(filesToCheck)
-            android.set(task.android)
-            debug.set(task.debug)
-            additionalEditorconfig.set(task.additionalEditorconfig)
-            formatSource.set(formatSources)
-            discoveredErrorsFile.set(task.discoveredErrors)
-            ktLintVersion.set(task.ktLintVersion)
-            editorconfigFilesWereChanged.set(editorConfigUpdated)
-            this.formatSnapshot.set(formatSnapshot)
+            it.filesToLint.from(filesToCheck)
+            it.android.set(task.android)
+            it.debug.set(task.debug)
+            it.additionalEditorconfig.set(task.additionalEditorconfig)
+            it.formatSource.set(formatSources)
+            it.discoveredErrorsFile.set(task.discoveredErrors)
+            it.ktLintVersion.set(task.ktLintVersion)
+            it.editorconfigFilesWereChanged.set(editorConfigUpdated)
+            it.formatSnapshot.set(formatSnapshot)
         }
     }
 

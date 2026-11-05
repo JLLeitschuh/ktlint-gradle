@@ -19,12 +19,12 @@ open class KtlintPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         target.tasks.register(CHECK_PARENT_TASK_NAME) {
-            group = VERIFICATION_GROUP
-            description = "Runs ktlint on all kotlin sources in this project."
+            it.group = VERIFICATION_GROUP
+            it.description = "Runs ktlint on all kotlin sources in this project."
         }
         target.tasks.register(FORMAT_PARENT_TASK_NAME) {
-            group = FORMATTING_GROUP
-            description = "Runs the ktlint formatter on all kotlin sources in this project."
+            it.group = FORMATTING_GROUP
+            it.description = "Runs the ktlint formatter on all kotlin sources in this project."
         }
         val holder = PluginHolder(target)
         holder.addKotlinScriptTasks()
@@ -54,7 +54,7 @@ open class KtlintPlugin : Plugin<Project> {
         // New API from AGP 9+ (with built-in Kotlin plugin)
         target.pluginManager.withPlugin("com.android.base") {
             if (target.plugins.hasKotlinBaseApiPlugin) {
-                target.plugins.withId(id, applyKtLintToAndroid(target))
+                target.plugins.withId(it.id, applyKtLintToAndroid(target))
             }
         }
     }
@@ -110,7 +110,7 @@ open class KtlintPlugin : Plugin<Project> {
 
     private fun PluginHolder.applyKtLint(): (Plugin<in Any>) -> Unit = {
         target.extensions.configure(KotlinProjectExtension::class.java) {
-            sourceSets.all(fun(sourceSet) {
+            it.sourceSets.all(fun(sourceSet) {
                 val checkTask = createCheckTask(
                     target,
                     sourceSet.name,

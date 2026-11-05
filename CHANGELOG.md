@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - streamline GenerateReportsTask creation [#1130](https://github.com/JLLeitschuh/ktlint-gradle/pull/1130)
 - streamline KtLintCheckTask and KtLintFormatTask [#1131](https://github.com/JLLeitschuh/ktlint-gradle/pull/1131)
 - remove PluginHolder usage from AndroidPluginsApplier.kt [#1133](https://github.com/JLLeitschuh/ktlint-gradle/pull/1133)
+- remove Gradle kotlin-dsl usage, per Gradle recommended practices for binary plugins [#1135](https://github.com/JLLeitschuh/ktlint-gradle/pull/1135)
 
 ## [14.2.0] - 2026-03-12
 

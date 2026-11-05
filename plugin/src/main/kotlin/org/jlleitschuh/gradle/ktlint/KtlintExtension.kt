@@ -10,8 +10,6 @@ import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.util.PatternFilterable
-import org.gradle.kotlin.dsl.domainObjectContainer
-import org.gradle.kotlin.dsl.newInstance
 import org.jlleitschuh.gradle.ktlint.reporter.CustomReporter
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import javax.inject.Inject
@@ -20,14 +18,13 @@ import javax.inject.Inject
  * Extension class for configuring the [KtlintPlugin].
  * @param filterTargetApplier When [KtlintExtension.filter] is called, this function is executed.
  */
-@Suppress("UnstableApiUsage")
 open class KtlintExtension @Inject internal constructor(
     objectFactory: ObjectFactory,
     projectLayout: ProjectLayout,
     private val filterTargetApplier: FilterApplier,
     kotlinScriptAdditionalPathApplier: KotlinScriptAdditionalPathApplier
 ) {
-    val reporterExtension = objectFactory.newInstance(ReporterExtension::class)
+    val reporterExtension: ReporterExtension = objectFactory.newInstance(ReporterExtension::class.java)
 
     /**
      * The version of KtLint to use.
@@ -157,7 +154,7 @@ open class KtlintExtension @Inject internal constructor(
             set(emptySet())
         }
         val customReporters: NamedDomainObjectContainer<CustomReporter> =
-            objectFactory.domainObjectContainer(CustomReporter::class) { CustomReporter(it) }
+            objectFactory.domainObjectContainer(CustomReporter::class.java) { CustomReporter(it) }
 
         /**
          * Use one of default Ktlint output reporter

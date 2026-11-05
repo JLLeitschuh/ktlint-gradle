@@ -2,7 +2,6 @@ import com.github.breadmoirai.githubreleaseplugin.GithubReleaseTask
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -10,7 +9,7 @@ import org.jetbrains.kotlin.util.prefixIfNot
 
 plugins {
     id("com.gradle.plugin-publish")
-    `kotlin-dsl`
+    kotlin("jvm")
     `maven-publish`
     id("org.jlleitschuh.gradle.ktlint")
     id("com.gradleup.shadow")
@@ -40,9 +39,8 @@ ktlint {
 
 tasks.withType<KotlinCompile> {
     compilerOptions {
-        languageVersion.set(KotlinVersion.KOTLIN_1_8)
-        apiVersion.set(KotlinVersion.KOTLIN_1_8)
-        jvmTarget.set(JvmTarget.JVM_1_8)
+        languageVersion.set(KotlinVersion.KOTLIN_2_0)
+        apiVersion.set(KotlinVersion.KOTLIN_2_0)
     }
 }
 

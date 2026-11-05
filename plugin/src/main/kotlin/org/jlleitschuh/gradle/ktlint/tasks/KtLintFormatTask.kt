@@ -42,32 +42,32 @@ abstract class KtLintFormatTask @Inject constructor(
             sources: FileCollection,
             name: String
         ): TaskProvider<KtLintFormatTask> {
-            return project.tasks.register(name, KtLintFormatTask::class.java) {
-                configureBaseCheckTask(project)
-                setSource(sources)
-                discoveredErrors.set(project.layout.intermediateResultsBuildDir("${name}_errors.bin"))
-                workerMaxHeapSize.convention("256m")
-                previousRunSnapshot.set(project.layout.intermediateResultsBuildDir("$name-snapshot.bin"))
-                description = "Lints files to ensure that they are formatted according to the code style " +
+            return project.tasks.register(name, KtLintFormatTask::class.java) { t ->
+                t.configureBaseCheckTask(project)
+                t.setSource(sources)
+                t.discoveredErrors.set(project.layout.intermediateResultsBuildDir("${name}_errors.bin"))
+                t.workerMaxHeapSize.convention("256m")
+                t.previousRunSnapshot.set(project.layout.intermediateResultsBuildDir("$name-snapshot.bin"))
+                t.description = "Lints files to ensure that they are formatted according to the code style " +
                     "and, on error, tries to format code to conform code style."
                 if (name != FORMAT_KOTLIN_SCRIPT_TASK_NAME) {
-                    mustRunAfter(project.tasks.named(FORMAT_KOTLIN_SCRIPT_TASK_NAME))
+                    t.mustRunAfter(project.tasks.named(FORMAT_KOTLIN_SCRIPT_TASK_NAME))
                 }
                 // Special UP-TO-DATE check to avoid situation when task does not check restored to pre-formatted state
                 // files
-                outputs.upToDateWhen {
-                    val inputSources = source.files
-                    previousRunSnapshot.asFile.get()
-                        .run {
-                            if (exists()) {
-                                KtLintWorkAction.FormatTaskSnapshot.readFromFile(this)
-                            } else {
-                                KtLintWorkAction.FormatTaskSnapshot(emptyMap())
-                            }
-                        }.formattedSources.none {
-                            inputSources.contains(it.key) &&
+                t.outputs.upToDateWhen { _ ->
+                    t.previousRunSnapshot.asFile.map {
+                        if (it.exists()) {
+                            KtLintWorkAction.FormatTaskSnapshot.readFromFile(it)
+                        } else {
+                            KtLintWorkAction.FormatTaskSnapshot(emptyMap())
+                        }
+                    }.map {
+                        it.formattedSources.none {
+                            t.source.files.contains(it.key) &&
                                 contentHash(it.key).contentEquals(it.value)
                         }
+                    }.get()
                 }
             }
         }

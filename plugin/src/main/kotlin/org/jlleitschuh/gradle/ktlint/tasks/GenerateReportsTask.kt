@@ -113,7 +113,7 @@ abstract class GenerateReportsTask @Inject constructor(
         // Classloader isolation is enough here as we just want to use some classes from KtLint classpath
         // to get errors and generate files/console reports. No KtLint main object is initialized/used in this case.
         val queue = workerExecutor.classLoaderIsolation {
-            classpath.from(ktLintClasspath, reportersClasspath)
+            it.classpath.from(ktLintClasspath, reportersClasspath)
         }
 
         val loadedReporters = loadLoadedReporters()
@@ -124,29 +124,29 @@ abstract class GenerateReportsTask @Inject constructor(
         val task = this
         loadedReporters.forEach { (loadedReporter, reporterOutput) ->
             queue.submit(GenerateReportsWorkAction::class.java) {
-                discoveredErrorsFile.set(task.discoveredErrors)
-                loadedReporterProviders.set(task.loadedReporterProviders)
-                reporterId.set(loadedReporter.reporterId)
-                this.reporterOutput.set(reporterOutput)
-                reporterOptions.set(generateReporterOptions(loadedReporter))
-                ktLintVersion.set(task.ktLintVersion)
-                baseline.set(task.baseline.files.firstOrNull())
-                projectDirectory.set(task.projectDirectory)
+                it.discoveredErrorsFile.set(task.discoveredErrors)
+                it.loadedReporterProviders.set(task.loadedReporterProviders)
+                it.reporterId.set(loadedReporter.reporterId)
+                it.reporterOutput.set(reporterOutput)
+                it.reporterOptions.set(generateReporterOptions(loadedReporter))
+                it.ktLintVersion.set(task.ktLintVersion)
+                it.baseline.set(task.baseline.files.firstOrNull())
+                it.projectDirectory.set(task.projectDirectory)
                 if (task.relative.get()) {
-                    filePathsRelativeTo.set(projectDirectory.asFile)
+                    it.filePathsRelativeTo.set(projectDirectory.asFile)
                 }
             }
         }
 
         queue.submit(ConsoleReportWorkAction::class.java) {
-            discoveredErrors.set(task.discoveredErrors)
-            outputToConsole.set(task.outputToConsole)
-            ignoreFailures.set(task.ignoreFailures)
-            verbose.set(task.verbose)
-            generatedReportsPaths.from(loadedReporters.values)
-            ktLintVersion.set(task.ktLintVersion)
-            baseline.set(task.baseline.files.firstOrNull())
-            projectDirectory.set(task.projectDirectory)
+            it.discoveredErrors.set(task.discoveredErrors)
+            it.outputToConsole.set(task.outputToConsole)
+            it.ignoreFailures.set(task.ignoreFailures)
+            it.verbose.set(verbose)
+            it.generatedReportsPaths.from(loadedReporters.values)
+            it.ktLintVersion.set(ktLintVersion)
+            it.baseline.set(baseline.files.firstOrNull())
+            it.projectDirectory.set(projectDirectory)
         }
     }
 
@@ -229,19 +229,19 @@ abstract class GenerateReportsTask @Inject constructor(
             name: String
         ): TaskProvider<GenerateReportsTask> {
             val task = project.tasks.register(name, GenerateReportsTask::class.java) {
-                projectDirectory.set(project.layout.projectDirectory)
-                mustRunAfter(project.tasks.named(FORMAT_KOTLIN_SCRIPT_TASK_NAME))
-                reportsName.set(name)
-                commonConfiguration(project, lintTask)
-                reportsOutputDirectory.set(
+                it.projectDirectory.set(project.layout.projectDirectory)
+                it.mustRunAfter(project.tasks.named(FORMAT_KOTLIN_SCRIPT_TASK_NAME))
+                it.reportsName.set(name)
+                it.commonConfiguration(project, lintTask)
+                it.reportsOutputDirectory.set(
                     project.layout
                         .buildDirectory
                         .dir("reports${File.separator}ktlint${File.separator}$name")
                 )
                 val de = lintTask.flatMap { it.discoveredErrors }
-                discoveredErrors.set(de)
-                onlyIf {
-                    discoveredErrors.map { it.asFile }.get().exists()
+                it.discoveredErrors.set(de)
+                it.onlyIf { _ ->
+                    de.map { it.asFile }.get().exists()
                 }
             }
             return task
