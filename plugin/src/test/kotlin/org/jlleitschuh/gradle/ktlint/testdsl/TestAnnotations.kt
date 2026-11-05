@@ -10,8 +10,7 @@ import java.util.stream.Stream
 import kotlin.streams.asStream
 
 fun getCurrentJavaVersion(): String {
-    return Runtime::class.java.getPackage().specificationVersion // java 8
-        ?: Runtime::class.java.getMethod("version").invoke(null).toString() // java 9+
+    return System.getProperty("java.specification.version").removePrefix("1.")
 }
 
 @Suppress("ConstPropertyName")
