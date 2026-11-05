@@ -18,14 +18,14 @@ internal fun addGenerateReportsTaskToProjectMetaCheckTask(
     project: Project,
     generatesReportsTask: TaskProvider<GenerateReportsTask>
 ) {
-    project.tasks.named(CHECK_PARENT_TASK_NAME).configure { dependsOn(generatesReportsTask) }
+    project.tasks.named(CHECK_PARENT_TASK_NAME).configure { it.dependsOn(generatesReportsTask) }
 }
 
 internal fun addGenerateReportsTaskToProjectMetaFormatTask(
     project: Project,
     generateReportsTask: TaskProvider<GenerateReportsTask>
 ) {
-    project.tasks.named(FORMAT_PARENT_TASK_NAME).configure { dependsOn(generateReportsTask) }
+    project.tasks.named(FORMAT_PARENT_TASK_NAME).configure { it.dependsOn(generateReportsTask) }
 }
 
 internal fun createFormatTask(
@@ -74,7 +74,7 @@ internal fun setCheckTaskDependsOnGenerateReportsTask(
 ) {
     project.plugins.withType(LifecycleBasePlugin::class.java) {
         project.tasks.named(LifecycleBasePlugin.CHECK_TASK_NAME) {
-            dependsOn(generateReportsTask)
+            it.dependsOn(generateReportsTask)
         }
     }
 }
@@ -89,16 +89,16 @@ internal fun createGenerateBaselineTask(
         GenerateBaselineTask.NAME,
         GenerateBaselineTask::class.java
     ) {
-        description = GenerateBaselineTask.DESCRIPTION
-        group = HELP_GROUP
+        it.description = GenerateBaselineTask.DESCRIPTION
+        it.group = HELP_GROUP
 
-        dependsOn(lintTasks)
+        it.dependsOn(lintTasks)
 
-        ktLintClasspath.setFrom(ktlintConfiguration)
-        baselineReporterClasspath.setFrom(project.configurations.named(KTLINT_BASELINE_REPORTER_CONFIGURATION_NAME))
-        discoveredErrors.from(lintTasks.map { it.discoveredErrors })
-        ktLintVersion.set(ktlintExtension.version)
-        baselineFile.set(ktlintExtension.baseline)
-        projectDirectory.set(project.layout.projectDirectory.asFile.absolutePath)
+        it.ktLintClasspath.setFrom(ktlintConfiguration)
+        it.baselineReporterClasspath.setFrom(project.configurations.named(KTLINT_BASELINE_REPORTER_CONFIGURATION_NAME))
+        it.discoveredErrors.from(lintTasks.map { it.discoveredErrors })
+        it.ktLintVersion.set(ktlintExtension.version)
+        it.baselineFile.set(ktlintExtension.baseline)
+        it.projectDirectory.set(project.layout.projectDirectory.asFile.absolutePath)
     }
 }

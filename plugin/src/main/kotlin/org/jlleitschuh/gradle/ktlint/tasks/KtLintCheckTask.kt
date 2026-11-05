@@ -34,11 +34,11 @@ abstract class KtLintCheckTask @Inject constructor(
             name: String
         ): TaskProvider<KtLintCheckTask> {
             return project.tasks.register(name, KtLintCheckTask::class.java) {
-                configureBaseCheckTask(project)
-                setSource(sources)
-                discoveredErrors.set(project.layout.intermediateResultsBuildDir("${name}_errors.bin"))
-                workerMaxHeapSize.convention("256m")
-                description = "Lints all .kt files to ensure that they are formatted according to the code style."
+                it.configureBaseCheckTask(project)
+                it.setSource(sources)
+                it.discoveredErrors.set(project.layout.intermediateResultsBuildDir("${name}_errors.bin"))
+                it.workerMaxHeapSize.convention("256m")
+                it.description = "Lints all .kt files to ensure that they are formatted according to the code style."
             }
         }
     }

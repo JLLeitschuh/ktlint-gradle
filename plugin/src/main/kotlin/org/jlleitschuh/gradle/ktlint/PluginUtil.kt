@@ -3,7 +3,6 @@ package org.jlleitschuh.gradle.ktlint
 import net.swiftzer.semver.SemVer
 import org.gradle.api.GradleException
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFile
 import org.gradle.api.logging.Logger
@@ -13,24 +12,10 @@ import org.gradle.api.plugins.HelpTasksPlugin
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
-import org.gradle.api.tasks.TaskProvider
-import org.gradle.kotlin.dsl.register
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
-
-internal inline fun <reified T : Task> Project.registerTask(
-    name: String,
-    vararg constructorArguments: Any = emptyArray(),
-    noinline configuration: T.() -> Unit
-): TaskProvider<T> {
-    return tasks
-        .register<T>(name, *constructorArguments)
-        .apply {
-            this.configure(configuration)
-        }
-}
 
 internal const val EDITOR_CONFIG_FILE_NAME = ".editorconfig"
 

@@ -42,9 +42,7 @@ internal fun applyKtLintToAndroid(project: Project): (Plugin<in Any>) -> Unit {
  * This approach creates one check tasks per one source set.
  */
 @Suppress("UnstableApiUsage")
-private fun androidPluginConfigureAction(
-    project: Project
-): (Plugin<Any>) -> Unit = {
+private fun androidPluginConfigureAction(project: Project): (Plugin<Any>) -> Unit = {
     project.extensions.configure(CommonExtension::class.java) {
         // kotlin property exists in AGP >= 7
         val kotlinProperty = AndroidSourceSet::class.memberProperties.firstOrNull { it.name == "kotlin" }
@@ -60,8 +58,8 @@ private fun androidPluginConfigureAction(
         val sourceMember: AndroidSourceSet.() -> AndroidSourceDirectorySet = {
             kotlinProperty?.get(this) as AndroidSourceDirectorySet? ?: this.java
         }
-        sourceSets.configureEach {
-            val androidSourceSet = sourceMember(this) as DefaultAndroidSourceDirectorySet
+        it.sourceSets.configureEach { sourceSet ->
+            val androidSourceSet = sourceMember(sourceSet) as DefaultAndroidSourceDirectorySet
             // Passing Callable, so returned FileCollection, will lazy evaluate it
             // only when task will need it.
             // Solves the problem of having additional source dirs in
@@ -69,7 +67,7 @@ private fun androidPluginConfigureAction(
             // evaluation.
             createAndroidTasks(
                 project,
-                name,
+                sourceSet.name,
                 project.files(androidSourceSet.srcDirs)
             )
         }

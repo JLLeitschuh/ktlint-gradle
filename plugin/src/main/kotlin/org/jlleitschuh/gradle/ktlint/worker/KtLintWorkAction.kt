@@ -16,7 +16,6 @@ import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
 
-@Suppress("UnstableApiUsage")
 abstract class KtLintWorkAction : WorkAction<KtLintWorkAction.KtLintWorkParameters> {
 
     private val logger = Logging.getLogger("ktlint-worker")

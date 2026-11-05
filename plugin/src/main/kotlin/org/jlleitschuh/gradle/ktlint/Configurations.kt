@@ -17,23 +17,20 @@ internal const val KTLINT_BASELINE_REPORTER_CONFIGURATION_DESCRIPTION =
     "Provides KtLint baseline reporter required to generate baseline file"
 
 internal fun createKtlintConfiguration(target: Project, extension: KtlintExtension): Configuration =
-    target.configurations.maybeCreate(KTLINT_CONFIGURATION_NAME).apply {
-        // Configurations in resolved state are not allowed to modify dependencies
-        if (state != Configuration.State.UNRESOLVED) return@apply
+    target.configurations.create(KTLINT_CONFIGURATION_NAME) { c ->
+        c.description = KTLINT_CONFIGURATION_DESCRIPTION
 
-        description = KTLINT_CONFIGURATION_DESCRIPTION
-
-        isCanBeResolved = true
-        isCanBeConsumed = false
+        c.isCanBeResolved = true
+        c.isCanBeConsumed = false
 
         // Starting from KtLint 0.41.0 version published artifact has two variants: "external" and "shadowed"
-        attributes {
-            attribute(Bundling.BUNDLING_ATTRIBUTE, target.objects.named(Bundling::class.java, Bundling.EXTERNAL))
+        c.attributes {
+            it.attribute(Bundling.BUNDLING_ATTRIBUTE, target.objects.named(Bundling::class.java, Bundling.EXTERNAL))
         }
 
         // Workaround for gradle 6 https://github.com/gradle/gradle/issues/13255
         val oldProp = target.objects.listProperty(Dependency::class.java)
-        dependencies.addAllLater(
+        c.dependencies.addAllLater(
             oldProp.value(
                 extension.version.map {
                     if (SemVer.parse(it) < SemVer(1, 0, 0)) {
@@ -53,6 +50,7 @@ internal fun createKtlintConfiguration(target: Project, extension: KtlintExtensi
         )
     }
 
+@Suppress("UnstableApiUsage")
 internal fun createKtlintRulesetConfiguration(
     target: Project,
     ktLintConfiguration: Configuration,
@@ -73,6 +71,7 @@ internal fun createKtlintRulesetConfiguration(
         )
     }
 
+@Suppress("UnstableApiUsage")
 internal fun createKtLintReporterConfiguration(
     target: Project,
     extension: KtlintExtension,
@@ -132,17 +131,15 @@ internal fun createKtLintReporterConfiguration(
         )
     }
 
+@Suppress("UnstableApiUsage")
 internal fun createKtLintBaselineReporterConfiguration(
     target: Project,
     ktLintConfiguration: Configuration
-): Configuration = target
-    .configurations
-    .maybeCreate(KTLINT_BASELINE_REPORTER_CONFIGURATION_NAME)
-    .apply {
-        description = KTLINT_BASELINE_REPORTER_CONFIGURATION_DESCRIPTION
+): Configuration = target.configurations.create(KTLINT_BASELINE_REPORTER_CONFIGURATION_NAME) { c ->
+    c.description = KTLINT_BASELINE_REPORTER_CONFIGURATION_DESCRIPTION
 
-        isCanBeResolved = true
-        isCanBeConsumed = false
+    c.isCanBeResolved = true
+    c.isCanBeConsumed = false
 
-        shouldResolveConsistentlyWith(ktLintConfiguration)
-    }
+    c.shouldResolveConsistentlyWith(ktLintConfiguration)
+}
