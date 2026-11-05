@@ -14,16 +14,18 @@ import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 const val CHECK_KOTLIN_SCRIPT_TASK_NAME = "runKtlintCheckOverKotlinScripts"
 const val FORMAT_KOTLIN_SCRIPT_TASK_NAME = "runKtlintFormatOverKotlinScripts"
 
-internal fun KtlintPlugin.PluginHolder.addGenerateReportsTaskToProjectMetaCheckTask(
+internal fun addGenerateReportsTaskToProjectMetaCheckTask(
+    project: Project,
     generatesReportsTask: TaskProvider<GenerateReportsTask>
 ) {
-    metaKtlintCheckTask.configure { dependsOn(generatesReportsTask) }
+    project.tasks.named(CHECK_PARENT_TASK_NAME).configure { dependsOn(generatesReportsTask) }
 }
 
-internal fun KtlintPlugin.PluginHolder.addGenerateReportsTaskToProjectMetaFormatTask(
+internal fun addGenerateReportsTaskToProjectMetaFormatTask(
+    project: Project,
     generateReportsTask: TaskProvider<GenerateReportsTask>
 ) {
-    metaKtlintFormatTask.configure { dependsOn(generateReportsTask) }
+    project.tasks.named(FORMAT_PARENT_TASK_NAME).configure { dependsOn(generateReportsTask) }
 }
 
 internal fun createFormatTask(
@@ -66,11 +68,12 @@ internal fun createKotlinScriptFormatTask(project: Project): TaskProvider<KtLint
     return task
 }
 
-internal fun KtlintPlugin.PluginHolder.setCheckTaskDependsOnGenerateReportsTask(
+internal fun setCheckTaskDependsOnGenerateReportsTask(
+    project: Project,
     generateReportsTask: TaskProvider<GenerateReportsTask>
 ) {
-    target.plugins.withType(LifecycleBasePlugin::class.java) {
-        target.tasks.named(LifecycleBasePlugin.CHECK_TASK_NAME) {
+    project.plugins.withType(LifecycleBasePlugin::class.java) {
+        project.tasks.named(LifecycleBasePlugin.CHECK_TASK_NAME) {
             dependsOn(generateReportsTask)
         }
     }
