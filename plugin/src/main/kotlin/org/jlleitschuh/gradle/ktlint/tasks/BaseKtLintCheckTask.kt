@@ -48,8 +48,7 @@ abstract class BaseKtLintCheckTask @Inject constructor(
     objectFactory: ObjectFactory,
     projectLayout: ProjectLayout,
     private val workerExecutor: WorkerExecutor
-) : DefaultTask(),
-    PatternFilterable {
+) : DefaultTask(), PatternFilterable {
     private val patternFilterable: PatternFilterable = PatternSet()
     private val sourceFiles: ConfigurableFileCollection = objectFactory.fileCollection()
 

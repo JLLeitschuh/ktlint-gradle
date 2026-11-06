@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - streamline KtLintCheckTask and KtLintFormatTask [#1131](https://github.com/JLLeitschuh/ktlint-gradle/pull/1131)
 - remove PluginHolder usage from AndroidPluginsApplier.kt [#1133](https://github.com/JLLeitschuh/ktlint-gradle/pull/1133)
 - remove Gradle kotlin-dsl usage, per Gradle recommended practices for binary plugins [#1135](https://github.com/JLLeitschuh/ktlint-gradle/pull/1135)
+- Ktlint 2.x support: Remove Gradle kotlin-dsl usage, per Gradle recommended practices. Plugin now requires kotlin 1.9.25+ and Gradle 8.5+ [#1114](https://github.com/JLLeitschuh/ktlint-gradle/pull/1114)
+- Plugin now requires gradle daemon java version 17+
 
 ## [14.2.0] - 2026-03-12
 
