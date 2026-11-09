@@ -2,6 +2,7 @@ package org.jlleitschuh.gradle.ktlint.testdsl
 
 import net.swiftzer.semver.SemVer
 import org.gradle.util.GradleVersion
+import org.jlleitschuh.gradle.ktlint.KtlintBasePlugin.Companion.LOWEST_SUPPORTED_GRADLE_VERSION
 import org.jlleitschuh.gradle.ktlint.KtlintPlugin
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.provider.Arguments
@@ -10,23 +11,21 @@ import java.util.stream.Stream
 import kotlin.streams.asStream
 
 fun getCurrentJavaVersion(): String {
-    return Runtime::class.java.getPackage().specificationVersion // java 8
-        ?: Runtime::class.java.getMethod("version").invoke(null).toString() // java 9+
+    return System.getProperty("java.specification.version").removePrefix("1.")
 }
 
 @Suppress("ConstPropertyName")
 object TestVersions {
     val majorJavaVersion = SemVer.parse(getCurrentJavaVersion()).major
     val minSupportedGradleVersion = when (majorJavaVersion) {
-        in Int.MIN_VALUE..20 -> "7.6.3"
-        in 21..23 -> "8.5"
         in 24..Int.MAX_VALUE -> "9.1.0"
-        else -> "7.6.3"
+        else -> LOWEST_SUPPORTED_GRADLE_VERSION
     }
 
+    // gradle 9 requires Java 17
     val maxSupportedGradleVersion = when (majorJavaVersion) {
-        in Int.MIN_VALUE..16 -> "8.14.3" // gradle 9 requires Java 17
-        else -> "9.5.1"
+        in Int.MIN_VALUE..16 -> "8.14.3"
+        else -> "9.8.2"
     }
 
     val pluginVersion = System.getProperty("project.version")
