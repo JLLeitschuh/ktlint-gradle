@@ -30,4 +30,12 @@ class KtLintClassesSerializerKtTest {
         val actual = loadAnyErrors(file)
         assertThat(actual).isEqualTo(input)
     }
+
+    @Test
+    internal fun `loadAnyErrors can read an empty list of errors`() {
+        val file = temporaryFolder.resolve("lintError.test")
+        KtLintClassesSerializer.create().saveErrors(emptyList(), file)
+
+        assertThat(loadAnyErrors(file)).isEmpty()
+    }
 }

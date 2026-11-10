@@ -40,6 +40,7 @@ import org.jlleitschuh.gradle.ktlint.applyGitFilter
 import org.jlleitschuh.gradle.ktlint.getEditorConfigFiles
 import org.jlleitschuh.gradle.ktlint.worker.KtLintClassesSerializer
 import org.jlleitschuh.gradle.ktlint.worker.KtLintWorkAction
+import org.jlleitschuh.gradle.ktlint.worker.LintErrorResult
 import java.io.File
 import javax.inject.Inject
 
@@ -167,21 +168,31 @@ abstract class BaseKtLintCheckTask @Inject constructor(
         }
 
         logTaskExecutionState(inputChanges, editorConfigUpdated)
-        if (skipExecution(filesToCheck)) return
 
-        val previousErrors: Set<File> = if (discoveredErrors.asFile.get().exists()) {
-            KtLintClassesSerializer
-                .create()
-                .loadErrors(discoveredErrors.asFile.get())
-                .map { it.lintedFile }
-                .filter { it.exists() }
-                .toSet()
-        } else {
-            emptySet()
+        // The worker only records the files it lints, so unchanged files that had errors are linted again to keep
+        // reporting them. Unchanged files without errors have nothing to report and are not linted again.
+        val filesWithPreviousErrors = loadPreviousLintResults()
+            .filter { it.lintErrors.isNotEmpty() }
+            .map { it.lintedFile }
+        val allFilesToCheck = filesToCheck + filesWithPreviousErrors.filter { it.exists() }
+
+        if (allFilesToCheck.isEmpty() && filesWithPreviousErrors.isNotEmpty()) {
+            logger.info("Every file with errors was removed")
+            KtLintClassesSerializer.create().saveErrors(emptyList(), discoveredErrors.asFile.get())
+            return
         }
-        val allfilesToCheck = filesToCheck + previousErrors
+        if (skipExecution(allFilesToCheck)) return
 
-        submitKtLintWork(allfilesToCheck, false, editorConfigUpdated, null)
+        submitKtLintWork(allFilesToCheck, false, editorConfigUpdated, null)
+    }
+
+    private fun loadPreviousLintResults(): List<LintErrorResult> {
+        val previousResults = discoveredErrors.asFile.get()
+        return if (previousResults.exists()) {
+            KtLintClassesSerializer.create().loadErrors(previousResults)
+        } else {
+            emptyList()
+        }
     }
 
     protected fun runFormat(
@@ -222,7 +233,6 @@ abstract class BaseKtLintCheckTask @Inject constructor(
             didWork = false
             true
         } else {
-            logger.debug("Linting files: ${filesToCheck.joinToString()}")
             false
         }
     }
@@ -233,6 +243,7 @@ abstract class BaseKtLintCheckTask @Inject constructor(
         editorConfigUpdated: Boolean,
         formatSnapshot: File? = null
     ) {
+        logger.debug("Linting files: ${filesToCheck.joinToString()}")
         // Process isolation is used here to run KtLint in a separate java process.
         // This allows to better isolate work actions from different projects tasks between each other
         // and to not pollute Gradle daemon heap, which otherwise greatly increases GC time.
