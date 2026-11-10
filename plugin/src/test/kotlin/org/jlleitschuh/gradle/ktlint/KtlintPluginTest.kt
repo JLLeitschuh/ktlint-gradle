@@ -486,6 +486,71 @@ class KtlintPluginTest : AbstractPluginTest() {
         }
     }
 
+    @DisplayName("Lint check should not lint again unchanged files without errors")
+    @CommonTest
+    fun checkIsIncrementalForCleanFiles(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            createSourceFile(
+                "src/main/kotlin/Initial.kt",
+                """
+                val foo = "bar"
+
+                """.trimIndent()
+            )
+
+            build(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+
+            createSourceFile(
+                "src/main/kotlin/AnotherFile.kt",
+                """
+                val bar = "foo"
+
+                """.trimIndent()
+            )
+
+            build(CHECK_PARENT_TASK_NAME, "--debug") {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                val lintedFiles = output.lines().filter { it.contains("Linting files: ") }
+                assertThat(lintedFiles).anyMatch { it.contains("AnotherFile.kt") }
+                assertThat(lintedFiles).noneMatch { it.contains("Initial.kt") }
+            }
+        }
+    }
+
+    @DisplayName("Lint check should pass once the only file with errors is removed")
+    @CommonTest
+    fun checkPassesAfterRemovingFileWithErrors(gradleVersion: GradleVersion) {
+        project(gradleVersion) {
+            createSourceFile(
+                "src/main/kotlin/Initial.kt",
+                """
+                val foo = "bar"
+
+                """.trimIndent()
+            )
+            val failingSourceFile = "src/main/kotlin/AnotherFile.kt"
+            createSourceFile(
+                failingSourceFile,
+                """
+                val bar="foo"
+
+                """.trimIndent()
+            )
+
+            buildAndFail(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            }
+
+            removeSourceFile(failingSourceFile)
+
+            build(CHECK_PARENT_TASK_NAME) {
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+        }
+    }
+
     @DisplayName("Should check files which path conatins whitespace")
     @CommonTest
     fun pathsWithWhitespace(gradleVersion: GradleVersion) {
