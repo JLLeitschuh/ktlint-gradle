@@ -1,10 +1,13 @@
 package org.jlleitschuh.gradle.ktlint
 
 import net.swiftzer.semver.SemVer
+import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
-import org.gradle.api.artifacts.Dependency
-import org.gradle.api.attributes.Bundling
+import org.gradle.api.plugins.jvm.internal.JvmPluginServices
+import org.gradle.api.provider.Provider
+import org.gradle.internal.extensions.core.serviceOf
+import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 internal const val KTLINT_CONFIGURATION_NAME = "ktlint"
 internal const val KTLINT_CONFIGURATION_DESCRIPTION = "Main ktlint-gradle configuration"
@@ -16,37 +19,38 @@ internal const val KTLINT_BASELINE_REPORTER_CONFIGURATION_NAME = "ktlintBaseline
 internal const val KTLINT_BASELINE_REPORTER_CONFIGURATION_DESCRIPTION =
     "Provides KtLint baseline reporter required to generate baseline file"
 
+internal fun determineKtlintArtifact(ktlintVersion: SemVer): String {
+    val artifact = if (ktlintVersion.major > 0) "ktlint-cli" else "ktlint"
+    return artifact
+}
+
+internal fun determineKtlintGroup(ktlintVersion: SemVer): String {
+    val groupId = when (ktlintVersion.major) {
+        0 -> "com.pinterest.ktlint"
+        1 -> "com.pinterest.ktlint"
+        else -> "io.github.ktlint.core"
+    }
+    return groupId
+}
+
+internal fun determineKtlintGav(ktlintVersion: SemVer): String {
+    return "${determineKtlintGroup(ktlintVersion)}:${determineKtlintArtifact(ktlintVersion)}:$ktlintVersion"
+}
+
 internal fun createKtlintConfiguration(target: Project, extension: KtlintExtension): Configuration =
     target.configurations.create(KTLINT_CONFIGURATION_NAME) { c ->
         c.description = KTLINT_CONFIGURATION_DESCRIPTION
 
         c.isCanBeResolved = true
         c.isCanBeConsumed = false
+        target.serviceOf<JvmPluginServices>().configureAsRuntimeElements(c)
 
-        // Starting from KtLint 0.41.0 version published artifact has two variants: "external" and "shadowed"
-        c.attributes {
-            it.attribute(Bundling.BUNDLING_ATTRIBUTE, target.objects.named(Bundling::class.java, Bundling.EXTERNAL))
-        }
-
-        // Workaround for gradle 6 https://github.com/gradle/gradle/issues/13255
-        val oldProp = target.objects.listProperty(Dependency::class.java)
         c.dependencies.addAllLater(
-            oldProp.value(
-                extension.version.map {
-                    if (SemVer.parse(it) < SemVer(1, 0, 0)) {
-                        target.logger.info("Add dependency: ktlint version $it")
-                        listOf(target.dependencies.create("com.pinterest:ktlint:$it"))
-                    } else {
-                        target.logger.info("Add dependencies: ktlint version $it")
-                        listOf(
-                            target.dependencies.create("com.pinterest.ktlint:ktlint-cli:$it"),
-                            // these transitive deps were introduced in ktlint 1.0, but for some reason not picked up automatically
-                            target.dependencies.create("io.github.oshai:kotlin-logging:5.1.0"),
-                            target.dependencies.create("io.github.detekt.sarif4k:sarif4k:0.5.0")
-                        )
-                    }
-                }
-            )
+            extension.version.map {
+                val semver = SemVer.parse(it)
+                target.logger.info("Add dependency: ktlint version $it")
+                listOf(target.dependencies.create(determineKtlintGav(semver)))
+            }
         )
     }
 
@@ -55,55 +59,72 @@ internal fun createKtlintRulesetConfiguration(
     target: Project,
     ktLintConfiguration: Configuration,
     extension: KtlintExtension
-): Configuration = target
-    .configurations.maybeCreate(KTLINT_RULESET_CONFIGURATION_NAME).apply {
-        description = KTLINT_RULESET_CONFIGURATION_DESCRIPTION
+): Configuration = target.configurations.create(KTLINT_RULESET_CONFIGURATION_NAME) { c ->
+    c.description = KTLINT_RULESET_CONFIGURATION_DESCRIPTION
 
-        isCanBeResolved = true
-        isCanBeConsumed = false
+    c.isCanBeResolved = true
+    c.isCanBeConsumed = false
+    target.serviceOf<JvmPluginServices>().configureAsRuntimeElements(c)
+    c.shouldResolveConsistentlyWith(ktLintConfiguration)
+    c.dependencies.addLater(
+        extension.version.map {
+            val semver = SemVer.parse(it)
+            target.dependencies.create(determineKtlintGav(semver))
+        }
+    )
+}
 
-        shouldResolveConsistentlyWith(ktLintConfiguration)
-        dependencies.addLater(
-            target.provider {
-                val ktlintVersion = extension.version.get()
-                target.dependencies.create("com.pinterest.ktlint:ktlint-ruleset-standard:$ktlintVersion")
+fun determineBuiltInReporterDependencies(
+    ktlintVersion: Provider<SemVer>,
+    reporterTypes: Set<ReporterType>
+): Provider<List<String>> {
+    return ktlintVersion.map { version ->
+        if (version.major < 0) {
+            emptyList()
+        } else {
+            val group = determineKtlintGroup(version)
+            reporterTypes.map { reporterType ->
+                when (reporterType) {
+                    ReporterType.CHECKSTYLE -> "$group:ktlint-cli-reporter-checkstyle:$version"
+                    ReporterType.SARIF -> "$group:ktlint-cli-reporter-sarif:$version"
+                    ReporterType.JSON -> "$group:ktlint-cli-reporter-json:$version"
+                    ReporterType.PLAIN -> "$group:ktlint-cli-reporter-plain:$version"
+                    ReporterType.HTML -> "$group:ktlint-cli-reporter-html:$version"
+                    ReporterType.PLAIN_GROUP_BY_FILE -> "$group:ktlint-cli-reporter-plain:$version"
+                }
             }
-        )
+        }
     }
+}
 
 @Suppress("UnstableApiUsage")
 internal fun createKtLintReporterConfiguration(
     target: Project,
     extension: KtlintExtension,
     ktLintConfiguration: Configuration
-): Configuration = target
-    .configurations
-    .maybeCreate(KTLINT_REPORTER_CONFIGURATION_NAME)
-    .apply {
-        description = KTLINT_REPORTER_CONFIGURATION_DESCRIPTION
+): NamedDomainObjectProvider<Configuration> = target
+    .configurations.register(KTLINT_REPORTER_CONFIGURATION_NAME) { c ->
+        c.description = KTLINT_REPORTER_CONFIGURATION_DESCRIPTION
 
-        isCanBeResolved = true
-        isCanBeConsumed = false
+        c.isCanBeResolved = true
+        c.isCanBeConsumed = false
+        target.serviceOf<JvmPluginServices>().configureAsRuntimeElements(c)
+        c.shouldResolveConsistentlyWith(ktLintConfiguration)
 
-        shouldResolveConsistentlyWith(ktLintConfiguration)
-
-        withDependencies {
-            // this transitive dep was introduced in ktlint 1.0, but for some reason, it is not picked up automatically
-            dependencies.addAllLater(
-                target.provider {
-                    if (SemVer.parse(extension.version.get()) >= SemVer(1, 0, 0)) {
-                        listOf(target.dependencies.create("io.github.detekt.sarif4k:sarif4k:0.5.0"))
-                    } else {
-                        listOf()
-                    }
+        val ktlintVersionProvider = extension.version.map { SemVer.parse(it) }
+        c.dependencies.addAllLater(
+            extension.reporterExtension.reporters.flatMap { reporters ->
+                determineBuiltInReporterDependencies(ktlintVersionProvider, reporters).map {
+                    it.map { target.dependencies.create(it) }
                 }
-            )
-
+            }
+        )
+        c.withDependencies {
             extension
                 .reporterExtension
                 .customReporters
                 .forEach {
-                    dependencies.addLater(
+                    c.dependencies.addLater(
                         target.provider {
                             val reporterDependency = it.dependency
                             requireNotNull(reporterDependency) {
@@ -114,21 +135,6 @@ internal fun createKtLintReporterConfiguration(
                     )
                 }
         }
-
-        // Workaround for gradle 6 https://github.com/gradle/gradle/issues/13255
-        val oldProp = target.objects.listProperty(Dependency::class.java)
-        dependencies.addAllLater(
-            oldProp.value(
-                extension.version.map { version ->
-                    if (SemVer.parse(version) >= SemVer(1, 0, 0)) {
-                        // this transitive dep was introduced in ktlint 1.0, but for some reason, it is not picked up automatically
-                        listOf(target.dependencies.create("io.github.oshai:kotlin-logging:5.1.0"))
-                    } else {
-                        listOf()
-                    }
-                }
-            )
-        )
     }
 
 @Suppress("UnstableApiUsage")
