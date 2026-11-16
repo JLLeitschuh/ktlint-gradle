@@ -1,14 +1,14 @@
 [versions]
-kotlin = "1.5.31"
+kotlin = "2.4.21"
 ktlint = "1.0.0"
 androidPlugin = "4.1.0"
 semver = "1.1.1"
-jgit = "5.13.3.202401111512-r"
+jgit = "5.13.4.202507202350-r"
 sl4fj = "2.0.17"
 gradleWrapper = "9.2.1"
 gradleWrapperSha = "72f44c9f8ebcb1af43838f45ee5c4aa9c5444898b3468ab3f4af7b6076c5bc3f"
 assertJ = "3.27.4"
-commonsIo = "2.17.0"
+commonsIo = "2.22.0"
 archUnit = "1.4.0"
 
 [libraries]
