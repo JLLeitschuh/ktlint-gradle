@@ -11,7 +11,6 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.work.InputChanges
 import org.gradle.workers.WorkerExecutor
-import org.jlleitschuh.gradle.ktlint.FORMAT_KOTLIN_SCRIPT_TASK_NAME
 import org.jlleitschuh.gradle.ktlint.intermediateResultsBuildDir
 import org.jlleitschuh.gradle.ktlint.worker.KtLintWorkAction
 import org.jlleitschuh.gradle.ktlint.worker.KtLintWorkAction.FormatTaskSnapshot.Companion.contentHash
@@ -50,9 +49,6 @@ abstract class KtLintFormatTask @Inject constructor(
                 t.previousRunSnapshot.set(project.layout.intermediateResultsBuildDir("$name-snapshot.bin"))
                 t.description = "Lints files to ensure that they are formatted according to the code style " +
                     "and, on error, tries to format code to conform code style."
-                if (name != FORMAT_KOTLIN_SCRIPT_TASK_NAME) {
-                    t.mustRunAfter(project.tasks.named(FORMAT_KOTLIN_SCRIPT_TASK_NAME))
-                }
                 // Special UP-TO-DATE check to avoid situation when task does not check restored to pre-formatted state
                 // files
                 t.outputs.upToDateWhen { _ ->
