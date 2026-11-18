@@ -32,7 +32,9 @@ private class CurrentKtLintClassesSerializer : KtLintClassesSerializer {
         lintErrors: List<LintErrorResult>,
         serializedErrors: File
     ) = ObjectOutputStream(serializedErrors.outputStream().buffered()).use {
-        it.writeObject(lintErrors)
+        // Copied into an ArrayList because loadAnyErrors only accepts that list class, and Kotlin's emptyList()
+        // and listOf() return other ones.
+        it.writeObject(ArrayList(lintErrors))
     }
 
     override fun loadErrors(serializedErrors: File): List<LintErrorResult> = loadAnyErrors(serializedErrors)
@@ -67,7 +69,7 @@ internal fun loadAnyErrors(file: File): List<LintErrorResult> {
     }
     return when (errors) {
         is List<*> ->
-            when (errors.first()) {
+            when (errors.firstOrNull()) {
                 null -> emptyList()
                 is LintErrorResult -> errors as List<LintErrorResult>
                 else -> throw GradleException("invalid error format")
