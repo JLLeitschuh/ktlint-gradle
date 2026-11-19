@@ -29,12 +29,12 @@ java {
     withJavadocJar()
     withSourcesJar()
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(8))
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
 ktlint {
-    version.set("1.6.0")
+    version.set("1.8.0")
 }
 
 tasks.withType<KotlinCompile> {
@@ -49,6 +49,11 @@ dependencies {
     compileOnly("com.pinterest.ktlint:ktlint-rule-engine:1.0.0")
     compileOnly("com.pinterest.ktlint:ktlint-ruleset-standard:1.0.0")
     compileOnly("com.pinterest.ktlint:ktlint-cli-reporter-baseline:1.0.0")
+
+    compileOnly("io.github.ktlint.core:ktlint-cli-reporter-core:2.0.0-ALPHA-4")
+    compileOnly("io.github.ktlint.core:ktlint-rule-engine:2.0.0-ALPHA-4")
+    compileOnly("io.github.ktlint.core:ktlint-ruleset-standard:2.0.0-ALPHA-4")
+    compileOnly("io.github.ktlint.core:ktlint-cli-reporter-baseline:2.0.0-ALPHA-4")
     compileOnly(libs.kotlin.gradle.plugin)
     compileOnly(libs.android.gradle.plugin)
     compileOnly(kotlin("stdlib-jdk8"))
@@ -60,6 +65,8 @@ dependencies {
     testImplementation(libs.kotlin.reflect)
     testImplementation(libs.ktlint.rule.engine)
     testImplementation(libs.archunit.junit5)
+    testImplementation("io.github.wakingrufus:testkit-project-builder:0.+")
+    testImplementation("io.github.wakingrufus:testkit-assertions:0.+")
     testImplementation("com.netflix.nebula:nebula-test:11.+") {
         because("12.x compile son java 17, and we still test against 8 and 11")
     }

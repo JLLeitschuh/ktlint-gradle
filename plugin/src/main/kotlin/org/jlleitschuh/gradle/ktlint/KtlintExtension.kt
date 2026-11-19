@@ -29,7 +29,7 @@ open class KtlintExtension @Inject internal constructor(
     /**
      * The version of KtLint to use.
      */
-    val version: Property<String> = objectFactory.property { set("1.5.0") }
+    val version: Property<String> = objectFactory.property { set("1.8.0") }
 
     /**
      * Enable relative paths in reports
