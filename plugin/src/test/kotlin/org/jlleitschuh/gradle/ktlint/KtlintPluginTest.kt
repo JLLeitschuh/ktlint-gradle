@@ -503,9 +503,9 @@ class KtlintPluginTest : AbstractPluginTest() {
         }
     }
 
-    @DisplayName("Should do nothing when there are no eligible incremental updates")
+    @DisplayName("Should refresh results when the only incremental update is a deletion")
     @CommonTest
-    fun noIncrementalUpdates(gradleVersion: GradleVersion) {
+    fun refreshResultsAfterSourceDeletion(gradleVersion: GradleVersion) {
         project(gradleVersion) {
             val passingContents =
                 """
@@ -532,11 +532,10 @@ class KtlintPluginTest : AbstractPluginTest() {
                 assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             }
 
-            // Removing a source file will cause the task to run, but the only incremental change will
-            // be REMOVED, which does need to call ktlint
+            // Refresh results even when no remaining source was added or modified.
             removeSourceFile(initialSourceFile)
             build(mainSourceSetCheckTaskName) {
-                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+                assertThat(task(":$mainSourceSetCheckTaskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             }
         }
     }
